@@ -32,6 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
     on<FetchUserProfile>(_onFetchUserProfile);
+    on<AuthLogoutRequested>(_onLogout);
   }
 
   Future<void> _onMicrosoftSignIn(
@@ -51,8 +52,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         emit(AuthAuthenticated(token.accessToken!));
         add(FetchUserProfile(token.accessToken!));
-
-        await _microsoftSignIn.logout();
       },
     );
   }
@@ -83,5 +82,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(AuthError("Failed to fetch user data: $e"));
     }
+  }
+
+  Future<void> _onLogout(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    await _microsoftSignIn.logout();
+    emit(AuthLogoutSuccess());
   }
 }

@@ -29,6 +29,8 @@ class AuthUserFetched extends AuthState {
   List<Object> get props => [userData];
 }
 
+class AuthLogoutSuccess extends AuthState {}
+
 // Trạng thái lỗi đăng nhập
 class AuthError extends AuthState {
   final String message;
