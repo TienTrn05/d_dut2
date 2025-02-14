@@ -1,22 +1,35 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'features/auth/bloc/auth_bloc.dart';
-import 'features/auth/presentation/auth_screen.dart';
+import 'common/routes/routes.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  runApp(MyApp(navigatorKey));
+  final prefs = await SharedPreferences.getInstance();
+  final String? token = prefs.getString('accessToken');
+  final String? userDataString = prefs.getString('userData');
+
+  runApp(MyApp(
+    navigatorKey,
+    token: token,
+    userData: userDataString != null ? jsonDecode(userDataString) : null,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
-  
-  const MyApp(this.navigatorKey, {super.key});
+  final String? token;
+  final Map<String, dynamic>? userData;
+
+  const MyApp(this.navigatorKey, {super.key, this.token, this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +37,12 @@ class MyApp extends StatelessWidget {
       create: (context) => AuthBloc(navigatorKey),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,  // Truyền navigatorKey vào MaterialApp
-        home: AuthScreen(),
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          fontFamily: 'Roboto',
+        ),
+        onGenerateRoute: Routes.onGenerateRoute,
+        initialRoute: userData != null ? Routes.root : Routes.auth,
       ),
     );
   }

@@ -8,6 +8,8 @@ sealed class AuthEvent extends Equatable {
 // Sự kiện yêu cầu đăng nhập
 class MicrosoftSignInRequested extends AuthEvent {}
 
+class AuthLogoutRequested extends AuthEvent {}
+
 class FetchUserProfile extends AuthEvent {
   final String accessToken; // Nhận access token từ Microsoft
 
