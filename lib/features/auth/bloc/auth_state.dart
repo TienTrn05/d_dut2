@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+part of 'auth_bloc.dart';
 
 sealed class AuthState extends Equatable {
   @override
@@ -18,6 +18,15 @@ class AuthAuthenticated extends AuthState {
 
   @override
   List<Object> get props => [accessToken];
+}
+
+class AuthUserFetched extends AuthState {
+  final Map<String, dynamic> userData;
+
+  AuthUserFetched(this.userData);
+
+  @override
+  List<Object> get props => [userData];
 }
 
 // Trạng thái lỗi đăng nhập
