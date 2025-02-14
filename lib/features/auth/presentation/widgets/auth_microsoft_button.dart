@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // ignore: must_be_immutable
 class AuthMicrosoftButton extends StatelessWidget {
   final String text;
   bool enabled;
+  Color color;
   Function()? onPressed;
 
-  AuthMicrosoftButton({super.key, required this.text, this.enabled = true, this.onPressed});
+  AuthMicrosoftButton({super.key, required this.text, this.enabled = true, this.color = Colors.blue, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class AuthMicrosoftButton extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8), // Bo góc 8px
         side: BorderSide(
-          color: Color.fromRGBO(19, 61, 135, 1),
+          color: color,
           width: 2,
           style: BorderStyle.solid,
         ),
@@ -32,7 +34,8 @@ class AuthMicrosoftButton extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: Color.fromRGBO(19, 61, 135, 1),
+              color: color,
+              fontFamily: GoogleFonts.notoSans().fontFamily,
               fontSize: 16,
             ),
           ),

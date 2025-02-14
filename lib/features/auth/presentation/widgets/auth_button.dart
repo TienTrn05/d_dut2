@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // ignore: must_be_immutable
 class AuthButton extends StatelessWidget {
   final String text;
+  Color fillColor;
   Function()? onPressed;
 
-  AuthButton({super.key, required this.text, this.onPressed});
+  AuthButton({super.key, required this.text, this.fillColor = Colors.blue, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
       onPressed: onPressed,
-      color: Color.fromRGBO(19, 61, 135, 1),
+      color: fillColor,
       padding: EdgeInsets.symmetric(vertical: 16),
       minWidth: double.infinity,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -20,6 +22,7 @@ class AuthButton extends StatelessWidget {
       child: Text(text,
           style: TextStyle(
             color: Colors.white,
+            fontFamily: GoogleFonts.notoSans().fontFamily,
             fontSize: 16,
           )),
     );
