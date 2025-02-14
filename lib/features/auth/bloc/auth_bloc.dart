@@ -1,17 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
+
 import 'package:aad_oauth/aad_oauth.dart';
 import 'package:aad_oauth/model/config.dart';
 import 'package:aad_oauth/model/failure.dart';
 import 'package:aad_oauth/model/token.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'auth_event.dart';
-import 'auth_state.dart';
+part 'auth_event.dart';
+part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
   late final AadOAuth _microsoftSignIn;
+  final Dio _dio = Dio();
 
   AuthBloc(this.navigatorKey) : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
@@ -25,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ));
 
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
+    on<FetchUserProfile>(_onFetchUserProfile);
   }
 
   Future<void> _onMicrosoftSignIn(
@@ -42,11 +49,39 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return;
         }
 
-        print('Logged in successfully: ${token.accessToken!}');
         emit(AuthAuthenticated(token.accessToken!));
+        add(FetchUserProfile(token.accessToken!));
 
         await _microsoftSignIn.logout();
       },
     );
+  }
+
+  Future<void> _onFetchUserProfile(
+      FetchUserProfile event, Emitter<AuthState> emit) async {
+    try {
+      emit(AuthLoading());
+
+      final response = await _dio.get(
+        "https://sso.dev.dut.udn.vn/profile/me",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer ${event.accessToken}",
+          },
+        ),
+      );
+
+      if (response.data is String) {
+        // Chuyển đổi String thành JSON
+        final Map<String, dynamic> userData = jsonDecode(response.data);
+        emit(AuthUserFetched(userData));
+      } else if (response.data is Map<String, dynamic>) {
+        emit(AuthUserFetched(response.data));
+      } else {
+        emit(AuthError("Unexpected response format"));
+      }
+    } catch (e) {
+      emit(AuthError("Failed to fetch user data: $e"));
+    }
   }
 }

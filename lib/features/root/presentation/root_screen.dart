@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../logic/root_bloc.dart';
+import '../bloc/root_bloc.dart';
 
 import '../../dashboard/presentation/dashboard_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
