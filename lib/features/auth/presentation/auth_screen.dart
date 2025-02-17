@@ -150,7 +150,10 @@ class AuthScreen extends StatelessWidget {
                     AuthButton(
                       text: "Đăng nhập",
                       fillColor: context.theme.primaryColor ?? Colors.blue,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            Routes.root, (route) => false);
+                      },
                     ),
                     SizedBox(height: 10),
                     BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
