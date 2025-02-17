@@ -9,14 +9,20 @@ extension ExtendedTheme on BuildContext {
 
 class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? primaryColor;
+  final Color? lightBlue;
+  final Color? red;
 
-  static const lightMode =
-      CustomThemeExtension(primaryColor: CommonColors.primaryColorLight);
+  static const lightMode = CustomThemeExtension(
+      primaryColor: CommonColors.primaryColor,
+      lightBlue: CommonColors.lightBlueColor,
+      red: CommonColors.redColor);
 
-  static const darkMode =
-      CustomThemeExtension(primaryColor: CommonColors.primaryColorDark);
+  static const darkMode = CustomThemeExtension(
+      primaryColor: CommonColors.primaryColor,
+      lightBlue: CommonColors.lightBlueColor,
+      red: CommonColors.redColor);
 
-  const CustomThemeExtension({this.primaryColor});
+  const CustomThemeExtension({this.primaryColor, this.lightBlue, this.red});
 
   @override
   ThemeExtension<CustomThemeExtension> copyWith({

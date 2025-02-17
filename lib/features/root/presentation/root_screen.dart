@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -45,10 +46,7 @@ class _MainViewState extends State<_MainView> {
             child: Container(
               height: double.infinity,
               decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: List.generate(3, (index) => Color.fromRGBO(247, 249, 252, 1)),
-                  center: const Alignment(-1.0, -1.0),
-                ),
+                color: context.theme.lightBlue,
               ),
               child: BlocBuilder<MainBloc, MainState>(
                 builder: (context, state) {
@@ -63,27 +61,24 @@ class _MainViewState extends State<_MainView> {
 
           // Bottom Navigation Bar
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 24,
+            left: 24,
+            right: 24,
             child: Container(
               width: double.infinity,
-              height: 80,
-              padding: const EdgeInsets.only(top: 10, right: 30, left: 30),
+              height: 50,
+              padding: const EdgeInsets.only(right: 30, left: 30),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
+                borderRadius: BorderRadius.all(Radius.circular(16)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  bottomNavigationItem(context, 0, Icons.home, 'Trang chủ'),
-                  bottomNavigationItem(context, 1, Icons.search, 'Tra cứu'),
-                  bottomNavigationItem(context, 2, Icons.person, 'Cá nhân'),
+                  bottomNavigationItem(context, 0, Icons.home),
+                  bottomNavigationItem(context, 1, Icons.search),
+                  bottomNavigationItem(context, 2, Icons.person),
                 ],
               ),
             ),
@@ -93,7 +88,8 @@ class _MainViewState extends State<_MainView> {
     );
   }
 
-  Expanded bottomNavigationItem(BuildContext context, int itemIndex, IconData icon, String text) {
+  Expanded bottomNavigationItem(
+      BuildContext context, int itemIndex, IconData icon) {
     return Expanded(
       flex: 1,
       child: InkWell(
@@ -104,20 +100,31 @@ class _MainViewState extends State<_MainView> {
           builder: (context, state) {
             bool isSelected = state.currentPage == itemIndex;
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Container(
+                  height: 2,
+                  width: 78,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? context.theme.primaryColor
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 Icon(
                   icon,
                   size: 30,
-                  color: isSelected ? Colors.blue : Colors.black,
+                  color: isSelected
+                      ? context.theme.primaryColor
+                      : Color.fromRGBO(116, 116, 116, 1),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  text,
-                  style: TextStyle(
-                    color: isSelected ? Colors.blue : Colors.black,
-                    fontSize: 12,
+                Container(
+                  height: 2,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ],
