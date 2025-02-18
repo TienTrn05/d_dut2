@@ -10,9 +10,10 @@ import 'widgets/auth_button.dart';
 import 'widgets/auth_microsoft_button.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
+import '../../../common/utils/app_environment.dart';
 
 class LoginForm extends StatelessWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  const LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class LoginForm extends StatelessWidget {
               ),
               SizedBox(width: 6),
               Text(
-                'dDUT',
+                AppEnvironment.appName,
                 style: TextStyle(
                   color: context.theme.primaryColor,
                   fontFamily: GoogleFonts.baloo2().fontFamily,
