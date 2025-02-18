@@ -5,7 +5,6 @@ class AuthTextField extends StatelessWidget {
   final String hintText;
   final dynamic prefixIcon; // Có thể là IconData hoặc AssetImage
   final Color? iconColor;
-  final TextEditingController controller;
   final bool obscureText;
   final bool enabledSuffixIcon;
   final TextInputType? keyboardType;
@@ -18,7 +17,6 @@ class AuthTextField extends StatelessWidget {
     required this.hintText,
     this.prefixIcon = Icons.person,
     this.iconColor,
-    required this.controller,
     this.obscureText = false,
     this.enabledSuffixIcon = false,
     this.keyboardType,
@@ -30,7 +28,6 @@ class AuthTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       enabled: enabled,
