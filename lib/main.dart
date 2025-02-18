@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,9 +9,10 @@ import 'features/auth/bloc/auth_bloc.dart';
 
 import 'common/extensions/custom_theme_extension.dart';
 import 'common/routes/routes.dart';
+import 'common/utils/app_environment.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  await AppEnvironment.setup();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final prefs = await SharedPreferences.getInstance();

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:equatable/equatable.dart';
 import 'package:dio/dio.dart';
 
@@ -10,6 +9,8 @@ import 'package:aad_oauth/aad_oauth.dart';
 import 'package:aad_oauth/model/config.dart';
 import 'package:aad_oauth/model/failure.dart';
 import 'package:aad_oauth/model/token.dart';
+
+import '../../../common/utils/app_environment.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -22,9 +23,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(this.navigatorKey)
       : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
-      tenant: dotenv.env['TENANT_ID']!,
-      clientId: dotenv.env['CLIENT_ID']!,
-      redirectUri: dotenv.env['REDIRECT_URI']!,
+      tenant: AppEnvironment.tenantId,
+      clientId: AppEnvironment.clientId,
+      redirectUri: AppEnvironment.redirectUri,
       responseType: "code",
       scope: "User.Read",
       loader: const Center(child: CircularProgressIndicator()),
