@@ -19,7 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late final AadOAuth _microsoftSignIn;
   final Dio _dio = Dio();
 
-  AuthBloc(this.navigatorKey) : super(AuthInitial()) {
+  AuthBloc(this.navigatorKey)
+      : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
       tenant: dotenv.env['TENANT_ID']!,
       clientId: dotenv.env['CLIENT_ID']!,
@@ -31,6 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ));
 
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
+    on<AuthLoginRequested>(_onLogin);
     on<FetchUserProfile>(_onFetchUserProfile);
     on<AuthLogoutRequested>(_onLogout);
   }
@@ -54,6 +56,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(FetchUserProfile(token.accessToken!));
       },
     );
+  }
+
+  Future<void> _onLogin(
+      AuthLoginRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+
+    try {
+      final response = await _dio.post(
+        "https://sso.dev.dut.udn.vn/login",
+        data: {
+          "username": event.username,
+          "password": event.password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data;
+        final String accessToken = data["accessToken"];
+
+        emit(AuthAuthenticated(accessToken));
+        emit(AuthUserFetched(data["user"]));
+      } else {
+        emit(AuthError("Failed to login: ${response.data["message"]}"));
+      }
+    } catch (e) {
+      emit(AuthError("Failed to login: $e"));
+    }
   }
 
   Future<void> _onFetchUserProfile(
@@ -84,7 +113,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogout(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogout(
+      AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
     await _microsoftSignIn.logout();
