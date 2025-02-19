@@ -1,6 +1,6 @@
 {
-     "name": "eDUT",
-     "short_name": "eDUT",
+     "name": "dDUT",
+     "short_name": "dDUT",
      "start_url": ".",
      "display": "standalone",
      "background_color": "#0175C2",

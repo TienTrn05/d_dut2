@@ -65,7 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     try {
       final response = await _dio.post(
-        "https://sso.dev.dut.udn.vn/login",
+        "https://sso.dev.dut.udn.vn/api/login",
         data: {
           "username": event.username,
           "password": event.password,
@@ -92,7 +92,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
 
       final response = await _dio.get(
-        "https://sso.dev.dut.udn.vn/profile/me",
+        "https://sso.dev.dut.udn.vn/microsoft/me",
         options: Options(
           headers: {
             "Authorization": "Bearer ${event.accessToken}",

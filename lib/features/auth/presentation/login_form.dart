@@ -18,7 +18,7 @@ class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 16, right: 16, top: 80, bottom: 100),
+      padding: EdgeInsets.symmetric(vertical: 46, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(178),
         borderRadius: BorderRadius.circular(10),
@@ -34,26 +34,23 @@ class LoginForm extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Image.asset(
+            AppEnvironment.logoPath,
+            width: 80,
+            height: 80,
+          ),
+          SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Đăng nhập',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 32,
-                  fontFamily: GoogleFonts.baloo2().fontFamily,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              SizedBox(width: 6),
-              Text(
-                AppEnvironment.appName,
+                "Digital DUT",
                 style: TextStyle(
                   color: context.theme.primaryColor,
                   fontFamily: GoogleFonts.baloo2().fontFamily,
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
+                  height: 1,
                 ),
               )
             ],
