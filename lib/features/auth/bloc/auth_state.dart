@@ -21,7 +21,7 @@ class AuthAuthenticated extends AuthState {
 }
 
 class AuthUserFetched extends AuthState {
-  final Map<String, dynamic> userData;
+  final UserModel userData;
 
   AuthUserFetched(this.userData);
 

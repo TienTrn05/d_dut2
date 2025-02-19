@@ -62,16 +62,13 @@ class DashboardScreen extends StatelessWidget {
                       BlocBuilder<AuthBloc, AuthState>(
                         builder: (context, state) {
                           final String displayName =
-                              (state is AuthUserFetched &&
-                                      state.userData.containsKey('displayName'))
-                                  ? state.userData['displayName']
+                              (state is AuthUserFetched)
+                                  ? state.userData.displayName
                                   : 'No Name';
 
                           final String userPrincipalName =
-                              (state is AuthUserFetched &&
-                                      state.userData
-                                          .containsKey('userPrincipalName'))
-                                  ? state.userData['userPrincipalName']
+                              (state is AuthUserFetched)
+                                  ? state.userData.userPrincipalName
                                   : 'No Email';
 
                           return Column(

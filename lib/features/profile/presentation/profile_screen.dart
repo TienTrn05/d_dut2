@@ -53,10 +53,9 @@ class ProfileScreen extends StatelessWidget {
         ),
         SizedBox(width: 10),
         BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-          if (state is AuthUserFetched &&
-              state.userData.containsKey('displayName')) {
+          if (state is AuthUserFetched) {
             return Text(
-              state.userData['displayName'] ?? "No Name",
+              state.userData.displayName,
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
