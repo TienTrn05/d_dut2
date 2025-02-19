@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:e_dut/features/auth/domain/repository/auth_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -20,9 +21,10 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
   late final AadOAuth _microsoftSignIn;
+  final AuthRepository _authRepository;
   final Dio _dio = Dio();
 
-  AuthBloc(this.navigatorKey)
+  AuthBloc(this.navigatorKey, this._authRepository)
       : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
       tenant: AppEnvironment.tenantId,
@@ -66,27 +68,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     try {
-      final response = await _dio.post(
-        "https://sso.dev.dut.udn.vn/api/login",
-        data: {
-          "username": event.username,
-          "password": event.password,
-        },
-      );
+      final data = await _authRepository.signIn(event.username, event.password);
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = response.data;
-        final String accessToken = data["accessToken"];
+      await Storage.setAccessToken(data["accessToken"]);
 
-        await Storage.setAccessToken(accessToken);
+      emit(AuthAuthenticated(data["accessToken"]));
+      emit(AuthUserFetched(data["user"]));
 
-        emit(AuthAuthenticated(accessToken));
-        emit(AuthUserFetched(UserModel.fromJson(data["user"])));
-
-        await Storage.setUser(UserModel.fromJson(data["user"]));
-      } else {
-        emit(AuthError("Failed to login: ${response.data["message"]}"));
-      }
+      await Storage.setUser(data["user"]);
     } catch (e) {
       emit(AuthError("Failed to login: $e"));
     }
