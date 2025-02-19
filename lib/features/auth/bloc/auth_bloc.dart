@@ -11,6 +11,8 @@ import 'package:aad_oauth/model/failure.dart';
 import 'package:aad_oauth/model/token.dart';
 
 import '../../../common/utils/app_environment.dart';
+import '../../../core/data/local/storage.dart';
+import '../../../features/auth/data/model/user_model.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -76,8 +78,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final Map<String, dynamic> data = response.data;
         final String accessToken = data["accessToken"];
 
+        await Storage.setAccessToken(accessToken);
+
         emit(AuthAuthenticated(accessToken));
-        emit(AuthUserFetched(data["user"]));
+        emit(AuthUserFetched(UserModel.fromJson(data["user"])));
+
+        await Storage.setUser(UserModel.fromJson(data["user"]));
       } else {
         emit(AuthError("Failed to login: ${response.data["message"]}"));
       }
@@ -102,10 +108,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (response.data is String) {
         // Chuyển đổi String thành JSON
-        final Map<String, dynamic> userData = jsonDecode(response.data);
+        final UserModel userData = UserModel.fromJson(jsonDecode(response.data));
         emit(AuthUserFetched(userData));
       } else if (response.data is Map<String, dynamic>) {
-        emit(AuthUserFetched(response.data));
+        final UserModel userData = UserModel.fromJson(response.data);
+        emit(AuthUserFetched(userData));
       } else {
         emit(AuthError("Unexpected response format"));
       }

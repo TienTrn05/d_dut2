@@ -10,15 +10,31 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_bloc: ^9.0.0
   webview_flutter: ^4.10.0
   aad_oauth: ^1.0.1
   flutter_dotenv: ^5.2.1
   equatable: ^2.0.7
   dio: ^5.8.0+1
+
+  #state management
+  flutter_bloc: ^9.0.0
+  dartx: ^1.2.0
+
+  # local storage
   shared_preferences: ^2.5.2
+  flutter_secure_storage: ^9.2.4
+  rx_shared_preferences: ^4.0.0
+
+  # ui
   google_fonts: ^6.2.1
   iconify_flutter: ^0.0.7
+
+  # dependency injection
+  get_it: ^8.0.3
+  injectable: ^2.5.0
+
+  # talker & logger
+  talker_flutter: ^4.6.11
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +43,9 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   rename_app: ^1.6.2
   flutter_launcher_icons: ^0.14.3
+
+  injectable_generator: ^2.7.0
+  build_runner: ^2.4.15
 
 flutter_launcher_icons:
   android: "launcher_icon"
