@@ -10,6 +10,7 @@ import 'common/utils/app_environment.dart';
 import 'common/utils/getit_utils.dart';
 import 'core/data/local/storage.dart';
 import 'features/auth/data/model/user_model.dart';
+import 'features/auth/domain/repository/auth_repo.dart';
 
 void main() async {
   await AppEnvironment.setup();
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(navigatorKey),
+      create: (context) => AuthBloc(navigatorKey, getIt<AuthRepository>()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
