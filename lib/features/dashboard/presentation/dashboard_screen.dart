@@ -1,4 +1,6 @@
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
@@ -56,32 +58,48 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            'Phan Trần Nhật Hạ',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: GoogleFonts.notoSans().fontFamily,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              height: 1,
-                            ),
-                          ),
-                          Text(
-                            '102210159',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: GoogleFonts.notoSans().fontFamily,
-                              fontSize: 12,
-                              height: 1,
-                            ),
-                          ),
-                        ],
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final String displayName =
+                              (state is AuthUserFetched &&
+                                      state.userData.containsKey('displayName'))
+                                  ? state.userData['displayName']
+                                  : 'No Name';
+
+                          final String userPrincipalName =
+                              (state is AuthUserFetched &&
+                                      state.userData
+                                          .containsKey('userPrincipalName'))
+                                  ? state.userData['userPrincipalName']
+                                  : 'No Email';
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                displayName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: GoogleFonts.notoSans().fontFamily,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1,
+                                ),
+                              ),
+                              Text(
+                                userPrincipalName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: GoogleFonts.notoSans().fontFamily,
+                                  fontSize: 12,
+                                  height: 1,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ],
                   ),
