@@ -16,7 +16,11 @@ class AuthLoginRequested extends AuthEvent {
   AuthLoginRequested(this.username, this.password);
 }
 
-class AuthLogoutRequested extends AuthEvent {}
+class AuthLogoutRequested extends AuthEvent {
+  final String email;
+
+  AuthLogoutRequested(this.email);
+}
 
 class FetchUserProfile extends AuthEvent {
   final String accessToken; // Get access token from Microsoft

@@ -208,7 +208,10 @@ class ProfileScreen extends StatelessWidget {
               right: 16,
               child: ElevatedButton(
                 onPressed: () {
-                  context.read<AuthBloc>().add(AuthLogoutRequested());
+                  final state = context.read<AuthBloc>().state;
+                  if (state is AuthUserAuthenticated) {
+                    context.read<AuthBloc>().add(AuthLogoutRequested(state.userData.mail));
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
