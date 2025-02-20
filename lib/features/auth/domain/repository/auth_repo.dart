@@ -13,4 +13,8 @@ class AuthRepository {
   Future<Map<String, dynamic>> signIn(String email, String password) async {
     return _authService.signIn(email, password);
   }
+
+  Future<Map<String, dynamic>> getProfileWithMicrosoft(String accessToken) async {
+    return _authService.getProfileWithMicrosoft(accessToken);
+  }
 }

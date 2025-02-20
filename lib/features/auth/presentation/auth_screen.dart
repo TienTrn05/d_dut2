@@ -24,7 +24,9 @@ class AuthScreen extends StatelessWidget {
         ),
         child: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
-            if (state is AuthUserFetched) {
+            if (state is AuthLoading) {
+              context.read<LoadingBloc>().add(LoadingShow());
+            } else if (state is AuthUserAuthenticated) {
               context.read<LoadingBloc>().add(LoadingHide());
               Navigator.pushNamedAndRemoveUntil(
                   context, Routes.root, (route) => false);

@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:dio/dio.dart';
 
 import 'package:aad_oauth/aad_oauth.dart';
 import 'package:aad_oauth/model/config.dart';
@@ -23,7 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
   late final AadOAuth _microsoftSignIn;
   final AuthRepository _authRepository;
-  final Dio _dio = Dio();
+  final String? savedEmail = Storage.user?.mail;
 
   AuthBloc(this.navigatorKey, this._authRepository) : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
@@ -32,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       redirectUri: AppEnvironment.redirectUri,
       responseType: "code",
       scope: "User.Read",
+      loginHint: savedEmail ?? "102210239@sv1.dut.udn.vn",
       loader: const Center(child: CircularProgressIndicator()),
       navigatorKey: navigatorKey, // Truyền navigatorKey
     ));
@@ -39,7 +37,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthInitRequested>(_onInitUser);
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
     on<AuthLoginRequested>(_onLogin);
-    on<FetchUserProfile>(_onFetchUserProfile);
     on<AuthLogoutRequested>(_onLogout);
   }
 
@@ -50,8 +47,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final UserModel? user = Storage.user;
 
       if (token != null && user != null) {
-        emit(AuthAuthenticated(token));
-        emit(AuthUserFetched(user));
+        emit(AuthUserAuthenticated(token, user));
+      } else {
+        emit(AuthHandlerFinished());
       }
     } catch (e) {
       logger.e("Failed to load user from storage: $e");
@@ -62,19 +60,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onMicrosoftSignIn(
       MicrosoftSignInRequested event, Emitter<AuthState> emit) async {
     var result = await _microsoftSignIn.login();
-    result.fold(
-      (Failure failure) {
+
+    await result.fold(
+      (Failure failure) async {
         logger.e("Failed to login: $failure");
       },
       (Token token) async {
+        emit(AuthLoading());
         if (token.accessToken == null) {
           logger.e("Access token is missing");
           emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
           return;
         }
 
-        emit(AuthAuthenticated(token.accessToken!));
-        add(FetchUserProfile(token.accessToken!));
+        try{
+          final data =
+              await _authRepository.getProfileWithMicrosoft(token.accessToken!);
+
+          await Storage.setAccessToken(data["accessToken"]);
+          await Storage.setUser(data["user"]);
+
+          emit(AuthUserAuthenticated(
+            data["accessToken"],
+            data["user"],
+          ));
+        } catch (e) {
+          logger.e("Failed to login: $e");
+          emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
+        }
       },
     );
   }
@@ -86,8 +99,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       await Storage.setAccessToken(data["accessToken"]);
 
-      emit(AuthAuthenticated(data["accessToken"]));
-      emit(AuthUserFetched(data["user"]));
+      emit(AuthUserAuthenticated(
+        data["accessToken"],
+        data["user"],
+      ));
 
       await Storage.setAccessToken(data["accessToken"]);
       await Storage.setUser(data["user"]);
@@ -95,37 +110,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       logger.e("Failed to login: $e");
       emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
     }
-  }
-
-  Future<void> _onFetchUserProfile(
-      FetchUserProfile event, Emitter<AuthState> emit) async {
-    try {
-      final response = await _dio.get(
-        "https://sso.dev.dut.udn.vn/microsoft/me",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer ${event.accessToken}",
-          },
-        ),
-      );
-
-      if (response.data is String) {
-        // Chuyển đổi String thành JSON
-        final UserModel userData =
-            UserModel.fromJson(jsonDecode(response.data));
-        emit(AuthUserFetched(userData));
-      } else if (response.data is Map<String, dynamic>) {
-        final UserModel userData = UserModel.fromJson(response.data);
-        emit(AuthUserFetched(userData));
-      } else {
-        emit(AuthError("Failed to fetch user data"));
-      }
-    } catch (e) {
-      logger.e("Failed to fetch user data: $e");
-      emit(AuthError(
-          "Đã xảy ra lỗi khi lấy thông tin người dùng. Vui lòng thử lại sau."));
-    }
-    emit(AuthHandlerFinished());
   }
 
   Future<void> _onLogout(

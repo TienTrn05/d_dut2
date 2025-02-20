@@ -68,12 +68,12 @@ class ProfileScreen extends StatelessWidget {
                           BlocBuilder<AuthBloc, AuthState>(
                             builder: (context, state) {
                               final String displayName =
-                                  (state is AuthUserFetched)
+                                  (state is AuthUserAuthenticated)
                                       ? state.userData.displayName
                                       : 'No Name';
 
                               final String userPrincipalName =
-                                  (state is AuthUserFetched)
+                                  (state is AuthUserAuthenticated)
                                       ? state.userData.userPrincipalName
                                       : 'No Email';
 
@@ -152,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                                 BlocBuilder<AuthBloc, AuthState>(
                                     builder: (context, state) {
                                   final String email =
-                                      (state is AuthUserFetched)
+                                      (state is AuthUserAuthenticated)
                                           ? state.userData.mail
                                           : 'Unknown';
                                   return InfoItem(
