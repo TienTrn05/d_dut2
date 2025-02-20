@@ -19,3 +19,21 @@ class LoginPasswordChanged extends LoginEvent {
   @override
   List<Object?> get props => [password];
 }
+
+class LoginShowPasswordChanged extends LoginEvent {
+  final bool? isShowPassword;
+
+  LoginShowPasswordChanged({this.isShowPassword});
+
+  @override
+  List<Object?> get props => [isShowPassword];
+}
+
+class LoginRememberMeChanged extends LoginEvent {
+  final bool? isRememberMe;
+
+  LoginRememberMeChanged({this.isRememberMe});
+
+  @override
+  List<Object?> get props => [isRememberMe];
+}
