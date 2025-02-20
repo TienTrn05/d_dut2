@@ -11,12 +11,14 @@ import 'common/utils/getit_utils.dart';
 import 'core/data/local/storage.dart';
 import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
+import 'features/loading/loading_bloc.dart';
+import 'features/loading/loading_overlay.dart';
 
 void main() async {
   await AppEnvironment.setup();
   await Storage.setup();
   await GetItUtils.setup();
-  
+
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final String? token = await Storage.accessToken;
@@ -35,24 +37,36 @@ class MyApp extends StatelessWidget {
   final UserModel? userData;
 
   const MyApp(this.navigatorKey, {super.key, this.token, this.userData});
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(navigatorKey, getIt.get<AuthRepository>())..add(AuthInitRequested()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              AuthBloc(navigatorKey, getIt.get<AuthRepository>())
+                ..add(AuthInitRequested()),
+        ),
+        BlocProvider(
+            create: (context) => LoadingBloc()),
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         theme: ThemeData(
           fontFamily: GoogleFonts.roboto().fontFamily,
-          extensions: [CustomThemeExtension.lightMode], // Gán theme extension
+          extensions: [CustomThemeExtension.lightMode],
         ),
         darkTheme: ThemeData(
           fontFamily: GoogleFonts.roboto().fontFamily,
-          extensions: [CustomThemeExtension.darkMode], // Gán theme extension cho dark mode
+          extensions: [CustomThemeExtension.darkMode],
         ),
         onGenerateRoute: Routes.onGenerateRoute,
         initialRoute: userData != null ? Routes.root : Routes.auth,
+        builder: (context, child) {
+          return LoadingOverlay(
+            child: child!,
+          );
+        },
       ),
     );
   }

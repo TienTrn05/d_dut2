@@ -8,9 +8,6 @@ sealed class AuthState extends Equatable {
 // Trạng thái ban đầu
 class AuthInitial extends AuthState {}
 
-// Trạng thái đang đăng nhập
-class AuthLoading extends AuthState {}
-
 // Trạng thái đăng nhập thành công
 class AuthAuthenticated extends AuthState {
   final String accessToken;
@@ -39,3 +36,6 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+
+
+class AuthHandlerFinished extends AuthState {}

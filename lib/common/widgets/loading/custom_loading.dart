@@ -11,24 +11,27 @@ class CustomLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          SpinKitFadingCircle(
-            color: color ?? context.theme.primaryColor,
-            size: size,
-          ),
-          SizedBox(height: 10.0),
-          Text(
-            message,
-            style: TextStyle(
+    return Container(
+      color: Colors.black.withAlpha(80),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SpinKitFadingCircle(
               color: color ?? context.theme.primaryColor,
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
+              size: size,
             ),
-          ),
-        ],
+            SizedBox(height: 10.0),
+            Text(
+              message,
+              style: TextStyle(
+                color: color ?? context.theme.primaryColor,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
