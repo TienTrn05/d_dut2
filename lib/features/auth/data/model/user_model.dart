@@ -1,9 +1,12 @@
+import 'scope_model.dart';
+
 class UserModel {
   final String userPrincipalName;
   final String displayName;
   final String surname;
   final String mail;
   final String givenName;
+  final List<ScopeModel> scopes;
 
   UserModel({
     required this.userPrincipalName,
@@ -11,6 +14,7 @@ class UserModel {
     required this.surname,
     required this.mail,
     required this.givenName,
+    required this.scopes,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,7 @@ class UserModel {
       surname: json['surname'] ?? '',
       mail: json['mail'] ?? '',
       givenName: json['givenName'] ?? '',
+      scopes: (json['scopes'] as List).map((scope) => ScopeModel.fromJson(scope)).toList(),
     );
   }
 
@@ -30,6 +35,7 @@ class UserModel {
       'surname': surname,
       'mail': mail,
       'givenName': givenName,
+      'scopes': scopes.map((scope) => scope.toJson()).toList(),
     };
   }
 }
