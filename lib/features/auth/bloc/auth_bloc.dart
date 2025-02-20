@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:e_dut/features/auth/domain/repository/auth_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -15,6 +14,7 @@ import '../../../common/utils/app_environment.dart';
 import '../../../common/utils/logger.dart';
 import '../../../core/data/local/storage.dart';
 import '../../../features/auth/data/model/user_model.dart';
+import '../../../features/auth/domain/repository/auth_repo.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -81,8 +81,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogin(
       AuthLoginRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-
     try {
       final data = await _authRepository.signIn(event.username, event.password);
 
@@ -97,13 +95,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       logger.e("Failed to login: $e");
       emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
     }
+    emit(AuthHandlerFinished());
   }
 
   Future<void> _onFetchUserProfile(
       FetchUserProfile event, Emitter<AuthState> emit) async {
     try {
-      emit(AuthLoading());
-
       final response = await _dio.get(
         "https://sso.dev.dut.udn.vn/microsoft/me",
         options: Options(
@@ -129,15 +126,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthError(
           "Đã xảy ra lỗi khi lấy thông tin người dùng. Vui lòng thử lại sau."));
     }
+    emit(AuthHandlerFinished());
   }
 
   Future<void> _onLogout(
       AuthLogoutRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-
     await _microsoftSignIn.logout();
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
     emit(AuthLogoutSuccess());
+    emit(AuthHandlerFinished());
   }
 }

@@ -1,4 +1,3 @@
-import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +8,7 @@ import './widgets/schedule_item.dart';
 import './widgets/feature_card.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
+import '../../../features/auth/bloc/auth_bloc.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

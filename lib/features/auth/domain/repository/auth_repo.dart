@@ -11,7 +11,6 @@ class AuthRepository {
   AuthRepository(this._authService);
 
   Future<Map<String, dynamic>> signIn(String email, String password) async {
-    await Future.delayed(Duration(seconds: 2));
     return _authService.signIn(email, password);
   }
 }

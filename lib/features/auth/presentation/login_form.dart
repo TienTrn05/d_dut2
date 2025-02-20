@@ -9,6 +9,8 @@ import 'widgets/auth_text_field.dart';
 import 'widgets/auth_button.dart';
 import 'widgets/auth_microsoft_button.dart';
 
+import '../../../features/loading/loading_bloc.dart';
+
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../common/utils/app_environment.dart';
 
@@ -131,6 +133,7 @@ class LoginForm extends StatelessWidget {
               text: "Đăng nhập",
               fillColor: context.theme.primaryColor ?? Colors.blue,
               onPressed: () {
+                context.read<LoadingBloc>().add(LoadingShow());
                 context.read<AuthBloc>().add(AuthLoginRequested(
                     // read data from bloc
                     context.read<LoginBloc>().state.username,
@@ -142,7 +145,6 @@ class LoginForm extends StatelessWidget {
           BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
             return AuthMicrosoftButton(
                 text: "Đăng nhập bằng Microsoft",
-                enabled: state is! AuthLoading,
                 color: context.theme.primaryColor ?? Colors.blue,
                 onPressed: () {
                   context.read<AuthBloc>().add(MicrosoftSignInRequested());
