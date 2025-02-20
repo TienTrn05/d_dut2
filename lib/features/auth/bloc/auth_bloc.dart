@@ -12,6 +12,7 @@ import 'package:aad_oauth/model/failure.dart';
 import 'package:aad_oauth/model/token.dart';
 
 import '../../../common/utils/app_environment.dart';
+import '../../../common/utils/logger.dart';
 import '../../../core/data/local/storage.dart';
 import '../../../features/auth/data/model/user_model.dart';
 
@@ -24,8 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final Dio _dio = Dio();
 
-  AuthBloc(this.navigatorKey, this._authRepository)
-      : super(AuthInitial()) {
+  AuthBloc(this.navigatorKey, this._authRepository) : super(AuthInitial()) {
     _microsoftSignIn = AadOAuth(Config(
       tenant: AppEnvironment.tenantId,
       clientId: AppEnvironment.clientId,
@@ -36,24 +36,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       navigatorKey: navigatorKey, // Truyền navigatorKey
     ));
 
+    on<AuthInitRequested>(_onInitUser);
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
     on<AuthLoginRequested>(_onLogin);
     on<FetchUserProfile>(_onFetchUserProfile);
     on<AuthLogoutRequested>(_onLogout);
   }
 
+  Future<void> _onInitUser(
+      AuthInitRequested event, Emitter<AuthState> emit) async {
+    try {
+      final String? token = await Storage.accessToken;
+      final UserModel? user = Storage.user;
+
+      if (token != null && user != null) {
+        emit(AuthAuthenticated(token));
+        emit(AuthUserFetched(user));
+      }
+    } catch (e) {
+      logger.e("Failed to load user from storage: $e");
+      emit(AuthError("Không thể lấy thông tin người dùng."));
+    }
+  }
+
   Future<void> _onMicrosoftSignIn(
       MicrosoftSignInRequested event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-
     var result = await _microsoftSignIn.login();
     result.fold(
       (Failure failure) {
-        emit(AuthError(failure.toString()));
+        logger.e("Failed to login: $failure");
       },
       (Token token) async {
         if (token.accessToken == null) {
-          emit(AuthError("Access token is missing"));
+          logger.e("Access token is missing");
+          emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
           return;
         }
 
@@ -75,9 +91,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthAuthenticated(data["accessToken"]));
       emit(AuthUserFetched(data["user"]));
 
+      await Storage.setAccessToken(data["accessToken"]);
       await Storage.setUser(data["user"]);
     } catch (e) {
-      emit(AuthError("Failed to login: $e"));
+      logger.e("Failed to login: $e");
+      emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
     }
   }
 
@@ -97,16 +115,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (response.data is String) {
         // Chuyển đổi String thành JSON
-        final UserModel userData = UserModel.fromJson(jsonDecode(response.data));
+        final UserModel userData =
+            UserModel.fromJson(jsonDecode(response.data));
         emit(AuthUserFetched(userData));
       } else if (response.data is Map<String, dynamic>) {
         final UserModel userData = UserModel.fromJson(response.data);
         emit(AuthUserFetched(userData));
       } else {
-        emit(AuthError("Unexpected response format"));
+        emit(AuthError("Failed to fetch user data"));
       }
     } catch (e) {
-      emit(AuthError("Failed to fetch user data: $e"));
+      logger.e("Failed to fetch user data: $e");
+      emit(AuthError(
+          "Đã xảy ra lỗi khi lấy thông tin người dùng. Vui lòng thử lại sau."));
     }
   }
 
@@ -115,6 +136,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     await _microsoftSignIn.logout();
+    await Storage.setAccessToken(null);
+    await Storage.setUser(null);
     emit(AuthLogoutSuccess());
   }
 }
