@@ -11,6 +11,7 @@ class AuthTextField extends StatelessWidget {
   final bool enabled;
   final Function(String)? onChanged;
   final Function(String)? onSubmitted;
+  final Function()? onShowPasswordChanged;
 
   const AuthTextField({
     super.key,
@@ -23,6 +24,7 @@ class AuthTextField extends StatelessWidget {
     this.enabled = true,
     this.onChanged,
     this.onSubmitted,
+    this.onShowPasswordChanged,
   });
 
   @override
@@ -52,10 +54,12 @@ class AuthTextField extends StatelessWidget {
                 color: iconColor,
               ),
         suffixIcon: enabledSuffixIcon
-            ? Image.asset(
-                'assets/icons/solar_eye-broken.png',
-                width: 20,
-                height: 20,
+            ? IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                  color: iconColor,
+                ),
+                onPressed: onShowPasswordChanged,
               )
             : null,
         filled: true,

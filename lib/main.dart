@@ -21,22 +21,19 @@ void main() async {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  final String? token = await Storage.accessToken;
   final UserModel? userData = Storage.user;
 
   runApp(MyApp(
     navigatorKey,
-    token: token,
     userData: userData,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
-  final String? token;
   final UserModel? userData;
 
-  const MyApp(this.navigatorKey, {super.key, this.token, this.userData});
+  const MyApp(this.navigatorKey, {super.key, this.userData});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(

@@ -12,6 +12,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginPasswordChanged>(
       _onPasswordChanged,
     );
+    on<LoginShowPasswordChanged>(
+      _onShowPasswordChanged,
+    );
+    on<LoginRememberMeChanged>(
+      _onRememberMeChanged,
+    );
   }
 
   void _onUsernameChanged(
@@ -26,5 +32,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) {
     emit(state.copyWith(password: event.password));
+  }
+
+  void _onShowPasswordChanged(
+    LoginShowPasswordChanged event,
+    Emitter<LoginState> emit,
+  ) {
+    emit(state.copyWith(isShowPassword: event.isShowPassword));
+  }
+
+  void _onRememberMeChanged(
+    LoginRememberMeChanged event,
+    Emitter<LoginState> emit,
+  ) {
+    emit(state.copyWith(isRememberMe: event.isRememberMe));
   }
 }

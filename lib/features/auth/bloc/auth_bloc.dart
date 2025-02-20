@@ -95,7 +95,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       logger.e("Failed to login: $e");
       emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
     }
-    emit(AuthHandlerFinished());
   }
 
   Future<void> _onFetchUserProfile(
