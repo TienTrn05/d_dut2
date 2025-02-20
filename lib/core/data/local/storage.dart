@@ -14,6 +14,7 @@ class _Keys {
   static const deviceId = 'device_id';
   static const pushToken = 'push_token';
   static const user = 'user';
+  static const hintEmail = 'hint_email';
 }
 
 class Storage {
@@ -116,6 +117,9 @@ class Storage {
   static Future setDeviceId(String? val) => _set(_Keys.deviceId, val);
 
   static String? get pushToken => _get(_Keys.pushToken);
-
   static Future setPushToken(String? val) => _set(_Keys.pushToken, val);
+
+  // Save hint email for login with Microsoft
+  static String? get hintEmail => _get(_Keys.hintEmail);
+  static Future<void> setHintEmail(String? val) => _set(_Keys.hintEmail, val);
 }

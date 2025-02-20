@@ -9,6 +9,7 @@ import 'package:aad_oauth/model/token.dart';
 
 import '../../../common/utils/app_environment.dart';
 import '../../../common/utils/logger.dart';
+import '../../../common/widgets/loading/cube_grid_loading.dart';
 import '../../../core/data/local/storage.dart';
 import '../../../features/auth/data/model/user_model.dart';
 import '../../../features/auth/domain/repository/auth_repo.dart';
@@ -18,26 +19,26 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
-  late final AadOAuth _microsoftSignIn;
   final AuthRepository _authRepository;
-  final String? savedEmail = Storage.user?.mail;
 
   AuthBloc(this.navigatorKey, this._authRepository) : super(AuthInitial()) {
-    _microsoftSignIn = AadOAuth(Config(
+    on<AuthInitRequested>(_onInitUser);
+    on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
+    on<AuthLoginRequested>(_onLogin);
+    on<AuthLogoutRequested>(_onLogout);
+  }
+
+  AadOAuth _microsoftSignInSetup(String? savedEmail) {
+    return AadOAuth(Config(
       tenant: AppEnvironment.tenantId,
       clientId: AppEnvironment.clientId,
       redirectUri: AppEnvironment.redirectUri,
       responseType: "code",
       scope: "User.Read",
-      loginHint: savedEmail ?? "102210239@sv1.dut.udn.vn",
-      loader: const Center(child: CircularProgressIndicator()),
+      loginHint: savedEmail ?? "",
+      loader: const Center(child: CubeGridLoading(backgroundColor: Color(0xFF2A74BD),)),
       navigatorKey: navigatorKey, // Truyền navigatorKey
     ));
-
-    on<AuthInitRequested>(_onInitUser);
-    on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
-    on<AuthLoginRequested>(_onLogin);
-    on<AuthLogoutRequested>(_onLogout);
   }
 
   Future<void> _onInitUser(
@@ -59,7 +60,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onMicrosoftSignIn(
       MicrosoftSignInRequested event, Emitter<AuthState> emit) async {
-    var result = await _microsoftSignIn.login();
+        String savedEmail = Storage.hintEmail ?? "";
+    AadOAuth microsoftSignIn = _microsoftSignInSetup(savedEmail);
+
+    var result = await microsoftSignIn.login();
 
     await result.fold(
       (Failure failure) async {
@@ -73,7 +77,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           return;
         }
 
-        try{
+        try {
           final data =
               await _authRepository.getProfileWithMicrosoft(token.accessToken!);
 
@@ -95,6 +99,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogin(
       AuthLoginRequested event, Emitter<AuthState> emit) async {
     try {
+      emit(AuthLoading());
       final data = await _authRepository.signIn(event.username, event.password);
 
       await Storage.setAccessToken(data["accessToken"]);
@@ -114,9 +119,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogout(
       AuthLogoutRequested event, Emitter<AuthState> emit) async {
-    await _microsoftSignIn.logout();
+    await _microsoftSignInSetup(null).logout();
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
+    await Storage.setHintEmail(event.email);
     emit(AuthLogoutSuccess());
     emit(AuthHandlerFinished());
   }

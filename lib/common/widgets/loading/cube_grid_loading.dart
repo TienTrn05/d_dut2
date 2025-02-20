@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CubeGridLoading extends StatefulWidget {
-  const CubeGridLoading({super.key});
+  final Color? backgroundColor;
+
+  const CubeGridLoading({super.key, this.backgroundColor});
 
   @override
   State<CubeGridLoading> createState() => _CubeGridLoadingState();
@@ -83,7 +85,7 @@ class _CubeGridLoadingState extends State<CubeGridLoading>
     final totalSize = gridItemSize * gridCount + gridSpacing * (gridCount - 1);
 
     return Container(
-      color: Colors.black.withAlpha(80),
+      color: widget.backgroundColor ?? Colors.black.withAlpha(80),
       child: Center(
         child: SafeArea(
           child: Stack(
