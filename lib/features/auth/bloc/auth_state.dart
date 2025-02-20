@@ -9,21 +9,14 @@ sealed class AuthState extends Equatable {
 class AuthInitial extends AuthState {}
 
 // Trạng thái đăng nhập thành công
-class AuthAuthenticated extends AuthState {
+class AuthUserAuthenticated extends AuthState {
   final String accessToken;
-  AuthAuthenticated(this.accessToken);
-
-  @override
-  List<Object> get props => [accessToken];
-}
-
-class AuthUserFetched extends AuthState {
   final UserModel userData;
 
-  AuthUserFetched(this.userData);
+  AuthUserAuthenticated(this.accessToken, this.userData);
 
   @override
-  List<Object> get props => [userData];
+  List<Object> get props => [accessToken,userData];
 }
 
 class AuthLogoutSuccess extends AuthState {}
@@ -37,5 +30,6 @@ class AuthError extends AuthState {
   List<Object> get props => [message];
 }
 
+class AuthLoading extends AuthState {}
 
 class AuthHandlerFinished extends AuthState {}

@@ -88,12 +88,12 @@ class DashboardScreen extends StatelessWidget {
                             BlocBuilder<AuthBloc, AuthState>(
                               builder: (context, state) {
                                 final String displayName =
-                                    (state is AuthUserFetched)
+                                    (state is AuthUserAuthenticated)
                                         ? state.userData.displayName
                                         : 'No Name';
 
                                 final String userPrincipalName =
-                                    (state is AuthUserFetched)
+                                    (state is AuthUserAuthenticated)
                                         ? state.userData.userPrincipalName
                                         : 'No Email';
 
@@ -301,9 +301,9 @@ class DashboardScreen extends StatelessWidget {
                                     onTap: () {
                                       final List<ScopeModel> scopeModels =
                                           context.read<AuthBloc>().state
-                                                  is AuthUserFetched
+                                                  is AuthUserAuthenticated
                                               ? (context.read<AuthBloc>().state
-                                                      as AuthUserFetched)
+                                                      as AuthUserAuthenticated)
                                                   .userData
                                                   .scopes
                                               : [];
