@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 
-
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
 
@@ -13,6 +12,8 @@ import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import './widgets/schedule_item.dart';
 import './widgets/feature_card.dart';
+
+import '../../auth/data/model/scope_model.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
@@ -294,14 +295,29 @@ class DashboardScreen extends StatelessWidget {
                                     subtitle: "Chương trình đào tạo",
                                   ),
                                   FeatureCard(
-                                    icon: Mdi.teach,
-                                    title: "MS Teams tool",
+                                    icon: Mdi.calendar,
+                                    title: "MS Team tool",
                                     subtitle: "Học trực tuyến",
-                                    onTap: () => context
-                                        .read<DashboardBloc>()
-                                        .add(DashboardNavigateRequested(
-                                            ["ms-teams-api-access"],
-                                            Routes.msteamtool)),
+                                    onTap: () {
+                                      final List<ScopeModel> scopeModels =
+                                          context.read<AuthBloc>().state
+                                                  is AuthUserFetched
+                                              ? (context.read<AuthBloc>().state
+                                                      as AuthUserFetched)
+                                                  .userData
+                                                  .scopes
+                                              : [];
+
+                                      List<String> scopes = [];
+                                      for (var scope in scopeModels) {
+                                        scopes.add(scope.name);
+                                      }
+
+                                      context.read<DashboardBloc>().add(
+                                            DashboardNavigateRequested(
+                                                scopes, Routes.msteamtool),
+                                          );
+                                    },
                                   ),
                                 ],
                               );

@@ -8,7 +8,7 @@ class DashboardRepo {
   String _getPermission(routeName) {
     switch (routeName) {
       case Routes.msteamtool:
-        return "ms-teams-api-access";
+        return "msteamtool-api-access";
       case Routes.schedule:
         return "schedule-api-access";
       default:
