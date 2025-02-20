@@ -4,6 +4,8 @@ sealed class AuthEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+// Event để khởi tạo user từ Storage
+class AuthInitRequested extends AuthEvent {} 
 
 class MicrosoftSignInRequested extends AuthEvent {}
 

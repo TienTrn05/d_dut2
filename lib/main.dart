@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(navigatorKey, getIt<AuthRepository>()),
+      create: (context) => AuthBloc(navigatorKey, getIt.get<AuthRepository>())..add(AuthInitRequested()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
