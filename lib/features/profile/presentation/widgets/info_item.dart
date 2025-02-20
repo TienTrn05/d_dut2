@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+
+import '../../../../common/extensions/custom_theme_extension.dart';
+
+class InfoItem extends StatelessWidget {
+  final String field;
+  final String value;
+  final bool enabledEdit;
+  final Function()? onEdit;
+
+  const InfoItem({
+    super.key,
+    required this.field,
+    required this.value,
+    this.enabledEdit = false,
+    this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              '$field:',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF747474),
+                height: 1.5,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+                if (enabledEdit)
+                  GestureDetector(
+                    onTap: onEdit,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius:
+                            BorderRadius.circular(20),
+                        onTap: onEdit,
+                        child: Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            size: 24,
+                            color: context.theme.primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
