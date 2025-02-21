@@ -11,18 +11,21 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? primaryColor;
   final Color? lightBlue;
   final Color? red;
+  final Color? grey;
 
   static const lightMode = CustomThemeExtension(
       primaryColor: CommonColors.primaryColor,
       lightBlue: CommonColors.lightBlueColor,
-      red: CommonColors.redColor);
+      red: CommonColors.redColor,
+      grey: CommonColors.greyColor);
 
   static const darkMode = CustomThemeExtension(
       primaryColor: CommonColors.primaryColor,
       lightBlue: CommonColors.lightBlueColor,
-      red: CommonColors.redColor);
+      red: CommonColors.redColor,
+      grey: CommonColors.greyColor);
 
-  const CustomThemeExtension({this.primaryColor, this.lightBlue, this.red});
+  const CustomThemeExtension({this.primaryColor, this.lightBlue, this.red, this.grey});
 
   @override
   ThemeExtension<CustomThemeExtension> copyWith({

@@ -6,7 +6,7 @@ class DashboardEvent extends Equatable {
 }
 
 class DashboardNavigateRequested extends DashboardEvent {
-  final List<String> scopes;
+  final List<ScopeModel> scopes;
   final String routeName;
 
   DashboardNavigateRequested(this.scopes, this.routeName);
