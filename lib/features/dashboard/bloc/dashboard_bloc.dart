@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../auth/data/model/scope_model.dart';
 import '../domain/repository/dashboard_repo.dart';
 
 part 'dashboard_event.dart';

@@ -1,3 +1,4 @@
+import 'package:e_dut/features/auth/data/model/scope_model.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../common/routes/routes.dart';
@@ -16,8 +17,12 @@ class DashboardRepo {
     }
   }
 
-  bool isPermissionGranted(List<String> scopes, String routeName) {
-    if (scopes.contains(_getPermission(routeName))) {
+  bool isPermissionGranted(List<ScopeModel> scopes, String routeName) {
+    List<String> scopeStrings = [];
+    for (var scope in scopes) {
+      scopeStrings.add(scope.name);
+    }
+    if (scopeStrings.contains(_getPermission(routeName)) || _getPermission(routeName) == "no-permission") {
       return true;
     } else {
       return false;

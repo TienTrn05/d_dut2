@@ -90,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.5,
+                                        height: 1.2,
                                       ),
                                     ),
                                     Text(
