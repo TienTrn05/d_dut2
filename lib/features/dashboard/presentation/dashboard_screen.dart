@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
 
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
@@ -53,7 +52,7 @@ class DashboardScreen extends StatelessWidget {
                 Container(
                     width: double.infinity,
                     height: 72,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(0),
                     decoration: BoxDecoration(
                       color: context.theme.primaryColor,
                       borderRadius: BorderRadius.circular(4),
@@ -62,77 +61,82 @@ class DashboardScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Row(
-                            children: [
-                              // Avatar
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16, right: 10, top: 16, bottom: 16),
+                            child: Row(
+                              children: [
+                                // Avatar
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
                                     color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.network(
-                                    'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              BlocBuilder<AuthBloc, AuthState>(
-                                builder: (context, state) {
-                                  final String displayName =
-                                      (state is AuthUserAuthenticated)
-                                          ? state.userData.displayName
-                                          : 'No Name';
-                          
-                                  final String userPrincipalName =
-                                      (state is AuthUserAuthenticated)
-                                          ? state.userData.userPrincipalName
-                                          : 'No Email';
-                          
-                                  return Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(
-                                          displayName,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily:
-                                                GoogleFonts.notoSans().fontFamily,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            height: 1,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          userPrincipalName,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily:
-                                                GoogleFonts.notoSans().fontFamily,
-                                            fontSize: 12,
-                                            height: 1,
-                                          ),
-                                        ),
-                                      ],
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 1,
                                     ),
-                                  );
-                                },
-                              ),
-                            ],
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                BlocBuilder<AuthBloc, AuthState>(
+                                  builder: (context, state) {
+                                    final String displayName =
+                                        (state is AuthUserAuthenticated)
+                                            ? state.userData.displayName
+                                            : 'No Name';
+
+                                    final String userPrincipalName =
+                                        (state is AuthUserAuthenticated)
+                                            ? state.userData.userPrincipalName
+                                            : 'No Email';
+
+                                    return Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+                                            displayName,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: GoogleFonts.notoSans()
+                                                  .fontFamily,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              height: 1,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            userPrincipalName,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily: GoogleFonts.notoSans()
+                                                  .fontFamily,
+                                              fontSize: 12,
+                                              height: 1,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         NotificationButton(
@@ -249,7 +253,8 @@ class DashboardScreen extends StatelessWidget {
                                       .name
                                   : "Student";
 
-                              if (userType == "Teacher" || userType == "Admin") {
+                              if (userType == "Teacher" ||
+                                  userType == "Admin") {
                                 return GridView(
                                   shrinkWrap: true,
                                   gridDelegate:
@@ -261,7 +266,8 @@ class DashboardScreen extends StatelessWidget {
                                   ),
                                   children: [
                                     FeatureCard(
-                                      icon: Mdi.calendar,
+                                      iconUrl:
+                                          "assets/icons/svg/solar_calendar-broken.svg",
                                       title: "Thời khóa biểu",
                                       subtitle: "Tra cứu thời khóa biểu",
                                       onTap: () {
@@ -271,7 +277,8 @@ class DashboardScreen extends StatelessWidget {
                                       },
                                     ),
                                     FeatureCard(
-                                      icon: Mdi.calendar,
+                                      iconUrl:
+                                          "assets/icons/svg/solar_calendar-broken.svg",
                                       title: "Lịch tuần",
                                       subtitle: "Lên lịch họp",
                                       onTap: () {
@@ -296,9 +303,10 @@ class DashboardScreen extends StatelessWidget {
                                 ),
                                 children: [
                                   FeatureCard(
-                                    icon: Mdi.calendar,
+                                    iconUrl:
+                                        "assets/icons/svg/solar_calendar-broken.svg",
                                     title: "Thời khóa biểu",
-                                    subtitle: "Tra cứu thời khóa biểu",
+                                    subtitle: "Xem lịch học & thi",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
@@ -306,22 +314,22 @@ class DashboardScreen extends StatelessWidget {
                                     },
                                   ),
                                   FeatureCard(
-                                    icon: Mdi.book_open,
+                                    iconUrl: "assets/icons/svg/mage_goals.svg",
                                     title: "Kết quả học tập",
                                     subtitle: "Tra cứu kết quả học tập",
                                   ),
                                   FeatureCard(
-                                    icon: Mdi.cash,
+                                    iconUrl: "assets/icons/svg/tabler_coin.svg",
                                     title: "Học phí",
                                     subtitle: "Học phí",
                                   ),
                                   FeatureCard(
-                                    icon: Mdi.book_alert,
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
                                     title: "CTĐT",
                                     subtitle: "Chương trình đào tạo",
                                   ),
                                   FeatureCard(
-                                    icon: Mdi.calendar,
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
                                     title: "MS Team tool",
                                     subtitle: "Học trực tuyến",
                                     onTap: () {

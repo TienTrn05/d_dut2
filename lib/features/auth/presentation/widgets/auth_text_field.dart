@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
 
 class AuthTextField extends StatelessWidget {
   final String hintText;
-  final dynamic prefixIcon; // Có thể là IconData hoặc AssetImage
+  final Widget prefixIcon;
   final Color? iconColor;
   final bool obscureText;
   final bool enabledSuffixIcon;
@@ -18,7 +19,7 @@ class AuthTextField extends StatelessWidget {
   const AuthTextField({
     super.key,
     required this.hintText,
-    this.prefixIcon = Icons.person,
+    required this.prefixIcon,
     this.iconColor,
     this.obscureText = false,
     this.enabledSuffixIcon = false,
@@ -42,25 +43,18 @@ class AuthTextField extends StatelessWidget {
       onSubmitted: onSubmitted,
       cursorColor: iconColor,
       decoration: InputDecoration(
-        prefixIcon: prefixIcon is String
-            ? Padding(
-                padding: const EdgeInsets.all(12.0), // Căn chỉnh icon
-                child: Image.asset(
-                  prefixIcon,
-                  width: 20,
-                  height: 20,
-                  color: iconColor, // Có thể đổi màu icon nếu cần
-                ),
-              )
-            : Icon(
-                prefixIcon,
-                color: iconColor,
-              ),
+        prefixIcon: prefixIcon,
         suffixIcon: enabledSuffixIcon
             ? IconButton(
-                icon: Icon(
-                  obscureText ? Icons.visibility : Icons.visibility_off,
-                  color: context.theme.grey,
+                icon: SvgPicture.asset(
+                  obscureText
+                      ? "assets/icons/svg/solar_eye-broken-lock.svg"
+                      : "assets/icons/svg/solar_eye-broken.svg",
+                  colorFilter: ColorFilter.mode(
+                      obscureText
+                          ? (context.theme.grey ?? Colors.grey)
+                          : (context.theme.primaryColor ?? Colors.blue),
+                      BlendMode.srcIn),
                 ),
                 onPressed: onShowPasswordChanged,
               )

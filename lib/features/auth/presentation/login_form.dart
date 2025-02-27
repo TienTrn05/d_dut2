@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/auth_bloc.dart';
@@ -59,7 +60,12 @@ class LoginForm extends StatelessWidget {
             SizedBox(height: 24),
             AuthTextField(
                 hintText: "Tên đăng nhập ...",
-                prefixIcon: "assets/icons/solar_user-bold.png",
+                prefixIcon: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SvgPicture.asset(
+                    "assets/icons/svg/solar_user-bold.svg",
+                  ),
+                ),
                 iconColor: context.theme.primaryColor,
                 onChanged: (value) {
                   context
@@ -69,7 +75,12 @@ class LoginForm extends StatelessWidget {
             SizedBox(height: 8),
             AuthTextField(
               hintText: "Mật khẩu ...",
-              prefixIcon: "assets/icons/solar_lock-bold.png",
+              prefixIcon: Padding(
+                padding: EdgeInsets.all(12),
+                child: SvgPicture.asset(
+                  "assets/icons/svg/solar_lock-bold.svg",
+                ),
+              ),
               iconColor: context.theme.primaryColor,
               obscureText: !context.read<LoginBloc>().state.isShowPassword,
               enabledSuffixIcon: true,
@@ -130,21 +141,21 @@ class LoginForm extends StatelessWidget {
             TextButton(
               onPressed: () {},
               style: ButtonStyle(
-                padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 14)),
+                padding: WidgetStateProperty.all(
+                    EdgeInsets.symmetric(horizontal: 14)),
                 overlayColor: WidgetStateProperty.all(Colors.transparent),
               ),
               child: Text(
                 "Quên mật khẩu?",
                 style: TextStyle(
-                  color: context.theme.primaryColor,
-                  fontFamily: GoogleFonts.notoSans().fontFamily,
-                  fontSize: 16,
-                  decoration: TextDecoration.underline,
-                  decorationColor: context.theme
-                      .primaryColor, // Đảm bảo màu underline giống màu chữ
-                  fontStyle: FontStyle.italic,
-                  height: 1.25
-                ),
+                    color: context.theme.primaryColor,
+                    fontFamily: GoogleFonts.notoSans().fontFamily,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                    decorationColor: context.theme
+                        .primaryColor, // Đảm bảo màu underline giống màu chữ
+                    fontStyle: FontStyle.italic,
+                    height: 1.25),
               ),
             ),
           ],
