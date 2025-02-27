@@ -171,7 +171,7 @@ class DashboardScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 13,
-                              height: 1.5,
+                              height: 1.25,
                             ),
                           ),
                           Text(
@@ -290,8 +290,9 @@ class DashboardScreen extends StatelessWidget {
                                     SliverGridDelegateWithMaxCrossAxisExtent(
                                   maxCrossAxisExtent:
                                       200, // Chiều rộng tối đa của item
-                                  crossAxisSpacing: 20,
-                                  mainAxisSpacing: 20,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  mainAxisExtent: 150,
                                 ),
                                 children: [
                                   FeatureCard(
@@ -316,7 +317,7 @@ class DashboardScreen extends StatelessWidget {
                                   ),
                                   FeatureCard(
                                     icon: Mdi.book_alert,
-                                    title: "Chương trình đào tạo",
+                                    title: "CTĐT",
                                     subtitle: "Chương trình đào tạo",
                                   ),
                                   FeatureCard(

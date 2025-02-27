@@ -19,7 +19,7 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) => Container(
-        padding: EdgeInsets.symmetric(vertical: 46, horizontal: 16),
+        padding: EdgeInsets.only(left: 32, right: 32, top: 48, bottom: 38),
         decoration: BoxDecoration(
           color: Colors.white.withAlpha(178),
           borderRadius: BorderRadius.circular(10),
@@ -66,7 +66,7 @@ class LoginForm extends StatelessWidget {
                       .read<LoginBloc>()
                       .add(LoginUsernameChanged(username: value));
                 }),
-            SizedBox(height: 10),
+            SizedBox(height: 8),
             AuthTextField(
               hintText: "Mật khẩu ...",
               prefixIcon: "assets/icons/solar_lock-bold.png",
@@ -83,51 +83,28 @@ class LoginForm extends StatelessWidget {
                     isShowPassword: !state.isShowPassword));
               },
             ),
-            SizedBox(height: 4),
             Row(
               children: [
-                Row(
-                  children: [
-                    Checkbox(
-                      value: state.isRememberMe,
-                      onChanged: (value) {
-                        context.read<LoginBloc>().add(LoginRememberMeChanged(
-                            isRememberMe: !state.isRememberMe));
-                      },
-                      activeColor: context.theme.primaryColor,
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    Text(
-                      "Nhớ mật khẩu",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: GoogleFonts.notoSans().fontFamily,
-                      ),
-                    ),
-                  ],
+                Checkbox(
+                  value: state.isRememberMe,
+                  onChanged: (value) {
+                    context.read<LoginBloc>().add(LoginRememberMeChanged(
+                        isRememberMe: !state.isRememberMe));
+                  },
+                  activeColor: context.theme.primaryColor,
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                Spacer(),
-                TextButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    padding: WidgetStateProperty.all(EdgeInsets.zero),
-                    overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  ),
-                  child: Text(
-                    "Quên mật khẩu?",
-                    style: TextStyle(
-                      color: context.theme.primaryColor,
-                      fontFamily: GoogleFonts.notoSans().fontFamily,
-                      fontSize: 16,
-                      decoration: TextDecoration.underline,
-                      fontStyle: FontStyle.italic,
-                    ),
+                Text(
+                  "Nhớ mật khẩu",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: GoogleFonts.notoSans().fontFamily,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 14),
+            SizedBox(height: 16),
             BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
               return AuthButton(
                 text: "Đăng nhập",
@@ -140,7 +117,7 @@ class LoginForm extends StatelessWidget {
                 },
               );
             }),
-            SizedBox(height: 10),
+            SizedBox(height: 8),
             BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
               return AuthMicrosoftButton(
                   text: "Đăng nhập bằng Microsoft",
@@ -149,6 +126,27 @@ class LoginForm extends StatelessWidget {
                     context.read<AuthBloc>().add(MicrosoftSignInRequested());
                   });
             }),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () {},
+              style: ButtonStyle(
+                padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 14)),
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+              ),
+              child: Text(
+                "Quên mật khẩu?",
+                style: TextStyle(
+                  color: context.theme.primaryColor,
+                  fontFamily: GoogleFonts.notoSans().fontFamily,
+                  fontSize: 16,
+                  decoration: TextDecoration.underline,
+                  decorationColor: context.theme
+                      .primaryColor, // Đảm bảo màu underline giống màu chữ
+                  fontStyle: FontStyle.italic,
+                  height: 1.25
+                ),
+              ),
+            ),
           ],
         ),
       ),

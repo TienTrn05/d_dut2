@@ -1,9 +1,9 @@
-import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/root_bloc.dart';
 
+import '/common/extensions/custom_theme_extension.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 

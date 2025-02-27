@@ -52,6 +52,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: GoogleFonts.roboto().fontFamily,
           extensions: [CustomThemeExtension.lightMode],
+          textTheme: Theme.of(context).textTheme.apply(
+          fontSizeFactor: 1,
+          fontSizeDelta: -0.0,
+        ),
         ),
         darkTheme: ThemeData(
           fontFamily: GoogleFonts.roboto().fontFamily,

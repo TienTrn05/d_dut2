@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../common/extensions/custom_theme_extension.dart';
+
 class AuthTextField extends StatelessWidget {
   final String hintText;
   final dynamic prefixIcon; // Có thể là IconData hoặc AssetImage
@@ -38,6 +40,7 @@ class AuthTextField extends StatelessWidget {
       ),
       onChanged: onChanged,
       onSubmitted: onSubmitted,
+      cursorColor: iconColor,
       decoration: InputDecoration(
         prefixIcon: prefixIcon is String
             ? Padding(
@@ -57,7 +60,7 @@ class AuthTextField extends StatelessWidget {
             ? IconButton(
                 icon: Icon(
                   obscureText ? Icons.visibility : Icons.visibility_off,
-                  color: iconColor,
+                  color: context.theme.grey,
                 ),
                 onPressed: onShowPasswordChanged,
               )
