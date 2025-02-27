@@ -23,6 +23,7 @@ class AuthButton extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontFamily: GoogleFonts.notoSans().fontFamily,
+            fontWeight: FontWeight.bold,
             fontSize: 16,
           )),
     );

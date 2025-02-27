@@ -1,7 +1,8 @@
-import 'package:e_dut/features/auth/data/model/scope_model.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../../common/routes/routes.dart';
+import '/common/routes/routes.dart';
+
+import '/features/auth/data/model/scope_model.dart';
 
 @singleton
 class DashboardRepo {
@@ -10,8 +11,6 @@ class DashboardRepo {
     switch (routeName) {
       case Routes.msteamtool:
         return "msteamtool-api-access";
-      case Routes.schedule:
-        return "schedule-api-access";
       default:
         return "no-permission";
     }

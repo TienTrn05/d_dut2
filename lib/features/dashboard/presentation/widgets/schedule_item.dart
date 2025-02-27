@@ -19,8 +19,7 @@ class ScheduleItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 48,
-      padding: EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.only(left: 6, right: 8, top: 4, bottom: 4),
       decoration: BoxDecoration(
         color: Color.fromRGBO(245, 245, 245, 1),
         border: Border(
@@ -38,8 +37,13 @@ class ScheduleItem extends StatelessWidget {
         children: [
           Text(
             subject,
-            style:
-                TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              height: 1.25,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(
             width: double.infinity,
@@ -48,7 +52,10 @@ class ScheduleItem extends StatelessWidget {
               children: [
                 Text(
                   time,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.25,
+                  ),
                 ),
                 Text(
                   room,
@@ -56,6 +63,7 @@ class ScheduleItem extends StatelessWidget {
                     color: Color.fromRGBO(116, 116, 116, 1),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    height: 1.25,
                   ),
                 ),
               ],
