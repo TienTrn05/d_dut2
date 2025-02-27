@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../bloc/root_bloc.dart';
 
@@ -76,9 +77,12 @@ class _MainViewState extends State<_MainView> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  bottomNavigationItem(context, 0, Icons.home),
-                  bottomNavigationItem(context, 1, Icons.search),
-                  bottomNavigationItem(context, 2, Icons.person),
+                  bottomNavigationItem(
+                      context, 0, "assets/icons/svg/iconoir_home-alt.svg"),
+                  bottomNavigationItem(context, 1,
+                      "assets/icons/svg/flowbite_search-outline.svg"),
+                  bottomNavigationItem(
+                      context, 2, "assets/icons/svg/solar_user-broken.svg"),
                 ],
               ),
             ),
@@ -89,7 +93,7 @@ class _MainViewState extends State<_MainView> {
   }
 
   Expanded bottomNavigationItem(
-      BuildContext context, int itemIndex, IconData icon) {
+      BuildContext context, int itemIndex, String iconUrl) {
     return Expanded(
       flex: 1,
       child: InkWell(
@@ -112,12 +116,13 @@ class _MainViewState extends State<_MainView> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                Icon(
-                  icon,
-                  size: 30,
-                  color: isSelected
-                      ? context.theme.primaryColor
-                      : Color.fromRGBO(116, 116, 116, 1),
+                SvgPicture.asset(
+                  iconUrl,
+                  colorFilter: ColorFilter.mode(
+                      isSelected
+                          ? (context.theme.primaryColor ?? Colors.blue)
+                          : (context.theme.grey ?? Colors.grey),
+                      BlendMode.srcIn),
                 ),
                 Container(
                   height: 2,

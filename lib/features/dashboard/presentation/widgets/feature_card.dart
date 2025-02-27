@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
 
 class FeatureCard extends StatelessWidget {
-  final String icon;
+  final String iconUrl;
   final String title;
   final String subtitle;
   final Function()? onTap;
 
   const FeatureCard(
       {super.key,
-      required this.icon,
+      required this.iconUrl,
       required this.title,
       required this.subtitle,
       this.onTap});
@@ -29,7 +29,11 @@ class FeatureCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Iconify(icon, size: 32, color: context.theme.primaryColor),
+            SvgPicture.asset(
+              iconUrl,
+              width: 32,
+              height: 32,
+            ),
             const SizedBox(height: 16),
             Column(
               children: [

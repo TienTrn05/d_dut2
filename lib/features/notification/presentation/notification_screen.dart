@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
 
@@ -67,11 +68,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
         appBar: AppBar(
           backgroundColor: context.theme.primaryColor, // Màu nền xanh dương
           elevation: 0, // Xóa bóng dưới AppBar
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context); // Quay lại màn hình trước
-            },
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context); // Quay lại màn hình trước
+              },
+            ),
           ),
           title: Text(
             'Thông báo',
@@ -83,14 +87,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
           centerTitle: true, // Căn giữa tiêu đề
           actions: [
-            Builder(builder: (context) {
-              return IconButton(
-                icon: Icon(Icons.settings, color: Colors.white),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            }),
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Builder(builder: (context) {
+                return IconButton(
+                  icon: SvgPicture.asset(
+                      "assets/icons/svg/solar_settings-broken.svg"),
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                );
+              }),
+            ),
           ],
         ),
         backgroundColor: Colors.white,
@@ -107,6 +115,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       color: context.theme.primaryColor,
                       size: 24,
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       "Thông báo",
                       style: TextStyle(
