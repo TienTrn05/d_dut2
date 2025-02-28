@@ -37,6 +37,10 @@ class _MainViewState extends State<_MainView> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double bottomItemWidth = 72;
+    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 3) / 4;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: false,
@@ -68,23 +72,55 @@ class _MainViewState extends State<_MainView> {
             child: Container(
               width: double.infinity,
               height: 50,
-              padding: const EdgeInsets.only(right: 30, left: 30),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(16)),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  bottomNavigationItem(
-                      context, 0, "assets/icons/svg/iconoir_home-alt.svg"),
-                  bottomNavigationItem(context, 1,
-                      "assets/icons/svg/flowbite_search-outline.svg"),
-                  bottomNavigationItem(
-                      context, 2, "assets/icons/svg/solar_user-broken.svg"),
-                ],
-              ),
+              child:
+                  BlocBuilder<MainBloc, MainState>(builder: (context, state) {
+                return Stack(
+                  children: [
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      top: 0,
+                      left: (offsetLeft + bottomItemWidth) * state.currentPage +
+                          offsetLeft,
+                      child: Container(
+                        height: 2,
+                        width: bottomItemWidth,
+                        decoration: BoxDecoration(
+                          color: context.theme.primaryColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+
+                    // Các icon tab
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        bottomNavigationItem(
+                            context,
+                            0,
+                            "assets/icons/svg/iconoir_home-alt.svg",
+                            bottomItemWidth),
+                        bottomNavigationItem(
+                            context,
+                            1,
+                            "assets/icons/svg/flowbite_search-outline.svg",
+                            bottomItemWidth),
+                        bottomNavigationItem(
+                            context,
+                            2,
+                            "assets/icons/svg/solar_user-broken.svg",
+                            bottomItemWidth),
+                      ],
+                    ),
+                  ],
+                );
+              }),
             ),
           ),
         ],
@@ -92,50 +128,37 @@ class _MainViewState extends State<_MainView> {
     );
   }
 
-  Expanded bottomNavigationItem(
-      BuildContext context, int itemIndex, String iconUrl) {
-    return Expanded(
-      flex: 1,
-      child: InkWell(
-        onTap: () {
-          context.read<MainBloc>().add(ChangePage(itemIndex));
+  Widget bottomNavigationItem(
+      BuildContext context, int itemIndex, String iconUrl, double width) {
+    return InkWell(
+      onTap: () {
+        context.read<MainBloc>().add(ChangePage(itemIndex));
+      },
+      child: BlocBuilder<MainBloc, MainState>(
+        builder: (context, state) {
+          bool isSelected = state.currentPage == itemIndex;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                iconUrl,
+                colorFilter: ColorFilter.mode(
+                    isSelected
+                        ? (context.theme.primaryColor ?? Colors.blue)
+                        : (context.theme.grey ?? Colors.grey),
+                    BlendMode.srcIn),
+              ),
+              Container(
+                height: 2,
+                width: width,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ],
+          );
         },
-        child: BlocBuilder<MainBloc, MainState>(
-          builder: (context, state) {
-            bool isSelected = state.currentPage == itemIndex;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  height: 2,
-                  width: 78,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.theme.primaryColor
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                SvgPicture.asset(
-                  iconUrl,
-                  colorFilter: ColorFilter.mode(
-                      isSelected
-                          ? (context.theme.primaryColor ?? Colors.blue)
-                          : (context.theme.grey ?? Colors.grey),
-                      BlendMode.srcIn),
-                ),
-                Container(
-                  height: 2,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
       ),
     );
   }
