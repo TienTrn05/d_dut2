@@ -101,7 +101,7 @@ class LoginForm extends StatelessWidget {
                     Text(
                       "Nhớ mật khẩu",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontFamily: GoogleFonts.notoSans().fontFamily,
                       ),
                     ),
@@ -119,7 +119,7 @@ class LoginForm extends StatelessWidget {
                     style: TextStyle(
                       color: context.theme.primaryColor,
                       fontFamily: GoogleFonts.notoSans().fontFamily,
-                      fontSize: 16,
+                      fontSize: 14,
                       decoration: TextDecoration.underline,
                       fontStyle: FontStyle.italic,
                     ),

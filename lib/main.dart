@@ -43,14 +43,18 @@ class MyApp extends StatelessWidget {
               AuthBloc(navigatorKey, getIt.get<AuthRepository>())
                 ..add(AuthInitRequested()),
         ),
-        BlocProvider(
-            create: (context) => LoadingBloc()),
+        BlocProvider(create: (context) => LoadingBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         theme: ThemeData(
-          fontFamily: GoogleFonts.roboto().fontFamily,
+          textTheme: TextTheme(
+            bodyLarge: TextStyle(fontSize: 18),
+            bodyMedium: TextStyle(fontSize: 16),
+            bodySmall: TextStyle(fontSize: 14),
+          ),
+          fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
           extensions: [CustomThemeExtension.lightMode],
         ),
         darkTheme: ThemeData(

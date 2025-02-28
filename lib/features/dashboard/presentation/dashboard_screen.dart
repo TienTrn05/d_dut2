@@ -92,15 +92,16 @@ class DashboardScreen extends StatelessWidget {
                                       (state is AuthUserAuthenticated)
                                           ? state.userData.displayName
                                           : 'No Name';
-                          
+
                                   final String userPrincipalName =
                                       (state is AuthUserAuthenticated)
                                           ? state.userData.userPrincipalName
                                           : 'No Email';
-                          
+
                                   return Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
@@ -108,8 +109,8 @@ class DashboardScreen extends StatelessWidget {
                                           displayName,
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontFamily:
-                                                GoogleFonts.notoSans().fontFamily,
+                                            fontFamily: GoogleFonts.notoSans()
+                                                .fontFamily,
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             height: 1,
@@ -121,8 +122,8 @@ class DashboardScreen extends StatelessWidget {
                                           userPrincipalName,
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontFamily:
-                                                GoogleFonts.notoSans().fontFamily,
+                                            fontFamily: GoogleFonts.notoSans()
+                                                .fontFamily,
                                             fontSize: 12,
                                             height: 1,
                                           ),
@@ -249,7 +250,8 @@ class DashboardScreen extends StatelessWidget {
                                       .name
                                   : "Student";
 
-                              if (userType == "Teacher" || userType == "Admin") {
+                              if (userType == "Teacher" ||
+                                  userType == "Admin") {
                                 return GridView(
                                   shrinkWrap: true,
                                   gridDelegate:

@@ -39,7 +39,7 @@ class ScheduleItem extends StatelessWidget {
           Text(
             subject,
             style:
-                TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1),
+                TextStyle(fontSize: 14, fontWeight: FontWeight.bold, height: 1),
           ),
           SizedBox(
             width: double.infinity,
@@ -48,13 +48,13 @@ class ScheduleItem extends StatelessWidget {
               children: [
                 Text(
                   time,
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 14),
                 ),
                 Text(
                   room,
                   style: TextStyle(
                     color: Color.fromRGBO(116, 116, 116, 1),
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
