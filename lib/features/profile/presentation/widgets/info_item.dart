@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../common/extensions/custom_theme_extension.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class InfoItem extends StatelessWidget {
   final String field;
@@ -56,18 +55,17 @@ class InfoItem extends StatelessWidget {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius:
-                            BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                         onTap: onEdit,
                         child: Container(
                           padding: EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.edit,
-                            size: 24,
-                            color: context.theme.primaryColor,
+                          child: SvgPicture.asset(
+                            "assets/icons/svg/lucide_pen.svg",
+                            width: 16,
+                            height: 16,
                           ),
                         ),
                       ),

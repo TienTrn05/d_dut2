@@ -1,6 +1,7 @@
-import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import '/common/extensions/custom_theme_extension.dart';
 
 class CustomLoading extends StatelessWidget {
   final String message;

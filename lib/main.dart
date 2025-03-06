@@ -49,13 +49,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
         theme: ThemeData(
-          textTheme: TextTheme(
-            bodyLarge: TextStyle(fontSize: 18),
-            bodyMedium: TextStyle(fontSize: 16),
-            bodySmall: TextStyle(fontSize: 14),
-          ),
           fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
           extensions: [CustomThemeExtension.lightMode],
+          textTheme: Theme.of(context).textTheme.apply(
+                fontSizeFactor: 1,
+                fontSizeDelta: -0.0,
+              ),
         ),
         darkTheme: ThemeData(
           fontFamily: GoogleFonts.roboto().fontFamily,

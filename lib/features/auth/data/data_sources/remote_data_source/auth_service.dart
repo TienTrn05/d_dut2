@@ -43,7 +43,7 @@ class AuthService {
       String accessToken) async {
     try {
       final response = await _dio.get(
-        "$_url/microsoft/me",
+        "$_url/api/microsoft/me",
         options: Options(
           headers: {
             "Authorization": "Bearer $accessToken",

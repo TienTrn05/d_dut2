@@ -7,7 +7,11 @@ class AuthButton extends StatelessWidget {
   Color fillColor;
   Function()? onPressed;
 
-  AuthButton({super.key, required this.text, this.fillColor = Colors.blue, this.onPressed});
+  AuthButton(
+      {super.key,
+      required this.text,
+      this.fillColor = Colors.blue,
+      this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,8 @@ class AuthButton extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontFamily: GoogleFonts.notoSans().fontFamily,
-            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
           )),
     );
   }

@@ -1,13 +1,14 @@
-import 'package:e_dut/features/profile/presentation/widgets/info_card.dart';
-import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../common/routes/routes.dart';
 
 import '../../auth/bloc/auth_bloc.dart';
+import './widgets/info_card.dart';
+import './widgets/info_item.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -210,7 +211,9 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () {
                   final state = context.read<AuthBloc>().state;
                   if (state is AuthUserAuthenticated) {
-                    context.read<AuthBloc>().add(AuthLogoutRequested(state.userData.mail));
+                    context
+                        .read<AuthBloc>()
+                        .add(AuthLogoutRequested(state.userData.mail));
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -219,10 +222,10 @@ class ProfileScreen extends StatelessWidget {
                   backgroundColor: context.theme.primaryColor,
                   elevation: 2,
                 ),
-                child: const Icon(
-                  Icons.logout,
-                  color: Colors.white,
-                  size: 28,
+                child: SvgPicture.asset(
+                  "assets/icons/svg/solar_logout-3-bold.svg",
+                  width: 24,
+                  height: 24,
                 ),
               ),
             )

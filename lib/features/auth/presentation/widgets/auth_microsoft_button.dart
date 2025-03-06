@@ -1,52 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// ignore: must_be_immutable
 class AuthMicrosoftButton extends StatelessWidget {
   final String text;
-  bool enabled;
-  Color color;
-  Function()? onPressed;
+  final bool enabled;
+  final Color color;
+  final Function()? onPressed;
 
-  AuthMicrosoftButton({super.key, required this.text, this.enabled = true, this.color = Colors.blue, this.onPressed});
+  const AuthMicrosoftButton({
+    super.key,
+    required this.text,
+    this.enabled = true,
+    this.color = Colors.blue,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-      onPressed: onPressed,
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: 16),
-      minWidth: double.infinity,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8), // Bo góc 8px
-        side: BorderSide(
-          color: color,
-          width: 2,
-          style: BorderStyle.solid,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      highlightElevation: 0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            style: TextStyle(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return MaterialButton(
+          onPressed: onPressed,
+          color: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          minWidth: double.infinity,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
               color: color,
-              fontFamily: GoogleFonts.notoSans().fontFamily,
-              fontSize: 16,
+              width: 2,
+              style: BorderStyle.solid,
             ),
           ),
-          SizedBox(width: 12),
-          Image.asset(
-            'assets/icons/mdi_microsoft.png',
-            width: 24,
-            height: 24,
+          clipBehavior: Clip.antiAlias,
+          elevation: 0,
+          highlightElevation: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min, // Giữ nội dung vừa đủ
+            children: [
+              Flexible(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: GoogleFonts.notoSans().fontFamily,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SvgPicture.asset("assets/icons/svg/mdi_microsoft.svg"),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
