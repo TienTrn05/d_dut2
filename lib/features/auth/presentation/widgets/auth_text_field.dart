@@ -37,8 +37,9 @@ class AuthTextField extends StatelessWidget {
       keyboardType: keyboardType,
       enabled: enabled,
       style: TextStyle(
-        fontFamily: GoogleFonts.notoSans().fontFamily,
-      ),
+          fontFamily: GoogleFonts.notoSans().fontFamily,
+          fontSize: 14,
+          height: 1),
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       cursorColor: iconColor,
@@ -62,8 +63,8 @@ class AuthTextField extends StatelessWidget {
         filled: true,
         fillColor: Colors.white,
         hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Colors.grey,
+        hintStyle: TextStyle(
+          color: context.theme.grey ?? Colors.grey,
         ),
         border: OutlineInputBorder(
           borderSide: BorderSide.none,

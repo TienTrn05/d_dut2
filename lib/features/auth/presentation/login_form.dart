@@ -20,10 +20,10 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) => Container(
-        padding: EdgeInsets.only(left: 32, right: 32, top: 48, bottom: 38),
+        padding: EdgeInsets.only(left: 32, right: 32, top: 48, bottom: 48),
         decoration: BoxDecoration(
           color: Colors.white.withAlpha(178),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(77),
@@ -48,13 +48,16 @@ class LoginForm extends StatelessWidget {
                 Text(
                   "Digital DUT",
                   style: TextStyle(
-                    color: context.theme.primaryColor,
-                    fontFamily: GoogleFonts.baloo2().fontFamily,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                  ),
-                )
+                      fontSize: 28,
+                      fontFamily: GoogleFonts.baloo2().fontFamily,
+                      fontWeight: FontWeight.w900,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 3 // Độ dày của viền
+                        ..color = context.theme.primaryColor ??
+                            Colors.blue, // Màu viền
+                      height: 1),
+                ),
               ],
             ),
             SizedBox(height: 24),
@@ -109,7 +112,7 @@ class LoginForm extends StatelessWidget {
                 Text(
                   "Nhớ mật khẩu",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
                   ),
                 ),
@@ -137,7 +140,7 @@ class LoginForm extends StatelessWidget {
                     context.read<AuthBloc>().add(MicrosoftSignInRequested());
                   });
             }),
-            const SizedBox(height: 8),
+            const SizedBox(height: 24),
             TextButton(
               onPressed: () {},
               style: ButtonStyle(
@@ -150,7 +153,7 @@ class LoginForm extends StatelessWidget {
                 style: TextStyle(
                     color: context.theme.primaryColor,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
-                    fontSize: 16,
+                    fontSize: 14,
                     decoration: TextDecoration.underline,
                     decorationColor: context.theme
                         .primaryColor, // Đảm bảo màu underline giống màu chữ

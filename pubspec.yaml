@@ -38,6 +38,7 @@ dependencies:
 
   # talker & logger
   talker_flutter: ^4.6.11
+  table_calendar: ^3.2.0
 
 dev_dependencies:
   flutter_test:

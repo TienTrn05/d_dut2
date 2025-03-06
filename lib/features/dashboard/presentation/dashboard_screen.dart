@@ -178,15 +178,20 @@ class DashboardScreen extends StatelessWidget {
                               height: 1.25,
                             ),
                           ),
-                          Text(
-                            '13',
-                            style: TextStyle(
-                              color: context.theme.primaryColor,
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              height: 1,
+                          Flexible(
+                            // fit: BoxFit.scaleDown, //thu nhỏ nếu không đủ chỗ
+                            child: Text(
+                              '13',
+                              style: TextStyle(
+                                color: context.theme.primaryColor,
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                          )
                         ],
                       ),
                       const SizedBox(width: 10),
@@ -209,7 +214,7 @@ class DashboardScreen extends StatelessWidget {
                               const SizedBox(height: 4),
                               ScheduleItem(
                                 subject: 'Lập trình di động',
-                                time: '10:00 - 12:50',
+                                time: '7:00, xuất 2C1, nhóm A',
                                 room: 'F109',
                                 isExam: true,
                               ),
