@@ -47,7 +47,7 @@ class AuthMicrosoftButton extends StatelessWidget {
                     color: color,
                     fontWeight: FontWeight.bold,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

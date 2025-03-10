@@ -50,18 +50,23 @@ class ScheduleItem extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.25,
+                Expanded(
+                  child: Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.25,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: 24),
                 Text(
                   room,
                   style: TextStyle(
                     color: Color.fromRGBO(116, 116, 116, 1),
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     height: 1.25,
                   ),

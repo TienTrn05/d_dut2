@@ -71,7 +71,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           leading: Padding(
             padding: const EdgeInsets.only(left: 16),
             child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context); // Quay lại màn hình trước
               },
@@ -82,7 +82,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontSize: 14,
             ),
           ),
           centerTitle: true, // Căn giữa tiêu đề
