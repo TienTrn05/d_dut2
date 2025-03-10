@@ -1,3 +1,4 @@
+import 'package:e_dut/features/schedule/presentation/widgets/calendar_month.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleScreen extends StatelessWidget {
@@ -5,10 +6,12 @@ class ScheduleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Schedule Screen'),
+    return Scaffold(
+        body: Container(
+      padding: EdgeInsets.all(24),
+      child: Column(
+        children: [CalendarCustom()],
       ),
-    );
+    ));
   }
 }
