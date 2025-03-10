@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
@@ -18,7 +19,7 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: context.theme.primaryColor ?? Colors.blue,
+          backgroundColor: context.theme.primaryColor,
           elevation: 0, // Xóa bóng dưới AppBar
           leading: Padding(
             padding: const EdgeInsets.only(left: 16),
@@ -95,7 +96,12 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
                   child: TabBarView(
                     children: [
                       Center(child: Text("Thông tin ca thi")),
-                      Center(child: Text("Danh sách sinh viên")),
+                      Center(
+                          child: Column(
+                        children: [
+                          SearchBarCustom(),
+                        ],
+                      )),
                     ],
                   ),
                 ),
