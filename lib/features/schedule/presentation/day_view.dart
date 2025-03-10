@@ -13,7 +13,7 @@ class DayView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CalendarMonth(),
+          CalendarCustom(),
           SizedBox(height: 20),
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,

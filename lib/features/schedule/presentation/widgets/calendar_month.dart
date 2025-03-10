@@ -101,8 +101,11 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 fontSize: 14,
               ),
               titleTextFormatter: (date, locale) {
-                String formatted = DateFormat.yMMMM(locale).format(date);
-                return capitalizeFirstLetter(formatted); // Viết hoa chữ cái đầu
+                String monthNumber =
+                    DateFormat.M(locale).format(date); // Lấy số tháng
+                String formatted = "Tháng $monthNumber, ${date.year}";
+
+                return formatted;
               },
               formatButtonVisible: false,
             ),
@@ -171,6 +174,13 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     _focusedDay = _selectedDay;
                   } else {
                     _calendarFormat = CalendarFormat.month;
+                  }
+                  if (_focusedDay.isAfter(_startdWeek)) {
+                    int weekDifference =
+                        _focusedDay.difference(_startdWeek).inDays ~/ 7;
+                    _currentWeek = weekDifference + 1;
+                  } else {
+                    _currentWeek = 0;
                   }
                 });
               },

@@ -144,6 +144,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600),
         ),
       ),
-    ));
+    );
   }
 }
