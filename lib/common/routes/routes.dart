@@ -4,6 +4,8 @@ import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
 import '../../../features/schedule/presentation/schedule_screen.dart';
+import '../../features/schedule/presentation/exam_shift_detail_screen.dart';
+
 class Routes {
   static const String root = "/";
   static const String auth = "/auth";
@@ -20,10 +22,12 @@ class Routes {
         return MaterialPageRoute(builder: (context) => const AuthScreen());
 
       case notification:
-        return MaterialPageRoute(builder: (settings) => const NotificationScreen());
+        return MaterialPageRoute(
+            builder: (settings) => const NotificationScreen());
 
       case schedule:
-        return MaterialPageRoute(builder: (context) => const ScheduleScreen());
+        return MaterialPageRoute(
+            builder: (context) => const ExamShilftDetailScreen());
 
       case msteamtool:
         return MaterialPageRoute(
