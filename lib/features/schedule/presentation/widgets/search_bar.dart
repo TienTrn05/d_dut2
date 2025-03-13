@@ -24,7 +24,7 @@ class _SearchBarCustomState extends State<SearchBarCustom> {
         filled: true,
         fillColor: Color.fromRGBO(245, 245, 245, 1),
         contentPadding:
-            EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
