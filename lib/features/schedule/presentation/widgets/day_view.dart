@@ -1,19 +1,80 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/calendar_month.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/selection_button.dart';
 import 'package:flutter/material.dart';
 
-class DayView extends StatelessWidget {
+final List<Map<String, dynamic>> scheduleItems = [
+  {
+    'idSubject': '1024010.2420.21.12',
+    'subject': 'Lập trình di động',
+    'time': '7:00, xuất 2C1, nhóm A',
+    'room': 'F109',
+    'isExam': true,
+  },
+  {
+    'idSubject': '1024010.2420.21.13',
+    'subject': 'Hệ điều hành',
+    'time': '9:00 - 11:50',
+    'room': 'F207',
+    'isExam': false,
+  },
+  {
+    'idSubject': '1024010.2420.21.13',
+    'subject': 'Hệ điều hành',
+    'time': '9:00 - 11:50',
+    'room': 'F207',
+    'isExam': true,
+  },
+  {
+    'idSubject': '1024010.2420.21.13',
+    'subject': 'Hệ điều hành',
+    'time': '9:00 - 11:50',
+    'room': 'F207',
+    'isExam': false,
+  },
+  {
+    'idSubject': '1024010.2420.21.13',
+    'subject': 'Hệ điều hành',
+    'time': '9:00 - 11:50',
+    'room': 'F207',
+    'isExam': false,
+  },
+];
+
+class DayView extends StatefulWidget {
   const DayView({super.key});
 
   @override
+  State<DayView> createState() => _DayViewState();
+}
+
+class _DayViewState extends State<DayView> {
+  Set<String> selectedOptions = {'isStudy', 'isExam'};
+
+  void handleSelectionChanged(Set<String> newSelection) {
+    setState(() {
+      selectedOptions = newSelection;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> filteredItems = scheduleItems.where((item) {
+      if (selectedOptions.contains('isStudy') && !item['isExam']) {
+        return true;
+      }
+      if (selectedOptions.contains('isExam') && item['isExam']) {
+        return true;
+      }
+      return false;
+    }).toList();
     return SingleChildScrollView(
       padding: EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CalendarMonth(),
+          CalendarCustom(),
           SizedBox(height: 20),
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -27,50 +88,34 @@ class DayView extends StatelessWidget {
                   height: 1,
                 ),
               ),
-              SelectionButton(),
+              SelectionButton(onSelectionChanged: handleSelectionChanged),
             ],
           ),
           SizedBox(height: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ScheduleItem(
-                idSubject: '1024010.2420.21.11',
-                subject: 'Điện toán đám mây',
-                time: '7:00 - 9:50',
-                room: 'F109',
-              ),
-              const SizedBox(height: 4),
-              ScheduleItem(
-                idSubject: '1024010.2420.21.11',
-                subject: 'Lập trình di động',
-                time: '7:00, xuất 2C1, nhóm A',
-                room: 'F109',
-                isExam: true,
-              ),
-              const SizedBox(height: 4),
-              ScheduleItem(
-                idSubject: '1024010.2420.21.11',
-                subject: 'Đồ án 1',
-                time: '13:00 - 15:50',
-                room: 'F109',
-              ),
-              const SizedBox(height: 4),
-              ScheduleItem(
-                idSubject: '1024010.2420.21.11',
-                subject: 'Đồ án 1',
-                time: '13:00 - 15:50',
-                room: 'F109',
-              ),
-              const SizedBox(height: 4),
-              ScheduleItem(
-                idSubject: '1024010.2420.21.11',
-                subject: 'Đồ án 1',
-                time: '13:00 - 15:50',
-                room: 'F109',
-              ),
-            ],
-          )
+
+          // Danh sách các ScheduleItem
+          if (filteredItems.isEmpty)
+            Center(
+              child: Text("Hiện không có lịch nào",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: context.theme.grey ?? Colors.grey)),
+            )
+          else
+            Column(
+              children: filteredItems.map((item) {
+                return ScheduleItem(
+                  idSubject: item['idSubject'],
+                  subject: item['subject'],
+                  time: item['time'],
+                  room: item['room'],
+                  isExam: item['isExam'],
+                );
+              }).toList(),
+            ),
+
+          SizedBox(height: 40), // Khoảng cách cuối cùng
         ],
       ),
     );

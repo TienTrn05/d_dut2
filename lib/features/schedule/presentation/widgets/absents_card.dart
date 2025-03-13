@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 
 class AbsentsCard extends StatelessWidget {
@@ -13,7 +14,7 @@ class AbsentsCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 310),
+          constraints: BoxConstraints(maxHeight: 300),
           child: Container(
             padding: EdgeInsets.all(24),
             child: Column(
@@ -28,28 +29,37 @@ class AbsentsCard extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                Flexible(
-                    child: ListView.builder(
-                  shrinkWrap: true,
-                  // physics: const BouncingScrollPhysics(),
-                  itemCount: absentDates.length,
-                  itemBuilder: (context, index) => Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListTile(
-                      title: Center(
-                        child: Text(
-                          absentDates[index],
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 14),
+                if (absentDates.isNotEmpty)
+                  Flexible(
+                      child: ListView.builder(
+                    shrinkWrap: true,
+                    // physics: const BouncingScrollPhysics(),
+                    itemCount: absentDates.length,
+                    itemBuilder: (context, index) => Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListTile(
+                        title: Center(
+                          child: Text(
+                            absentDates[index],
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 14),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ))
+                  ))
+                else
+                  Text(
+                    'Không có buổi vắng nào',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14,
+                        color: context.theme.grey ?? Colors.grey),
+                  )
               ],
             ),
           )),
