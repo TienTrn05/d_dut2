@@ -37,7 +37,7 @@ class AuthTextField extends StatelessWidget {
       keyboardType: keyboardType,
       enabled: enabled,
       style: TextStyle(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
+          // fontFamily: GoogleFonts.notoSans().fontFamily,
           fontSize: 14,
           height: 1),
       onChanged: onChanged,

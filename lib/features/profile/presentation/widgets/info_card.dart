@@ -48,7 +48,7 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
                     return Transform.rotate(
                       angle: value * (3.1415926535 / 2), // 90 độ = pi/2 radian
                       child: Icon(
-                        Icons.keyboard_arrow_down, // Chỉ dùng 1 icon
+                        Icons.keyboard_arrow_down_rounded, // Chỉ dùng 1 icon
                         color: Colors.black,
                         size: 24,
                       ),

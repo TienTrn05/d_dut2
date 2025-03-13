@@ -1,6 +1,6 @@
+import 'package:e_dut/features/schedule/presentation/widgets/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/calendar_month.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/selection_button.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/subject_item.dart';
 import 'package:flutter/material.dart';
 
 class DayView extends StatelessWidget {
@@ -30,36 +30,41 @@ class DayView extends StatelessWidget {
               SelectionButton(),
             ],
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SubjectItem(
+              ScheduleItem(
+                idSubject: '1024010.2420.21.11',
                 subject: 'Điện toán đám mây',
                 time: '7:00 - 9:50',
                 room: 'F109',
               ),
               const SizedBox(height: 4),
-              SubjectItem(
+              ScheduleItem(
+                idSubject: '1024010.2420.21.11',
                 subject: 'Lập trình di động',
                 time: '7:00, xuất 2C1, nhóm A',
                 room: 'F109',
                 isExam: true,
               ),
               const SizedBox(height: 4),
-              SubjectItem(
+              ScheduleItem(
+                idSubject: '1024010.2420.21.11',
                 subject: 'Đồ án 1',
                 time: '13:00 - 15:50',
                 room: 'F109',
               ),
               const SizedBox(height: 4),
-              SubjectItem(
+              ScheduleItem(
+                idSubject: '1024010.2420.21.11',
                 subject: 'Đồ án 1',
                 time: '13:00 - 15:50',
                 room: 'F109',
               ),
               const SizedBox(height: 4),
-              SubjectItem(
+              ScheduleItem(
+                idSubject: '1024010.2420.21.11',
                 subject: 'Đồ án 1',
                 time: '13:00 - 15:50',
                 room: 'F109',
