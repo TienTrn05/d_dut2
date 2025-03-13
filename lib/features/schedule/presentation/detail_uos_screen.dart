@@ -143,8 +143,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                               final Uri url = Uri.parse(
                                   "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429");
                               if (await canLaunchUrl(url)) {
-                                await launchUrl(url,
-                                    mode: LaunchMode.externalApplication);
+                                await launchUrl(url);
                               } else if (context.mounted) {
                                 CustomSnackbar.showSnackBar(
                                   context,
