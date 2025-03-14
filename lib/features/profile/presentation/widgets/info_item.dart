@@ -27,7 +27,7 @@ class InfoItem extends StatelessWidget {
             child: Text(
               '$field:',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Color(0xFF747474),
                 height: 1.5,
               ),
@@ -42,7 +42,7 @@ class InfoItem extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                       height: 1.5,

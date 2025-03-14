@@ -137,7 +137,9 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   child: Text(
                     text,
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        height: 1),
                   ),
                 );
               },

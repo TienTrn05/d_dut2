@@ -1,8 +1,8 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
-import 'package:e_dut/features/schedule/presentation/day_view.dart';
-import 'package:e_dut/features/schedule/presentation/semester_view.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/day_view.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/semester_view.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleScreen extends StatefulWidget {
