@@ -5,6 +5,7 @@ import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
 import '../../../features/schedule/presentation/schedule_screen.dart';
+import '../../features/schedule/presentation/detail_uos_teacher_screen.dart';
 
 class Routes {
   static const String root = "/";
@@ -27,7 +28,7 @@ class Routes {
             builder: (settings) => const NotificationScreen());
 
       case schedule:
-        return MaterialPageRoute(builder: (context) => const ScheduleScreen());
+        return MaterialPageRoute(builder: (context) => const DetailUOSTeacherScreen());
 
       case detail_unit_of_study:
         final idSubject = settings.arguments as String; // Lấy id từ arguments
