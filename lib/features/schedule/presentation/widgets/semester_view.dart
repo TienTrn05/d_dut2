@@ -58,6 +58,22 @@ class _SemesterViewState extends State<SemesterView> {
     );
   }
 
+  void _previousSemester() {
+    if (selectedSemesterIndex < semesters.length - 1) {
+      setState(() {
+        selectedSemesterIndex++;
+      });
+    }
+  }
+
+  void _nextSemester() {
+    if (selectedSemesterIndex > 0) {
+      setState(() {
+        selectedSemesterIndex--;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -70,7 +86,8 @@ class _SemesterViewState extends State<SemesterView> {
             mainAxisSize: MainAxisSize.max,
             children: [
               GestureDetector(
-                  onTap: () {}, child: Icon(Icons.arrow_back_ios_new_rounded)),
+                  onTap: _previousSemester,
+                  child: Icon(Icons.arrow_back_ios_new_rounded)),
               GestureDetector(
                 onTap: () => _showPicker(context),
                 child: Text(
@@ -80,7 +97,8 @@ class _SemesterViewState extends State<SemesterView> {
                 ),
               ),
               GestureDetector(
-                  onTap: () {}, child: Icon(Icons.arrow_forward_ios_rounded)),
+                  onTap: _nextSemester,
+                  child: Icon(Icons.arrow_forward_ios_rounded)),
             ],
           ),
           const SizedBox(height: 20),

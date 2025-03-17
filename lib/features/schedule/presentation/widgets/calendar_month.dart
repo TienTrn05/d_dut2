@@ -20,7 +20,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
   Map<DateTime, List<String>> events = {
     DateTime.utc(2025, 3, 10): ["học", "thi"],
     DateTime.utc(2025, 3, 15): ["thi"],
-    DateTime.utc(2025, 3, 20): ["học", "học"],
+    DateTime.utc(2025, 3, 20): ["học"],
   };
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Lịch mặc định là tháng
