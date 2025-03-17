@@ -4,6 +4,7 @@ import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   const DetailUOSTeacherScreen({super.key});
@@ -12,9 +13,29 @@ class DetailUOSTeacherScreen extends StatefulWidget {
   State<DetailUOSTeacherScreen> createState() => _DetailUOSTeacherScreenState();
 }
 
-class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen> {
+class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
+    with SingleTickerProviderStateMixin {
   bool isCheckAbsent = true;
   bool isOverlayVisible = false;
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    // Lắng nghe sự thay đổi tab và cập nhật state
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {}); // Cập nhật giao diện khi tab thay đổi
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +95,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen> {
                     height: 28,
                     color: Colors.white,
                     child: TabBar.secondary(
+                      controller: _tabController,
                       labelColor: Colors.white,
                       unselectedLabelColor: context.theme.grey,
                       indicator: BoxDecoration(
@@ -102,6 +124,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen> {
                     child: Container(
                       width: double.infinity,
                       child: TabBarView(
+                        controller: _tabController,
                         children: [
                           Center(child: Text("Thông tin ca thi")),
                           Column(
@@ -200,42 +223,104 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Container(
-                  alignment: Alignment.topRight,
-                  padding: EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 1),
-                    color: Color.fromRGBO(255, 255, 255, 0.7),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        bottom: 80,
-                        right: 0,
-                        child: Row(
-                          children: [
-                            Text("Tổng quan"),
-                            ElevatedButton(
-                              onPressed: () {},
-                              child: Icon(Icons.verified_user),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                child: GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      isOverlayVisible = !isOverlayVisible;
+                    });
+                  },
+                  child: Container(
+                    alignment: Alignment.topRight,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(255, 255, 255, 0.7),
+                    ),
+                    
                   ),
                 ),
               )
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              isOverlayVisible = !isOverlayVisible;
-            });
-          },
-          child: Icon(Icons.checklist),
-        ),
+        floatingActionButton: _tabController.index == 1
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isOverlayVisible) ...[
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: Center(
+                            child: FloatingActionButton.small(
+                              onPressed: () {
+                                setState(() {
+                                  isCheckAbsent = !isCheckAbsent;
+                                  isOverlayVisible = !isOverlayVisible;
+                                });
+                              },
+                              backgroundColor: context.theme.lightBlue,
+                              shape: CircleBorder(),
+                              foregroundColor: Colors.white,
+                              child: SvgPicture.asset(
+                                isCheckAbsent
+                                    ? "assets/icons/svg/student_tracking_overview.svg"
+                                    : "assets/icons/svg/student_tracking.svg",
+                                width: 18,
+                                height: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                  ], // Khoảng cách giữa hai FAB]
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isOverlayVisible) ...[
+                        Text(
+                          !isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                      ],
+                      FloatingActionButton(
+                        onPressed: () {
+                          setState(() {
+                            isOverlayVisible = !isOverlayVisible;
+                          });
+                        },
+                        backgroundColor: context.theme.primaryColor,
+                        shape: CircleBorder(),
+                        child: SvgPicture.asset(
+                          isCheckAbsent
+                              ? "assets/icons/svg/student_tracking.svg"
+                              : "assets/icons/svg/student_tracking_overview.svg",
+                          width: 24,
+                          height: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : null,
       ),
     );
   }
