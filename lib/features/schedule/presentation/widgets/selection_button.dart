@@ -2,8 +2,8 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 
 class SelectionButton extends StatefulWidget {
-  // final Function(Set<String>) onSelectionChanged;
-  const SelectionButton({super.key});
+  final Function(Set<String>) onSelectionChanged;
+  const SelectionButton({super.key, required this.onSelectionChanged});
 
   @override
   State<SelectionButton> createState() => _SelectionButtonState();
@@ -19,7 +19,7 @@ class _SelectionButtonState extends State<SelectionButton> {
       } else {
         selectedOptions.add(option); // Chọn nếu chưa được chọn
       }
-      // widget.onSelectionChanged(selectedOptions);
+      widget.onSelectionChanged(selectedOptions);
     });
   }
 

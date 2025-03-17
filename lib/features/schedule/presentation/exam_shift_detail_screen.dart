@@ -116,6 +116,7 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
                               itemBuilder: (context, index) => StudentCard(
                                 name: "Nhật Hạ",
                                 mail: "102210159@sv1.dut.udn.vn",
+                                absentCount: index,
                               ),
                             ),
                           ),
