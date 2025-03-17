@@ -1,3 +1,4 @@
+import 'package:e_dut/features/schedule/presentation/detail_uos_teacher_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../features/auth/presentation/auth_screen.dart';
@@ -27,7 +28,7 @@ class Routes {
 
       case schedule:
         return MaterialPageRoute(
-            builder: (context) => const ExamShilftDetailScreen());
+            builder: (context) => const DetailUOSTeacherScreen());
 
       case msteamtool:
         return MaterialPageRoute(
