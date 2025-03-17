@@ -18,6 +18,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   bool isCheckAbsent = true;
   bool isOverlayVisible = false;
   late TabController _tabController;
+  bool isSellectedAll = false;
 
   @override
   void initState() {
@@ -158,16 +159,17 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           width: 18,
                                           height: 18,
                                           child: Checkbox(
-                                            value: isCheckAbsent,
+                                            value: isSellectedAll,
                                             activeColor:
                                                 context.theme.primaryColor,
                                             onChanged: (bool? newValue) {
                                               setState(() {
-                                                isCheckAbsent = !isCheckAbsent;
+                                                // Chọn tất cả
+                                                isSellectedAll = !isSellectedAll;
                                               });
                                             },
-                                            visualDensity: VisualDensity
-                                                .compact, // Giảm khoảng cách xung quanh
+                                            visualDensity:
+                                                VisualDensity.compact,
                                             materialTapTargetSize:
                                                 MaterialTapTargetSize
                                                     .shrinkWrap,
@@ -194,7 +196,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 ],
                               ),
                               Expanded(
-                                // Để danh sách có thể cuộn trong phần còn lại của màn hình
                                 child: ListView.builder(
                                   itemCount: 10,
                                   itemBuilder: (context, index) => StudentCard(
@@ -202,6 +203,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                     mail: "102210159@sv1.dut.udn.vn",
                                     absentCount: index,
                                     isCheckAbsent: isCheckAbsent,
+                                    isAbsentToday: isSellectedAll,
                                   ),
                                 ),
                               ),
@@ -224,7 +226,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                 left: 0,
                 right: 0,
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     setState(() {
                       isOverlayVisible = !isOverlayVisible;
                     });
@@ -234,7 +236,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(255, 255, 255, 0.7),
                     ),
-                    
                   ),
                 ),
               )

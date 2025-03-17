@@ -3,24 +3,26 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 
 class StudentCard extends StatefulWidget {
-  StudentCard(
-      {super.key,
-      required this.name,
-      required this.mail,
-      this.absentCount,
-      this.isCheckAbsent = false});
+  StudentCard({
+    super.key,
+    required this.name,
+    required this.mail,
+    this.absentCount,
+    this.isCheckAbsent = false,
+    this.isAbsentToday = false,
+  });
 
   final name;
   final mail;
   final absentCount;
   bool isCheckAbsent;
+  bool isAbsentToday;
 
   @override
   State<StudentCard> createState() => _StudentCardState();
 }
 
 class _StudentCardState extends State<StudentCard> {
-  bool isAbsent = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -107,11 +109,11 @@ class _StudentCardState extends State<StudentCard> {
               width: 83,
               alignment: Alignment.center,
               child: Checkbox(
-                value: isAbsent,
+                value: widget.isAbsentToday,
                 activeColor: context.theme.primaryColor,
                 onChanged: (bool? newValue) {
                   setState(() {
-                    isAbsent = !isAbsent;
+                    widget.isAbsentToday = !widget.isAbsentToday;
                   });
                 },
               ),
