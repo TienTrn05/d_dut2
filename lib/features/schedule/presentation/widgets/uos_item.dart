@@ -33,7 +33,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => {
         Navigator.of(context)
-            .pushNamed(Routes.detail_unit_of_study, arguments: idSubject)
+            .pushNamed(Routes.detailUnitOfStudy, arguments: idSubject)
       },
       child: Container(
         width: double.infinity,

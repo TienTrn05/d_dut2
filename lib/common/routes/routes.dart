@@ -13,7 +13,8 @@ class Routes {
   static const String notification = "/notification";
   static const String schedule = "/schedule";
   static const String msteamtool = "/msteamtool";
-  static const String detail_unit_of_study = "/detailUnitOfStudy";
+  static const String detailUnitOfStudy = "/detailUnitOfStudy";
+  static const String detailUnitOfStudyTeacher = "/detailUOSTeacher";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -28,12 +29,17 @@ class Routes {
             builder: (settings) => const NotificationScreen());
 
       case schedule:
-        return MaterialPageRoute(builder: (context) => const DetailUOSTeacherScreen());
+        return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
-      case detail_unit_of_study:
+      case detailUnitOfStudy:
         final idSubject = settings.arguments as String; // Lấy id từ arguments
         return MaterialPageRoute(
           builder: (context) => DetailUnitOfStudy(idSubject: idSubject),
+        );
+
+      case detailUnitOfStudyTeacher:
+        return MaterialPageRoute(
+          builder: (context) => DetailUOSTeacherScreen(),
         );
 
       case msteamtool:

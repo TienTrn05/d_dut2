@@ -266,8 +266,9 @@ class DashboardScreen extends StatelessWidget {
                                       SliverGridDelegateWithMaxCrossAxisExtent(
                                     maxCrossAxisExtent:
                                         200, // Chiều rộng tối đa của item
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    mainAxisExtent: 150,
                                   ),
                                   children: [
                                     FeatureCard(
@@ -278,7 +279,7 @@ class DashboardScreen extends StatelessWidget {
                                       onTap: () {
                                         context.read<DashboardBloc>().add(
                                             DashboardNavigateRequested(
-                                                scopes, Routes.schedule));
+                                                scopes, Routes.detailUnitOfStudyTeacher));
                                       },
                                     ),
                                     FeatureCard(
