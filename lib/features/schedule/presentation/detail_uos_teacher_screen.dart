@@ -15,10 +15,11 @@ class DetailUOSTeacherScreen extends StatefulWidget {
 
 class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
-  bool isCheckAbsent = true;
+  bool isCheckAbsent = false;
   bool isOverlayVisible = false;
   late TabController _tabController;
   bool isSellectedAll = false;
+  var currentDate = "17/03/2025, tuần 3";
 
   @override
   void initState() {
@@ -99,6 +100,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                       controller: _tabController,
                       labelColor: Colors.white,
                       unselectedLabelColor: context.theme.grey,
+                      dividerColor: context.theme.primaryColor,
                       indicator: BoxDecoration(
                         color: context.theme.primaryColor,
                         borderRadius:
@@ -113,6 +115,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         fontSize: 13,
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,
+                      labelPadding:
+                          EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                       tabs: [
                         Tab(text: "Thông tin"),
                         Tab(text: "Điểm danh"),
@@ -133,6 +137,112 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                             spacing: 4,
                             children: [
                               SearchBarCustom(),
+                              if (isCheckAbsent) ...[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      flex: 5,
+                                      child: ElevatedButton(
+                                        onPressed: () {},
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          side: BorderSide(
+                                            color: context.theme.primaryColor ??
+                                                Colors.blue,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 4,
+                                            horizontal: 8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '$currentDate',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: context.theme.primaryColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      flex: 4,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Flexible(
+                                            child: OutlinedButton(
+                                              onPressed: () {},
+                                              style: OutlinedButton.styleFrom(
+                                                backgroundColor: Colors.white,
+                                                side: BorderSide(
+                                                  color: context.theme.red ??
+                                                      Colors.red,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 4,
+                                                  horizontal: 8,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Xóa',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: context.theme.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Flexible(
+                                            child: OutlinedButton(
+                                              onPressed: () {},
+                                              style: OutlinedButton.styleFrom(
+                                                backgroundColor: context
+                                                        .theme.primaryColor ??
+                                                    Colors.blue,
+                                                side: BorderSide(
+                                                  color: context
+                                                          .theme.primaryColor ??
+                                                      Colors.blue,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                  vertical: 4,
+                                                  horizontal: 8,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Lưu',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -165,7 +275,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             onChanged: (bool? newValue) {
                                               setState(() {
                                                 // Chọn tất cả
-                                                isSellectedAll = !isSellectedAll;
+                                                isSellectedAll =
+                                                    !isSellectedAll;
                                               });
                                             },
                                             visualDensity:
@@ -197,14 +308,22 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                               ),
                               Expanded(
                                 child: ListView.builder(
-                                  itemCount: 10,
-                                  itemBuilder: (context, index) => StudentCard(
-                                    name: "Nhật Hạ",
-                                    mail: "102210159@sv1.dut.udn.vn",
-                                    absentCount: index,
-                                    isCheckAbsent: isCheckAbsent,
-                                    isAbsentToday: isSellectedAll,
-                                  ),
+                                  itemCount:
+                                      10 + 1, // Thêm 1 phần tử cho SizedBox
+                                  itemBuilder: (context, index) {
+                                    if (index == 10) {
+                                      return SizedBox(
+                                          height:
+                                              56); // Thêm khoảng trống cuối danh sách
+                                    }
+                                    return StudentCard(
+                                      name: "Nhật Hạ",
+                                      mail: "102210159@sv1.dut.udn.vn",
+                                      absentCount: index,
+                                      isCheckAbsent: isCheckAbsent,
+                                      isAbsentToday: isSellectedAll,
+                                    );
+                                  },
                                 ),
                               ),
                             ],
