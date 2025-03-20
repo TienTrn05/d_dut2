@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
@@ -35,7 +36,7 @@ class DetailUnitOfStudy extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: FontSizes.medium,
           ),
         ),
         centerTitle: true,
@@ -54,7 +55,7 @@ class DetailUnitOfStudy extends StatelessWidget {
             Text(
               'Lập trình di động',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: FontSizes.extraLarge,
                 fontWeight: FontWeight.bold,
                 height: 1.25,
                 color: context.theme.primaryColor ?? Colors.blue,
@@ -109,7 +110,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                           value: Text(
                             "012ajsh",
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: FontSizes.medium,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                               height: 1.5,
@@ -156,7 +157,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                             child: Text(
                               "Link tham gia Teams",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: FontSizes.medium,
                                 fontWeight: FontWeight.w400,
                                 color:
                                     context.theme.primaryColor ?? Colors.blue,
@@ -216,7 +217,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                               child: Text(
                                 "3",
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: FontSizes.medium,
                                   fontWeight: FontWeight.bold,
                                   color: context.theme.red ?? Colors.red,
                                   decoration: TextDecoration.underline,

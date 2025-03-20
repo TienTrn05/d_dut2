@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -98,7 +99,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
               titleTextStyle: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color.fromRGBO(42, 116, 189, 1),
-                fontSize: 14,
+                fontSize: FontSizes.medium,
               ),
               titleTextFormatter: (date, locale) {
                 String monthNumber =
@@ -187,9 +188,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 });
               },
               child: Text(
-                _calendarFormat == CalendarFormat.month
-                    ? "- Thu gọn -"
-                    : "- Tuần " + _currentWeek.toString() + " -",
+                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" : "",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],

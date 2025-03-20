@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,7 +29,7 @@ class AuthButton extends StatelessWidget {
             color: Colors.white,
             fontFamily: GoogleFonts.notoSans().fontFamily,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: FontSizes.medium,
           )),
     );
   }

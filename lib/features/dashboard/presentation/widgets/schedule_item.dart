@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
@@ -38,7 +39,7 @@ class ScheduleItem extends StatelessWidget {
           Text(
             subject,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: FontSizes.medium,
               fontWeight: FontWeight.bold,
               height: 1.25,
             ),
@@ -54,7 +55,7 @@ class ScheduleItem extends StatelessWidget {
                   child: Text(
                     time,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: FontSizes.medium,
                       height: 1.25,
                     ),
                     maxLines: 1,
@@ -66,7 +67,7 @@ class ScheduleItem extends StatelessWidget {
                   room,
                   style: TextStyle(
                     color: Color.fromRGBO(116, 116, 116, 1),
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     height: 1.25,
                   ),

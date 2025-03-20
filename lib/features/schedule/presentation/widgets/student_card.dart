@@ -1,5 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/absents_card.dart';
 import 'package:flutter/material.dart';
 
 class StudentCard extends StatefulWidget {
@@ -39,68 +40,86 @@ class _StudentCardState extends State<StudentCard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1,
-                  ),
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(Icons.error,
-                          size: 40, color: Colors.red); // Hiển thị icon lỗi
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${widget.name}",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+          Expanded(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 1,
                     ),
                   ),
-                  Text(
-                    "${widget.mail}",
-                    style: TextStyle(
-                      fontSize: 13,
+                  child: ClipOval(
+                    child: Image.network(
+                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.error,
+                            size: 40, color: Colors.red); // Hiển thị icon lỗi
+                      },
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${widget.name}",
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        softWrap: true, // Cho phép xuống hàng
+                        overflow: TextOverflow.visible, // Không cắt chữ
+                      ),
+                      Text(
+                        "${widget.mail}",
+                        style: TextStyle(
+                          fontSize: FontSizes.small,
+                        ),
+                        softWrap: true, // Cho phép xuống hàng
+                        overflow: TextOverflow.visible, // Không cắt chữ
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           if (!widget.isCheckAbsent)
             // ignore: dead_code
             Container(
               width: 39,
               alignment: Alignment.center,
-              child: Text(
-                "${widget.absentCount}",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: widget.absentCount % 2 == 0
-                      ? context.theme.red
-                      : context.theme.grey,
-                  decoration: TextDecoration.underline,
-                  decorationColor: widget.absentCount % 2 == 0
-                      ? context.theme.red
-                      : context.theme.grey,
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        const AbsentsCard(isTeacher: true, absentDates: []),
+                  );
+                },
+                child: Text(
+                  "${widget.absentCount}",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: widget.absentCount % 2 == 0
+                        ? context.theme.red
+                        : context.theme.grey,
+                    decoration: TextDecoration.underline,
+                    decorationColor: widget.absentCount % 2 == 0
+                        ? context.theme.red
+                        : context.theme.grey,
+                  ),
                 ),
               ),
             )

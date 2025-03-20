@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleCard extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
                 Text(
                   widget.title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: widget.isExam
                         ? context.theme.red ?? Colors.red

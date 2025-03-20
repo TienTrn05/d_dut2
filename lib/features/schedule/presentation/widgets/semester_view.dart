@@ -1,7 +1,11 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/schedule_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/uos_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SemesterView extends StatefulWidget {
   const SemesterView({super.key});
@@ -47,7 +51,7 @@ class _SemesterViewState extends State<SemesterView> {
                             child: Text(
                           e,
                           style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: FontSizes.medium,
                               fontWeight: FontWeight.bold,
                               height: 1.25),
                         )))
@@ -76,6 +80,13 @@ class _SemesterViewState extends State<SemesterView> {
 
   @override
   Widget build(BuildContext context) {
+    final String userType =
+        context.read<AuthBloc>().state is AuthUserAuthenticated
+            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
+                .userData
+                .userType
+                .name
+            : "Student";
     return SafeArea(
         child: Padding(
       padding: EdgeInsets.all(24),
@@ -93,7 +104,7 @@ class _SemesterViewState extends State<SemesterView> {
                 child: Text(
                   semesters[selectedSemesterIndex],
                   style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                      fontSize: FontSizes.medium, fontWeight: FontWeight.bold),
                 ),
               ),
               GestureDetector(
@@ -107,7 +118,7 @@ class _SemesterViewState extends State<SemesterView> {
             child: Column(
               children: [
                 ScheduleCard(
-                  title: "Lịch học",
+                  title: userType == "Student" ? "Lịch học" : "Lịch dạy",
                   child: Column(
                     children: [
                       DetailUnitOfStudyItem(
@@ -152,7 +163,7 @@ class _SemesterViewState extends State<SemesterView> {
                 ),
                 const SizedBox(height: 20),
                 ScheduleCard(
-                  title: "Lịch thi",
+                  title: userType == "Student" ? "Lịch thi" : "Lịch coi thi",
                   isExam: true,
                   child: Column(
                     children: [

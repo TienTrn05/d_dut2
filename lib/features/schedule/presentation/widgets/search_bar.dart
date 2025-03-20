@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class SearchBarCustom extends StatefulWidget {
@@ -13,8 +14,7 @@ class _SearchBarCustomState extends State<SearchBarCustom> {
   Widget build(BuildContext context) {
     return TextField(
       decoration: InputDecoration(
-        prefixIcon:
-            Icon(Icons.search, color: context.theme.grey),
+        prefixIcon: Icon(Icons.search, color: context.theme.grey),
         hintText: "Tìm kiếm...",
         hintStyle: TextStyle(color: context.theme.grey),
         border: OutlineInputBorder(
@@ -23,9 +23,9 @@ class _SearchBarCustomState extends State<SearchBarCustom> {
         ),
         filled: true,
         fillColor: Color.fromRGBO(245, 245, 245, 1),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
+      style: TextStyle(fontSize: FontSizes.medium),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -82,7 +83,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 14,
+              fontSize: FontSizes.medium,
             ),
           ),
           centerTitle: true, // Căn giữa tiêu đề
@@ -119,7 +120,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     Text(
                       "Thông báo",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: FontSizes.extraLarge,
                         fontWeight: FontWeight.bold,
                         color: context.theme.primaryColor,
                       ),
@@ -165,6 +166,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     border: InputBorder.none,
                     icon: Icon(Icons.search, color: context.theme.grey),
                   ),
+                  style: TextStyle(fontSize: FontSizes.medium),
                 ),
               ),
               const SizedBox(height: 10),
@@ -176,8 +178,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   indicator: BoxDecoration(
                     color: context.theme.primaryColor, // Màu nền tab được chọn
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
                     ),
                   ),
                   labelColor: Colors.white, // Màu chữ của tab được chọn
@@ -190,7 +192,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: Center(
                           child: Text("Thông báo của tôi",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.bold,
                               )),
                         ),
@@ -202,7 +204,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: Center(
                           child: Text("Chung",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.bold,
                               )),
                         ),

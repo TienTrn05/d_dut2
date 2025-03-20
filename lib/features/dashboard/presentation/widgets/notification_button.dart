@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -47,7 +48,7 @@ class NotificationButton extends StatelessWidget {
                       '$notificationCount',
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
-                        fontSize: 12,
+                        fontSize: FontSizes.small,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

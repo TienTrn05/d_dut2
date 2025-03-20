@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class UosInfoCard extends StatefulWidget {
@@ -51,7 +52,7 @@ class _UosInfoCardState extends State<UosInfoCard> {
                 Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
