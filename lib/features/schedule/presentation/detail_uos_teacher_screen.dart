@@ -1,10 +1,17 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
+import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/absents_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/uos_info_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/uos_info_item.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   const DetailUOSTeacherScreen({super.key});
@@ -122,12 +129,172 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                   ),
                   // TabBarView
                   Expanded(
-                    child: Container(
+                    child: SizedBox(
                       width: double.infinity,
                       child: TabBarView(
                         controller: _tabController,
                         children: [
-                          Center(child: Text("Thông tin ca thi")),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    UosInfoCard(
+                                      title: 'Thông tin chung',
+                                      child: Column(
+                                        children: [
+                                          InfoItem(
+                                              field: "Mã lớp học phần",
+                                              value: "1024010.2420.21.11"),
+                                          InfoItem(
+                                              field: "Mã môn", value: "123456"),
+                                          InfoItem(
+                                            field: "Hệ",
+                                            value: "CLC",
+                                          ),
+                                          InfoItem(
+                                            field: "Số tín chỉ",
+                                            value: "03",
+                                          ),
+                                          InfoItem(
+                                            field: "Kỳ học",
+                                            value: "Học kì 1, 2025-2026",
+                                          ),
+                                          InfoItem(
+                                            field: "Tuần học",
+                                            value: "31-43",
+                                          ),
+                                          InfoItem(
+                                            field: "TKB",
+                                            value: "Thứ 4, 1-3, F109",
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    UosInfoCard(
+                                      title: 'Giảng dạy',
+                                      child: Column(
+                                        children: [
+                                          InfoItem(
+                                              field: "Hình thức GD",
+                                              value: "Offline & Online"),
+                                          UosInfoItem(
+                                            field: "Mã truy cập",
+                                            value: Text(
+                                              "012ajsh",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                                height: 1.5,
+                                              ),
+                                            ),
+                                            linkIconAsset:
+                                                "assets/icons/svg/lucide_copy.svg",
+                                            action: () {
+                                              try {
+                                                Clipboard.setData(ClipboardData(
+                                                    text: "012ajsh"));
+                                                // debugPrint("Copied: 012ajsh");
+                                                CustomSnackbar.showSnackBar(
+                                                  context,
+                                                  "Thành công",
+                                                  "Đã sao chép mã 012ajsh",
+                                                  AlertType.success,
+                                                );
+                                              } catch (e) {
+                                                CustomSnackbar.showSnackBar(
+                                                  context,
+                                                  "Lỗi",
+                                                  "Không thể sao chép",
+                                                  AlertType.error,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          UosInfoItem(
+                                            field: "Link tham gia",
+                                            value: GestureDetector(
+                                              onTap: () async {
+                                                final Uri url = Uri.parse(
+                                                    "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429");
+                                                if (await canLaunchUrl(url)) {
+                                                  await launchUrl(url);
+                                                } else if (context.mounted) {
+                                                  CustomSnackbar.showSnackBar(
+                                                    context,
+                                                    "Lỗi",
+                                                    "Không thể truy cập link",
+                                                    AlertType.error,
+                                                  );
+                                                }
+                                              },
+                                              child: Text(
+                                                "Link tham gia Teams",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: context
+                                                          .theme.primaryColor ??
+                                                      Colors.blue,
+                                                  fontStyle: FontStyle.italic,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor: context
+                                                          .theme.primaryColor ??
+                                                      Colors.blue,
+                                                  height: 1.5,
+                                                ),
+                                              ),
+                                            ),
+                                            linkIconAsset:
+                                                "assets/icons/svg/lucide_copy.svg",
+                                            action: () {
+                                              try {
+                                                Clipboard.setData(ClipboardData(
+                                                    text:
+                                                        "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429"));
+                                                // debugPrint("Copied: 012ajsh");
+                                                CustomSnackbar.showSnackBar(
+                                                  context,
+                                                  "Thành công",
+                                                  "Đã sao chép đường link",
+                                                  AlertType.success,
+                                                );
+                                              } catch (e) {
+                                                CustomSnackbar.showSnackBar(
+                                                  context,
+                                                  "Lỗi",
+                                                  "Không thể sao chép",
+                                                  AlertType.error,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    UosInfoCard(
+                                      title: 'Đánh giá',
+                                      child: Column(
+                                        children: [
+                                          InfoItem(
+                                              field: "Công thức điểm",
+                                              value:
+                                                  "[GK]*0.20+[BT]*0.20+[CK]*0.60"),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                  ],
+                                ),
+                              ))
+                            ],
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             spacing: 4,
@@ -165,7 +332,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             onChanged: (bool? newValue) {
                                               setState(() {
                                                 // Chọn tất cả
-                                                isSellectedAll = !isSellectedAll;
+                                                isSellectedAll =
+                                                    !isSellectedAll;
                                               });
                                             },
                                             visualDensity:

@@ -28,7 +28,8 @@ class Routes {
             builder: (settings) => const NotificationScreen());
 
       case schedule:
-        return MaterialPageRoute(builder: (context) => const DetailUOSTeacherScreen());
+        // return MaterialPageRoute(builder: (context) => const DetailUOSTeacherScreen());
+        return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
       case detail_unit_of_study:
         final idSubject = settings.arguments as String; // Lấy id từ arguments

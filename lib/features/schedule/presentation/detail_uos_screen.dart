@@ -206,7 +206,11 @@ class DetailUnitOfStudy extends StatelessWidget {
                                 showDialog(
                                   context: context,
                                   builder: (context) => const AbsentsCard(
-                                      isTeacher: false, absentDates: []),
+                                      isTeacher: false,
+                                      absentDates: [
+                                        "10/09/2023",
+                                        "11/09/2023"
+                                      ]),
                                 );
                               },
                               child: Text(
