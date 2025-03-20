@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 enum AlertType {
@@ -46,14 +47,14 @@ class CustomSnackbar {
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
-                        fontSize: 14,
+                        fontSize: FontSizes.medium,
                       ),
                     ),
                     Text(
                       message,
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 14,
+                        fontSize: FontSizes.medium,
                         height: 1.25,
                       ),
                       maxLines: 2,

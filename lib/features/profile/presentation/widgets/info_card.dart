@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class InfoCart extends StatefulWidget {
@@ -59,7 +60,7 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
                 Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: FontSizes.large,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),

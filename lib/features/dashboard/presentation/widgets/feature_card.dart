@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -44,7 +45,7 @@ class FeatureCard extends StatelessWidget {
                     maxLines: 2,
                     style: TextStyle(
                         color: context.theme.primaryColor,
-                        fontSize: 16,
+                        fontSize: FontSizes.large,
                         fontWeight: FontWeight.bold,
                         height: 1),
                     textAlign: TextAlign.center,
@@ -57,7 +58,7 @@ class FeatureCard extends StatelessWidget {
                     subtitle,
                     maxLines: 2,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: FontSizes.small,
                       color: Color.fromRGBO(116, 116, 116, 1),
                       height: 1,
                     ),

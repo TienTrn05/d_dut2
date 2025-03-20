@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class AbsentsCard extends StatelessWidget {
@@ -24,7 +25,9 @@ class AbsentsCard extends StatelessWidget {
               children: [
                 Text(
                   'Các buổi vắng',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: FontSizes.extraLarge,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
                   height: 20,
@@ -46,7 +49,8 @@ class AbsentsCard extends StatelessWidget {
                           child: Text(
                             absentDates[index],
                             style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 14),
+                                fontWeight: FontWeight.w500,
+                                fontSize: FontSizes.medium),
                           ),
                         ),
                       ),
@@ -57,7 +61,7 @@ class AbsentsCard extends StatelessWidget {
                     'Không có buổi vắng nào',
                     style: TextStyle(
                         fontWeight: FontWeight.w400,
-                        fontSize: 14,
+                        fontSize: FontSizes.medium,
                         color: context.theme.grey ?? Colors.grey),
                   )
               ],

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -101,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: 16,
+                                        fontSize: FontSizes.large,
                                         height: 1.5,
                                       ),
                                     ),

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -112,7 +113,7 @@ class LoginForm extends StatelessWidget {
                 Text(
                   "Nhớ mật khẩu",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
                   ),
                 ),
@@ -153,7 +154,7 @@ class LoginForm extends StatelessWidget {
                 style: TextStyle(
                     color: context.theme.primaryColor,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     decoration: TextDecoration.underline,
                     decorationColor: context.theme
                         .primaryColor, // Đảm bảo màu underline giống màu chữ

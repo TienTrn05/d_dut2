@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -113,7 +114,7 @@ class DashboardScreen extends StatelessWidget {
                                               color: Colors.white,
                                               fontFamily: GoogleFonts.notoSans()
                                                   .fontFamily,
-                                              fontSize: 16,
+                                              fontSize: FontSizes.large,
                                               fontWeight: FontWeight.bold,
                                               height: 1,
                                             ),
@@ -126,7 +127,7 @@ class DashboardScreen extends StatelessWidget {
                                               color: Colors.white,
                                               fontFamily: GoogleFonts.notoSans()
                                                   .fontFamily,
-                                              fontSize: 12,
+                                              fontSize: FontSizes.small,
                                               height: 1,
                                             ),
                                           ),
@@ -164,7 +165,7 @@ class DashboardScreen extends StatelessWidget {
                           Text(
                             'Thứ 2',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: FontSizes.large,
                               fontWeight: FontWeight.bold,
                               height: 1.25,
                             ),
@@ -174,7 +175,7 @@ class DashboardScreen extends StatelessWidget {
                             'Tháng 2',
                             style: TextStyle(
                               color: Colors.grey[600],
-                              fontSize: 13,
+                              fontSize: FontSizes.medium,
                               height: 1.25,
                             ),
                           ),
@@ -266,8 +267,9 @@ class DashboardScreen extends StatelessWidget {
                                       SliverGridDelegateWithMaxCrossAxisExtent(
                                     maxCrossAxisExtent:
                                         200, // Chiều rộng tối đa của item
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    mainAxisExtent: 150,
                                   ),
                                   children: [
                                     FeatureCard(
@@ -296,56 +298,62 @@ class DashboardScreen extends StatelessWidget {
                                 );
                               }
 
-                              return GridView(
-                                shrinkWrap: true,
-                                gridDelegate:
-                                    SliverGridDelegateWithMaxCrossAxisExtent(
-                                  maxCrossAxisExtent:
-                                      200, // Chiều rộng tối đa của item
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  mainAxisExtent: 150,
-                                ),
-                                children: [
-                                  FeatureCard(
-                                    iconUrl:
-                                        "assets/icons/svg/solar_calendar-broken.svg",
-                                    title: "Thời khóa biểu",
-                                    subtitle: "Xem lịch học & thi",
-                                    onTap: () {
-                                      context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                              scopes, Routes.schedule));
-                                    },
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/mage_goals.svg",
-                                    title: "Kết quả học tập",
-                                    subtitle: "Tra cứu kết quả học tập",
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/tabler_coin.svg",
-                                    title: "Học phí",
-                                    subtitle: "Học phí",
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "CTĐT",
-                                    subtitle: "Chương trình đào tạo",
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "MS Team tool",
-                                    subtitle: "Học trực tuyến",
-                                    onTap: () {
-                                      context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.msteamtool),
-                                          );
-                                    },
-                                  ),
-                                ],
-                              );
+                              return SizedBox(
+                                  height: 400,
+                                  child: GridView(
+                                    shrinkWrap: true,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent:
+                                          200, // Chiều rộng tối đa của item
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      mainAxisExtent: 150,
+                                    ),
+                                    children: [
+                                      FeatureCard(
+                                        iconUrl:
+                                            "assets/icons/svg/solar_calendar-broken.svg",
+                                        title: "Thời khóa biểu",
+                                        subtitle: "Xem lịch học & thi",
+                                        onTap: () {
+                                          context.read<DashboardBloc>().add(
+                                              DashboardNavigateRequested(
+                                                  scopes, Routes.schedule));
+                                        },
+                                      ),
+                                      FeatureCard(
+                                        iconUrl:
+                                            "assets/icons/svg/mage_goals.svg",
+                                        title: "Kết quả học tập",
+                                        subtitle: "Tra cứu kết quả học tập",
+                                      ),
+                                      FeatureCard(
+                                        iconUrl:
+                                            "assets/icons/svg/tabler_coin.svg",
+                                        title: "Học phí",
+                                        subtitle: "Học phí",
+                                      ),
+                                      FeatureCard(
+                                        iconUrl:
+                                            "assets/icons/svg/carbon_book.svg",
+                                        title: "CTĐT",
+                                        subtitle: "Chương trình đào tạo",
+                                      ),
+                                      FeatureCard(
+                                        iconUrl:
+                                            "assets/icons/svg/carbon_book.svg",
+                                        title: "MS Team tool",
+                                        subtitle: "Học trực tuyến",
+                                        onTap: () {
+                                          context.read<DashboardBloc>().add(
+                                                DashboardNavigateRequested(
+                                                    scopes, Routes.msteamtool),
+                                              );
+                                        },
+                                      ),
+                                    ],
+                                  ));
                             },
                           ),
                         ),

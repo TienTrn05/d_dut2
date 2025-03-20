@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,7 +39,7 @@ class AuthTextField extends StatelessWidget {
       enabled: enabled,
       style: TextStyle(
           // fontFamily: GoogleFonts.notoSans().fontFamily,
-          fontSize: 14,
+          fontSize: FontSizes.medium,
           height: 1),
       onChanged: onChanged,
       onSubmitted: onSubmitted,

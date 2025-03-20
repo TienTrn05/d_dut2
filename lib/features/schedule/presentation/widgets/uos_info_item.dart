@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -27,7 +28,7 @@ class UosInfoItem extends StatelessWidget {
             child: Text(
               '$field:',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: FontSizes.medium,
                 color: Color(0xFF747474),
                 height: 1.5,
               ),
@@ -53,8 +54,8 @@ class UosInfoItem extends StatelessWidget {
                       ),
                       child: SvgPicture.asset(
                         linkIconAsset!,
-                        width: 24,
-                        height: 24,
+                        width: 20,
+                        height: 20,
                       ),
                     ),
                   )

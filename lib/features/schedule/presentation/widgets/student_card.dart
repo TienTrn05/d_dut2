@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/absents_card.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +75,7 @@ class _StudentCardState extends State<StudentCard> {
                       Text(
                         "${widget.name}",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
                         ),
                         softWrap: true, // Cho phép xuống hàng
@@ -84,7 +84,7 @@ class _StudentCardState extends State<StudentCard> {
                       Text(
                         "${widget.mail}",
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: FontSizes.small,
                         ),
                         softWrap: true, // Cho phép xuống hàng
                         overflow: TextOverflow.visible, // Không cắt chữ
@@ -111,7 +111,7 @@ class _StudentCardState extends State<StudentCard> {
                 child: Text(
                   "${widget.absentCount}",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: FontSizes.medium,
                     color: widget.absentCount % 2 == 0
                         ? context.theme.red
                         : context.theme.grey,

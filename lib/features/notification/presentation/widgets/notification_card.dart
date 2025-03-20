@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
@@ -28,19 +29,19 @@ class NotificationCard extends StatelessWidget {
           children: [
             Text(date,
                 style: TextStyle(
-                  color: Color(0xFFCC0102),
-                  fontWeight: FontWeight.bold,
-                )),
+                    color: Color(0xFFCC0102),
+                    fontWeight: FontWeight.bold,
+                    fontSize: FontSizes.medium)),
             SizedBox(height: 5),
             Text(title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: FontSizes.medium,
                 )),
             SizedBox(height: 5),
             Text(content,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: FontSizes.medium,
                   color: context.theme.grey,
                 )),
           ],
