@@ -104,6 +104,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
         backgroundColor: Colors.white,
         endDrawer: Drawer(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+            ),
+          ),
             child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
