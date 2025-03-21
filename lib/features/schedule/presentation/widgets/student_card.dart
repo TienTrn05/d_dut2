@@ -73,7 +73,7 @@ class _StudentCardState extends State<StudentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${widget.name}",
+                        widget.name,
                         style: TextStyle(
                           fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
@@ -82,7 +82,7 @@ class _StudentCardState extends State<StudentCard> {
                         overflow: TextOverflow.visible, // Không cắt chữ
                       ),
                       Text(
-                        "${widget.mail}",
+                        widget.mail,
                         style: TextStyle(
                           fontSize: FontSizes.small,
                         ),
@@ -104,8 +104,11 @@ class _StudentCardState extends State<StudentCard> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) =>
-                        const AbsentsCard(isTeacher: true, absentDates: []),
+                    builder: (context) => const AbsentsCard(
+                        isTeacher: true,
+                        name: "Đỗ Nhật Hoàng",
+                        mail: "102210159@sv1.dut.udn.vn",
+                        absentDates: ["10/09/2023", "11/09/2023"]),
                   );
                 },
                 child: Text(

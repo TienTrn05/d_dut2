@@ -1,5 +1,4 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/schedule_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/uos_item.dart';

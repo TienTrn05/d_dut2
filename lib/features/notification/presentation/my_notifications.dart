@@ -15,6 +15,7 @@ class MyNotifications extends StatelessWidget {
           title:
               "Thầy Văn Công Vũ thông báo đến lớp: Kinh tế chính trị Mác - Lênin [24.Nh86]",
           content: "Thầy nhắn: Lớp NGHỈ HỌC (Tiết:3-4) ngày: 17/02/2025",
+          isRead: false,
         ),
         NotificationCard(
           date: "14/02/2025",
@@ -28,6 +29,7 @@ class MyNotifications extends StatelessWidget {
           title:
               "Thầy Văn Công Vũ thông báo đến lớp: Kinh tế chính trị Mác - Lênin [24.Nh86]",
           content: "Thầy nhắn: Lớp NGHỈ HỌC (Tiết:3-4) ngày: 17/02/2025",
+          isRead: false,
         ),
         NotificationCard(
           date: "14/02/2025",
