@@ -37,7 +37,6 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Container(
                       width: double.infinity,
-                      height: 112,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.theme.primaryColor,
@@ -92,9 +91,10 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.2,
+                                        height: 1,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
                                     Text(
                                       // get string before @
                                       userPrincipalName.split('@').first,
@@ -103,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: FontSizes.large,
-                                        height: 1.5,
+                                        height: 1.25,
                                       ),
                                     ),
                                   ],
