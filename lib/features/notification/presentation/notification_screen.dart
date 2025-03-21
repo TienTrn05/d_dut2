@@ -29,7 +29,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
-      title: Text(title),
+      title: Text(title,
+          style: TextStyle(
+              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
       trailing: Switch(
         padding: EdgeInsets.all(0),
         activeColor: Colors.white,
@@ -43,7 +45,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildDropdownTile() {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
-      title: Text("Thông báo lịch học/thi trước"),
+      title: Text("Thông báo lịch học/thi trước",
+          style: TextStyle(
+              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
       trailing: DropdownButton<String>(
         value: selectedTime,
         onChanged: (String? newValue) {
@@ -54,7 +58,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         items: ["15 phút", "30 phút", "1 giờ", "1 ngày"]
             .map((time) => DropdownMenuItem(
                   value: time,
-                  child: Text(time),
+                  child: Text(time,
+                      style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          fontWeight: FontWeight.bold)),
                 ))
             .toList(),
       ),
@@ -117,16 +124,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.notifications,
-                      color: context.theme.primaryColor,
-                      size: 24,
+                    SvgPicture.asset(
+                      "assets/icons/svg/solar_bell-bold.svg",
+                      colorFilter: ColorFilter.mode(
+                        context.theme.primaryColor ?? Colors.blue,
+                        BlendMode.srcIn,
+                      ),
+                      width: 24,
+                      height: 24,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       "Thông báo",
                       style: TextStyle(
-                        fontSize: FontSizes.extraLarge,
+                        fontSize: FontSizes.large,
                         fontWeight: FontWeight.bold,
                         color: context.theme.primaryColor,
                       ),
