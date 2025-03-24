@@ -194,7 +194,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 });
               },
               child: Text(
-                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" : "",
+                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" :"- Tuần ${ _currentWeek.toString()} -",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],

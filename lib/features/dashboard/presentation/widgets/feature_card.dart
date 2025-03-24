@@ -51,7 +51,7 @@ class FeatureCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 5),
+                // const SizedBox(height: 5),
                 SizedBox(
                   height: 30,
                   child: Text(

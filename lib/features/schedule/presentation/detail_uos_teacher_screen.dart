@@ -14,7 +14,10 @@ import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'widgets/calendar_absent.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   const DetailUOSTeacherScreen({super.key});
@@ -29,8 +32,23 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   bool isOverlayVisible = false;
   late TabController _tabController;
   bool isSellectedAll = false;
-  var currentDate = "17/03/2025, tuần 3";
+  DateTime currentDate = DateTime.now();
+  var selectedDate = "17/03/2025, tuần 3";
+  DateTime startdWeek = DateTime(2025, 3, 3);
   String currentLink = "";
+
+  void _updateCurrentDate(DateTime newValue) {
+    currentDate = newValue;
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+    if (currentDate.isAfter(startdWeek)) {
+      int weekDifference = currentDate.difference(startdWeek).inDays ~/ 7;
+      selectedDate = "$formattedDate, tuần ${weekDifference + 1}";
+    } else {
+      selectedDate = "$formattedDate, tuần 0";
+    }
+    setState(() {});
+    Navigator.pop(context);
+  }
 
   @override
   void initState() {
@@ -38,7 +56,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     _tabController = TabController(length: 3, vsync: this);
     // Lắng nghe sự thay đổi tab và cập nhật state
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
+      if (_tabController.indexIsChanging ||
+          _tabController.index != _tabController.previousIndex) {
         setState(() {}); // Cập nhật giao diện khi tab thay đổi
       }
     });
@@ -111,26 +130,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
             ));
       },
     );
-  }
-
-  void _onTabTapped(int index) {
-    int currentIndex = _tabController.index;
-
-    if ((currentIndex - index).abs() > 1) {
-      // Nếu tab cách xa nhau, reset animation và đặt trực tiếp
-      _tabController.animateTo(
-        index,
-        duration: Duration(milliseconds: 1), // Gần như ngay lập tức
-        curve: Curves.ease, // Tránh bị nhảy đột ngột
-      );
-    } else {
-      // Nếu tab kề nhau, dùng animateTo để có hiệu ứng mượt
-      _tabController.animateTo(
-        index,
-        duration: Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
   @override
@@ -208,7 +207,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         fontSize: FontSizes.medium,
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,
-                      onTap: _onTabTapped,
                       tabs: [
                         Tab(text: "Thông tin"),
                         Tab(text: "Điểm danh"),
@@ -441,7 +439,16 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                     Flexible(
                                       flex: 5,
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () => {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  CalendarAbsent(
+                                                    initDate: currentDate,
+                                                    onValueChange:
+                                                        _updateCurrentDate,
+                                                  ))
+                                        },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.white,
                                           side: BorderSide(
@@ -459,7 +466,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           elevation: 0,
                                         ),
                                         child: Text(
-                                          currentDate,
+                                          selectedDate,
                                           style: TextStyle(
                                             fontSize: FontSizes.medium,
                                             color: context.theme.primaryColor,
