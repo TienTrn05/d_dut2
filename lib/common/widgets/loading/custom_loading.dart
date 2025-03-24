@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -8,7 +9,8 @@ class CustomLoading extends StatelessWidget {
   final double size;
   final Color? color;
 
-  const CustomLoading({super.key, this.message = "", this.size = 50.0, this.color});
+  const CustomLoading(
+      {super.key, this.message = "", this.size = 50.0, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class CustomLoading extends StatelessWidget {
               message,
               style: TextStyle(
                 color: color ?? context.theme.primaryColor,
-                fontSize: 16.0,
+                fontSize: FontSizes.large,
                 fontWeight: FontWeight.bold,
               ),
             ),

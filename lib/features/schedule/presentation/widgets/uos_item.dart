@@ -1,6 +1,9 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DetailUnitOfStudyItem extends StatelessWidget {
   final String idSubject;
@@ -30,10 +33,22 @@ class DetailUnitOfStudyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String userType =
+        context.read<AuthBloc>().state is AuthUserAuthenticated
+            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
+                .userData
+                .role
+                .name
+            : "Student";
     return GestureDetector(
-      onTap: () => {
-        Navigator.of(context)
-            .pushNamed(Routes.detail_unit_of_study, arguments: idSubject)
+      onTap: () {
+        Navigator.of(context).pushNamed(
+            userType == "Student"
+                ? Routes.detailUnitOfStudy
+                : isExam
+                    ? Routes.detailExamShiftTeacher
+                    : Routes.detailUnitOfStudyTeacher,
+            arguments: idSubject);
       },
       child: Container(
         width: double.infinity,
@@ -53,7 +68,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
                 Text(
                   idSubject,
                   style: TextStyle(
-                      fontSize: 12,
+                      fontSize: FontSizes.small,
                       fontWeight: FontWeight.w500,
                       height: 1.25,
                       color: context.theme.grey ?? Colors.grey),
@@ -61,7 +76,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
                 Text(
                   credit != null ? '$credit tín chỉ' : '',
                   style: TextStyle(
-                      fontSize: 12,
+                      fontSize: FontSizes.small,
                       fontWeight: FontWeight.w500,
                       height: 1.25,
                       color: context.theme.grey ?? Colors.grey),
@@ -72,7 +87,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
             Text(
               nameSubject,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: FontSizes.large,
                 fontWeight: FontWeight.bold,
                 height: 1.25,
                 color: isExam
@@ -86,7 +101,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
                   ? '$time, $room'
                   : 'Hiện chưa có lịch',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: FontSizes.medium,
                 fontWeight: FontWeight.w400,
                 color: (time != null || room != null)
                     ? Colors.black
@@ -99,7 +114,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
                 ? Text(
                     'Tuần $weekRange',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: FontSizes.small,
                       fontWeight: FontWeight.w500,
                       height: 1.25,
                       color: context.theme.grey ?? Colors.grey,
@@ -118,7 +133,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
                             : 'GV: $teacher',
                         style: TextStyle(
                           color: context.theme.grey ?? Colors.grey,
-                          fontSize: 14,
+                          fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                           height: 1.25,

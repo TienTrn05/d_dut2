@@ -1,18 +1,25 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class AbsentsCard extends StatelessWidget {
   final bool isTeacher;
+  final String? name;
+  final String? mail;
   final List<String> absentDates;
   const AbsentsCard(
-      {super.key, this.isTeacher = true, required this.absentDates});
+      {super.key,
+      this.isTeacher = true,
+      this.name,
+      this.mail,
+      required this.absentDates});
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.white,
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 300),
           child: Container(
@@ -22,13 +29,66 @@ class AbsentsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Các buổi vắng',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
+                if (name?.isNotEmpty == true && mail?.isNotEmpty == true)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: Image.network(
+                              'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.error,
+                                    size: 40,
+                                    color: Colors.red); // Hiển thị icon lỗi
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name!,
+                                style: TextStyle(
+                                  fontSize: FontSizes.medium,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                softWrap: true, // Cho phép xuống hàng
+                                overflow: TextOverflow.visible, // Không cắt chữ
+                              ),
+                              Text(
+                                mail!,
+                                style: TextStyle(
+                                  fontSize: FontSizes.small,
+                                ),
+                                softWrap: true, // Cho phép xuống hàng
+                                overflow: TextOverflow.visible, // Không cắt chữ
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // const SizedBox(height: 10),
                 if (absentDates.isNotEmpty)
                   Flexible(
                       child: ListView.builder(
@@ -46,7 +106,8 @@ class AbsentsCard extends StatelessWidget {
                           child: Text(
                             absentDates[index],
                             style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 14),
+                                fontWeight: FontWeight.w500,
+                                fontSize: FontSizes.medium),
                           ),
                         ),
                       ),
@@ -57,9 +118,23 @@ class AbsentsCard extends StatelessWidget {
                     'Không có buổi vắng nào',
                     style: TextStyle(
                         fontWeight: FontWeight.w400,
-                        fontSize: 14,
+                        fontSize: FontSizes.medium,
                         color: context.theme.grey ?? Colors.grey),
-                  )
+                  ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Divider(color: context.theme.primaryColor ?? Colors.blue),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Các buổi vắng',
+                  style: TextStyle(
+                      fontSize: FontSizes.extraLarge,
+                      fontWeight: FontWeight.bold,
+                      color: context.theme.primaryColor ?? Colors.blue),
+                ),
               ],
             ),
           )),

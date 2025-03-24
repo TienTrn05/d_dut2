@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -36,7 +37,6 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Container(
                       width: double.infinity,
-                      height: 112,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.theme.primaryColor,
@@ -91,9 +91,10 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.2,
+                                        height: 1,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
                                     Text(
                                       // get string before @
                                       userPrincipalName.split('@').first,
@@ -101,8 +102,8 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: 16,
-                                        height: 1.5,
+                                        fontSize: FontSizes.large,
+                                        height: 1.25,
                                       ),
                                     ),
                                   ],

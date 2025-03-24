@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -27,7 +28,7 @@ class InfoItem extends StatelessWidget {
             child: Text(
               '$field:',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: FontSizes.medium,
                 color: Color(0xFF747474),
                 height: 1.5,
               ),
@@ -42,7 +43,7 @@ class InfoItem extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: FontSizes.medium,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                       height: 1.5,

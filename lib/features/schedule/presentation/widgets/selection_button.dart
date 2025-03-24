@@ -1,9 +1,16 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class SelectionButton extends StatefulWidget {
+  final String studyLabel;
+  final String examLabel;
   final Function(Set<String>) onSelectionChanged;
-  const SelectionButton({super.key, required this.onSelectionChanged});
+  const SelectionButton(
+      {super.key,
+      required this.studyLabel,
+      required this.examLabel,
+      required this.onSelectionChanged});
 
   @override
   State<SelectionButton> createState() => _SelectionButtonState();
@@ -41,8 +48,9 @@ class _SelectionButtonState extends State<SelectionButton> {
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           ),
-          child: const Text("Lịch học",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          child: Text(widget.studyLabel,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: FontSizes.small)),
         ),
         const SizedBox(width: 4),
         FilledButton(
@@ -58,8 +66,9 @@ class _SelectionButtonState extends State<SelectionButton> {
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           ),
-          child: const Text("Lịch thi",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          child: Text(widget.examLabel,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: FontSizes.small)),
         ),
       ],
     );

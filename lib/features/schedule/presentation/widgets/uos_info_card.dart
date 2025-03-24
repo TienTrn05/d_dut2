@@ -1,10 +1,19 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class UosInfoCard extends StatefulWidget {
   final String title;
   final Widget? child;
+  final bool canEdit;
+  final Function()? action;
 
-  const UosInfoCard({super.key, required this.title, this.child});
+  const UosInfoCard(
+      {super.key,
+      required this.title,
+      this.child,
+      this.canEdit = false,
+      this.action});
 
   @override
   State<UosInfoCard> createState() => _UosInfoCardState();
@@ -48,14 +57,30 @@ class _UosInfoCardState extends State<UosInfoCard> {
                   },
                 ),
                 const SizedBox(width: 8),
-                Text(
+                Expanded(
+                    child: Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
-                ),
+                )),
+                if (widget.canEdit && isShowing)
+                  GestureDetector(
+                    onTap: widget.action,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: SvgPicture.asset(
+                        "assets/icons/svg/lucide_pen.svg",
+                        width: 20,
+                        height: 20,
+                      ),
+                    ),
+                  )
               ],
             ),
           ),

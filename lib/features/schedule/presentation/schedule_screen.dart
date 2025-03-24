@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/day_view.dart';
@@ -35,7 +36,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: FontSizes.medium,
           ),
         ),
         centerTitle: true,
@@ -81,7 +82,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   child: Text(
                     'Thời khóa biểu',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: FontSizes.large,
                       height: 1,
                       fontWeight: FontWeight.bold,
                       color: context.theme.primaryColor ?? Colors.blue,
@@ -140,7 +141,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Text(
           title,
           style: TextStyle(
-              fontSize: 14,
+              fontSize: FontSizes.medium,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600),
         ),
       ),

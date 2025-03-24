@@ -1,18 +1,21 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/uos_info_card.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 
-class ExamShilftDetailScreen extends StatefulWidget {
-  const ExamShilftDetailScreen({super.key});
+class DetaitlExamShiftScreen extends StatefulWidget {
+  const DetaitlExamShiftScreen({super.key});
 
   @override
-  State<ExamShilftDetailScreen> createState() => _ExamShilftDetailScreenState();
+  State<DetaitlExamShiftScreen> createState() => _DetaitlExamShiftScreenState();
 }
 
-class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
+class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -36,7 +39,7 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 14,
+              fontSize: FontSizes.medium,
             ),
           ),
           centerTitle: true,
@@ -58,14 +61,14 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
                 child: Text(
                   "Mạng máy tính",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: FontSizes.extraLarge,
                     fontWeight: FontWeight.bold,
                     color: context.theme.primaryColor,
                   ),
                 ),
               ),
               Container(
-                height: 28,
+                // height: 32,
                 color: Colors.white,
                 child: TabBar.secondary(
                   labelColor: Colors.white,
@@ -75,15 +78,18 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(4)),
                   ),
+                  dividerColor: context.theme.primaryColor,
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: 13.0,
                   ),
                   unselectedLabelStyle: TextStyle(
                     fontWeight: FontWeight.normal,
-                    fontSize: 13,
+                    fontSize: 13.0,
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
+                  // labelPadding:
+                  //     EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   tabs: [
                     Tab(text: "Thông tin"),
                     Tab(text: "Danh sách sinh viên"),
@@ -92,11 +98,61 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
               ),
               // TabBarView
               Expanded(
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   child: TabBarView(
                     children: [
-                      Center(child: Text("Thông tin ca thi")),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                              child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                UosInfoCard(
+                                  title: 'Thông tin chung',
+                                  child: Column(
+                                    children: [
+                                      InfoItem(
+                                          field: "Mã ca thi",
+                                          value: "1024010.2420.21.11"),
+                                      InfoItem(
+                                          field: "Thời gian làm bài",
+                                          value: "7:00, 13/12/2023"),
+                                      InfoItem(
+                                        field: "Phòng",
+                                        value: "C202",
+                                      ),
+                                      InfoItem(
+                                        field: "Xuất",
+                                        value: "2C1",
+                                      ),
+                                      InfoItem(
+                                        field: "Dạng đề",
+                                        value: "Đề mở",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                UosInfoCard(
+                                  title: 'Cán bộ coi thi',
+                                  child: Column(
+                                    children: [
+                                      InfoItem(
+                                          field: "Cán bộ 1",
+                                          value: "102-Trần Hồ Thủy Tiên"),
+                                      InfoItem(
+                                          field: "Cán bộ 2",
+                                          value: "130-Đặng Thiên Bình"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))
+                        ],
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 4,
@@ -105,7 +161,7 @@ class _ExamShilftDetailScreenState extends State<ExamShilftDetailScreen> {
                           Text(
                             "Sinh viên (10)",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: FontSizes.medium,
                               color: context.theme.grey,
                             ),
                           ),

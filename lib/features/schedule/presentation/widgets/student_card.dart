@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/absents_card.dart';
 import 'package:flutter/material.dart';
 
@@ -73,18 +73,18 @@ class _StudentCardState extends State<StudentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${widget.name}",
+                        widget.name,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
                         ),
                         softWrap: true, // Cho phép xuống hàng
                         overflow: TextOverflow.visible, // Không cắt chữ
                       ),
                       Text(
-                        "${widget.mail}",
+                        widget.mail,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: FontSizes.small,
                         ),
                         softWrap: true, // Cho phép xuống hàng
                         overflow: TextOverflow.visible, // Không cắt chữ
@@ -104,14 +104,17 @@ class _StudentCardState extends State<StudentCard> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) =>
-                        const AbsentsCard(isTeacher: true, absentDates: []),
+                    builder: (context) => const AbsentsCard(
+                        isTeacher: true,
+                        name: "Đỗ Nhật Hoàng",
+                        mail: "102210159@sv1.dut.udn.vn",
+                        absentDates: ["10/09/2023", "11/09/2023"]),
                   );
                 },
                 child: Text(
                   "${widget.absentCount}",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: FontSizes.medium,
                     color: widget.absentCount % 2 == 0
                         ? context.theme.red
                         : context.theme.grey,

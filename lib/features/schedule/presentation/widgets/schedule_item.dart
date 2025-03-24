@@ -1,6 +1,11 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../auth/data/model/role_model.dart';
 
 class ScheduleItem extends StatelessWidget {
   final String idSubject;
@@ -20,10 +25,22 @@ class ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String userRole =
+        context.read<AuthBloc>().state is AuthUserAuthenticated
+            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
+                .userData
+                .role
+                .name
+            : RoleModel.roleStudent;
     return GestureDetector(
-      onTap: () => {
-        Navigator.of(context)
-            .pushNamed(Routes.detail_unit_of_study, arguments: idSubject)
+      onTap: () {
+        Navigator.of(context).pushNamed(
+            userRole == RoleModel.roleStudent
+                ? Routes.detailUnitOfStudy
+                : isExam
+                    ? Routes.detailExamShiftTeacher
+                    : Routes.detailUnitOfStudyTeacher,
+            arguments: idSubject);
       },
       child: Container(
         width: double.infinity,
@@ -55,7 +72,7 @@ class ScheduleItem extends StatelessWidget {
                   Text(
                     subject,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: FontSizes.medium,
                       fontWeight: FontWeight.bold,
                       height: 1.25,
                     ),
@@ -70,7 +87,7 @@ class ScheduleItem extends StatelessWidget {
                         child: Text(
                           time,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: FontSizes.medium,
                             height: 1,
                           ),
                           maxLines: 1,
@@ -82,7 +99,7 @@ class ScheduleItem extends StatelessWidget {
                         room,
                         style: TextStyle(
                           color: Color.fromRGBO(116, 116, 116, 1),
-                          fontSize: 14,
+                          fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
                           height: 1,
                         ),
