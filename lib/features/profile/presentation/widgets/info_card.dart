@@ -60,7 +60,7 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
                 Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: FontSizes.large,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),

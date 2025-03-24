@@ -1,21 +1,21 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/schedule_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/uos_item.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/items/uos_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../auth/data/model/role_model.dart';
+import '../../../../auth/data/model/role_model.dart';
 
-class SemesterView extends StatefulWidget {
-  const SemesterView({super.key});
+class SemesterMode extends StatefulWidget {
+  const SemesterMode({super.key});
 
   @override
-  State<SemesterView> createState() => _SemesterViewState();
+  State<SemesterMode> createState() => _SemesterModeState();
 }
 
-class _SemesterViewState extends State<SemesterView> {
+class _SemesterModeState extends State<SemesterMode> {
   int selectedSemesterIndex = 0;
   final List<String> semesters = [
     "HỌC KÌ 2, 2025-2026",
@@ -118,11 +118,13 @@ class _SemesterViewState extends State<SemesterView> {
               child: SingleChildScrollView(
             child: Column(
               children: [
-                ScheduleCard(
-                  title: userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
+                UosCard(
+                  title: userRole == RoleModel.roleStudent
+                      ? "Lịch học"
+                      : "Lịch dạy",
                   child: Column(
                     children: [
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'Lập trình di động',
                         credit: 2,
@@ -131,7 +133,7 @@ class _SemesterViewState extends State<SemesterView> {
                         room: 'F109',
                         teacher: 'Đặng Thiên Bình',
                       ),
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'Công nghệ phần mềm',
                         credit: 2,
@@ -140,7 +142,7 @@ class _SemesterViewState extends State<SemesterView> {
                         room: 'F109',
                         teacher: 'Võ Đức Hoàng',
                       ),
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'Cấu trúc dữ liệu & giải thuật',
                         credit: 3,
@@ -150,7 +152,7 @@ class _SemesterViewState extends State<SemesterView> {
                         room: 'F109',
                         teacher: 'Đặng Thiên Bình',
                       ),
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'PBL 05: Dự án Công nghệ phần mềm',
                         credit: 2,
@@ -163,12 +165,14 @@ class _SemesterViewState extends State<SemesterView> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                ScheduleCard(
-                  title: userRole == RoleModel.roleStudent ? "Lịch thi" : "Lịch coi thi",
+                UosCard(
+                  title: userRole == RoleModel.roleStudent
+                      ? "Lịch thi"
+                      : "Lịch coi thi",
                   isExam: true,
                   child: Column(
                     children: [
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'Lập trình di động',
                         time: '7:00, 14/5/2025',
@@ -177,7 +181,7 @@ class _SemesterViewState extends State<SemesterView> {
                         examGroupNo: 'A',
                         isExam: true,
                       ),
-                      DetailUnitOfStudyItem(
+                      UnitOfStudyItem(
                         idSubject: '1024010.2420.21.11',
                         nameSubject: 'PBL 05: Dự án Công nghệ phần mềm',
                         isExam: true,
