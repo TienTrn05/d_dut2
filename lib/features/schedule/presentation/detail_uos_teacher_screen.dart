@@ -113,6 +113,26 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     );
   }
 
+  void _onTabTapped(int index) {
+    int currentIndex = _tabController.index;
+
+    if ((currentIndex - index).abs() > 1) {
+      // Nếu tab cách xa nhau, reset animation và đặt trực tiếp
+      _tabController.animateTo(
+        index,
+        duration: Duration(milliseconds: 1), // Gần như ngay lập tức
+        curve: Curves.ease, // Tránh bị nhảy đột ngột
+      );
+    } else {
+      // Nếu tab kề nhau, dùng animateTo để có hiệu ứng mượt
+      _tabController.animateTo(
+        index,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -168,7 +188,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                     ),
                   ),
                   Container(
-                    // height: 28,
                     color: Colors.white,
                     child: TabBar.secondary(
                       controller: _tabController,
@@ -189,8 +208,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         fontSize: FontSizes.medium,
                       ),
                       indicatorSize: TabBarIndicatorSize.tab,
-                      // labelPadding:
-                      //     EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                      onTap: _onTabTapped,
                       tabs: [
                         Tab(text: "Thông tin"),
                         Tab(text: "Điểm danh"),
@@ -204,6 +222,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                       width: double.infinity,
                       child: TabBarView(
                         controller: _tabController,
+                        physics:
+                            ClampingScrollPhysics(), // Ngăn trượt quá đà khi bấm tab
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,6 +456,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             vertical: 4,
                                             horizontal: 8,
                                           ),
+                                          elevation: 0,
                                         ),
                                         child: Text(
                                           currentDate,

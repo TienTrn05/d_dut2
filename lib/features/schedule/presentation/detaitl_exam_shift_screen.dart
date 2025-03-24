@@ -172,7 +172,6 @@ class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
                               itemBuilder: (context, index) => StudentItem(
                                 name: "Nhật Hạ",
                                 mail: "102210159@sv1.dut.udn.vn",
-                                absentCount: index,
                               ),
                             ),
                           ),
