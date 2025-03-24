@@ -3,7 +3,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/uos_info_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';

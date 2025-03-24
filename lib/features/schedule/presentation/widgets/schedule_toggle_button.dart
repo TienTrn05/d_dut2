@@ -2,21 +2,21 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-class SelectionButton extends StatefulWidget {
+class ScheduleToggleButton extends StatefulWidget {
   final String studyLabel;
   final String examLabel;
   final Function(Set<String>) onSelectionChanged;
-  const SelectionButton(
+  const ScheduleToggleButton(
       {super.key,
       required this.studyLabel,
       required this.examLabel,
       required this.onSelectionChanged});
 
   @override
-  State<SelectionButton> createState() => _SelectionButtonState();
+  State<ScheduleToggleButton> createState() => _ScheduleToggleButtonState();
 }
 
-class _SelectionButtonState extends State<SelectionButton> {
+class _ScheduleToggleButtonState extends State<ScheduleToggleButton> {
   Set<String> selectedOptions = {'isStudy', 'isExam'};
 
   void toggleSelection(String option) {

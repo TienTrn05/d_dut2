@@ -5,7 +5,7 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DetailUnitOfStudyItem extends StatelessWidget {
+class UnitOfStudyItem extends StatelessWidget {
   final String idSubject;
   final String nameSubject;
   final bool isExam;
@@ -18,7 +18,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
   final String? examShiftNo;
   final String? examGroupNo;
 
-  const DetailUnitOfStudyItem(
+  const UnitOfStudyItem(
       {super.key,
       required this.idSubject,
       required this.nameSubject,

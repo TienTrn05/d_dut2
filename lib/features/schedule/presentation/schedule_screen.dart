@@ -2,8 +2,8 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/day_view.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/semester_view.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/schedule_mode/day_mode.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/schedule_mode/semester_mode.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -47,7 +47,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
         ],
       ),
-      body: _isDayView ? const DayView() : const SemesterView(),
+      body: _isDayView ? const DayMode() : const SemesterMode(),
       floatingActionButton: Builder(
         builder: (context) => Container(
           decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
