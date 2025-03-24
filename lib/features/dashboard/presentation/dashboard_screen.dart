@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -249,18 +250,16 @@ class DashboardScreen extends StatelessWidget {
                                       .scopes
                                   : [];
 
-                              final String userType = context
+                              final String userRole = context
                                       .read<AuthBloc>()
                                       .state is AuthUserAuthenticated
                                   ? (context.read<AuthBloc>().state
                                           as AuthUserAuthenticated)
                                       .userData
-                                      .userType
-                                      .name
-                                  : "Student";
+                                      .role.name : RoleModel.roleStudent;
 
-                              if (userType == "Teacher" ||
-                                  userType == "Admin") {
+                              if (userRole == RoleModel.roleTeacher ||
+                                  userRole == RoleModel.roleAdmin) {
                                 return GridView(
                                   shrinkWrap: true,
                                   gridDelegate:

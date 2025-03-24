@@ -5,6 +5,8 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../auth/data/model/role_model.dart';
+
 class ScheduleItem extends StatelessWidget {
   final String idSubject;
   final String subject;
@@ -23,17 +25,17 @@ class ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String userType =
+    final String userRole =
         context.read<AuthBloc>().state is AuthUserAuthenticated
             ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
                 .userData
-                .userType
+                .role
                 .name
-            : "Student";
+            : RoleModel.roleStudent;
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
-            userType == "Student"
+            userRole == RoleModel.roleStudent
                 ? Routes.detailUnitOfStudy
                 : isExam
                     ? Routes.detailExamShiftTeacher

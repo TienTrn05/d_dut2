@@ -37,7 +37,7 @@ class DetailUnitOfStudyItem extends StatelessWidget {
         context.read<AuthBloc>().state is AuthUserAuthenticated
             ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
                 .userData
-                .userType
+                .role
                 .name
             : "Student";
     return GestureDetector(
