@@ -268,6 +268,7 @@ class DashboardScreen extends StatelessWidget {
                                         200, // Chiều rộng tối đa của item
                                     crossAxisSpacing: 20,
                                     mainAxisSpacing: 20,
+                                    mainAxisExtent: 150,
                                   ),
                                   children: [
                                     FeatureCard(
