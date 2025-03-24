@@ -1,5 +1,6 @@
 import 'scope_model.dart';
 import 'user_type_model.dart';
+import 'role_model.dart';
 class UserModel {
   final String userPrincipalName;
   final String displayName;
@@ -7,6 +8,7 @@ class UserModel {
   final String mail;
   final String givenName;
   final List<ScopeModel> scopes;
+  final RoleModel role;
   final UserTypeModel userType;
 
   UserModel({
@@ -16,6 +18,7 @@ class UserModel {
     required this.mail,
     required this.givenName,
     required this.scopes,
+    required this.role,
     required this.userType,
   });
 
@@ -27,6 +30,7 @@ class UserModel {
       mail: json['mail'] ?? '',
       givenName: json['givenName'] ?? '',
       scopes: (json['scopes'] as List).map((scope) => ScopeModel.fromJson(scope)).toList(),
+      role: json['role'] != null  ? RoleModel.fromJson(json['role']) : (json['roles'] as List).map((r) => RoleModel.fromJson(r)).toList().first,
       userType: UserTypeModel.fromJson(json['userType']),
     );
   }
@@ -39,6 +43,7 @@ class UserModel {
       'mail': mail,
       'givenName': givenName,
       'scopes': scopes.map((scope) => scope.toJson()).toList(),
+      'role': role.toJson(),
       'userType': userType.toJson(),
     };
   }

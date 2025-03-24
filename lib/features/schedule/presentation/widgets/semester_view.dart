@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../auth/data/model/role_model.dart';
+
 class SemesterView extends StatefulWidget {
   const SemesterView({super.key});
 
@@ -79,13 +81,13 @@ class _SemesterViewState extends State<SemesterView> {
 
   @override
   Widget build(BuildContext context) {
-    final String userType =
+    final String userRole =
         context.read<AuthBloc>().state is AuthUserAuthenticated
             ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
                 .userData
-                .userType
+                .role
                 .name
-            : "Student";
+            : RoleModel.roleStudent;
     return SafeArea(
         child: Padding(
       padding: EdgeInsets.all(24),
@@ -117,7 +119,7 @@ class _SemesterViewState extends State<SemesterView> {
             child: Column(
               children: [
                 ScheduleCard(
-                  title: userType == "Student" ? "Lịch học" : "Lịch dạy",
+                  title: userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
                   child: Column(
                     children: [
                       DetailUnitOfStudyItem(
@@ -162,7 +164,7 @@ class _SemesterViewState extends State<SemesterView> {
                 ),
                 const SizedBox(height: 20),
                 ScheduleCard(
-                  title: userType == "Student" ? "Lịch thi" : "Lịch coi thi",
+                  title: userRole == RoleModel.roleStudent ? "Lịch thi" : "Lịch coi thi",
                   isExam: true,
                   child: Column(
                     children: [
