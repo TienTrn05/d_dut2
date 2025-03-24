@@ -3,8 +3,8 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/absents_card.dart';
 import 'package:flutter/material.dart';
 
-class StudentCard extends StatefulWidget {
-  StudentCard({
+class StudentItem extends StatefulWidget {
+  StudentItem({
     super.key,
     required this.name,
     required this.mail,
@@ -20,10 +20,10 @@ class StudentCard extends StatefulWidget {
   bool isAbsentToday;
 
   @override
-  State<StudentCard> createState() => _StudentCardState();
+  State<StudentItem> createState() => _StudentItemState();
 }
 
-class _StudentCardState extends State<StudentCard> {
+class _StudentItemState extends State<StudentItem> {
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -6,7 +6,7 @@ import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/edit_field_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/uos_info_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/uos_info_item.dart';
 import 'package:flutter/material.dart';
@@ -592,7 +592,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           height:
                                               56); // Thêm khoảng trống cuối danh sách
                                     }
-                                    return StudentCard(
+                                    return StudentItem(
                                       name: "Nhật Hạ",
                                       mail: "102210159@sv1.dut.udn.vn",
                                       absentCount: index,

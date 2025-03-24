@@ -2,7 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/student_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/uos_info_card.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
@@ -169,7 +169,7 @@ class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
                             // Để danh sách có thể cuộn trong phần còn lại của màn hình
                             child: ListView.builder(
                               itemCount: 10,
-                              itemBuilder: (context, index) => StudentCard(
+                              itemBuilder: (context, index) => StudentItem(
                                 name: "Nhật Hạ",
                                 mail: "102210159@sv1.dut.udn.vn",
                                 absentCount: index,
