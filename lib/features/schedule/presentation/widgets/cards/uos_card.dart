@@ -2,18 +2,18 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-class ScheduleCard extends StatefulWidget {
+class UosCard extends StatefulWidget {
   final String title;
   final bool isExam;
   final Widget? child;
-  const ScheduleCard(
+  const UosCard(
       {super.key, required this.title, this.child, this.isExam = false});
 
   @override
-  State<ScheduleCard> createState() => _ScheduleCardState();
+  State<UosCard> createState() => _UosCardState();
 }
 
-class _ScheduleCardState extends State<ScheduleCard> {
+class _UosCardState extends State<UosCard> {
   bool isShowing = true;
   @override
   Widget build(BuildContext context) {

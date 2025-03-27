@@ -89,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: 20,
+                                        fontSize: FontSizes.extraLarge,
                                         fontWeight: FontWeight.bold,
                                         height: 1,
                                       ),
@@ -102,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: FontSizes.large,
+                                        fontSize: FontSizes.medium,
                                         height: 1.25,
                                       ),
                                     ),
