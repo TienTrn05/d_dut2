@@ -3,8 +3,8 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/absents_card.dart';
 import 'package:flutter/material.dart';
 
-class StudentCard extends StatefulWidget {
-  StudentCard({
+class StudentItem extends StatefulWidget {
+  StudentItem({
     super.key,
     required this.name,
     required this.mail,
@@ -13,17 +13,17 @@ class StudentCard extends StatefulWidget {
     this.isAbsentToday = false,
   });
 
-  final name;
-  final mail;
+  final String name;
+  final String mail;
   final absentCount;
   bool isCheckAbsent;
   bool isAbsentToday;
 
   @override
-  State<StudentCard> createState() => _StudentCardState();
+  State<StudentItem> createState() => _StudentItemState();
 }
 
-class _StudentCardState extends State<StudentCard> {
+class _StudentItemState extends State<StudentItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -95,51 +95,52 @@ class _StudentCardState extends State<StudentCard> {
               ],
             ),
           ),
-          if (!widget.isCheckAbsent)
-            // ignore: dead_code
-            Container(
-              width: 39,
-              alignment: Alignment.center,
-              child: GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const AbsentsCard(
-                        isTeacher: true,
-                        name: "Đỗ Nhật Hoàng",
-                        mail: "102210159@sv1.dut.udn.vn",
-                        absentDates: ["10/09/2023", "11/09/2023"]),
-                  );
-                },
-                child: Text(
-                  "${widget.absentCount}",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: widget.absentCount % 2 == 0
-                        ? context.theme.red
-                        : context.theme.grey,
-                    decoration: TextDecoration.underline,
-                    decorationColor: widget.absentCount % 2 == 0
-                        ? context.theme.red
-                        : context.theme.grey,
+          if (widget.absentCount != null)
+            if (!widget.isCheckAbsent)
+              // ignore: dead_code
+              Container(
+                width: 39,
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AbsentsCard(
+                          isTeacher: true,
+                          name: widget.name.toString(),
+                          mail: widget.mail.toString(),
+                          absentDates: ["10/09/2023", "11/09/2023"]),
+                    );
+                  },
+                  child: Text(
+                    "${widget.absentCount}",
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: widget.absentCount % 2 == 0
+                          ? context.theme.red
+                          : context.theme.grey,
+                      decoration: TextDecoration.underline,
+                      decorationColor: widget.absentCount % 2 == 0
+                          ? context.theme.red
+                          : context.theme.grey,
+                    ),
                   ),
                 ),
-              ),
-            )
-          else
-            Container(
-              width: 83,
-              alignment: Alignment.center,
-              child: Checkbox(
-                value: widget.isAbsentToday,
-                activeColor: context.theme.primaryColor,
-                onChanged: (bool? newValue) {
-                  setState(() {
-                    widget.isAbsentToday = !widget.isAbsentToday;
-                  });
-                },
-              ),
-            )
+              )
+            else
+              Container(
+                width: 83,
+                alignment: Alignment.center,
+                child: Checkbox(
+                  value: widget.isAbsentToday,
+                  activeColor: context.theme.primaryColor,
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      widget.isAbsentToday = !widget.isAbsentToday;
+                    });
+                  },
+                ),
+              )
         ],
       ),
     );

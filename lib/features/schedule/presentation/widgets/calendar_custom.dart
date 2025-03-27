@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -14,8 +15,7 @@ class CalendarCustom extends StatefulWidget {
 class _CalendarCustomState extends State<CalendarCustom> {
   DateTime _focusedDay = DateTime.now(); // Tháng hiện tại đang xem
   DateTime _selectedDay = DateTime.now(); // Lưu ngày được chọn
-  // DateTime _previousDay = DateTime.now();
-  DateTime _startdWeek = DateTime(2025, 3, 3);
+  final DateTime _startdWeek = DateTime(2025, 3, 3);
   int? _currentWeek;
 
   Map<DateTime, List<String>> events = {
@@ -63,7 +63,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
       child: Column(
         children: [
           TableCalendar(
-            locale: 'vi', // Đặt ngôn ngữ tiếng Việt
+            locale: 'vi',
             focusedDay: _focusedDay,
             onPageChanged: (focusDate) {
               setState(() {
@@ -110,16 +110,23 @@ class _CalendarCustomState extends State<CalendarCustom> {
               },
               formatButtonVisible: false,
             ),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(fontSize: FontSizes.small),
+              weekendStyle: TextStyle(fontSize: FontSizes.small),
+            ),
             calendarStyle: CalendarStyle(
+              defaultTextStyle: TextStyle(fontSize: FontSizes.medium),
+              weekendTextStyle: TextStyle(fontSize: FontSizes.medium),
+              outsideTextStyle: TextStyle(fontSize: FontSizes.small, color: context.theme.grey),
               cellMargin: EdgeInsets.all(0),
               todayDecoration: BoxDecoration(
                 color: Color.fromRGBO(245, 245, 245, 1), // Màu nền ngày hôm nay
                 shape: BoxShape.circle,
               ),
               todayTextStyle: TextStyle(
-                color: Colors.black, // Màu chữ của ngày hôm nay
-                fontWeight: FontWeight.bold,
-              ),
+                  color: Colors.black, // Màu chữ của ngày hôm nay
+                  fontWeight: FontWeight.bold,
+                  fontSize: FontSizes.small),
               selectedDecoration: BoxDecoration(
                 color:
                     Color.fromRGBO(203, 221, 235, 1), // Màu nền ngày được chọn
@@ -132,8 +139,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
             ),
             calendarBuilders: CalendarBuilders(
               dowBuilder: (context, day) {
-                final text = DateFormat.E('vi')
-                    .format(day); // Hiển thị Chủ Nhật theo tiếng Việt
+                final text = day.weekday == 7 ? "CN" : 'T${day.weekday + 1}';
                 return Center(
                   child: Text(
                     text,
@@ -188,7 +194,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 });
               },
               child: Text(
-                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" : "",
+                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" :"- Tuần ${ _currentWeek.toString()} -",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],
