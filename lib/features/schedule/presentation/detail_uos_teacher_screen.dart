@@ -6,7 +6,7 @@ import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/edit_field_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/student_item.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/uos_info_item.dart';
 import 'package:flutter/material.dart';
