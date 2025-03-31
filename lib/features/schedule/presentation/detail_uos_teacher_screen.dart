@@ -37,6 +37,61 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   DateTime startdWeek = DateTime(2025, 3, 3);
   String currentLink = "";
 
+  // Giả lập sinh viên
+  List<Map<String, dynamic>> students = [
+    {
+      "name": "Nguyễn Văn A",
+      "mail": "a@example.com",
+      "absentCount": 0,
+      "isCheckAbsent": false,
+      "isAbsentToday": false
+    },
+    {
+      "name": "Trần Thị B",
+      "mail": "b@example.com",
+      "absentCount": 1,
+      "isCheckAbsent": false,
+      "isAbsentToday": false
+    },
+    {
+      "name": "Lê Văn C",
+      "mail": "c@example.com",
+      "absentCount": 2,
+      "isCheckAbsent": false,
+      "isAbsentToday": true
+    },
+    {
+      "name": "Nhật Hạ",
+      "mail": "102210159@sv1.dut.udn.vn",
+      "absentCount": 0,
+      "isCheckAbsent": false,
+      "isAbsentToday": true
+    },
+  ];
+
+  // Cập nhập trang thái điểm danh
+  void updateAbsentStatus(int index, bool isAbsent) {
+    setState(() {
+      students[index]["isAbsentToday"] = isAbsent;
+      if (isAbsent == false && isSellectedAll) {
+        isSellectedAll = false;
+      }
+    });
+  }
+
+  void toggleSelectAll() {
+    setState(() {
+      isSellectedAll = !isSellectedAll;
+      // Tạo một danh sách mới để Flutter nhận diện sự thay đổi
+      students = students.map((student) {
+        return {
+          ...student, // Sao chép toàn bộ dữ liệu
+          "isAbsentToday": isSellectedAll, // Cập nhật giá trị mới
+        };
+      }).toList();
+    });
+  }
+
   void _updateCurrentDate(DateTime newValue) {
     currentDate = newValue;
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
@@ -577,11 +632,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             activeColor:
                                                 context.theme.primaryColor,
                                             onChanged: (bool? newValue) {
-                                              setState(() {
-                                                // Chọn tất cả
-                                                isSellectedAll =
-                                                    !isSellectedAll;
-                                              });
+                                              toggleSelectAll();
                                             },
                                             visualDensity:
                                                 VisualDensity.compact,
@@ -612,20 +663,28 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                               ),
                               Expanded(
                                 child: ListView.builder(
-                                  itemCount:
-                                      10 + 1, // Thêm 1 phần tử cho SizedBox
+                                  // Thêm 1 phần tử cho SizedBox
+                                  itemCount: students.length + 1,
                                   itemBuilder: (context, index) {
-                                    if (index == 10) {
-                                      return SizedBox(
-                                          height:
-                                              56); // Thêm khoảng trống cuối danh sách
+                                    if (index == students.length) {
+                                      // Thêm khoảng trống cuối danh sách
+                                      return SizedBox(height: 56);
                                     }
                                     return StudentItem(
-                                      name: "Nhật Hạ",
-                                      mail: "102210159@sv1.dut.udn.vn",
-                                      absentCount: index,
+                                      name: students[index]["name"],
+                                      mail: students[index]["mail"],
+                                      absentCount: students[index]
+                                          ["absentCount"],
                                       isCheckAbsent: isCheckAbsent,
-                                      isAbsentToday: isSellectedAll,
+                                      isAbsentToday: students[index]
+                                          ["isAbsentToday"],
+                                      onAbsentChanged: (isAbsent) {
+                                        updateAbsentStatus(index, isAbsent);
+                                        setState(() {
+                                          isSellectedAll = students.every((s) =>
+                                              s["isAbsentToday"] == true);
+                                        });
+                                      },
                                     );
                                   },
                                 ),

@@ -117,7 +117,8 @@ class _CalendarCustomState extends State<CalendarCustom> {
             calendarStyle: CalendarStyle(
               defaultTextStyle: TextStyle(fontSize: FontSizes.medium),
               weekendTextStyle: TextStyle(fontSize: FontSizes.medium),
-              outsideTextStyle: TextStyle(fontSize: FontSizes.small, color: context.theme.grey),
+              outsideTextStyle: TextStyle(
+                  fontSize: FontSizes.small, color: context.theme.grey),
               cellMargin: EdgeInsets.all(0),
               todayDecoration: BoxDecoration(
                 color: Color.fromRGBO(245, 245, 245, 1), // Màu nền ngày hôm nay
@@ -172,6 +173,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     ),
                   );
                 }
+                return null;
               },
             ),
           ),
@@ -194,7 +196,9 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 });
               },
               child: Text(
-                _calendarFormat == CalendarFormat.month ? "- Thu gọn -" :"- Tuần ${ _currentWeek.toString()} -",
+                _calendarFormat == CalendarFormat.month
+                    ? "- Thu gọn -"
+                    : "- Tuần ${_currentWeek.toString()} -",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],
