@@ -3,27 +3,30 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/absents_card.dart';
 import 'package:flutter/material.dart';
 
-class StudentItem extends StatefulWidget {
-  StudentItem({
+class StudentItem extends StatelessWidget {
+  const StudentItem({
     super.key,
     required this.name,
     required this.mail,
-    this.absentCount,
+    this.absentCount = -1,
     this.isCheckAbsent = false,
     this.isAbsentToday = false,
+    this.onAbsentChanged,
   });
 
   final String name;
   final String mail;
-  final absentCount;
-  bool isCheckAbsent;
-  bool isAbsentToday;
+  final int absentCount;
+  final bool isCheckAbsent;
+  final bool isAbsentToday;
+  final ValueChanged<bool>? onAbsentChanged;
 
-  @override
-  State<StudentItem> createState() => _StudentItemState();
-}
+  void _toggleAbsent() {
+    if (onAbsentChanged != null) {
+      onAbsentChanged!(!isAbsentToday);
+    }
+  }
 
-class _StudentItemState extends State<StudentItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -73,7 +76,7 @@ class _StudentItemState extends State<StudentItem> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.name,
+                        name,
                         style: TextStyle(
                           fontSize: FontSizes.medium,
                           fontWeight: FontWeight.bold,
@@ -82,7 +85,7 @@ class _StudentItemState extends State<StudentItem> {
                         overflow: TextOverflow.visible, // Không cắt chữ
                       ),
                       Text(
-                        widget.mail,
+                        mail,
                         style: TextStyle(
                           fontSize: FontSizes.small,
                         ),
@@ -95,8 +98,8 @@ class _StudentItemState extends State<StudentItem> {
               ],
             ),
           ),
-          if (widget.absentCount != null)
-            if (!widget.isCheckAbsent)
+          if (absentCount != -1)
+            if (!isCheckAbsent)
               // ignore: dead_code
               Container(
                 width: 39,
@@ -107,20 +110,20 @@ class _StudentItemState extends State<StudentItem> {
                       context: context,
                       builder: (context) => AbsentsCard(
                           isTeacher: true,
-                          name: widget.name.toString(),
-                          mail: widget.mail.toString(),
+                          name: name.toString(),
+                          mail: mail.toString(),
                           absentDates: ["10/09/2023", "11/09/2023"]),
                     );
                   },
                   child: Text(
-                    "${widget.absentCount}",
+                    "$absentCount",
                     style: TextStyle(
                       fontSize: FontSizes.medium,
-                      color: widget.absentCount % 2 == 0
+                      color: absentCount > 0
                           ? context.theme.red
                           : context.theme.grey,
                       decoration: TextDecoration.underline,
-                      decorationColor: widget.absentCount % 2 == 0
+                      decorationColor: absentCount > 0
                           ? context.theme.red
                           : context.theme.grey,
                     ),
@@ -132,12 +135,10 @@ class _StudentItemState extends State<StudentItem> {
                 width: 83,
                 alignment: Alignment.center,
                 child: Checkbox(
-                  value: widget.isAbsentToday,
+                  value: isAbsentToday,
                   activeColor: context.theme.primaryColor,
                   onChanged: (bool? newValue) {
-                    setState(() {
-                      widget.isAbsentToday = !widget.isAbsentToday;
-                    });
+                    _toggleAbsent();
                   },
                 ),
               )

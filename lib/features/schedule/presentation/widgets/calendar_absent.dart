@@ -8,7 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 class CalendarAbsent extends StatefulWidget {
   const CalendarAbsent(
       {super.key, required this.initDate, required this.onValueChange});
-  final initDate;
+  final DateTime initDate;
   final Function(DateTime) onValueChange;
 
   @override
@@ -157,6 +157,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                       ),
                     );
                   }
+                  return null;
                 },
               ),
             ),
