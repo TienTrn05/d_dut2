@@ -79,7 +79,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     });
   }
 
-  void toggleSelectAll() {
+  void _toggleSelectAll() {
     setState(() {
       isSellectedAll = !isSellectedAll;
       // Tạo một danh sách mới để Flutter nhận diện sự thay đổi
@@ -184,6 +184,30 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               ],
             ));
       },
+    );
+  }
+
+  void _confirmAction(
+      BuildContext context, VoidCallback onConfirm, String confirmText) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Xác nhận"),
+        content: Text(confirmText),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Hủy"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onConfirm();
+            },
+            child: Text("Xác nhận"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -538,7 +562,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                         children: [
                                           Flexible(
                                             child: OutlinedButton(
-                                              onPressed: () {},
+                                              onPressed: () => {
+                                                _confirmAction(context, () {},
+                                                    "Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $selectedDate không?")
+                                              },
                                               style: OutlinedButton.styleFrom(
                                                 backgroundColor: Colors.white,
                                                 side: BorderSide(
@@ -567,7 +594,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           SizedBox(width: 4),
                                           Flexible(
                                             child: OutlinedButton(
-                                              onPressed: () {},
+                                              onPressed: () => {
+                                                _confirmAction(context, () {},
+                                                    "Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $selectedDate không?")
+                                              },
                                               style: OutlinedButton.styleFrom(
                                                 backgroundColor: context
                                                         .theme.primaryColor ??
@@ -632,7 +662,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             activeColor:
                                                 context.theme.primaryColor,
                                             onChanged: (bool? newValue) {
-                                              toggleSelectAll();
+                                              _toggleSelectAll();
                                             },
                                             visualDensity:
                                                 VisualDensity.compact,
