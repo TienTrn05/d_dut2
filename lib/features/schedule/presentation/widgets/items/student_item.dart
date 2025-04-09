@@ -59,7 +59,7 @@ class StudentItem extends StatelessWidget {
                   ),
                   child: ClipOval(
                     child: Image.network(
-                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                      'https://placehold.co/600x400',
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,

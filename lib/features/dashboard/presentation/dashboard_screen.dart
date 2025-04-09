@@ -82,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
                                   ),
                                   child: ClipOval(
                                     child: Image.network(
-                                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                                      'https://placehold.co/600x400',
                                       width: 40,
                                       height: 40,
                                       fit: BoxFit.cover,
@@ -256,7 +256,9 @@ class DashboardScreen extends StatelessWidget {
                                   ? (context.read<AuthBloc>().state
                                           as AuthUserAuthenticated)
                                       .userData
-                                      .role.name : RoleModel.roleStudent;
+                                      .role
+                                      .name
+                                  : RoleModel.roleStudent;
 
                               if (userRole == RoleModel.roleTeacher ||
                                   userRole == RoleModel.roleAdmin) {
