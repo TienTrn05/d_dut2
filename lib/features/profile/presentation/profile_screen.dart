@@ -58,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             child: ClipRRect(
                               child: Image.network(
-                                'https://placehold.co/600x400',
+                                'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,

@@ -47,7 +47,7 @@ class AbsentsCard extends StatelessWidget {
                           ),
                           child: ClipOval(
                             child: Image.network(
-                              'https://placehold.co/600x400',
+                              'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
                               width: 40,
                               height: 40,
                               fit: BoxFit.cover,

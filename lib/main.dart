@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +9,7 @@ import 'common/extensions/custom_theme_extension.dart';
 import 'common/routes/routes.dart';
 import 'common/utils/app_environment.dart';
 import 'common/utils/getit_utils.dart';
+import 'common/utils/custom_http_overrides.dart';
 import 'core/data/local/storage.dart';
 import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
@@ -23,6 +25,7 @@ void main() async {
 
   final UserModel? userData = Storage.user;
 
+  HttpOverrides.global = CustomHttpOverrides();
   runApp(MyApp(
     navigatorKey,
     userData: userData,
@@ -71,3 +74,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
