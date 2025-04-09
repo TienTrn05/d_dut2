@@ -2,7 +2,6 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
@@ -12,7 +11,8 @@ import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import './widgets/schedule_item.dart';
 import './widgets/feature_card.dart';
-import './widgets/notification_button.dart';
+import './widgets/feature_card_skeleton.dart';
+import './widgets/header.dart';
 
 import '../../auth/data/model/scope_model.dart';
 
@@ -51,104 +51,22 @@ class DashboardScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Container(
-                    width: double.infinity,
-                    height: 72,
-                    padding: const EdgeInsets.all(0),
-                    decoration: BoxDecoration(
-                      color: context.theme.primaryColor,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16, right: 10, top: 16, bottom: 16),
-                            child: Row(
-                              children: [
-                                // Avatar
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                                      width: 40,
-                                      height: 40,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                BlocBuilder<AuthBloc, AuthState>(
-                                  builder: (context, state) {
-                                    final String displayName =
-                                        (state is AuthUserAuthenticated)
-                                            ? state.userData.displayName
-                                            : 'No Name';
+                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+                  if (state is! AuthUserAuthenticated) {
+                    return const Header(
+                      displayName: "title",
+                      userPrincipalName: "subtitle",
+                      isLoading: true,
+                    );
+                  }
 
-                                    final String userPrincipalName =
-                                        (state is AuthUserAuthenticated)
-                                            ? state.userData.userPrincipalName
-                                            : 'No Email';
-
-                                    return Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            displayName,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: GoogleFonts.notoSans()
-                                                  .fontFamily,
-                                              fontSize: FontSizes.large,
-                                              fontWeight: FontWeight.bold,
-                                              height: 1,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Text(
-                                            userPrincipalName,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: GoogleFonts.notoSans()
-                                                  .fontFamily,
-                                              fontSize: FontSizes.small,
-                                              height: 1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        NotificationButton(
-                          notificationCount: 2,
-                          onTap: () => {
-                            Navigator.of(context).pushNamed(Routes.notification)
-                          },
-                        ),
-                      ],
-                    )),
+                  return Header(
+                      displayName: state.userData.displayName,
+                      userPrincipalName: state.userData.userPrincipalName,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(Routes.notification);
+                      });
+                }),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -239,24 +157,29 @@ class DashboardScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         Expanded(
-                          child: BlocBuilder<DashboardBloc, DashboardState>(
+                          child: BlocBuilder<AuthBloc, AuthState>(
                             builder: (context, state) {
-                              final List<ScopeModel> scopes = context
-                                      .read<AuthBloc>()
-                                      .state is AuthUserAuthenticated
-                                  ? (context.read<AuthBloc>().state
-                                          as AuthUserAuthenticated)
-                                      .userData
-                                      .scopes
-                                  : [];
+                              if (state is! AuthUserAuthenticated) {
+                                return GridView(
+                                    shrinkWrap: true,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent:
+                                          200, // Chiều rộng tối đa của item
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      mainAxisExtent: 150,
+                                    ),
+                                    children: [
+                                      FeatureCardSkeleton(),
+                                      FeatureCardSkeleton(),
+                                    ]);
+                              }
 
-                              final String userRole = context
-                                      .read<AuthBloc>()
-                                      .state is AuthUserAuthenticated
-                                  ? (context.read<AuthBloc>().state
-                                          as AuthUserAuthenticated)
-                                      .userData
-                                      .role.name : RoleModel.roleStudent;
+                              final List<ScopeModel> scopes =
+                                  state.userData.scopes;
+
+                              final String userRole = state.userData.role.name;
 
                               if (userRole == RoleModel.roleTeacher ||
                                   userRole == RoleModel.roleAdmin) {

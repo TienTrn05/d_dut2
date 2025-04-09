@@ -26,17 +26,18 @@ class EditFieldItem extends StatelessWidget {
             color: context.theme.grey ?? Colors.grey,
           ),
           decoration: InputDecoration(
-            filled: true,
-            fillColor: Color(0xFFF5F5F5),
-            // hintText: "Đường dẫn...",
-            hintStyle: TextStyle(
-              color: context.theme.grey ?? Colors.grey,
-            ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+              filled: true,
+              fillColor: Color(0xFFF5F5F5),
+              // hintText: "Đường dẫn...",
+              hintStyle: TextStyle(
+                color: context.theme.grey ?? Colors.grey,
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
         ),
       ],
     );

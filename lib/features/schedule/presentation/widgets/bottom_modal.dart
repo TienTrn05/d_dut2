@@ -70,7 +70,8 @@ class _BottomModalState extends State<BottomModal> {
                       side: WidgetStateProperty.all(BorderSide(
                           color: context.theme.primaryColor ?? Colors.blue,
                           width: 2)),
-                      padding: WidgetStateProperty.all(EdgeInsets.all(16)),
+                      padding: WidgetStateProperty.all(
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                       shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -95,7 +96,8 @@ class _BottomModalState extends State<BottomModal> {
                         backgroundColor: WidgetStateProperty.all(
                           context.theme.primaryColor ?? Colors.blue,
                         ),
-                        padding: WidgetStateProperty.all(EdgeInsets.all(16)),
+                        padding: WidgetStateProperty.all(
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                         shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
