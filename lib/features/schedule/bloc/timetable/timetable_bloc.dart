@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
@@ -10,7 +12,10 @@ part 'timetable_state.dart';
 class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
   final ScheduleRepository _repository;
 
-  final Map<String, List<UosItemModel>> _uosCache = {};
+  // Khai báo ở đầu file hoặc trong class:
+  final int _cacheLimit = 5;
+  final LinkedHashMap<String, List<UosItemModel>> _uosCache = LinkedHashMap();
+
   int selectedIndex = 0;
 
   TimetableBloc(this._repository) : super(TimetableInitial()) {
@@ -62,6 +67,11 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
         } else {
           // Gọi API lấy mới
           final listUOS = await _repository.getListUOSBySemester(idSemester);
+          if (_uosCache.length >= _cacheLimit) {
+            // Xoá mục cũ nhất (mục đầu tiên)
+            _uosCache.remove(_uosCache.keys.first);
+          }
+
           _uosCache[idSemester] = listUOS; // Lưu cache
 
           emit(TimetableDataLoaded(
