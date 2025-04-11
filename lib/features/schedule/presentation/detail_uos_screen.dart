@@ -70,9 +70,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                     title: 'Thông tin chung',
                     child: Column(
                       children: [
-                        InfoItem(
-                            field: "Mã lớp học phần",
-                            value: "1024010.2420.21.11"),
+                        InfoItem(field: "Mã lớp học phần", value: idSubject),
                         InfoItem(field: "Mã môn", value: "123456"),
                         InfoItem(
                           field: "Hệ",

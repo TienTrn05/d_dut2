@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
+import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -15,14 +17,38 @@ class ScheduleService {
     try {
       final response = await _dio.get("$_url/api/Timetable/GetListSemesters");
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
+        final responseData = response.data;
+
+        final List<dynamic> data = responseData['data'];
 
         return data.map((e) => SemesterModel.fromJson(e)).toList();
       } else {
         throw Exception("Failed to load semesters : ${response.statusMessage}");
       }
     } catch (e) {
+      logger.e("Failed to load semesters: $e");
       throw Exception("Failed to fetch semesters: $e");
+    }
+  }
+
+  Future<List<UosItemModel>> getListUOSBySemester(String idSemester) async {
+    try {
+      final response = await _dio.get(
+          "$_url/api/Timetable/GetListTimetablesBySemester",
+          queryParameters: {'idSemester': idSemester});
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        final List<dynamic> data = responseData['data'];
+
+        return data.map((e) => UosItemModel.fromJson(e)).toList();
+      } else {
+        throw Exception(
+            "[51:schedule_service]Failed to load list UOSItem : ${response.statusMessage}");
+      }
+    } catch (e) {
+      logger.e("[54:schedule_service]Failed to load UOSItem: $e");
+      throw Exception("Failed to fetch UOSItem: $e");
     }
   }
 }

@@ -2,6 +2,8 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/exam_shift_model.dart';
+import 'package:e_dut/features/schedule/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,26 +12,22 @@ class UnitOfStudyItem extends StatelessWidget {
   final String nameSubject;
   final bool isExam;
   final int? credit;
-  final String? weekRange;
-  final String? time;
+  final Map<String, List<String>>? timetable;
+  final List<ExamShiftModel>? examShifts;
   final String? room;
   final String? teacher;
 
-  final String? examShiftNo;
-  final String? examGroupNo;
-
-  const UnitOfStudyItem(
-      {super.key,
-      required this.idSubject,
-      required this.nameSubject,
-      this.isExam = false,
-      this.credit,
-      this.weekRange,
-      this.time,
-      this.room,
-      this.teacher,
-      this.examShiftNo,
-      this.examGroupNo});
+  const UnitOfStudyItem({
+    super.key,
+    required this.idSubject,
+    required this.nameSubject,
+    this.isExam = false,
+    this.credit,
+    this.timetable,
+    this.examShifts,
+    this.room,
+    this.teacher,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,41 +94,84 @@ class UnitOfStudyItem extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              (time != null || room != null)
-                  ? '$time, $room'
-                  : 'Hiện chưa có lịch',
-              style: TextStyle(
-                fontSize: FontSizes.medium,
-                fontWeight: FontWeight.w400,
-                color: (time != null || room != null)
-                    ? Colors.black
-                    : context.theme.grey ?? Colors.grey,
-                height: 1.25,
-              ),
-            ),
-            const SizedBox(height: 4),
-            weekRange != null && weekRange!.isNotEmpty
-                ? Text(
-                    'Tuần $weekRange',
-                    style: TextStyle(
-                      fontSize: FontSizes.small,
-                      fontWeight: FontWeight.w500,
-                      height: 1.25,
-                      color: context.theme.grey ?? Colors.grey,
+            ...(timetable?.entries.map((entry) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tuần ${entry.key}', // ví dụ: "Tuần 31-32"
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: FontSizes.medium),
+                        ),
+                        const SizedBox(height: 4),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: entry.value.map((shiftStr) {
+                            return Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Container(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      left: BorderSide(
+                                        color:
+                                            context.theme.grey ?? Colors.grey,
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    shiftStr,
+                                    style: TextStyle(
+                                        color:
+                                            context.theme.grey ?? Colors.grey,
+                                        fontSize: FontSizes.medium),
+                                  ),
+                                ));
+                          }).toList(),
+                        )
+                      ],
                     ),
-                  )
-                : SizedBox.shrink(),
+                  );
+                }).toList() ??
+                []),
             const SizedBox(height: 4),
-            (isExam && examShiftNo != null && examGroupNo != null) ||
-                    (!isExam && teacher != null)
+            ...(examShifts?.map((shift) {
+                  return Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    alignment: WrapAlignment.spaceBetween,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        '${Functions.formatDateTime(shift.examDate)},  ${shift.room}',
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          height: 1.25,
+                        ),
+                      ),
+                      Text(
+                        'Xuất ${shift.noExamShift}, nhóm ${shift.noExamGroup}',
+                        style: TextStyle(
+                          color: context.theme.grey ?? Colors.grey,
+                          fontSize: FontSizes.medium,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList() ??
+                []),
+            (teacher != null)
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        isExam
-                            ? 'Xuất $examShiftNo, nhóm $examGroupNo'
-                            : 'GV: $teacher',
+                        'GV: $teacher',
                         style: TextStyle(
                           color: context.theme.grey ?? Colors.grey,
                           fontSize: FontSizes.medium,
