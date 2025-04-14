@@ -16,9 +16,27 @@ class TimetableError extends TimetableState {
   List<Object?> get props => [message];
 }
 
-class SemesterListLoaded extends TimetableState {
+// class SemesterListLoaded extends TimetableState {
+//   final List<SemesterModel> semesters;
+//   SemesterListLoaded(this.semesters);
+//   @override
+//   List<Object?> get props => [semesters];
+// }
+
+// class UOSBySemesterLoaded extends TimetableState {
+//   final List<UosItemModel> listUOS;
+//   UOSBySemesterLoaded(this.listUOS);
+//   @override
+//   List<Object?> get props => [listUOS];
+// }
+
+class TimetableDataLoaded extends TimetableState {
   final List<SemesterModel> semesters;
-  SemesterListLoaded(this.semesters);
+  final List<UosItemModel> listUOS;
+  final int selectedIndex;
+
+  TimetableDataLoaded(this.semesters, this.listUOS, this.selectedIndex);
+
   @override
-  List<Object?> get props => [semesters];
+  List<Object?> get props => [semesters, listUOS, selectedIndex];
 }

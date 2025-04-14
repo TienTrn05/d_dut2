@@ -1,7 +1,11 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
@@ -19,11 +23,38 @@ import '../../auth/data/model/scope_model.dart';
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final scheduleState = context.read<ScheduleBloc>().state;
+    final DateTime today = DateTime.now();
+    final String weekday = DateFormat.EEEE('vi').format(today);
+    final String month = 'Tháng ${today.month}';
+    final String day = '${today.day}';
+
+    final List<ScheduleItemModel> schedulesToday =
+        scheduleState is SchedulesLoaded
+            ? scheduleState.schedules.where((schedule) {
+                final date = schedule.examTime;
+                if (date == null) return false;
+                return date.year == today.year &&
+                    date.month == today.month &&
+                    date.day == today.day;
+              }).toList()
+            : [];
     return BlocProvider(
       create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
       child: BlocListener<DashboardBloc, DashboardState>(
@@ -77,12 +108,13 @@ class DashboardScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Thứ 2',
+                            weekday,
                             style: TextStyle(
                               fontSize: FontSizes.large,
                               fontWeight: FontWeight.bold,
@@ -91,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Tháng 2',
+                            month,
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: FontSizes.medium,
@@ -101,7 +133,7 @@ class DashboardScreen extends StatelessWidget {
                           Flexible(
                             // fit: BoxFit.scaleDown, //thu nhỏ nếu không đủ chỗ
                             child: Text(
-                              '13',
+                              day,
                               style: TextStyle(
                                 color: context.theme.primaryColor,
                                 fontSize: 48,
@@ -122,31 +154,43 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ScheduleItem(
-                                subject: 'Điện toán đám mây',
-                                time: '7:00 - 9:50',
-                                room: 'F109',
+                        child: schedulesToday.isEmpty
+                            ? Text("Hôm nay không có lịch nào",
+                                style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontWeight: FontWeight.w600,
+                                    color: context.theme.grey ?? Colors.grey))
+                            : SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: schedulesToday.map((item) {
+                                    return ScheduleItem(
+                                      // idSubject: item.idUnitOfStudy,
+                                      subject: item.subjectName,
+                                      time: item.isExam
+                                          ? "${DateFormat.Hm().format(item.examTime!)}, xuất ..., nhóm ..."
+                                          : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+                                      room: item.room,
+                                      isExam: item.isExam,
+                                    );
+                                  }).toList(),
+                                  // children: [
+                                  //   ScheduleItem(
+                                  //     subject: 'Lập trình di động',
+                                  //     time: '7:00, xuất 2C1, nhóm A',
+                                  //     room: 'F109',
+                                  //     isExam: true,
+                                  //   ),
+                                  //   const SizedBox(height: 4),
+                                  //   ScheduleItem(
+                                  //     subject: 'Đồ án 1',
+                                  //     time: '13:00 - 15:50',
+                                  //     room: 'F109',
+                                  //   ),
+                                  // ],
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              ScheduleItem(
-                                subject: 'Lập trình di động',
-                                time: '7:00, xuất 2C1, nhóm A',
-                                room: 'F109',
-                                isExam: true,
-                              ),
-                              const SizedBox(height: 4),
-                              ScheduleItem(
-                                subject: 'Đồ án 1',
-                                time: '13:00 - 15:50',
-                                room: 'F109',
-                              ),
-                            ],
-                          ),
-                        ),
                       )
                     ],
                   ),

@@ -21,9 +21,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   bool _isDayView = true;
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (_) => TimetableBloc(getIt.get<ScheduleRepository>())
-          ..add(LoadListSemesters()),
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (_) => TimetableBloc(getIt.get<ScheduleRepository>())),
+        ],
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
