@@ -2,6 +2,7 @@ import 'package:e_dut/features/schedule/data/model/exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
 
 class UosItemModel {
+  final String idUnitOfStudy;
   final String noUOS;
   final int credit;
   final String subjectName;
@@ -10,7 +11,8 @@ class UosItemModel {
   final List<ExamShiftModel> examShifts;
 
   UosItemModel(
-      {required this.noUOS,
+      {required this.idUnitOfStudy,
+      required this.noUOS,
       required this.credit,
       required this.subjectName,
       required this.teacherName,
@@ -19,6 +21,7 @@ class UosItemModel {
 
   factory UosItemModel.fromJson(Map<String, dynamic> json) {
     return UosItemModel(
+        idUnitOfStudy: json['idUnitOfStudy'],
         noUOS: json['noUOS'],
         credit: json['credit'],
         subjectName: json['subjectName'],
@@ -32,6 +35,7 @@ class UosItemModel {
   }
   Map<String, dynamic> toJson() {
     return {
+      'idUnitOfStudy': idUnitOfStudy,
       'noUOS': noUOS,
       'credit': credit,
       'subjectName': subjectName,

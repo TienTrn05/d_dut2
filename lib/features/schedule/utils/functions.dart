@@ -1,4 +1,5 @@
 import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Functions {
@@ -67,5 +68,12 @@ class Functions {
 
   static formatDateTime(DateTime dt) {
     return DateFormat('HH:mm, dd/MM/yyyy').format(dt);
+  }
+
+  static TimeOfDay parseTimeOfDay(String timeString) {
+    final parts = timeString.split(":");
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:e_dut/features/schedule/data/data_sources/remote_data_source/schedule_service.dart';
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
 import 'package:injectable/injectable.dart';
@@ -15,5 +16,9 @@ class ScheduleRepository {
 
   Future<List<UosItemModel>> getListUOSBySemester(String idSemester) {
     return _scheduleService.getListUOSBySemester(idSemester);
+  }
+
+  Future<List<ScheduleItemModel>> getSchedulesByDate(DateTime inputDate) {
+    return _scheduleService.getSchedulesByDate(inputDate);
   }
 }

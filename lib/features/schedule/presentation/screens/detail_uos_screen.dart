@@ -4,19 +4,45 @@ import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
+import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/absents_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/uos_info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
+import 'package:e_dut/features/schedule/utils/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailUnitOfStudy extends StatelessWidget {
   final String idSubject;
+
   const DetailUnitOfStudy({super.key, required this.idSubject});
 
   @override
   Widget build(BuildContext context) {
+    // Map<String, List<String>> timetable = Functions.analyzeStudyShifts([
+    //   StudyShiftModel(
+    //       dayOfWeek: 1,
+    //       startPeriod: 1,
+    //       endPeriod: 3,
+    //       startWeek: 3,
+    //       endWeek: 18,
+    //       room: "E201A"),
+    //   StudyShiftModel(
+    //       dayOfWeek: 2,
+    //       startPeriod: 1,
+    //       endPeriod: 3,
+    //       startWeek: 3,
+    //       endWeek: 19,
+    //       room: "E201A"),
+    //   StudyShiftModel(
+    //       dayOfWeek: 3,
+    //       startPeriod: 1,
+    //       endPeriod: 3,
+    //       startWeek: 3,
+    //       endWeek: 19,
+    //       room: "E201A"),
+    // ]);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -70,7 +96,9 @@ class DetailUnitOfStudy extends StatelessWidget {
                     title: 'Thông tin chung',
                     child: Column(
                       children: [
-                        InfoItem(field: "Mã lớp học phần", value: idSubject),
+                        InfoItem(
+                            field: "Mã lớp học phần",
+                            value: "1022101897.21.11"),
                         InfoItem(field: "Mã môn", value: "123456"),
                         InfoItem(
                           field: "Hệ",
@@ -83,14 +111,6 @@ class DetailUnitOfStudy extends StatelessWidget {
                         InfoItem(
                           field: "Kỳ học",
                           value: "Học kì 1, 2025-2026",
-                        ),
-                        InfoItem(
-                          field: "Tuần học",
-                          value: "31-43",
-                        ),
-                        InfoItem(
-                          field: "TKB",
-                          value: "Thứ 4, 1-3, F109",
                         ),
                       ],
                     ),
@@ -231,6 +251,55 @@ class DetailUnitOfStudy extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  // UosInfoCard(
+                  //   title: 'Lịch học',
+                  //   child: Column(
+                  //       children: timetable.entries.map((entry) {
+                  //     return Padding(
+                  //       padding: const EdgeInsets.only(top: 8),
+                  //       child: Column(
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Text(
+                  //             'Tuần ${entry.key}',
+                  //             style: TextStyle(
+                  //               fontWeight: FontWeight.bold,
+                  //               fontSize: FontSizes.medium,
+                  //             ),
+                  //           ),
+                  //           const SizedBox(height: 4),
+                  //           ...entry.value.map((shiftStr) {
+                  //             return Padding(
+                  //               padding:
+                  //                   const EdgeInsets.symmetric(horizontal: 8),
+                  //               child: Container(
+                  //                 padding: const EdgeInsets.only(left: 10),
+                  //                 decoration: BoxDecoration(
+                  //                   border: Border(
+                  //                     left: BorderSide(
+                  //                       color:
+                  //                           context.theme.grey ?? Colors.grey,
+                  //                       width: 1,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //                 child: Text(
+                  //                   shiftStr,
+                  //                   style: TextStyle(
+                  //                     color: context.theme.grey ?? Colors.grey,
+                  //                     fontSize: FontSizes.medium,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           }),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   }).toList()),
+                  // ),
+
                   const SizedBox(height: 10),
                   UosInfoCard(
                     title: 'Lịch thi',
