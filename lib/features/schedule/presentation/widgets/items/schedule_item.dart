@@ -10,7 +10,7 @@ import '../../../../auth/data/model/role_model.dart';
 class ScheduleItem extends StatelessWidget {
   final String idSubject;
   final String subject;
-  final String time;
+  final String? time;
   final String room;
   final bool isExam;
 
@@ -85,7 +85,7 @@ class ScheduleItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          time,
+                          time ?? "",
                           style: TextStyle(
                             fontSize: FontSizes.medium,
                             height: 1,

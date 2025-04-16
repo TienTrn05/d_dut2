@@ -1,6 +1,8 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -93,6 +95,9 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 _selectedDay = selectedDay; // Cập nhật ngày được chọn
                 _focusedDay = selectedDay; // Cập nhật tiêu đề tháng
               });
+              context
+                  .read<ScheduleBloc>()
+                  .add(LoadSchedulesByDate(inputDate: _selectedDay));
             },
             headerStyle: HeaderStyle(
               titleCentered: true,

@@ -2,49 +2,14 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/calendar_custom.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/schedule_toggle_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-final List<Map<String, dynamic>> scheduleItems = [
-  {
-    'idSubject': '1024010.2420.21.12',
-    'subject': 'Lập trình di động',
-    'time': '7:00, xuất 2C1, nhóm A',
-    'room': 'F109',
-    'isExam': true,
-  },
-  {
-    'idSubject': '1024010.2420.21.13',
-    'subject': 'Hệ điều hành',
-    'time': '9:00 - 11:50',
-    'room': 'F207',
-    'isExam': false,
-  },
-  {
-    'idSubject': '1024010.2420.21.13',
-    'subject': 'Hệ điều hành',
-    'time': '9:00 - 11:50',
-    'room': 'F207',
-    'isExam': true,
-  },
-  {
-    'idSubject': '1024010.2420.21.13',
-    'subject': 'Hệ điều hành',
-    'time': '9:00 - 11:50',
-    'room': 'F207',
-    'isExam': false,
-  },
-  {
-    'idSubject': '1024010.2420.21.13',
-    'subject': 'Hệ điều hành',
-    'time': '9:00 - 11:50',
-    'room': 'F207',
-    'isExam': false,
-  },
-];
+import 'package:intl/intl.dart';
 
 class DayMode extends StatefulWidget {
   const DayMode({super.key});
@@ -55,12 +20,22 @@ class DayMode extends StatefulWidget {
 
 class _DayModeState extends State<DayMode> {
   Set<String> selectedOptions = {'isStudy', 'isExam'};
+  List<ScheduleItemModel> schedules = [];
+  DateTime selectedDay = DateTime.now();
 
   void handleSelectionChanged(Set<String> newSelection) {
     setState(() {
       selectedOptions = newSelection;
     });
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   context
+  //       .read<ScheduleBloc>()
+  //       .add(LoadSchedulesByDate(inputDate: selectedDay));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -71,72 +46,105 @@ class _DayModeState extends State<DayMode> {
                 .role
                 .name
             : RoleModel.roleStudent;
-    List<Map<String, dynamic>> filteredItems = scheduleItems.where((item) {
-      if (selectedOptions.contains('isStudy') && !item['isExam']) {
+    List<ScheduleItemModel> filteredItems = schedules.where((item) {
+      if (selectedOptions.contains('isStudy') && !item.isExam) {
         return true;
       }
-      if (selectedOptions.contains('isExam') && item['isExam']) {
+      if (selectedOptions.contains('isExam') && item.isExam) {
         return true;
       }
       return false;
     }).toList();
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return BlocConsumer<ScheduleBloc, ScheduleState>(
+        listener: (context, state) {
+      if (state is SchedulesLoaded) {
+        setState(() {
+          selectedDay = state.selectedDay;
+          schedules = state.schedules;
+        });
+      }
+    }, builder: (context, state) {
+      return Column(
         children: [
-          CalendarCustom(),
-          SizedBox(height: 20),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            alignment: WrapAlignment.spaceBetween,
-            runSpacing: 4,
-            children: [
-              Text(
-                'Tuần 32, 22/01/2025',
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
-                  fontWeight: FontWeight.bold,
-                  height: 1,
-                ),
-              ),
-              ScheduleToggleButton(
-                studyLabel:
-                    userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
-                examLabel: userRole == RoleModel.roleStudent
-                    ? "Lịch thi"
-                    : "Lịch coi thi",
-                onSelectionChanged: handleSelectionChanged,
-              ),
-            ],
+          SizedBox(
+            height: 2,
+            child: state is ScheduleLoading
+                ? LinearProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF0D99FF),
+                    ),
+                    backgroundColor: Colors.transparent,
+                    minHeight: 2,
+                  )
+                : SizedBox.shrink(), // không hiển thị gì nếu không loading
           ),
-          SizedBox(height: 10),
+          Expanded(
+              child: SingleChildScrollView(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CalendarCustom(),
+                SizedBox(height: 20),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: 4,
+                  children: [
+                    Text(
+                      "Tuần 32, ${DateFormat('dd/MM/yyyy').format(selectedDay)}",
+                      style: TextStyle(
+                        fontSize: FontSizes.medium,
+                        fontWeight: FontWeight.bold,
+                        height: 1,
+                      ),
+                    ),
+                    ScheduleToggleButton(
+                      studyLabel: userRole == RoleModel.roleStudent
+                          ? "Lịch học"
+                          : "Lịch dạy",
+                      examLabel: userRole == RoleModel.roleStudent
+                          ? "Lịch thi"
+                          : "Lịch coi thi",
+                      onSelectionChanged: handleSelectionChanged,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                if (state is ScheduleLoading)
+                  Center()
+                else
+                // Danh sách các ScheduleItem
+                if (filteredItems.isEmpty)
+                  Center(
+                    child: Text("Hiện không có lịch nào",
+                        style: TextStyle(
+                            fontSize: FontSizes.medium,
+                            fontWeight: FontWeight.w600,
+                            color: context.theme.grey ?? Colors.grey)),
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: filteredItems.map((item) {
+                      return ScheduleItem(
+                        idSubject: item.idUnitOfStudy,
+                        subject: item.subjectName,
+                        time: item.isExam
+                            ? "${DateFormat.Hm().format(item.examTime!)}, xuất ..., nhóm ..."
+                            : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+                        room: item.room,
+                        isExam: item.isExam,
+                      );
+                    }).toList(),
+                  ),
 
-          // Danh sách các ScheduleItem
-          if (filteredItems.isEmpty)
-            Center(
-              child: Text("Hiện không có lịch nào",
-                  style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      fontWeight: FontWeight.w600,
-                      color: context.theme.grey ?? Colors.grey)),
-            )
-          else
-            Column(
-              children: filteredItems.map((item) {
-                return ScheduleItem(
-                  idSubject: item['idSubject'],
-                  subject: item['subject'],
-                  time: item['time'],
-                  room: item['room'],
-                  isExam: item['isExam'],
-                );
-              }).toList(),
+                SizedBox(height: 40), // Khoảng cách cuối cùng
+              ],
             ),
-
-          SizedBox(height: 40), // Khoảng cách cuối cùng
+          ))
         ],
-      ),
-    );
+      );
+    });
   }
 }

@@ -1,8 +1,11 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
@@ -12,18 +15,46 @@ import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import './widgets/schedule_item.dart';
 import './widgets/feature_card.dart';
-import './widgets/notification_button.dart';
+import './widgets/feature_card_skeleton.dart';
+import './widgets/header.dart';
 
 import '../../auth/data/model/scope_model.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final scheduleState = context.read<ScheduleBloc>().state;
+    final DateTime today = DateTime.now();
+    final String weekday = DateFormat.EEEE('vi').format(today);
+    final String month = 'Tháng ${today.month}';
+    final String day = '${today.day}';
+
+    final List<ScheduleItemModel> schedulesToday =
+        scheduleState is SchedulesLoaded
+            ? scheduleState.schedules.where((schedule) {
+                final date = schedule.examTime;
+                if (date == null) return false;
+                return date.year == today.year &&
+                    date.month == today.month &&
+                    date.day == today.day;
+              }).toList()
+            : [];
     return BlocProvider(
       create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
       child: BlocListener<DashboardBloc, DashboardState>(
@@ -51,104 +82,22 @@ class DashboardScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Container(
-                    width: double.infinity,
-                    height: 72,
-                    padding: const EdgeInsets.all(0),
-                    decoration: BoxDecoration(
-                      color: context.theme.primaryColor,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16, right: 10, top: 16, bottom: 16),
-                            child: Row(
-                              children: [
-                                // Avatar
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                                      width: 40,
-                                      height: 40,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                BlocBuilder<AuthBloc, AuthState>(
-                                  builder: (context, state) {
-                                    final String displayName =
-                                        (state is AuthUserAuthenticated)
-                                            ? state.userData.displayName
-                                            : 'No Name';
+                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+                  if (state is! AuthUserAuthenticated) {
+                    return const Header(
+                      displayName: "title",
+                      userPrincipalName: "subtitle",
+                      isLoading: true,
+                    );
+                  }
 
-                                    final String userPrincipalName =
-                                        (state is AuthUserAuthenticated)
-                                            ? state.userData.userPrincipalName
-                                            : 'No Email';
-
-                                    return Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            displayName,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: GoogleFonts.notoSans()
-                                                  .fontFamily,
-                                              fontSize: FontSizes.large,
-                                              fontWeight: FontWeight.bold,
-                                              height: 1,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Text(
-                                            userPrincipalName,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: GoogleFonts.notoSans()
-                                                  .fontFamily,
-                                              fontSize: FontSizes.small,
-                                              height: 1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        NotificationButton(
-                          notificationCount: 2,
-                          onTap: () => {
-                            Navigator.of(context).pushNamed(Routes.notification)
-                          },
-                        ),
-                      ],
-                    )),
+                  return Header(
+                      displayName: state.userData.displayName,
+                      userPrincipalName: state.userData.userPrincipalName,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(Routes.notification);
+                      });
+                }),
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
@@ -159,12 +108,13 @@ class DashboardScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Thứ 2',
+                            weekday,
                             style: TextStyle(
                               fontSize: FontSizes.large,
                               fontWeight: FontWeight.bold,
@@ -173,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Tháng 2',
+                            month,
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: FontSizes.medium,
@@ -183,7 +133,7 @@ class DashboardScreen extends StatelessWidget {
                           Flexible(
                             // fit: BoxFit.scaleDown, //thu nhỏ nếu không đủ chỗ
                             child: Text(
-                              '13',
+                              day,
                               style: TextStyle(
                                 color: context.theme.primaryColor,
                                 fontSize: 48,
@@ -204,31 +154,43 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ScheduleItem(
-                                subject: 'Điện toán đám mây',
-                                time: '7:00 - 9:50',
-                                room: 'F109',
+                        child: schedulesToday.isEmpty
+                            ? Text("Hôm nay không có lịch nào",
+                                style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontWeight: FontWeight.w600,
+                                    color: context.theme.grey ?? Colors.grey))
+                            : SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: schedulesToday.map((item) {
+                                    return ScheduleItem(
+                                      // idSubject: item.idUnitOfStudy,
+                                      subject: item.subjectName,
+                                      time: item.isExam
+                                          ? "${DateFormat.Hm().format(item.examTime!)}, xuất ..., nhóm ..."
+                                          : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+                                      room: item.room,
+                                      isExam: item.isExam,
+                                    );
+                                  }).toList(),
+                                  // children: [
+                                  //   ScheduleItem(
+                                  //     subject: 'Lập trình di động',
+                                  //     time: '7:00, xuất 2C1, nhóm A',
+                                  //     room: 'F109',
+                                  //     isExam: true,
+                                  //   ),
+                                  //   const SizedBox(height: 4),
+                                  //   ScheduleItem(
+                                  //     subject: 'Đồ án 1',
+                                  //     time: '13:00 - 15:50',
+                                  //     room: 'F109',
+                                  //   ),
+                                  // ],
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              ScheduleItem(
-                                subject: 'Lập trình di động',
-                                time: '7:00, xuất 2C1, nhóm A',
-                                room: 'F109',
-                                isExam: true,
-                              ),
-                              const SizedBox(height: 4),
-                              ScheduleItem(
-                                subject: 'Đồ án 1',
-                                time: '13:00 - 15:50',
-                                room: 'F109',
-                              ),
-                            ],
-                          ),
-                        ),
                       )
                     ],
                   ),
@@ -239,24 +201,29 @@ class DashboardScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         Expanded(
-                          child: BlocBuilder<DashboardBloc, DashboardState>(
+                          child: BlocBuilder<AuthBloc, AuthState>(
                             builder: (context, state) {
-                              final List<ScopeModel> scopes = context
-                                      .read<AuthBloc>()
-                                      .state is AuthUserAuthenticated
-                                  ? (context.read<AuthBloc>().state
-                                          as AuthUserAuthenticated)
-                                      .userData
-                                      .scopes
-                                  : [];
+                              if (state is! AuthUserAuthenticated) {
+                                return GridView(
+                                    shrinkWrap: true,
+                                    gridDelegate:
+                                        SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent:
+                                          200, // Chiều rộng tối đa của item
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                      mainAxisExtent: 150,
+                                    ),
+                                    children: [
+                                      FeatureCardSkeleton(),
+                                      FeatureCardSkeleton(),
+                                    ]);
+                              }
 
-                              final String userRole = context
-                                      .read<AuthBloc>()
-                                      .state is AuthUserAuthenticated
-                                  ? (context.read<AuthBloc>().state
-                                          as AuthUserAuthenticated)
-                                      .userData
-                                      .role.name : RoleModel.roleStudent;
+                              final List<ScopeModel> scopes =
+                                  state.userData.scopes;
+
+                              final String userRole = state.userData.role.name;
 
                               if (userRole == RoleModel.roleTeacher ||
                                   userRole == RoleModel.roleAdmin) {

@@ -1,0 +1,27 @@
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
+import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+part 'schedule_event.dart';
+part 'schedule_state.dart';
+
+class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
+  final ScheduleRepository _repository;
+
+  ScheduleBloc(this._repository) : super(ScheduleInitial()) {
+    on<LoadSchedulesByDate>(_onLoadSchedulesByDate);
+  }
+
+  Future<void> _onLoadSchedulesByDate(
+      LoadSchedulesByDate event, Emitter<ScheduleState> emit) async {
+    emit(ScheduleLoading());
+    try {
+      final inputDate = event.inputDate;
+      final schedules = await _repository.getSchedulesByDate(inputDate);
+      emit(SchedulesLoaded(selectedDay: inputDate, schedules: schedules));
+    } catch (e) {
+      emit(ScheduleError(e.toString()));
+    }
+  }
+}

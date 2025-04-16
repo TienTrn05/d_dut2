@@ -1,12 +1,12 @@
-import 'package:e_dut/features/schedule/presentation/detail_uos_screen.dart';
-import 'package:e_dut/features/schedule/presentation/detaitl_exam_shift_screen.dart';
+import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
+import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
-import '../../../features/schedule/presentation/schedule_screen.dart';
-import '../../features/schedule/presentation/detail_uos_teacher_screen.dart';
+import '../../features/schedule/presentation/screens/schedule_screen.dart';
+import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
 
 class Routes {
   static const String root = "/";
