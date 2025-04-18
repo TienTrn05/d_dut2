@@ -3,9 +3,9 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/notification/presentation/widgets/notification_card.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/bottom_modal.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/edit_field_item.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/uos_info_item.dart';
@@ -17,7 +17,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../widgets/calendar_absent.dart';
+import '../widgets/custom/calendar_absent.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   const DetailUOSTeacherScreen({super.key});

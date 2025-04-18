@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +30,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
       CalendarFormat.month; // Lịch mặc định là tháng
 
   void _loadCalendarEventsForMonth() {
-    context.read<ScheduleBloc>().add(
+    context.read<CalendarBloc>().add(
           LoadCalendarEvents(
             month: _focusedDay.month,
             year: _focusedDay.year,
@@ -60,7 +61,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
   // Hàm để chọn tháng và năm
   Future<void> _selectMonthYear() async {
     print("_selectMonthYear");
-
   }
 
   @override
@@ -81,7 +81,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
       ),
       child: Column(
         children: [
-          BlocListener<ScheduleBloc, ScheduleState>(listener: (context, state) {
+          BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
             if (state is CalendarEventLoaded) {
               final newEventMap = <DateTime, List<int>>{};
               for (var event in state.calendarEvents) {
@@ -96,7 +96,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 _eventMap = newEventMap;
               });
             }
-          }, child: BlocBuilder<ScheduleBloc, ScheduleState>(
+          }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
             if (state is CalendarEventLoaded) {
               _eventMap = {};
@@ -128,7 +128,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                       _currentWeek = 0;
                     }
                   });
-                  context.read<ScheduleBloc>().add(
+                  context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
                           month: focusDate.month,
                           year: focusDate.year,

@@ -10,10 +10,3 @@ class LoadSchedulesByDate extends ScheduleEvent {
 
   LoadSchedulesByDate({required this.inputDate});
 }
-
-class LoadCalendarEvents extends ScheduleEvent{
-  final int month;
-  final int year;
-
-  LoadCalendarEvents({required this.month, required this.year});
-}

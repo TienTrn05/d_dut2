@@ -5,11 +5,12 @@ import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/schedule_item.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/calendar_custom.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/schedule_toggle_button.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_custom.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/custom/schedule_toggle_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class DayMode extends StatefulWidget {
   const DayMode({super.key});
@@ -117,11 +118,16 @@ class _DayModeState extends State<DayMode> {
                 // Danh sách các ScheduleItem
                 if (filteredItems.isEmpty)
                   Center(
-                    child: Text("Không có lịch nào trong ngày này",
-                        style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.w600,
-                            color: context.theme.grey ?? Colors.grey)),
+                    child: Text(
+                      isSameDay(selectedDay, DateTime.now())
+                          ? "Hôm nay không có lịch nào"
+                          : "Không có lịch nào trong ngày này",
+                      style: TextStyle(
+                        fontSize: FontSizes.medium,
+                        fontWeight: FontWeight.w600,
+                        color: context.theme.grey ?? Colors.grey,
+                      ),
+                    ),
                   )
                 else
                   Column(

@@ -179,7 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "Hôm nay không có lịch!",
+                                          "Hôm nay không có lịch nào!",
                                           style: TextStyle(
                                             fontSize: FontSizes.medium,
                                             fontWeight: FontWeight.w600,

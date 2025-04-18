@@ -3,6 +3,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
@@ -26,6 +27,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         providers: [
           BlocProvider(
               create: (_) => TimetableBloc(getIt.get<ScheduleRepository>())),
+          BlocProvider(
+              create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
           BlocProvider(
             create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
               ..add(LoadSchedulesByDate(inputDate: DateTime.now())),
