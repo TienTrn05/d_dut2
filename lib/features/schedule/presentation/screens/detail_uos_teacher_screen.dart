@@ -330,14 +330,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             field: "Kỳ học",
                                             value: "Học kì 1, 2025-2026",
                                           ),
-                                          InfoItem(
-                                            field: "Tuần học",
-                                            value: "31-43",
-                                          ),
-                                          InfoItem(
-                                            field: "TKB",
-                                            value: "Thứ 4, 1-3, F109",
-                                          ),
                                         ],
                                       ),
                                     ),

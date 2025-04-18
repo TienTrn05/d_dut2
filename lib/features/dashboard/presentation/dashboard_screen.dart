@@ -1,9 +1,11 @@
+import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
-import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
+import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
@@ -39,24 +41,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheduleState = context.read<ScheduleBloc>().state;
     final DateTime today = DateTime.now();
     final String weekday = DateFormat.EEEE('vi').format(today);
     final String month = 'Tháng ${today.month}';
     final String day = '${today.day}';
 
-    final List<ScheduleItemModel> schedulesToday =
-        scheduleState is SchedulesLoaded
-            ? scheduleState.schedules.where((schedule) {
-                final date = schedule.examTime;
-                if (date == null) return false;
-                return date.year == today.year &&
-                    date.month == today.month &&
-                    date.day == today.day;
-              }).toList()
-            : [];
-    return BlocProvider(
-      create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
+        ),
+        BlocProvider(
+          create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
+            ..add(LoadSchedulesByDate(inputDate: DateTime.now())),
+        ),
+      ],
       child: BlocListener<DashboardBloc, DashboardState>(
         listener: (context, state) {
           if (state is DashboardPermissionRequested) {
@@ -153,44 +152,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         color: Colors.grey[300],
                       ),
                       const SizedBox(width: 10),
-                      Expanded(
-                        child: schedulesToday.isEmpty
-                            ? Text("Hôm nay không có lịch nào",
-                                style: TextStyle(
-                                    fontSize: FontSizes.medium,
-                                    fontWeight: FontWeight.w600,
-                                    color: context.theme.grey ?? Colors.grey))
-                            : SingleChildScrollView(
+                      BlocBuilder<ScheduleBloc, ScheduleState>(
+                        builder: (context, state) {
+                          if (state is ScheduleLoading) {
+                            return Expanded(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: schedulesToday.map((item) {
-                                    return ScheduleItem(
-                                      // idSubject: item.idUnitOfStudy,
-                                      subject: item.subjectName,
-                                      time: item.isExam
-                                          ? "${DateFormat.Hm().format(item.examTime!)}, xuất ..., nhóm ..."
-                                          : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
-                                      room: item.room,
-                                      isExam: item.isExam,
-                                    );
-                                  }).toList(),
-                                  // children: [
-                                  //   ScheduleItem(
-                                  //     subject: 'Lập trình di động',
-                                  //     time: '7:00, xuất 2C1, nhóm A',
-                                  //     room: 'F109',
-                                  //     isExam: true,
-                                  //   ),
-                                  //   const SizedBox(height: 4),
-                                  //   ScheduleItem(
-                                  //     subject: 'Đồ án 1',
-                                  //     time: '13:00 - 15:50',
-                                  //     room: 'F109',
-                                  //   ),
-                                  // ],
+                              children: [
+                                CardLoading(
+                                  height: 56,
+                                  margin: EdgeInsets.only(bottom: 4),
                                 ),
-                              ),
+                              ],
+                            ));
+                          } else if (state is SchedulesLoaded) {
+                            return Expanded(
+                              child: state.schedules.isEmpty
+                                  ? Column(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: SvgPicture.asset(
+                                              "assets/icons/svg/undraw_online-calendar_zaoc.svg",
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          "Hôm nay không có lịch!",
+                                          style: TextStyle(
+                                            fontSize: FontSizes.medium,
+                                            fontWeight: FontWeight.w600,
+                                            color: context.theme.grey ??
+                                                Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: state.schedules.map((item) {
+                                          return ScheduleItem(
+                                            idSubject: item.idUnitOfStudy,
+                                            subject: item.subjectName,
+                                            time: item.isExam
+                                                ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
+                                                : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+                                            room: item.room,
+                                            isExam: item.isExam,
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                            );
+                          } else {
+                            return Text("loading");
+                          }
+                        },
                       )
                     ],
                   ),

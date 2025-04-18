@@ -12,7 +12,6 @@ part 'timetable_state.dart';
 class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
   final ScheduleRepository _repository;
 
-  // Khai báo ở đầu file hoặc trong class:
   final int _cacheLimit = 5;
   final LinkedHashMap<String, List<UosItemModel>> _uosCache = LinkedHashMap();
 

@@ -3,6 +3,7 @@ import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
+import 'package:e_dut/features/schedule/utils/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
@@ -64,9 +65,10 @@ class ScheduleService {
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final List<dynamic> data = responseData['data'];
-        // print("Raw data: $data");
 
-        return data.map((e) => ScheduleItemModel.fromJson(e)).toList();
+        final schedules = Functions.sortSchedulesByTime(
+            data.map((e) => ScheduleItemModel.fromJson(e)).toList());
+        return schedules;
       } else {
         throw Exception(
             "[69:schedule_service]Failed to load list ScheduleItem : ${response.data['message']}");

@@ -38,7 +38,7 @@ class _UosInfoCardState extends State<UosInfoCard> {
               });
             },
             minWidth: double.infinity,
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.only(top: 16, right: 16, left: 16, bottom: 10),
             child: Row(
               children: [
                 TweenAnimationBuilder(
@@ -92,10 +92,11 @@ class _UosInfoCardState extends State<UosInfoCard> {
                     padding: const EdgeInsets.only(
                       left: 16,
                       right: 16,
-                      bottom: 8,
+                      bottom: 16,
                     ),
                     child: Container(
                         padding: EdgeInsets.only(top: 8),
+                        width: double.infinity,
                         decoration: BoxDecoration(
                             border: Border(
                                 top: BorderSide(
