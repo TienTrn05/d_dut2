@@ -22,3 +22,11 @@ class SchedulesLoaded extends ScheduleState {
 
   SchedulesLoaded({required this.selectedDay, required this.schedules});
 }
+
+class CalendarEventLoaded extends ScheduleState {
+  final List<CalendarEventModel> calendarEvents;
+  CalendarEventLoaded({required this.calendarEvents});
+
+  @override
+  List<Object> get props => [calendarEvents];
+}

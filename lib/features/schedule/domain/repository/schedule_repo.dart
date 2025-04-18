@@ -1,4 +1,5 @@
 import 'package:e_dut/features/schedule/data/data_sources/remote_data_source/schedule_service.dart';
+import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
@@ -20,5 +21,9 @@ class ScheduleRepository {
 
   Future<List<ScheduleItemModel>> getSchedulesByDate(DateTime inputDate) {
     return _scheduleService.getSchedulesByDate(inputDate);
+  }
+
+  Future<List<CalendarEventModel>> getCalendarEvents(int month, int year) {
+    return _scheduleService.getCalendarEvents(month, year);
   }
 }

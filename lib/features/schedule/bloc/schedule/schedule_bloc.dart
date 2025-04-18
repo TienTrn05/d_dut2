@@ -5,6 +5,8 @@ import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/model/calendar_event_model.dart';
+
 part 'schedule_event.dart';
 part 'schedule_state.dart';
 
@@ -17,6 +19,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   ScheduleBloc(this._repository) : super(ScheduleInitial()) {
     on<LoadSchedulesByDate>(_onLoadSchedulesByDate);
+    on<LoadCalendarEvents>(_onLoadCalendarEvents);
   }
 
   Future<void> _onLoadSchedulesByDate(
@@ -35,6 +38,18 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         _schedulesCache[inputDate] = schedules;
         emit(SchedulesLoaded(selectedDay: inputDate, schedules: schedules));
       }
+    } catch (e) {
+      emit(ScheduleError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadCalendarEvents(
+      LoadCalendarEvents event, Emitter<ScheduleState> emit) async {
+    // emit(ScheduleLoading());
+    try {
+      final events =
+          await _repository.getCalendarEvents(event.month, event.year);
+      emit(CalendarEventLoaded(calendarEvents: events));
     } catch (e) {
       emit(ScheduleError(e.toString()));
     }
