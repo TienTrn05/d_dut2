@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class CalendarCustom extends StatefulWidget {
   const CalendarCustom({super.key});
@@ -21,11 +22,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
   final DateTime _startdWeek = DateTime(2025, 3, 3);
   int? _currentWeek;
   Map<DateTime, List<int>> _eventMap = {};
-  // Map<DateTime, List<String>> events = {
-  //   DateTime.utc(2025, 3, 10): ["học", "thi"],
-  //   DateTime.utc(2025, 3, 15): ["thi"],
-  //   DateTime.utc(2025, 3, 20): ["học"],
-  // };
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Lịch mặc định là tháng
 
@@ -60,7 +56,78 @@ class _CalendarCustomState extends State<CalendarCustom> {
 
   // Hàm để chọn tháng và năm
   Future<void> _selectMonthYear() async {
-    print("_selectMonthYear");
+    final picked = await showMonthPicker(
+      context: context,
+      initialDate: _selectedDay ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      monthPickerDialogSettings: MonthPickerDialogSettings(
+          headerSettings: PickerHeaderSettings(
+              headerBackgroundColor: context.theme.primaryColor),
+          dialogSettings: PickerDialogSettings(
+            locale: Locale('vi'),
+            dialogRoundedCornersRadius: 16,
+            dialogBackgroundColor: Colors.white,
+          ),
+          dateButtonsSettings: PickerDateButtonsSettings(
+            selectedMonthBackgroundColor: context.theme.primaryColor,
+            selectedMonthTextColor: Colors.white,
+            unselectedMonthsTextColor: Colors.black,
+            currentMonthTextColor: context.theme.primaryColor,
+          ),
+          actionBarSettings: PickerActionBarSettings(
+            cancelWidget: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  backgroundColor: Colors.white,
+                ),
+                child: Text(
+                  "Hủy",
+                  style: TextStyle(
+                    color: context.theme.primaryColor,
+                  ),
+                ),
+              ),
+            ),
+            // confirmWidget: Padding(
+            //   padding: const EdgeInsets.only(bottom: 16),
+            //   child: ElevatedButton(
+            //     onPressed: () => Navigator.of(context).pop(),
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: context.theme.primaryColor ?? Colors.blue,
+            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(8),
+            //       ),
+            //     ),
+            //     child: Text(
+            //       "Chọn",
+            //       style: TextStyle(
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          )),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _focusedDay = picked;
+      });
+      context.read<CalendarBloc>().add(
+            LoadCalendarEvents(
+              month: _focusedDay.month,
+              year: _focusedDay.year,
+            ),
+          );
+    }
   }
 
   @override
