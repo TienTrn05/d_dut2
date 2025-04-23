@@ -76,25 +76,25 @@ class _CalendarCustomState extends State<CalendarCustom> {
             currentMonthTextColor: context.theme.primaryColor,
           ),
           actionBarSettings: PickerActionBarSettings(
-            cancelWidget: Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  backgroundColor: Colors.white,
-                ),
-                child: Text(
-                  "Hủy",
-                  style: TextStyle(
-                    color: context.theme.primaryColor,
-                  ),
-                ),
-              ),
-            ),
+            // cancelWidget: Padding(
+            //   padding: const EdgeInsets.only(bottom: 16),
+            //   child: ElevatedButton(
+            //     onPressed: () => Navigator.of(context).pop(),
+            //     style: ElevatedButton.styleFrom(
+            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(8),
+            //       ),
+            //       backgroundColor: Colors.white,
+            //     ),
+            //     child: Text(
+            //       "Hủy",
+            //       style: TextStyle(
+            //         color: context.theme.primaryColor,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             // confirmWidget: Padding(
             //   padding: const EdgeInsets.only(bottom: 16),
             //   child: ElevatedButton(
@@ -114,7 +114,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
             //     ),
             //   ),
             // ),
-          )),
+          ),),
     );
 
     if (picked != null) {
