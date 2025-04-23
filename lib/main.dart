@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
-import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,9 +47,6 @@ class MyApp extends StatelessWidget {
                 ..add(AuthInitRequested()),
         ),
         BlocProvider(create: (context) => LoadingBloc()),
-        BlocProvider(
-            create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
-              ..add(LoadSchedulesByDate(inputDate: DateTime.now())))
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

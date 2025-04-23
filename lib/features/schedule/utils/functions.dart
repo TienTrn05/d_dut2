@@ -1,3 +1,4 @@
+import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -75,5 +76,40 @@ class Functions {
     final hour = int.parse(parts[0]);
     final minute = int.parse(parts[1]);
     return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  static List<ScheduleItemModel> sortSchedulesByTime(
+      List<ScheduleItemModel> schedules) {
+    schedules.sort((a, b) {
+      DateTime? timeA;
+      DateTime? timeB;
+
+      if (a.isExam) {
+        timeA = a.examTime;
+      } else if (a.startStudyTime != null) {
+        try {
+          timeA = DateFormat.Hms().parse(a.startStudyTime!);
+        } catch (_) {
+          timeA = null;
+        }
+      }
+
+      if (b.isExam) {
+        timeB = b.examTime;
+      } else if (b.startStudyTime != null) {
+        try {
+          timeB = DateFormat.Hms().parse(b.startStudyTime!);
+        } catch (_) {
+          timeB = null;
+        }
+      }
+      if (timeA == null && timeB == null) return 0;
+      if (timeA == null) return 1;
+      if (timeB == null) return -1;
+
+      return timeA.compareTo(timeB);
+    });
+
+    return schedules;
   }
 }

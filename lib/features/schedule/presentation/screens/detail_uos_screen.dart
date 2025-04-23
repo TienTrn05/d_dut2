@@ -20,29 +20,30 @@ class DetailUnitOfStudy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Map<String, List<String>> timetable = Functions.analyzeStudyShifts([
-    //   StudyShiftModel(
-    //       dayOfWeek: 1,
-    //       startPeriod: 1,
-    //       endPeriod: 3,
-    //       startWeek: 3,
-    //       endWeek: 18,
-    //       room: "E201A"),
-    //   StudyShiftModel(
-    //       dayOfWeek: 2,
-    //       startPeriod: 1,
-    //       endPeriod: 3,
-    //       startWeek: 3,
-    //       endWeek: 19,
-    //       room: "E201A"),
-    //   StudyShiftModel(
-    //       dayOfWeek: 3,
-    //       startPeriod: 1,
-    //       endPeriod: 3,
-    //       startWeek: 3,
-    //       endWeek: 19,
-    //       room: "E201A"),
-    // ]);
+    Map<String, List<String>> timetable = Functions.analyzeStudyShifts([
+      StudyShiftModel(
+          dayOfWeek: 1,
+          startPeriod: 1,
+          endPeriod: 3,
+          startWeek: 3,
+          endWeek: 18,
+          room: "E201A"),
+      StudyShiftModel(
+          dayOfWeek: 2,
+          startPeriod: 1,
+          endPeriod: 3,
+          startWeek: 3,
+          endWeek: 19,
+          room: "E201A"),
+      StudyShiftModel(
+          dayOfWeek: 3,
+          startPeriod: 1,
+          endPeriod: 3,
+          startWeek: 3,
+          endWeek: 19,
+          room: "E201A"),
+    ]);
+    final entries = timetable.entries.toList();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -252,54 +253,65 @@ class DetailUnitOfStudy extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // UosInfoCard(
-                  //   title: 'Lịch học',
-                  //   child: Column(
-                  //       children: timetable.entries.map((entry) {
-                  //     return Padding(
-                  //       padding: const EdgeInsets.only(top: 8),
-                  //       child: Column(
-                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                  //         children: [
-                  //           Text(
-                  //             'Tuần ${entry.key}',
-                  //             style: TextStyle(
-                  //               fontWeight: FontWeight.bold,
-                  //               fontSize: FontSizes.medium,
-                  //             ),
-                  //           ),
-                  //           const SizedBox(height: 4),
-                  //           ...entry.value.map((shiftStr) {
-                  //             return Padding(
-                  //               padding:
-                  //                   const EdgeInsets.symmetric(horizontal: 8),
-                  //               child: Container(
-                  //                 padding: const EdgeInsets.only(left: 10),
-                  //                 decoration: BoxDecoration(
-                  //                   border: Border(
-                  //                     left: BorderSide(
-                  //                       color:
-                  //                           context.theme.grey ?? Colors.grey,
-                  //                       width: 1,
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //                 child: Text(
-                  //                   shiftStr,
-                  //                   style: TextStyle(
-                  //                     color: context.theme.grey ?? Colors.grey,
-                  //                     fontSize: FontSizes.medium,
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           }),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   }).toList()),
-                  // ),
-
+                  UosInfoCard(
+                      title: 'Lịch học',
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: List.generate(entries.length, (index) {
+                            final entry = entries[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Tuần ${entry.key}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: FontSizes.medium,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ...entry.value.map((shiftStr) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        child: Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              left: BorderSide(
+                                                color: context.theme.grey ??
+                                                    Colors.grey,
+                                                width: 1,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            shiftStr,
+                                            style: TextStyle(
+                                              color: context.theme.grey ??
+                                                  Colors.grey,
+                                              fontSize: FontSizes.medium,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                                if (index < entries.length - 1)
+                                  const SizedBox(height: 10),
+                              ],
+                            );
+                          }),
+                        ),
+                      )),
                   const SizedBox(height: 10),
                   UosInfoCard(
                     title: 'Lịch thi',

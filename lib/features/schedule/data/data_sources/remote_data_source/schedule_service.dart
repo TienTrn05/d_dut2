@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
+import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
+import 'package:e_dut/features/schedule/utils/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
@@ -64,9 +66,10 @@ class ScheduleService {
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final List<dynamic> data = responseData['data'];
-        // print("Raw data: $data");
 
-        return data.map((e) => ScheduleItemModel.fromJson(e)).toList();
+        final schedules = Functions.sortSchedulesByTime(
+            data.map((e) => ScheduleItemModel.fromJson(e)).toList());
+        return schedules;
       } else {
         throw Exception(
             "[69:schedule_service]Failed to load list ScheduleItem : ${response.data['message']}");
@@ -74,6 +77,29 @@ class ScheduleService {
     } catch (e) {
       logger.e("[72:schedule_service]Failed to load ScheduleItem: $e");
       throw Exception("Failed to fetch ScheduleItem: $e");
+    }
+  }
+
+  Future<List<CalendarEventModel>> getCalendarEvents(
+      int month, int year) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/Timetable/GetCalendarEvents", queryParameters: {
+        'month': month,
+        'year': year,
+      });
+
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final List<dynamic> data = responseData['data'];
+        return data.map((item) => CalendarEventModel.fromJson(item)).toList();
+      } else {
+        throw Exception(
+            "Fail to load Calendar Events: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Fail to load Calendar Events: $e");
+      throw Exception("Failed to fetch CalendarEvents: $e");
     }
   }
 }

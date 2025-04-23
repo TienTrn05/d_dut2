@@ -14,7 +14,7 @@ class UnitOfStudyItem extends StatelessWidget {
   final bool isExam;
   final int? credit;
   final Map<String, List<String>>? timetable;
-  final List<ExamShiftModel>? examShifts;
+  final ExamShiftModel? examShift;
   final String? room;
   final String? teacher;
 
@@ -26,7 +26,7 @@ class UnitOfStudyItem extends StatelessWidget {
     this.isExam = false,
     this.credit,
     this.timetable,
-    this.examShifts,
+    this.examShift,
     this.room,
     this.teacher,
   });
@@ -141,21 +141,23 @@ class UnitOfStudyItem extends StatelessWidget {
                 }).toList() ??
                 []),
             const SizedBox(height: 4),
-            ...(examShifts?.map((shift) {
-                  return Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    alignment: WrapAlignment.spaceBetween,
-                    runSpacing: 4,
+            if (examShift != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${Functions.formatDateTime(examShift!.examDate)},  ${examShift!.room}',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        '${Functions.formatDateTime(shift.examDate)},  ${shift.room}',
-                        style: TextStyle(
-                          fontSize: FontSizes.medium,
-                          height: 1.25,
-                        ),
-                      ),
-                      Text(
-                        'Xuất ${shift.noExamShift}, nhóm ${shift.noExamGroup}',
+                        'Xuất ${examShift!.noExamShift}, nhóm ${examShift!.noExamGroup}',
                         style: TextStyle(
                           color: context.theme.grey ?? Colors.grey,
                           fontSize: FontSizes.medium,
@@ -165,9 +167,9 @@ class UnitOfStudyItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                  );
-                }).toList() ??
-                []),
+                  )
+                ],
+              ),
             (teacher != null)
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.end,

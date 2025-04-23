@@ -6,6 +6,8 @@ class ScheduleItemModel {
   final String? endStudyTime;
   final DateTime? examTime;
   final bool isExam;
+  final String? noExamShift;
+  final String? noExamGroup;
 
   ScheduleItemModel(
       {required this.idUnitOfStudy,
@@ -14,6 +16,8 @@ class ScheduleItemModel {
       this.startStudyTime,
       this.endStudyTime,
       this.examTime,
+      this.noExamShift,
+      this.noExamGroup,
       this.isExam = false})
       : assert(
           (isExam && examTime != null) ||
@@ -44,6 +48,8 @@ class ScheduleItemModel {
       endStudyTime: endStudyTime,
       examTime: examTime,
       isExam: isExam,
+      noExamShift: json['noExamShift'],
+      noExamGroup: json['noExamGroup'],
     );
   }
 }

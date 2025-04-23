@@ -251,12 +251,14 @@ class _SemesterModeState extends State<SemesterMode> {
                                         ? "Lịch thi"
                                         : "Lịch coi thi",
                                     isExam: true,
-                                    child: listUOS.any(
-                                            (uos) => uos.examShifts.isNotEmpty)
+                                    child: listUOS.any((uos) =>
+                                            uos.examShift !=
+                                            null) //kiểm tra có ít nhất 1 học phần có lịch thi
                                         ? Column(
                                             children: listUOS
                                                 .where((uos) =>
-                                                    uos.examShifts.isNotEmpty)
+                                                    uos.examShift !=
+                                                    null) //chỉ hiện những học phần có lịch thi
                                                 .map((uos) => UnitOfStudyItem(
                                                       idUnitOfStudy:
                                                           uos.idUnitOfStudy,
@@ -264,8 +266,7 @@ class _SemesterModeState extends State<SemesterMode> {
                                                       nameSubject:
                                                           uos.subjectName,
                                                       room: uos.subjectName,
-                                                      examShifts:
-                                                          uos.examShifts,
+                                                      examShift: uos.examShift,
                                                       isExam: true,
                                                     ))
                                                 .toList(),
@@ -279,6 +280,7 @@ class _SemesterModeState extends State<SemesterMode> {
                                             ),
                                           ),
                                   ),
+                                  const SizedBox(height: 40),
                                 ],
                               ),
                             ),
@@ -295,7 +297,7 @@ class _SemesterModeState extends State<SemesterMode> {
                                   height: 120,
                                 ),
                                 const SizedBox(height: 16),
-                                Text("Hiện chưa có học phần nào",
+                                Text("Hiện chưa có dữ liệu cho học kỳ này",
                                     style: TextStyle(
                                         fontSize: FontSizes.medium,
                                         fontWeight: FontWeight.w600,

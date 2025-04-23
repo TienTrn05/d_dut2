@@ -8,7 +8,7 @@ class UosItemModel {
   final String subjectName;
   final String teacherName;
   final List<StudyShiftModel> studyShifts;
-  final List<ExamShiftModel> examShifts;
+  final ExamShiftModel? examShift;
 
   UosItemModel(
       {required this.idUnitOfStudy,
@@ -17,21 +17,22 @@ class UosItemModel {
       required this.subjectName,
       required this.teacherName,
       required this.studyShifts,
-      required this.examShifts});
+      this.examShift});
 
   factory UosItemModel.fromJson(Map<String, dynamic> json) {
     return UosItemModel(
-        idUnitOfStudy: json['idUnitOfStudy'],
-        noUOS: json['noUOS'],
-        credit: json['credit'],
-        subjectName: json['subjectName'],
-        teacherName: json['teacherName'],
-        studyShifts: (json['studyShifts'] as List)
-            .map((studyShift) => StudyShiftModel.fromJson(studyShift))
-            .toList(),
-        examShifts: (json['examShifts'] as List)
-            .map((examShift) => ExamShiftModel.fromJson(examShift))
-            .toList());
+      idUnitOfStudy: json['idUnitOfStudy'],
+      noUOS: json['noUOS'],
+      credit: json['credit'],
+      subjectName: json['subjectName'],
+      teacherName: json['teacherName'],
+      studyShifts: (json['studyShifts'] as List)
+          .map((studyShift) => StudyShiftModel.fromJson(studyShift))
+          .toList(),
+      examShift: json['examShift'] != null
+          ? ExamShiftModel.fromJson(json['examShift'])
+          : null,
+    );
   }
   Map<String, dynamic> toJson() {
     return {
@@ -42,7 +43,7 @@ class UosItemModel {
       'teacherName': teacherName,
       'studyShifts':
           studyShifts.map((studyShift) => studyShift.toJson()).toList(),
-      'examShifts': examShifts.map((examShift) => examShift.toJson()).toList(),
+      'examShift': examShift?.toJson(),
     };
   }
 }

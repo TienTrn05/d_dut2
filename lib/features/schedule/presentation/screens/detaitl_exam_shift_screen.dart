@@ -1,7 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/search_bar.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
 import 'package:flutter/material.dart';
