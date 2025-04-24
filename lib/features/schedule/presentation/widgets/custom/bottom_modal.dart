@@ -6,13 +6,14 @@ class BottomModal extends StatefulWidget {
   final String title;
   final Widget? child;
   final VoidCallback mainAction;
+  final VoidCallback? onClose;
 
-  const BottomModal({
-    super.key,
-    required this.title,
-    this.child,
-    required this.mainAction,
-  });
+  const BottomModal(
+      {super.key,
+      required this.title,
+      this.child,
+      required this.mainAction,
+      this.onClose});
 
   @override
   State<BottomModal> createState() => _BottomModalState();
@@ -20,10 +21,7 @@ class BottomModal extends StatefulWidget {
 
 class _BottomModalState extends State<BottomModal> {
   void resetValues() {
-    // Nếu có TextEditingController, bạn reset chúng ở đây
-    // controller1.clear();
-    // controller2.clear();
-
+    widget.onClose?.call();
     Navigator.pop(context); // Đóng modal
   }
 

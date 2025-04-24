@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_info_tab.dart';
@@ -136,10 +137,18 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     });
   }
 
-  void _deleteNotification(int index) {
-    setState(() {
-      notifications.removeAt(index);
-    });
+  void _deleteNotification(int index, String title) {
+    String truncatedTitle =
+        title.length > 50 ? '${title.substring(0, 47)}...' : title;
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Xóa thông báo',
+        'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
+        AlertType.delete,
+        onConfirm: () => setState(() {
+              notifications.removeAt(index);
+            }),
+        textConfirm: "Xóa");
   }
 
   void _showCreatNewNoti(BuildContext context) {
@@ -161,12 +170,17 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               _addNotification(title, content);
               Navigator.pop(context);
             },
+            onClose: () {
+              _titleController.clear();
+              _contentController.clear();
+            },
             child: Column(
               children: [
                 EditFieldItem(
                   field: "Tiêu đề",
                   controller: _titleController,
                   minLine: 1,
+                  maxLine: 2,
                 ),
                 const SizedBox(height: 10),
                 EditFieldItem(
@@ -177,7 +191,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               ],
             ));
       },
-    );
+    ).whenComplete(() {
+      _titleController.clear();
+      _contentController.clear();
+    });
   }
 
   void _confirmAction(

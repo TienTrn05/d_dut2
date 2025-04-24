@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class UosNotiTab extends StatelessWidget {
   final List<NotiModel> notifications;
-  final Function(int) onDelete;
+  final Function(int, String) onDelete;
   const UosNotiTab(
       {super.key, required this.notifications, required this.onDelete});
 
@@ -21,7 +21,7 @@ class UosNotiTab extends StatelessWidget {
           title: item.title,
           content: item.content,
           canDel: true,
-          onDelete: () => onDelete(index),
+          onDelete: () => onDelete(index, item.title),
         );
       },
     );

@@ -6,11 +6,13 @@ class EditFieldItem extends StatelessWidget {
   final String field;
   final TextEditingController controller;
   final int? minLine;
+  final int? maxLine;
   const EditFieldItem(
       {super.key,
       required this.field,
       required this.controller,
-      this.minLine = 1});
+      this.minLine = 1,
+      this.maxLine = 7});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class EditFieldItem extends StatelessWidget {
         TextField(
           controller: controller,
           cursorColor: context.theme.grey ?? Colors.grey,
-          maxLines: 7,
+          maxLines: maxLine,
           minLines: minLine,
           style: TextStyle(
             fontSize: FontSizes.medium,
