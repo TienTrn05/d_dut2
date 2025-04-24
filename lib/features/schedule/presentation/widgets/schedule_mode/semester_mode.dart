@@ -189,8 +189,7 @@ class _SemesterModeState extends State<SemesterMode> {
                                     child: Column(
                                       children: listUOS
                                           .map((uos) => UnitOfStudyItem(
-                                                idUnitOfStudy:
-                                                    uos.idUnitOfStudy,
+                                                idUos: uos.idUnitOfStudy,
                                                 noUOS: uos.noUOS,
                                                 nameSubject: uos.subjectName,
                                                 credit: uos.credit,
@@ -260,8 +259,7 @@ class _SemesterModeState extends State<SemesterMode> {
                                                     uos.examShift !=
                                                     null) //chỉ hiện những học phần có lịch thi
                                                 .map((uos) => UnitOfStudyItem(
-                                                      idUnitOfStudy:
-                                                          uos.idUnitOfStudy,
+                                                      idUos: uos.idUnitOfStudy,
                                                       noUOS: uos.noUOS,
                                                       nameSubject:
                                                           uos.subjectName,

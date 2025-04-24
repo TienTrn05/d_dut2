@@ -18,7 +18,11 @@ class ScheduleError extends ScheduleState {
 
 class SchedulesLoaded extends ScheduleState {
   final DateTime selectedDay;
+  final String noWeek;
   final List<ScheduleItemModel> schedules;
 
-  SchedulesLoaded({required this.selectedDay, required this.schedules});
+  SchedulesLoaded(
+      {required this.selectedDay,
+      required this.noWeek,
+      required this.schedules});
 }

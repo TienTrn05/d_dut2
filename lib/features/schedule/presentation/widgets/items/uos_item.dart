@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UnitOfStudyItem extends StatelessWidget {
-  final String idUnitOfStudy;
+  final String idUos;
   final String noUOS;
   final String nameSubject;
   final bool isExam;
@@ -20,7 +20,7 @@ class UnitOfStudyItem extends StatelessWidget {
 
   const UnitOfStudyItem({
     super.key,
-    required this.idUnitOfStudy,
+    required this.idUos,
     required this.noUOS,
     required this.nameSubject,
     this.isExam = false,
@@ -48,7 +48,7 @@ class UnitOfStudyItem extends StatelessWidget {
                 : isExam
                     ? Routes.detailExamShiftTeacher
                     : Routes.detailUnitOfStudyTeacher,
-            arguments: idUnitOfStudy);
+            arguments: idUos);
       },
       child: Container(
         width: double.infinity,
