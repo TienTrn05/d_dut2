@@ -6,15 +6,15 @@ import 'package:intl/intl.dart';
 class Functions {
   static String getDayOfWeekStr(int dayOfWeek) {
     const days = [
+      'Chủ nhật',
       'Thứ 2',
       'Thứ 3',
       'Thứ 4',
       'Thứ 5',
       'Thứ 6',
       'Thứ 7',
-      'Chủ nhật'
     ];
-    return days[(dayOfWeek - 1).clamp(0, 6)];
+    return days[dayOfWeek.clamp(0, 6)];
   }
 
   static bool setEquals(Set a, Set b) {
@@ -67,6 +67,10 @@ class Functions {
     return result;
   }
 
+  static formatDate(DateTime dt) {
+    return DateFormat('dd/MM/yyyy').format(dt);
+  }
+
   static formatDateTime(DateTime dt) {
     return DateFormat('HH:mm, dd/MM/yyyy').format(dt);
   }
@@ -112,4 +116,28 @@ class Functions {
 
     return schedules;
   }
+
+  // static int getSemesterOrder(String noSemester) {
+  //   switch (noSemester.toLowerCase()) {
+  //     case "1":
+  //       return 1;
+  //     case "2":
+  //       return 2;
+  //     case "hè":
+  //       return 3;
+  //     default:
+  //       return 99; // fallback cho các trường hợp không xác định
+  //   }
+  // }
+
+  // static int compareSemesters(SemesterModel a, SemesterModel b) {
+  //   int startYearCompare = a.startYear.compareTo(b.startYear);
+  //   if (startYearCompare != 0) return startYearCompare;
+
+  //   int endYearCompare = a.endYear.compareTo(b.endYear);
+  //   if (endYearCompare != 0) return endYearCompare;
+
+  //   return getSemesterOrder(a.noSemester)
+  //       .compareTo(getSemesterOrder(b.noSemester));
+  // }
 }

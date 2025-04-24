@@ -31,10 +31,22 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
         emit(TimetableError("Không có học kỳ nào."));
         return;
       }
+      final currentIdSemester =
+          await _repository.getSemesterByDate(DateTime.now());
+      final updatedSemesters = semesters.map((s) {
+        return SemesterModel(
+            idSemester: s.idSemester,
+            noSemester: s.noSemester,
+            startYear: s.startYear,
+            endYear: s.endYear,
+            isCurrentSemester: s.idSemester == currentIdSemester);
+      }).toList();
 
-      // Mặc định chọn học kỳ đầu tiên
-      final selectedIndex = 0;
-      final selectedSemester = semesters[selectedIndex];
+      final selectedIndex =
+          updatedSemesters.indexWhere((s) => s.isCurrentSemester) >= 0
+              ? updatedSemesters.indexWhere((s) => s.isCurrentSemester)
+              : 0;
+      final selectedSemester = updatedSemesters[selectedIndex];
 
       final listUOS =
           await _repository.getListUOSBySemester(selectedSemester.idSemester);
@@ -56,7 +68,6 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
 
         final idSemester = event.idSemester;
 
-        // Nếu đã có cache, dùng lại
         if (_uosCache.containsKey(idSemester)) {
           emit(TimetableDataLoaded(
             semesters,
@@ -64,14 +75,12 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
             index,
           ));
         } else {
-          // Gọi API lấy mới
           final listUOS = await _repository.getListUOSBySemester(idSemester);
           if (_uosCache.length >= _cacheLimit) {
-            // Xoá mục cũ nhất (mục đầu tiên)
             _uosCache.remove(_uosCache.keys.first);
           }
 
-          _uosCache[idSemester] = listUOS; // Lưu cache
+          _uosCache[idSemester] = listUOS;
 
           emit(TimetableDataLoaded(
             semesters,

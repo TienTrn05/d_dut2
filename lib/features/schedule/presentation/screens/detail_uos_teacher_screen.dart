@@ -1,26 +1,23 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
-import 'package:e_dut/features/notification/presentation/widgets/notification_card.dart';
-import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
+import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_info_tab.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_noti_tab.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/edit_field_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_info_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/items/uos_info_item.dart';
 import 'package:flutter/material.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/custom/calendar_absent.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
-  const DetailUOSTeacherScreen({super.key});
+  final String idUos;
+  const DetailUOSTeacherScreen({super.key, required this.idUos});
 
   @override
   State<DetailUOSTeacherScreen> createState() => _DetailUOSTeacherScreenState();
@@ -68,6 +65,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
       "isAbsentToday": true
     },
   ];
+
+  List<NotiModel> notifications = NotiModel.mockData;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
 
   // Cập nhập trang thái điểm danh
   void updateAbsentStatus(int index, bool isAbsent) {
@@ -124,35 +125,21 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     super.dispose();
   }
 
-  void _showEditLinkModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (BuildContext context) {
-        return BottomModal(
-            title: "Giảng dạy",
-            mainAction: () {},
-            child: Column(
-              children: [
-                EditFieldItem(
-                  field: "Mã truy cập",
-                  value: "",
-                ),
-                const SizedBox(height: 10),
-                EditFieldItem(
-                  field: "Đường link truy cập",
-                  value: "",
-                  minLine: 5,
-                )
-              ],
-            ));
-      },
+  void _addNotification(String title, String content) {
+    final newItem = NotiModel(
+      title: title,
+      content: content,
+      date: DateTime.now(),
     );
+    setState(() {
+      notifications.insert(0, newItem);
+    });
+  }
+
+  void _deleteNotification(int index) {
+    setState(() {
+      notifications.removeAt(index);
+    });
   }
 
   void _showCreatNewNoti(BuildContext context) {
@@ -167,18 +154,24 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
       builder: (BuildContext context) {
         return BottomModal(
             title: "Thêm thông báo mới",
-            mainAction: () {},
+            mainAction: () {
+              // Giả định bạn lấy dữ liệu từ các controller
+              final title = _titleController.text.trim();
+              final content = _contentController.text.trim();
+              _addNotification(title, content);
+              Navigator.pop(context);
+            },
             child: Column(
               children: [
                 EditFieldItem(
                   field: "Tiêu đề",
-                  value: "",
+                  controller: _titleController,
                   minLine: 1,
                 ),
                 const SizedBox(height: 10),
                 EditFieldItem(
                   field: "Nội dung",
-                  value: "",
+                  controller: _contentController,
                   minLine: 3,
                 )
               ],
@@ -302,200 +295,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         physics:
                             ClampingScrollPhysics(), // Ngăn trượt quá đà khi bấm tab
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                  child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    UosInfoCard(
-                                      title: 'Thông tin chung',
-                                      child: Column(
-                                        children: [
-                                          InfoItem(
-                                              field: "Mã lớp học phần",
-                                              value: "1024010.2420.21.11"),
-                                          InfoItem(
-                                              field: "Mã môn", value: "123456"),
-                                          InfoItem(
-                                            field: "Hệ",
-                                            value: "CLC",
-                                          ),
-                                          InfoItem(
-                                            field: "Số tín chỉ",
-                                            value: "03",
-                                          ),
-                                          InfoItem(
-                                            field: "Kỳ học",
-                                            value: "Học kì 1, 2025-2026",
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    UosInfoCard(
-                                      title: 'Giảng dạy',
-                                      canEdit: true,
-                                      action: () => _showEditLinkModal(context),
-                                      child: Column(
-                                        children: [
-                                          InfoItem(
-                                              field: "Hình thức GD",
-                                              value: "Offline & Online"),
-                                          UosInfoItem(
-                                            field: "Mã truy cập",
-                                            value: Text(
-                                              "012ajsh",
-                                              style: TextStyle(
-                                                fontSize: FontSizes.medium,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                                height: 1.5,
-                                              ),
-                                            ),
-                                            linkIconAsset:
-                                                "assets/icons/svg/lucide_copy.svg",
-                                            action: () {
-                                              try {
-                                                Clipboard.setData(ClipboardData(
-                                                    text: "012ajsh"));
-                                                // debugPrint("Copied: 012ajsh");
-                                                CustomSnackbar.showSnackBar(
-                                                  context,
-                                                  "Thành công",
-                                                  "Đã sao chép mã 012ajsh",
-                                                  AlertType.success,
-                                                );
-                                              } catch (e) {
-                                                CustomSnackbar.showSnackBar(
-                                                  context,
-                                                  "Lỗi",
-                                                  "Không thể sao chép",
-                                                  AlertType.error,
-                                                );
-                                              }
-                                            },
-                                          ),
-                                          UosInfoItem(
-                                            field: "Link tham gia",
-                                            value: GestureDetector(
-                                              onTap: () async {
-                                                final Uri url = Uri.parse(
-                                                    "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429");
-                                                if (await canLaunchUrl(url)) {
-                                                  await launchUrl(url);
-                                                } else if (context.mounted) {
-                                                  CustomSnackbar.showSnackBar(
-                                                    context,
-                                                    "Lỗi",
-                                                    "Không thể truy cập link",
-                                                    AlertType.error,
-                                                  );
-                                                }
-                                              },
-                                              child: Text(
-                                                "Link tham gia Teams",
-                                                style: TextStyle(
-                                                  fontSize: FontSizes.medium,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: context
-                                                          .theme.primaryColor ??
-                                                      Colors.blue,
-                                                  fontStyle: FontStyle.italic,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  decorationColor: context
-                                                          .theme.primaryColor ??
-                                                      Colors.blue,
-                                                  height: 1.5,
-                                                ),
-                                              ),
-                                            ),
-                                            linkIconAsset:
-                                                "assets/icons/svg/lucide_copy.svg",
-                                            action: () {
-                                              try {
-                                                Clipboard.setData(ClipboardData(
-                                                    text:
-                                                        "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429"));
-                                                // debugPrint("Copied: 012ajsh");
-                                                CustomSnackbar.showSnackBar(
-                                                  context,
-                                                  "Thành công",
-                                                  "Đã sao chép đường link",
-                                                  AlertType.success,
-                                                );
-                                              } catch (e) {
-                                                CustomSnackbar.showSnackBar(
-                                                  context,
-                                                  "Lỗi",
-                                                  "Không thể sao chép",
-                                                  AlertType.error,
-                                                );
-                                              }
-                                            },
-                                          ),
-                                          // UosInfoItem(
-                                          //   field: "Link tham gia",
-                                          //   value: GestureDetector(
-                                          //     onTap: () async {
-                                          //       final Uri url = Uri.parse(
-                                          //           "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429");
-                                          //       if (await canLaunchUrl(url)) {
-                                          //         await launchUrl(url);
-                                          //       } else if (context.mounted) {
-                                          //         CustomSnackbar.showSnackBar(
-                                          //           context,
-                                          //           "Lỗi",
-                                          //           "Không thể truy cập link",
-                                          //           AlertType.error,
-                                          //         );
-                                          //       }
-                                          //     },
-                                          //     child: Text(
-                                          //       "Link tham gia Teams",
-                                          //       style: TextStyle(
-                                          //         fontSize: FontSizes.medium,
-                                          //         fontWeight: FontWeight.w400,
-                                          //         color: context
-                                          //                 .theme.primaryColor ??
-                                          //             Colors.blue,
-                                          //         fontStyle: FontStyle.italic,
-                                          //         decoration:
-                                          //             TextDecoration.underline,
-                                          //         decorationColor: context
-                                          //                 .theme.primaryColor ??
-                                          //             Colors.blue,
-                                          //         height: 1.5,
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          //   linkIconAsset:
-                                          //       "assets/icons/svg/lucide_pen.svg",
-                                          //   action: () =>
-                                          //       _showEditLinkModal(context),
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    UosInfoCard(
-                                      title: 'Đánh giá',
-                                      child: Column(
-                                        children: [
-                                          InfoItem(
-                                              field: "Công thức điểm",
-                                              value:
-                                                  "[GK]*0.20+[BT]*0.20+[CK]*0.60"),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                  ],
-                                ),
-                              ))
-                            ],
+                          UosInfoTab(
+                            idUos: widget.idUos,
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -713,38 +514,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                               ),
                             ],
                           ),
-                          ListView(
-                            padding: EdgeInsets.all(0),
-                            children: [
-                              NotificationCard(
-                                date: "14/02/2025",
-                                title: "CHÚ Ý: Thông báo đổi phòng học",
-                                content: "Đổi sang phòng E205",
-                                canDel: true,
-                              ),
-                              NotificationCard(
-                                date: "10/02/2025",
-                                title: "NGHỈ HỌC 21/02/2025",
-                                content:
-                                    "Lớp nghỉ học vì thầy bận học hội nghị",
-                                canDel: true,
-                              ),
-                              NotificationCard(
-                                date: "11/12/2024",
-                                title: "V/v Nộp bài tập NLB",
-                                content:
-                                    "Chào các em, \nDo chiều mai sau khi thi xong Thầy bận họp về Bảo vệ Đồ án Tốt nghiệp nên các em sẽ nộp bài tập NLB vào 1h - 2h30 chiều mai tại C204 đồng thời ký bảng điểm Giữa kỳ luôn.",
-                                canDel: true,
-                              ),
-                              NotificationCard(
-                                date: "10/12/2024",
-                                title: "[Thống kê] Điểm bài tập",
-                                content:
-                                    "1. Cho các em tạm ứng bài NLB, sau khi thi cuối kỳ sẽ nộp. Ai không nộp thì trừ lại \n2. Thống kê theo link trong Teams Files. Thắc mắc gì inbox Thầy.",
-                                canDel: true,
-                              ),
-                            ],
-                          ),
+                          UosNotiTab(
+                            notifications: notifications,
+                            onDelete: _deleteNotification,
+                          )
                         ],
                       ),
                     ),

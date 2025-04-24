@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 
 class EditFieldItem extends StatelessWidget {
   final String field;
-  final String value;
+  final TextEditingController controller;
   final int? minLine;
   const EditFieldItem(
-      {super.key, required this.field, required this.value, this.minLine = 1});
+      {super.key,
+      required this.field,
+      required this.controller,
+      this.minLine = 1});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +20,7 @@ class EditFieldItem extends StatelessWidget {
         Text(field, style: TextStyle(fontSize: FontSizes.medium)),
         const SizedBox(height: 4),
         TextField(
-          // controller: value,
+          controller: controller,
           cursorColor: context.theme.grey ?? Colors.grey,
           maxLines: 7,
           minLines: minLine,

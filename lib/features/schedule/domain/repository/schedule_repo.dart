@@ -26,4 +26,12 @@ class ScheduleRepository {
   Future<List<CalendarEventModel>> getCalendarEvents(int month, int year) {
     return _scheduleService.getCalendarEvents(month, year);
   }
+
+  Future<String> getSemesterByDate(DateTime inputDate) {
+    return _scheduleService.getSemesterByDate(inputDate);
+  }
+
+  Future<String> getWeekByDate(DateTime inputDate) {
+    return _scheduleService.getWeekByDate(inputDate);
+  }
 }
