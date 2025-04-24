@@ -2,12 +2,12 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class CalendarCustom extends StatefulWidget {
   const CalendarCustom({super.key});
@@ -54,72 +54,85 @@ class _CalendarCustomState extends State<CalendarCustom> {
     return text[0].toUpperCase() + text.substring(1);
   }
 
-  // Hàm để chọn tháng và năm
-  Future<void> _selectMonthYear() async {
-    final picked = await showMonthPicker(
-      context: context,
-      initialDate: _selectedDay ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      monthPickerDialogSettings: MonthPickerDialogSettings(
-          headerSettings: PickerHeaderSettings(
-              headerBackgroundColor: context.theme.primaryColor),
-          dialogSettings: PickerDialogSettings(
-            locale: Locale('vi'),
-            dialogRoundedCornersRadius: 16,
-            dialogBackgroundColor: Colors.white,
-          ),
-          dateButtonsSettings: PickerDateButtonsSettings(
-            selectedMonthBackgroundColor: context.theme.primaryColor,
-            selectedMonthTextColor: Colors.white,
-            unselectedMonthsTextColor: Colors.black,
-            currentMonthTextColor: context.theme.primaryColor,
-          ),
-          actionBarSettings: PickerActionBarSettings(
-            // cancelWidget: Padding(
-            //   padding: const EdgeInsets.only(bottom: 16),
-            //   child: ElevatedButton(
-            //     onPressed: () => Navigator.of(context).pop(),
-            //     style: ElevatedButton.styleFrom(
-            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //       backgroundColor: Colors.white,
-            //     ),
-            //     child: Text(
-            //       "Hủy",
-            //       style: TextStyle(
-            //         color: context.theme.primaryColor,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // confirmWidget: Padding(
-            //   padding: const EdgeInsets.only(bottom: 16),
-            //   child: ElevatedButton(
-            //     onPressed: () => Navigator.of(context).pop(),
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: context.theme.primaryColor ?? Colors.blue,
-            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //     ),
-            //     child: Text(
-            //       "Chọn",
-            //       style: TextStyle(
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-          ),),
-    );
+  void _showMonthYearPicker() {
+    int tempMonth = _focusedDay.month;
+    int tempYear = _focusedDay.year;
 
-    if (picked != null) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: SizedBox(
+            height: 250,
+            child: Row(
+              children: [
+                // Tháng
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CupertinoPicker(
+                        itemExtent: 40,
+                        scrollController: FixedExtentScrollController(
+                            initialItem: tempMonth - 1),
+                        onSelectedItemChanged: (index) {
+                          tempMonth = index + 1;
+                        },
+                        children: List.generate(
+                          12,
+                          (index) {
+                            return Center(
+                              child: Center(
+                                child: Text("${index + 1}"),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      // IgnorePointer(
+                      //   child: Container(
+                      //     width: double.infinity,
+                      //     height: 40,
+                      //     decoration: BoxDecoration(
+                      //       color: Color.fromRGBO(42, 116, 189, 0.2),
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
+                // Năm
+                Expanded(
+                  child: CupertinoPicker(
+                      itemExtent: 40,
+                      scrollController: FixedExtentScrollController(
+                          initialItem: tempYear - 2000),
+                      onSelectedItemChanged: (index) {
+                        tempYear = index + 2000;
+                      },
+                      children: List.generate(
+                        50,
+                        (index) {
+                          return Center(
+                            child: Center(
+                              child: Text("${index + 2000}"),
+                            ),
+                          );
+                        },
+                      )),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
       setState(() {
-        _focusedDay = picked;
+        _focusedDay = DateTime(tempYear, tempMonth, 1);
       });
       context.read<CalendarBloc>().add(
             LoadCalendarEvents(
@@ -127,7 +140,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
               year: _focusedDay.year,
             ),
           );
-    }
+    });
   }
 
   @override
@@ -180,7 +193,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
 
             return GestureDetector(
-              onTap: _selectMonthYear,
+              onTap: _showMonthYearPicker,
               child: TableCalendar(
                 locale: 'vi',
                 focusedDay: _focusedDay,
