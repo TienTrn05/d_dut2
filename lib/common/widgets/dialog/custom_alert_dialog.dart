@@ -29,18 +29,18 @@ class CustomAlertDialog {
                 Container(
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _getColor(alertType).withAlpha(30)),
+                      color: _getColor(alertType, context).withAlpha(10)),
                   child: Padding(
                     padding: EdgeInsets.all(8),
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _getColor(alertType).withAlpha(30),
+                        color: _getColor(alertType, context).withAlpha(10),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(8),
                         child: Center(
-                          child: _getIcon(alertType),
+                          child: _getIcon(alertType, context),
                         ),
                       ),
                     ),
@@ -72,8 +72,8 @@ class CustomAlertDialog {
                     Expanded(
                         child: OutlinedButton(
                       style: ButtonStyle(
-                        side: WidgetStateProperty.all(
-                            BorderSide(color: _getColor(alertType), width: 2)),
+                        side: WidgetStateProperty.all(BorderSide(
+                            color: _getColor(alertType, context), width: 2)),
                         padding: WidgetStateProperty.all(
                             EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                         shape: WidgetStateProperty.all(
@@ -92,7 +92,7 @@ class CustomAlertDialog {
                         child: Text(
                           "Hủy",
                           style: TextStyle(
-                              color: _getColor(alertType),
+                              color: _getColor(alertType, context),
                               fontWeight: FontWeight.bold,
                               fontSize: FontSizes.medium),
                         ),
@@ -103,7 +103,7 @@ class CustomAlertDialog {
                       child: TextButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all(
-                            _getColor(alertType),
+                            _getColor(alertType, context),
                           ),
                           padding: WidgetStateProperty.all(EdgeInsets.symmetric(
                               horizontal: 16, vertical: 12)),
@@ -138,8 +138,9 @@ class CustomAlertDialog {
     );
   }
 
-  static Icon _getIcon(AlertType type, {double size = 28}) {
-    Color iconColor = _getColor(type);
+  static Icon _getIcon(AlertType type, BuildContext context,
+      {double size = 28}) {
+    Color iconColor = _getColor(type, context);
     switch (type) {
       case AlertType.confirm:
         return Icon(Icons.info_outline_rounded, color: iconColor, size: size);
@@ -148,12 +149,12 @@ class CustomAlertDialog {
     }
   }
 
-  static Color _getColor(AlertType type) {
+  static Color _getColor(AlertType type, BuildContext context) {
     switch (type) {
       case AlertType.confirm:
-        return Color(0xFF2A74BD);
+        return context.theme.primaryColor ?? Colors.blue;
       case AlertType.delete:
-        return Color(0xFFCC0102);
+        return context.theme.red ?? Colors.red;
     }
   }
 }
