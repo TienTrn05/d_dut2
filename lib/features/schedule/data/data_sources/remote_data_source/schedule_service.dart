@@ -25,7 +25,9 @@ class ScheduleService {
 
         final List<dynamic> data = responseData['data'];
 
-        return data.map((e) => SemesterModel.fromJson(e)).toList();
+        final semesters = data.map((e) => SemesterModel.fromJson(e)).toList();
+        // semesters.sort(Functions.compareSemesters);
+        return semesters;
       } else {
         throw Exception(
             "Failed to load semesters : ${response.data['message']}");
@@ -100,6 +102,54 @@ class ScheduleService {
     } catch (e) {
       logger.e("Fail to load Calendar Events: $e");
       throw Exception("Failed to fetch CalendarEvents: $e");
+    }
+  }
+
+  Future<String> getSemesterByDate(DateTime inputDate) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/Timetable/GetWeekSemester", queryParameters: {
+        'date': DateFormat('yyyy-MM-dd').format(inputDate),
+      });
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final data = responseData['data'];
+
+        final idSemester = data['idSemester'] as String?;
+        if (idSemester != null && idSemester.isNotEmpty) {
+          return idSemester;
+        } else {
+          throw Exception("[getSemesterByDate] idSemester is null or empty.");
+        }
+      } else {
+        throw Exception(
+            "[118:schedule_service]Failed to load idSemester: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("[121:schedule_service]Failed to load ScheduleItem: $e");
+      throw Exception("Failed to fetch ScheduleItem: $e");
+    }
+  }
+
+  Future<String> getWeekByDate(DateTime inputDate) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/Timetable/GetWeekSemester", queryParameters: {
+        'date': DateFormat('yyyy-MM-dd').format(inputDate),
+      });
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final data = responseData['data'];
+
+        final noWeek = data['noWeek'].toString();
+        return noWeek;
+      } else {
+        throw Exception(
+            "[152:schedule_service]Failed to load noWeek: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("[155:schedule_service]Failed to load week: $e");
+      throw Exception("Failed to fetch week: $e");
     }
   }
 }

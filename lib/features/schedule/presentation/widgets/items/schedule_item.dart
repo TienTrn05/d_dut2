@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../auth/data/model/role_model.dart';
 
 class ScheduleItem extends StatelessWidget {
-  final String idSubject;
+  final String idUos;
   final String subject;
   final String? time;
   final String room;
@@ -16,7 +16,7 @@ class ScheduleItem extends StatelessWidget {
 
   const ScheduleItem({
     super.key,
-    required this.idSubject,
+    required this.idUos,
     required this.subject,
     required this.time,
     required this.room,
@@ -40,7 +40,7 @@ class ScheduleItem extends StatelessWidget {
                 : isExam
                     ? Routes.detailExamShiftTeacher
                     : Routes.detailUnitOfStudyTeacher,
-            arguments: idSubject);
+            arguments: idUos);
       },
       child: Container(
         width: double.infinity,

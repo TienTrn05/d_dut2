@@ -34,14 +34,17 @@ class Routes {
         return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
       case detailUnitOfStudy:
-        final idSubject = settings.arguments as String; // Lấy id từ arguments
+        final idUos = settings.arguments as String; // Lấy id từ arguments
         return MaterialPageRoute(
-          builder: (context) => DetailUnitOfStudy(idSubject: idSubject),
+          builder: (context) => DetailUnitOfStudy(idUos: idUos),
         );
 
       case detailUnitOfStudyTeacher:
+        final idUos = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (context) => DetailUOSTeacherScreen(),
+          builder: (context) => DetailUOSTeacherScreen(
+            idUos: idUos,
+          ),
         );
 
       case detailExamShiftTeacher:

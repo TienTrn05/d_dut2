@@ -10,21 +10,22 @@ class NotificationCard extends StatelessWidget {
   final String content;
   final bool isRead;
   final bool canDel;
+  final VoidCallback? onDelete;
 
-  const NotificationCard({
-    super.key,
-    required this.date,
-    required this.title,
-    required this.content,
-    this.isRead = true,
-    this.canDel = false,
-  });
+  const NotificationCard(
+      {super.key,
+      required this.date,
+      required this.title,
+      required this.content,
+      this.isRead = true,
+      this.canDel = false,
+      this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.only(top: 0, bottom: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       color: isRead ? Color(0xffF5F5F5) : Color(0xffE4EDF4),
       child: Padding(
@@ -43,7 +44,7 @@ class NotificationCard extends StatelessWidget {
                 ),
                 if (canDel)
                   GestureDetector(
-                    onTap: () {},
+                    onTap: onDelete,
                     child: Container(
                       padding: EdgeInsets.all(4),
                       decoration: BoxDecoration(

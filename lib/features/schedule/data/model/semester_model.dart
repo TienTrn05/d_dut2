@@ -3,12 +3,14 @@ class SemesterModel {
   final String noSemester;
   final int startYear;
   final int endYear;
+  final bool isCurrentSemester;
 
   SemesterModel(
       {required this.idSemester,
       required this.noSemester,
       required this.startYear,
-      required this.endYear});
+      required this.endYear,
+      this.isCurrentSemester = false});
 
   factory SemesterModel.fromJson(Map<String, dynamic> json) {
     return SemesterModel(

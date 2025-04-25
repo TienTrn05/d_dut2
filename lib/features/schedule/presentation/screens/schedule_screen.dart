@@ -30,9 +30,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           BlocProvider(
               create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
           BlocProvider(
-            create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
-              ..add(LoadSchedulesByDate(inputDate: DateTime.now())),
-          )
+              create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>()))
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
