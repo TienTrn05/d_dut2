@@ -71,38 +71,29 @@ class _CalendarCustomState extends State<CalendarCustom> {
               children: [
                 // Tháng
                 Expanded(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CupertinoPicker(
-                        itemExtent: 40,
-                        scrollController: FixedExtentScrollController(
-                            initialItem: tempMonth - 1),
-                        onSelectedItemChanged: (index) {
-                          tempMonth = index + 1;
-                        },
-                        children: List.generate(
-                          12,
-                          (index) {
-                            return Center(
-                              child: Center(
-                                child: Text("${index + 1}"),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      // IgnorePointer(
-                      //   child: Container(
-                      //     width: double.infinity,
-                      //     height: 40,
-                      //     decoration: BoxDecoration(
-                      //       color: Color.fromRGBO(42, 116, 189, 0.2),
-                      //       borderRadius: BorderRadius.circular(8),
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
+                  child: CupertinoPicker(
+                    itemExtent: 40,
+                    scrollController:
+                        FixedExtentScrollController(initialItem: tempMonth - 1),
+                    onSelectedItemChanged: (index) {
+                      tempMonth = index + 1;
+                      setState(() {
+                        _focusedDay = DateTime(tempYear, tempMonth, 1);
+                      });
+                    },
+                    selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                      background: Colors.lightBlue.withAlpha(30),
+                    ),
+                    children: List.generate(
+                      12,
+                      (index) {
+                        return Center(
+                          child: Center(
+                            child: Text("${index + 1}"),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
                 // Năm
@@ -113,7 +104,13 @@ class _CalendarCustomState extends State<CalendarCustom> {
                           initialItem: tempYear - 2000),
                       onSelectedItemChanged: (index) {
                         tempYear = index + 2000;
+                        setState(() {
+                          _focusedDay = DateTime(tempYear, tempMonth, 1);
+                        });
                       },
+                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                        background: Colors.lightBlue.withAlpha(30),
+                      ),
                       children: List.generate(
                         50,
                         (index) {
@@ -125,22 +122,13 @@ class _CalendarCustomState extends State<CalendarCustom> {
                         },
                       )),
                 ),
+                // Button
               ],
             ),
           ),
         );
       },
-    ).whenComplete(() {
-      setState(() {
-        _focusedDay = DateTime(tempYear, tempMonth, 1);
-      });
-      context.read<CalendarBloc>().add(
-            LoadCalendarEvents(
-              month: _focusedDay.month,
-              year: _focusedDay.year,
-            ),
-          );
-    });
+    );
   }
 
   @override
