@@ -1,5 +1,3 @@
-import 'package:dartx/dartx.dart';
-
 class EventTypeModel {
   // 1: Study, 2: Exam
   final int eventType;
@@ -35,7 +33,8 @@ class CalendarEventModel {
   factory CalendarEventModel.fromJson(Map<String, dynamic> json) {
     return CalendarEventModel(
       date: DateTime.parse(json['date']),
-      eventTypes: (json['eventTypes'] as List<dynamic>) // Chuyển mảng objectJSON về list các EventTypeModel
+      eventTypes: (json['eventTypes'] as List<
+              dynamic>) // Chuyển mảng objectJSON về list các EventTypeModel
           .map((e) => EventTypeModel.fromJson(e))
           .toList(),
     );

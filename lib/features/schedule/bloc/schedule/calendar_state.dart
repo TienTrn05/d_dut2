@@ -5,13 +5,13 @@ class CalendarState extends Equatable {
   List<Object?> get props => [];
 }
 
-class CaledarInitial extends CalendarState {}
+class CalendarInitial extends CalendarState {}
 
 class CalendarLoading extends CalendarState {}
 
-class CaledarError extends CalendarState {
+class CalendarError extends CalendarState {
   final String message;
-  CaledarError(this.message);
+  CalendarError(this.message);
   @override
   List<Object?> get props => [message];
 }
@@ -22,4 +22,11 @@ class CalendarEventLoaded extends CalendarState {
 
   @override
   List<Object> get props => [calendarEvents];
+}
+
+class CalendarWeekLoaded extends CalendarState {
+  final String noWeek;
+  CalendarWeekLoaded({required this.noWeek});
+  @override
+  List<Object> get props => [noWeek];
 }
