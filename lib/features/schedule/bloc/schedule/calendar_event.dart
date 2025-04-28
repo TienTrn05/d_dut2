@@ -11,3 +11,8 @@ class LoadCalendarEvents extends CalendarEvent {
 
   LoadCalendarEvents({required this.month, required this.year});
 }
+
+class LoadCalendarWeek extends CalendarEvent {
+  final DateTime inputDate;
+  LoadCalendarWeek({required this.inputDate});
+}

@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/extensions/optional_x.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,8 +20,8 @@ class CalendarCustom extends StatefulWidget {
 class _CalendarCustomState extends State<CalendarCustom> {
   DateTime _focusedDay = DateTime.now(); // Tháng hiện tại đang xem
   DateTime _selectedDay = DateTime.now(); // Lưu ngày được chọn
-  final DateTime _startdWeek = DateTime(2025, 3, 3);
-  int? _currentWeek;
+  // final DateTime _startdWeek = DateTime(2025, 3, 3);
+  late String _currentWeek = "Lỗi";
   Map<DateTime, List<int>> _eventMap = {};
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Lịch mặc định là tháng
@@ -41,12 +42,12 @@ class _CalendarCustomState extends State<CalendarCustom> {
 
     _loadCalendarEventsForMonth();
 
-    if (_focusedDay.isAfter(_startdWeek)) {
-      int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
-      _currentWeek = weekDifference + 1;
-    } else {
-      _currentWeek = 0;
-    }
+    // if (_focusedDay.isAfter(_startdWeek)) {
+    //   int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
+    //   _currentWeek = weekDifference + 1;
+    // } else {
+    //   _currentWeek = 0;
+    // }
   }
 
   String capitalizeFirstLetter(String text) {
@@ -131,6 +132,11 @@ class _CalendarCustomState extends State<CalendarCustom> {
     );
   }
 
+  DateTime getMondayOfWeek(DateTime focusedDay) {
+    int difference = focusedDay.weekday - DateTime.monday;
+    return focusedDay.subtract(Duration(days: difference));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -164,6 +170,15 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 _eventMap = newEventMap;
               });
             }
+            if (state is CalendarWeekLoaded) {
+              setState(() {
+                if (state.noWeek.isNotEmpty) {
+                  _currentWeek = "Tuần ${state.noWeek}";
+                } else {
+                  _currentWeek = "Không phải tuần học";
+                }
+              });
+            }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
             if (state is CalendarEventLoaded) {
@@ -188,13 +203,13 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 onPageChanged: (focusDate) {
                   setState(() {
                     _focusedDay = focusDate;
-                    if (focusDate.isAfter(_startdWeek)) {
-                      int weekDifference =
-                          _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                      _currentWeek = weekDifference + 1;
-                    } else {
-                      _currentWeek = 0;
-                    }
+                    // if (focusDate.isAfter(_startdWeek)) {
+                    //   int weekDifference =
+                    //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
+                    //   _currentWeek = weekDifference + 1;
+                    // } else {
+                    //   _currentWeek = 0;
+                    // }
                   });
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
@@ -202,6 +217,12 @@ class _CalendarCustomState extends State<CalendarCustom> {
                           year: focusDate.year,
                         ),
                       );
+                  if (_calendarFormat == CalendarFormat.week) {
+                    context.read<CalendarBloc>().add(
+                          LoadCalendarWeek(
+                              inputDate: getMondayOfWeek(_focusedDay)),
+                        );
+                  }
                 },
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
@@ -321,19 +342,25 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   } else {
                     _calendarFormat = CalendarFormat.month;
                   }
-                  if (_focusedDay.isAfter(_startdWeek)) {
-                    int weekDifference =
-                        _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                    _currentWeek = weekDifference + 1;
-                  } else {
-                    _currentWeek = 0;
-                  }
+                  // if (_focusedDay.isAfter(_startdWeek)) {
+                  //   int weekDifference =
+                  //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
+                  //   _currentWeek = weekDifference + 1;
+                  // } else {
+                  //   _currentWeek = 0;
+                  // }
                 });
+                if (_calendarFormat == CalendarFormat.week) {
+                  context.read<CalendarBloc>().add(
+                        LoadCalendarWeek(
+                            inputDate: getMondayOfWeek(_focusedDay)),
+                      );
+                }
               },
               child: Text(
                 _calendarFormat == CalendarFormat.month
                     ? "- Thu gọn -"
-                    : "- Tuần ${_currentWeek.toString()} -",
+                    : "- $_currentWeek -",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],

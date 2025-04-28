@@ -9,8 +9,9 @@ part 'calendar_state.dart';
 class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   final ScheduleRepository _repository;
 
-  CalendarBloc(this._repository) : super(CaledarInitial()) {
+  CalendarBloc(this._repository) : super(CalendarInitial()) {
     on<LoadCalendarEvents>(_onLoadCalendarEvents);
+    on<LoadCalendarWeek>(_onLoadCalendarWeek);
   }
 
   Future<void> _onLoadCalendarEvents(
@@ -21,7 +22,18 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
           await _repository.getCalendarEvents(event.month, event.year);
       emit(CalendarEventLoaded(calendarEvents: events));
     } catch (e) {
-      emit(CaledarError(e.toString()));
+      emit(CalendarError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadCalendarWeek(
+      LoadCalendarWeek event, Emitter<CalendarState> emit) async {
+    emit(CalendarLoading());
+    try {
+      final events = await _repository.getWeekByDate(event.inputDate);
+      emit(CalendarWeekLoaded(noWeek: events));
+    } catch (e) {
+      emit(CalendarError(e.toString()));
     }
   }
 }
