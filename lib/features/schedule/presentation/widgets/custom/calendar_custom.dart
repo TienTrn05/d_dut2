@@ -1,6 +1,5 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/extensions/optional_x.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/cupertino.dart';
