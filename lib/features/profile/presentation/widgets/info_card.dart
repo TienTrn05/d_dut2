@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class InfoCart extends StatefulWidget {
@@ -38,20 +39,30 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
             },
             minWidth: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            elevation: 0,
+            highlightElevation: 0,
             child: Row(
               children: [
-                Icon(
-                  isShowing
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.black,
-                  size: 24,
+                TweenAnimationBuilder(
+                  tween: Tween<double>(
+                      begin: 0, end: isShowing ? 0 : -1), // 1 tương đương 90 độ
+                  duration: const Duration(milliseconds: 300),
+                  builder: (context, double value, child) {
+                    return Transform.rotate(
+                      angle: value * (3.1415926535 / 2), // 90 độ = pi/2 radian
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded, // Chỉ dùng 1 icon
+                        color: Colors.black,
+                        size: 24,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 8),
                 Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),

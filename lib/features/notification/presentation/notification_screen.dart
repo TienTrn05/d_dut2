@@ -1,4 +1,6 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
 
@@ -27,7 +29,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
-      title: Text(title),
+      title: Text(title,
+          style: TextStyle(
+              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
       trailing: Switch(
         padding: EdgeInsets.all(0),
         activeColor: Colors.white,
@@ -41,7 +45,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildDropdownTile() {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
-      title: Text("Thông báo lịch học/thi trước"),
+      title: Text("Thông báo lịch học/thi trước",
+          style: TextStyle(
+              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
       trailing: DropdownButton<String>(
         value: selectedTime,
         onChanged: (String? newValue) {
@@ -52,7 +58,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         items: ["15 phút", "30 phút", "1 giờ", "1 ngày"]
             .map((time) => DropdownMenuItem(
                   value: time,
-                  child: Text(time),
+                  child: Text(time,
+                      style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          fontWeight: FontWeight.bold)),
                 ))
             .toList(),
       ),
@@ -67,34 +76,47 @@ class _NotificationScreenState extends State<NotificationScreen> {
         appBar: AppBar(
           backgroundColor: context.theme.primaryColor, // Màu nền xanh dương
           elevation: 0, // Xóa bóng dưới AppBar
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.pop(context); // Quay lại màn hình trước
-            },
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+              onPressed: () {
+                Navigator.pop(context); // Quay lại màn hình trước
+              },
+            ),
           ),
           title: Text(
             'Thông báo',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 20,
+              fontSize: FontSizes.medium,
             ),
           ),
           centerTitle: true, // Căn giữa tiêu đề
           actions: [
-            Builder(builder: (context) {
-              return IconButton(
-                icon: Icon(Icons.settings, color: Colors.white),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            }),
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Builder(builder: (context) {
+                return IconButton(
+                  icon: SvgPicture.asset(
+                      "assets/icons/svg/solar_settings-broken.svg"),
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                );
+              }),
+            ),
           ],
         ),
         backgroundColor: Colors.white,
         endDrawer: Drawer(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+            ),
+          ),
             child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -102,15 +124,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.notifications,
-                      color: context.theme.primaryColor,
-                      size: 24,
+                    SvgPicture.asset(
+                      "assets/icons/svg/solar_bell-bold.svg",
+                      colorFilter: ColorFilter.mode(
+                        context.theme.primaryColor ?? Colors.blue,
+                        BlendMode.srcIn,
+                      ),
+                      width: 24,
+                      height: 24,
                     ),
+                    const SizedBox(width: 8),
                     Text(
                       "Thông báo",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: FontSizes.large,
                         fontWeight: FontWeight.bold,
                         color: context.theme.primaryColor,
                       ),
@@ -156,6 +183,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     border: InputBorder.none,
                     icon: Icon(Icons.search, color: context.theme.grey),
                   ),
+                  style: TextStyle(fontSize: FontSizes.medium),
                 ),
               ),
               const SizedBox(height: 10),
@@ -167,8 +195,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   indicator: BoxDecoration(
                     color: context.theme.primaryColor, // Màu nền tab được chọn
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
                     ),
                   ),
                   labelColor: Colors.white, // Màu chữ của tab được chọn
@@ -181,7 +209,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: Center(
                           child: Text("Thông báo của tôi",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.bold,
                               )),
                         ),
@@ -193,7 +221,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: Center(
                           child: Text("Chung",
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.bold,
                               )),
                         ),

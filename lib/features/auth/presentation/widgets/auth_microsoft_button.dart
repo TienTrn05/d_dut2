@@ -1,4 +1,6 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AuthMicrosoftButton extends StatelessWidget {
@@ -46,7 +48,7 @@ class AuthMicrosoftButton extends StatelessWidget {
                     color: color,
                     fontWeight: FontWeight.bold,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
-                    fontSize: 16,
+                    fontSize: FontSizes.medium,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -54,11 +56,7 @@ class AuthMicrosoftButton extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Image.asset(
-                'assets/icons/mdi_microsoft.png',
-                width: 24,
-                height: 24,
-              ),
+              SvgPicture.asset("assets/icons/svg/mdi_microsoft.svg"),
             ],
           ),
         );

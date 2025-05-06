@@ -1,5 +1,7 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
@@ -35,7 +37,6 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Container(
                       width: double.infinity,
-                      height: 112,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.theme.primaryColor,
@@ -88,11 +89,12 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: 20,
+                                        fontSize: FontSizes.extraLarge,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.2,
+                                        height: 1,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
                                     Text(
                                       // get string before @
                                       userPrincipalName.split('@').first,
@@ -100,8 +102,8 @@ class ProfileScreen extends StatelessWidget {
                                         color: Colors.white,
                                         fontFamily:
                                             GoogleFonts.notoSans().fontFamily,
-                                        fontSize: 16,
-                                        height: 1.5,
+                                        fontSize: FontSizes.medium,
+                                        height: 1.25,
                                       ),
                                     ),
                                   ],
@@ -210,7 +212,9 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () {
                   final state = context.read<AuthBloc>().state;
                   if (state is AuthUserAuthenticated) {
-                    context.read<AuthBloc>().add(AuthLogoutRequested(state.userData.mail));
+                    context
+                        .read<AuthBloc>()
+                        .add(AuthLogoutRequested(state.userData.mail));
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -219,10 +223,10 @@ class ProfileScreen extends StatelessWidget {
                   backgroundColor: context.theme.primaryColor,
                   elevation: 2,
                 ),
-                child: const Icon(
-                  Icons.logout,
-                  color: Colors.white,
-                  size: 28,
+                child: SvgPicture.asset(
+                  "assets/icons/svg/solar_logout-3-bold.svg",
+                  width: 24,
+                  height: 24,
                 ),
               ),
             )

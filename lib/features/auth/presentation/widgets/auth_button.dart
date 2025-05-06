@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -7,7 +8,11 @@ class AuthButton extends StatelessWidget {
   Color fillColor;
   Function()? onPressed;
 
-  AuthButton({super.key, required this.text, this.fillColor = Colors.blue, this.onPressed});
+  AuthButton(
+      {super.key,
+      required this.text,
+      this.fillColor = Colors.blue,
+      this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,7 @@ class AuthButton extends StatelessWidget {
             color: Colors.white,
             fontFamily: GoogleFonts.notoSans().fontFamily,
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: FontSizes.medium,
           )),
     );
   }

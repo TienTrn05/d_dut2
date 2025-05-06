@@ -1,17 +1,18 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
 
 class FeatureCard extends StatelessWidget {
-  final String icon;
+  final String iconUrl;
   final String title;
   final String subtitle;
   final Function()? onTap;
 
   const FeatureCard(
       {super.key,
-      required this.icon,
+      required this.iconUrl,
       required this.title,
       required this.subtitle,
       this.onTap});
@@ -29,7 +30,11 @@ class FeatureCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Iconify(icon, size: 32, color: context.theme.primaryColor),
+            SvgPicture.asset(
+              iconUrl,
+              width: 32,
+              height: 32,
+            ),
             const SizedBox(height: 16),
             Column(
               children: [
@@ -40,20 +45,20 @@ class FeatureCard extends StatelessWidget {
                     maxLines: 2,
                     style: TextStyle(
                         color: context.theme.primaryColor,
-                        fontSize: 16,
+                        fontSize: FontSizes.large,
                         fontWeight: FontWeight.bold,
                         height: 1),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 5),
+                // const SizedBox(height: 5),
                 SizedBox(
                   height: 30,
                   child: Text(
                     subtitle,
                     maxLines: 2,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: FontSizes.small,
                       color: Color.fromRGBO(116, 116, 116, 1),
                       height: 1,
                     ),

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 enum AlertType {
@@ -16,7 +17,7 @@ class CustomSnackbar {
   ) {
     final snackBar = SnackBar(
       content: Container(
-        padding: EdgeInsets.all(8),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: _getColor(alertType),
           borderRadius: BorderRadius.circular(8),
@@ -24,38 +25,43 @@ class CustomSnackbar {
         child: Row(
           children: [
             _getIcon(alertType),
-            SizedBox(width: 10),
-            Container(
-              width: 1,
-              height: 44,
-              color: Colors.black,
-            ),
-            SizedBox(width: 10),
+            SizedBox(width: 16),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
+              child: Container(
+                padding: EdgeInsets.only(left: 16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
                       color: Colors.black,
-                      fontSize: 16,
+                      width: 2.0,
                     ),
                   ),
-                  Text(
-                    message,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      height: 1.2,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: FontSizes.medium,
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    Text(
+                      message,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: FontSizes.medium,
+                        height: 1.25,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -65,9 +71,10 @@ class CustomSnackbar {
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
               },
               child: SizedBox(
-                width: 44,
-                height: 44,
-                child: Icon(Icons.close, color: Colors.black, size: 26)),
+                  width: 44,
+                  height: 44,
+                  child:
+                      Icon(Icons.clear_rounded, color: Colors.black, size: 28)),
             ),
           ],
         ),
@@ -81,16 +88,16 @@ class CustomSnackbar {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  static Icon _getIcon(AlertType type) {
+  static Icon _getIcon(AlertType type, {double size = 28}) {
     switch (type) {
       case AlertType.error:
-        return Icon(Icons.error);
+        return Icon(Icons.error, size: size);
       case AlertType.warning:
-        return Icon(Icons.warning);
+        return Icon(Icons.warning_rounded, size: size);
       case AlertType.notice:
-        return Icon(Icons.info);
+        return Icon(Icons.info, size: size);
       case AlertType.success:
-        return Icon(Icons.check_circle);
+        return Icon(Icons.check_circle_rounded, size: size);
     }
   }
 

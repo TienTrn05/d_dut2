@@ -1,6 +1,6 @@
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../common/extensions/custom_theme_extension.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class InfoItem extends StatelessWidget {
   final String field;
@@ -18,8 +18,9 @@ class InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
+      margin: EdgeInsets.only(bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -28,7 +29,7 @@ class InfoItem extends StatelessWidget {
             child: Text(
               '$field:',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: FontSizes.medium,
                 color: Color(0xFF747474),
                 height: 1.5,
               ),
@@ -43,7 +44,7 @@ class InfoItem extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: FontSizes.medium,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                       height: 1.5,
@@ -56,18 +57,17 @@ class InfoItem extends StatelessWidget {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius:
-                            BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                         onTap: onEdit,
                         child: Container(
                           padding: EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.edit,
-                            size: 24,
-                            color: context.theme.primaryColor,
+                          child: SvgPicture.asset(
+                            "assets/icons/svg/lucide_pen.svg",
+                            width: 16,
+                            height: 16,
                           ),
                         ),
                       ),
