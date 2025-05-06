@@ -325,8 +325,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       FeatureCard(
                                         iconUrl:
                                             "assets/icons/svg/carbon_book.svg",
-                                        title: "CTĐT",
-                                        subtitle: "Chương trình đào tạo",
+                                        title: "Học phần",
+                                        subtitle: "Đăng ký học phần",
+                                        onTap: () {
+                                          context.read<DashboardBloc>().add(
+                                                DashboardNavigateRequested(
+                                                    scopes, Routes.courseRegistration),
+                                              );
+                                        },
                                       ),
                                       FeatureCard(
                                         iconUrl:
