@@ -7,6 +7,7 @@ import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
+import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 
 class Routes {
   static const String root = "/";
@@ -17,6 +18,7 @@ class Routes {
   static const String detailUnitOfStudy = "/detailUnitOfStudy";
   static const String detailUnitOfStudyTeacher = "/detailUOSTeacher";
   static const String detailExamShiftTeacher = "/detailExamShiftTeacher";
+  static const String courseRegistration = "/courseRegistration";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -58,6 +60,11 @@ class Routes {
               child: Text('MSTeamTool Screen'),
             ),
           ),
+        );
+
+      case courseRegistration:
+        return MaterialPageRoute(
+          builder: (context) => const CourseRegistrationScreen(),
         );
 
       default:
