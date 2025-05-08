@@ -28,23 +28,16 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
 
   String currentLink = "";
 
-
   List<NotiModel> notifications = NotiModel.mockData;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
-
-  
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    // Lắng nghe sự thay đổi tab và cập nhật state
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging ||
-          _tabController.index != _tabController.previousIndex) {
-        setState(() {}); // Cập nhật giao diện khi tab thay đổi
-      }
+      setState(() {});
     });
   }
 
@@ -125,7 +118,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -182,30 +174,13 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                   ),
                   Container(
                     color: Colors.white,
-                    child: TabBar.secondary(
+                    child: CustomTabBar(
                       controller: _tabController,
-                      labelColor: Colors.white,
-                      unselectedLabelColor: context.theme.grey,
-                      dividerColor: context.theme.primaryColor,
-                      indicator: BoxDecoration(
-                        color: context.theme.primaryColor,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(4)),
-                      ),
-                      labelStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: FontSizes.medium,
-                      ),
-                      unselectedLabelStyle: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: FontSizes.medium,
-                      ),
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      tabs: [
-                        Tab(text: "Thông tin"),
-                        Tab(text: "Điểm danh"),
-                        Tab(text: "Thông báo"),
-                      ],
+                      tabs: ["Thông tin", "Điểm danh", "Thông báo"],
+                      onTap: (newindex) {
+                        _tabController.index = newindex;
+                        setState(() {});
+                      },
                     ),
                   ),
                   // TabBarView
@@ -360,6 +335,63 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                   )
                 : null,
       ),
+    );
+  }
+}
+
+class CustomTabBar extends StatelessWidget {
+  final TabController controller;
+  final List<String> tabs;
+  final void Function(int index) onTap;
+
+  const CustomTabBar({
+    super.key,
+    required this.controller,
+    required this.tabs,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          color: Colors.white,
+          child: Row(
+            children: List.generate(tabs.length, (index) {
+              final isSelected = controller.index == index;
+              return Expanded(
+                  child: GestureDetector(
+                onTap: () => onTap(index),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.theme.primaryColor
+                          : Colors.transparent,
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(4))),
+                  alignment: Alignment.center,
+                  child: Text(
+                    tabs[index],
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.grey,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: FontSizes.medium,
+                    ),
+                  ),
+                ),
+              ));
+            }),
+          ),
+        ),
+        Container(
+          height: 1,
+          color: context.theme.primaryColor,
+        )
+      ],
     );
   }
 }
