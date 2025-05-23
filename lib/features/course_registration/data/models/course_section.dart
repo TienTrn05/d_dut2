@@ -1,4 +1,5 @@
 import 'course.dart';
+import 'lecturer.dart';
 
 class CourseSection {
   final String id;
@@ -16,6 +17,7 @@ class CourseSection {
   final String enrollmentYear;
   final String sectionCode;
   final Course course;
+  final Lecturer lecturer;
 
   CourseSection({
     required this.id,
@@ -33,7 +35,12 @@ class CourseSection {
     required this.enrollmentYear,
     required this.sectionCode,
     required this.course,
+    required this.lecturer,
   });
+
+  String get courseSectionCodeSplited {
+    return "${courseSectionCode.substring(0, 7)}.${courseSectionCode.substring(7, 11)}.${courseSectionCode.substring(11, 13)}.${courseSectionCode.substring(13, courseSectionCode.length)}";
+  }
 
   factory CourseSection.fromJson(Map<String, dynamic> json) {
     return CourseSection(
@@ -52,6 +59,7 @@ class CourseSection {
       enrollmentYear: json['enrollmentYear'],
       sectionCode: json['sectionCode'],
       course: Course.fromJson(json['course'] as Map<String, dynamic>),
+      lecturer: Lecturer.fromJson(json['lecturer'] as Map<String, dynamic>),
     );
   }
 
