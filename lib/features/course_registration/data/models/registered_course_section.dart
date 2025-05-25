@@ -10,6 +10,7 @@ class RegisteredCourseSection {
   final String lecturerId;
   final String scheduleGroup;
   final String schedule;
+  final String studyWeeks;
   final String facultyId;
   final String courseSymbol;
   final String courseCodeExtracted;
@@ -29,6 +30,7 @@ class RegisteredCourseSection {
     required this.lecturerId,
     required this.scheduleGroup,
     required this.schedule,
+    required this.studyWeeks,
     required this.facultyId,
     required this.courseSymbol,
     required this.courseCodeExtracted,
@@ -54,6 +56,7 @@ class RegisteredCourseSection {
       lecturerId: json['lecturerId'],
       scheduleGroup: json['scheduleGroup'],
       schedule: json['schedule'] ?? '',
+      studyWeeks: json['studyWeeks'] ?? '',
       facultyId: json['facultyId'],
       courseSymbol: json['courseSymbol'],
       courseCodeExtracted: json['courseCodeExtracted'],
@@ -76,6 +79,7 @@ class RegisteredCourseSection {
       'lecturerId': lecturerId,
       'scheduleGroup': scheduleGroup,
       'schedule': schedule,
+      'studyWeeks': studyWeeks,
       'facultyId': facultyId,
       'courseSymbol': courseSymbol,
       'courseCodeExtracted': courseCodeExtracted,

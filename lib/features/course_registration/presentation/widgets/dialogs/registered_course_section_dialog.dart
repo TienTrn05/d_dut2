@@ -106,7 +106,7 @@ class RegisteredCourseSectionDialog {
                     ),
                     CourseSectionInfoItem(
                       title: "Tuần học",
-                      content: courseSection.schedule,
+                      content: courseSection.studyWeeks,
                     ),
                     CourseSectionInfoItem(
                       title: "Thời khóa biểu",
