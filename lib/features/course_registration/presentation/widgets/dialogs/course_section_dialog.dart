@@ -106,7 +106,7 @@ class CourseSectionDialog {
                     ),
                     CourseSectionInfoItem(
                       title: "Tuần học",
-                      content: courseSection.schedule,
+                      content: courseSection.studyWeeks,
                     ),
                     CourseSectionInfoItem(
                       title: "Thời khóa biểu",
@@ -125,6 +125,7 @@ class CourseSectionDialog {
                       children: [
                         CustomButton(
                           text: "Đăng ký",
+                          disabled: !courseSection.canRegister,
                           onPressed: onRegister,
                         ),
                       ],

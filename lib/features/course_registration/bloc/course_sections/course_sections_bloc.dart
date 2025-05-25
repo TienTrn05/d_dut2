@@ -57,10 +57,10 @@ class CourseSectionsBloc
   Future<void> _onRegisterCourse(
       RegisterCourseRequested event, Emitter<CourseSectionsState> emit) async {
     try {
-      await courseRepository.registerCourse(
-          event.token, event.courseSectionId);
       emit(state.copyWith(
           status: () => AvailableCoursesStatus.loading));
+      await courseRepository.registerCourse(
+          event.token, event.courseSectionId);
       final courses = await courseRepository.fetchAvailableCourses(event.token);
       emit(state.copyWith(
           status: () => AvailableCoursesStatus.success,
@@ -70,15 +70,30 @@ class CourseSectionsBloc
           status: () => AvailableCoursesStatus.failure,
           errorCourseSectionMessage: () => "Đã có lỗi xảy ra!"));
     }
+
+    // Refresh registered courses after registration
+    try {
+      emit(state.copyWith(
+          registeredCoursesStatus: () => RegisteredCoursesStatus.loading));
+      final registeredCourses =
+          await courseRepository.fetchMyCourses(event.token);
+      emit(state.copyWith(
+          registeredCoursesStatus: () => RegisteredCoursesStatus.success,
+          registeredCourses: () => registeredCourses));
+    } catch (e) {
+      emit(state.copyWith(
+          registeredCoursesStatus: () => RegisteredCoursesStatus.failure,
+          errorRegisteredCoursesMessage: () => "Đã có lỗi xảy ra!"));
+    }
   }
 
   Future<void> _onUnregisterCourse(
       UnregisterCourseRequested event, Emitter<CourseSectionsState> emit) async {
     try {
-      await courseRepository.unregisterCourse(
-          event.token, event.courseSectionId);
       emit(state.copyWith(
           registeredCoursesStatus: () => RegisteredCoursesStatus.loading));
+      await courseRepository.unregisterCourse(
+          event.token, event.courseSectionId);
       final courses = await courseRepository.fetchMyCourses(event.token);
       emit(state.copyWith(
           registeredCoursesStatus: () => RegisteredCoursesStatus.success,
@@ -87,6 +102,19 @@ class CourseSectionsBloc
       emit(state.copyWith(
           registeredCoursesStatus: () => RegisteredCoursesStatus.failure,
           errorRegisteredCoursesMessage: () => "Đã có lỗi xảy ra!"));
+    }
+
+    // Refresh available courses after unregistration
+    try {
+      emit(state.copyWith(status: () => AvailableCoursesStatus.loading));
+      final courses = await courseRepository.fetchAvailableCourses(event.token);
+      emit(state.copyWith(
+          status: () => AvailableCoursesStatus.success,
+          courses: () => courses));
+    } catch (e) {
+      emit(state.copyWith(
+          status: () => AvailableCoursesStatus.failure,
+          errorCourseSectionMessage: () => "Đã có lỗi xảy ra!"));
     }
   }
 }

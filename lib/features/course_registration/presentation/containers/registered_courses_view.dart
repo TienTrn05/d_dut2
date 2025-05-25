@@ -33,45 +33,136 @@ class _RegisteredCoursesViewState extends State<RegisteredCoursesView> {
             builder: (context, state) {
           if (state.registeredCoursesStatus ==
               RegisteredCoursesStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: context.theme.primaryColor,
+            ));
           }
 
-          return ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          var numOfRegisteredCredits = state.registeredCourses.fold<int>(
+              0,
+              (sum, courseSections) =>
+                  sum +
+                  (courseSections.isRegistering
+                      ? 0
+                      : courseSections.course.credits));
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (state.registeredCoursesStatus ==
-                  RegisteredCoursesStatus.failure)
-                Center(
-                  child: Text(
-                    state.errorRegisteredCoursesMessage,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                )
-              else if (state.registeredCourses.isEmpty)
-                const Center(child: Text('No registered courses'))
-              else
-                ...state.registeredCourses.map(
-                  (course) => RegisteredCourseSectionItem(
-                    courseSection: course,
-                    onDetail: () {
-                      RegisteredCourseSectionDialog.showCustomDialog(
-                        context,
-                        course,
-                        () {
-                          context.read<CourseSectionsBloc>().add(
-                                UnregisterCourseRequested(
-                                  token: (stateAuth as AuthUserAuthenticated)
-                                      .accessToken,
-                                  courseSectionId: course.id,
-                                ),
-                              );
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
+              Text(
+                "Số tín chỉ tối đa cho phép đăng ký: ${30}",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: context.theme.primaryColor,
                 ),
+              ),
+              const SizedBox(height: 4),
+              Text("Bạn đã đăng ký: $numOfRegisteredCredits tín chỉ",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: context.theme.primaryColor,
+                  )),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                  children: [
+                    if (state.registeredCoursesStatus ==
+                        RegisteredCoursesStatus.failure)
+                      Center(
+                        child: Text(
+                          state.errorRegisteredCoursesMessage,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      )
+                    else if (state.registeredCourses.isEmpty)
+                      const Center(
+                          child: Text('Bạn chưa đăng ký học phần nào!'))
+                    else
+                      // Hiển thị các học phần đã đăng ký
+                      const Text(
+                        'Các học phần đã đăng ký:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    const SizedBox(height: 4),
+                    state.registeredCourses.where((c) => !c.isRegistering).isEmpty
+                        ? const Center(child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Bạn chưa đăng ký học phần nào!'),
+                        ))
+                        : const SizedBox.shrink(),
+                    ...state.registeredCourses
+                        .where((c) => !c.isRegistering)
+                        .map(
+                          (course) => RegisteredCourseSectionItem(
+                            courseSection: course,
+                            onDetail: () {
+                              RegisteredCourseSectionDialog.showCustomDialog(
+                                context,
+                                course,
+                                () {
+                                  context.read<CourseSectionsBloc>().add(
+                                        UnregisterCourseRequested(
+                                          token: (stateAuth
+                                                  as AuthUserAuthenticated)
+                                              .accessToken,
+                                          courseSectionId: course.id,
+                                        ),
+                                      );
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                    const Text(
+                      'Các học phần đang đăng ký:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    state.registeredCourses.where((c) => c.isRegistering).isEmpty
+                        ? const Center(child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Bạn không có học phần nào đang đăng ký!'),
+                        ))
+                        : const SizedBox.shrink(),
+                    ...state.registeredCourses
+                        .where((c) => c.isRegistering)
+                        .map(
+                          (course) => RegisteredCourseSectionItem(
+                            courseSection: course,
+                            onDetail: () {
+                              RegisteredCourseSectionDialog.showCustomDialog(
+                                context,
+                                course,
+                                () {
+                                  context.read<CourseSectionsBloc>().add(
+                                        UnregisterCourseRequested(
+                                          token: (stateAuth
+                                                  as AuthUserAuthenticated)
+                                              .accessToken,
+                                          courseSectionId: course.id,
+                                        ),
+                                      );
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                  ],
+                ),
+              ),
             ],
           );
         }),
