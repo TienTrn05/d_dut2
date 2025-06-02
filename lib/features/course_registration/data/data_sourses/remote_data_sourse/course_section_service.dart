@@ -3,8 +3,8 @@ import 'package:injectable/injectable.dart';
 
 import '/common/utils/logger.dart';
 
-import '../../models/course_section.dart';
 import '../../models/registered_course_section.dart';
+import '../../models/course_section_response.dart';
 
 @injectable
 class CourseSectionService {
@@ -15,7 +15,7 @@ class CourseSectionService {
       : _url = url,
         _dio = Dio();
 
-  Future<List<CourseSection>> getAvailableCourses(
+  Future<CourseSectionResponse> getAvailableCourses(
     String token,
   ) async {
     try {
@@ -25,12 +25,12 @@ class CourseSectionService {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200) {
-        final data = response.data['data'];
+        final data = response.data;
 
-        final List<CourseSection> courses = (data as List)
-            .map((course) => CourseSection.fromJson(course))
-            .toList();
-        return courses;
+        final CourseSectionResponse courseSectionResponse =
+            CourseSectionResponse.fromJson(data);
+
+        return courseSectionResponse;
       } else {
         throw Exception("Failed to load courses: ${response.data['message']}");
       }

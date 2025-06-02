@@ -15,24 +15,17 @@ class RegistrationSignalRBloc extends Bloc<RegistrationSignalREvent, Registratio
   late StreamSubscription<String> _streamSubscription;
 
   RegistrationSignalRBloc(this._repository) : super(RegistrationSignalRInitial()) {
-    on<RegistrationSignalRStarted>((event, emit) async {
-      await _repository.initConnection(); // gọi connect() ở đây nếu cần
-    });
-    
-    on<RegistrationSignalRUpdated>(_handlerRegistrationSignalRUpdated);
 
     _streamSubscription = _repository.response().listen((data) {
       logger.e('Received data from SignalR: $data');
     });
-
   }
 
-  void _handlerRegistrationSignalRUpdated(RegistrationSignalRUpdated event, Emitter<RegistrationSignalRState> emit) {
-    // Handle the event and emit new states
-    if (event.status == 'SUCCESS') {
-      logger.d('Registration successful for course section: ${event.courseId}');
-    } else {
-      emit(RegistrationSignalRFailure('Failed to register for course section'));
-    }
+  @override
+  Future<void> close() async {
+    logger.d('Closing RegistrationSignalRBloc');
+    await _streamSubscription.cancel(); // Hủy stream listener
+    await _repository.disconnect(); // Ngắt kết nối SignalR
+    return super.close(); // Gọi hàm close của Bloc cha
   }
 }

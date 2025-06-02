@@ -4,7 +4,7 @@ enum AvailableCoursesStatus { initial, loading, success, failure }
 enum RegisteredCoursesStatus { initial, loading, success, failure }
 
 class CourseSectionsState extends Equatable {
-  final AvailableCoursesStatus status;
+  final AvailableCoursesStatus availableCoursesStatus;
   final List<CourseSection> courses;
   final String errorCourseSectionMessage;
 
@@ -12,25 +12,29 @@ class CourseSectionsState extends Equatable {
   final List<RegisteredCourseSection> registeredCourses;
   final String errorRegisteredCoursesMessage;
 
+  final RegistrationPhase registrationPhase;
+
   const CourseSectionsState({
-    this.status = AvailableCoursesStatus.initial,
+    this.availableCoursesStatus = AvailableCoursesStatus.initial,
     this.registeredCoursesStatus = RegisteredCoursesStatus.initial,
     this.courses = const <CourseSection>[],
     this.registeredCourses = const <RegisteredCourseSection>[],
     this.errorCourseSectionMessage = '',
     this.errorRegisteredCoursesMessage = '',
+    this.registrationPhase = RegistrationPhase.group,
   });
 
   CourseSectionsState copyWith({
-    AvailableCoursesStatus Function()? status,
+    AvailableCoursesStatus Function()? availableCoursesStatus,
     RegisteredCoursesStatus Function()? registeredCoursesStatus,
     List<CourseSection> Function()? courses,
     List<RegisteredCourseSection> Function()? registeredCourses,
     String Function()? errorCourseSectionMessage,
     String Function()? errorRegisteredCoursesMessage,
+    RegistrationPhase Function()? registrationPhase,
   }) {
     return CourseSectionsState(
-      status: status != null ? status() : this.status,
+      availableCoursesStatus: availableCoursesStatus != null ? availableCoursesStatus() : this.availableCoursesStatus,
       registeredCoursesStatus: registeredCoursesStatus != null
           ? registeredCoursesStatus()
           : this.registeredCoursesStatus,
@@ -44,16 +48,20 @@ class CourseSectionsState extends Equatable {
       errorRegisteredCoursesMessage: errorRegisteredCoursesMessage != null
           ? errorRegisteredCoursesMessage()
           : this.errorRegisteredCoursesMessage,
+      registrationPhase: registrationPhase != null
+          ? registrationPhase()
+          : this.registrationPhase,
     );
   }
 
   @override
   List<Object?> get props => [
-    status,
+    availableCoursesStatus,
     registeredCoursesStatus,
     courses,
     registeredCourses,
     errorCourseSectionMessage,
     errorRegisteredCoursesMessage,
+    registrationPhase,
   ];
 }
