@@ -1,5 +1,8 @@
+import 'package:injectable/injectable.dart';
+
 import '../../data/data_sourses/stream_data_source/signalr_service.dart';
 
+@injectable
 class RegistrationSignalRRepository {
   final SignalRService _signalRService;
 
@@ -9,7 +12,7 @@ class RegistrationSignalRRepository {
     return _signalRService.statusStream;
   }
 
-  Future<void> initConnection() async {
-    await _signalRService.connect();
+  Future<void> disconnect() async {
+    await _signalRService.disconnect();
   }
 }

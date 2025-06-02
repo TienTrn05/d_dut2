@@ -8,7 +8,7 @@ import '../../../features/notification/presentation/notification_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
-
+import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
 class Routes {
   static const String root = "/";
   static const String auth = "/auth";
@@ -19,6 +19,7 @@ class Routes {
   static const String detailUnitOfStudyTeacher = "/detailUOSTeacher";
   static const String detailExamShiftTeacher = "/detailExamShiftTeacher";
   static const String courseRegistration = "/courseRegistration";
+  static const String courseRegistrationGrade = "/courseRegistrationGrade";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -65,6 +66,11 @@ class Routes {
       case courseRegistration:
         return MaterialPageRoute(
           builder: (context) => const CourseRegistrationScreen(),
+        );
+
+        case courseRegistrationGrade:
+        return MaterialPageRoute(
+          builder: (context) => const GradeScreen(),
         );
 
       default:

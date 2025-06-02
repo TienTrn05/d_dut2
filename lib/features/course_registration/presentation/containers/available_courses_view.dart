@@ -1,6 +1,8 @@
+import 'package:e_dut/features/course_registration/bloc/registration_signalr/registration_signalr_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/models/course_section_response.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/features/auth/bloc/auth_bloc.dart';
 
@@ -36,7 +38,7 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
           backgroundColor: Colors.white,
           child: BlocBuilder<CourseSectionsBloc, CourseSectionsState>(
             builder: (context, state) {
-              if (state.status == AvailableCoursesStatus.loading) {
+              if (state.availableCoursesStatus == AvailableCoursesStatus.loading) {
                 return Center(
                     child: CircularProgressIndicator(
                   color: context.theme.primaryColor,
@@ -64,7 +66,7 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
                       children: [
-                        if (state.status == AvailableCoursesStatus.failure)
+                        if (state.availableCoursesStatus == AvailableCoursesStatus.failure)
                           Center(
                             child: Text(
                               state.errorCourseSectionMessage,
@@ -72,8 +74,9 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                             ),
                           )
                         else if (groupedCourses.isEmpty)
-                          const Center(child: Text('No available courses'))
-                        else
+                          const Center(child: Text("Không có học phần nào khả dụng"))
+                        else if (state.registrationPhase ==
+                            RegistrationPhase.cohort || state.registrationPhase == RegistrationPhase.global)
                           ...groupedCourses.entries.map((entry) {
                             final course = entry.key;
                             final sections = entry.value;
@@ -121,6 +124,9 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                               ],
                             );
                           }),
+
+                        if (state.registrationPhase ==
+                            RegistrationPhase.group)
                         ...groupedCoursesByScheduleGroup.entries.map((entry) {
                           final scheduleGroup = entry.key;
                           final sections = entry.value;
@@ -138,7 +144,9 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                                             text:
                                                 "Đ.ký tất cả các học phần nhóm này",
                                             onPressed: () {
-                                              // Handle button press if needed
+                                              context.read<RegistrationSignalRBloc>().add(
+                                                RegistrationSignalRStarted()
+                                              );
                                             }),
                                         Column(
                                             children: sections

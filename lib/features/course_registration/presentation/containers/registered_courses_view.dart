@@ -79,9 +79,6 @@ class _RegisteredCoursesViewState extends State<RegisteredCoursesView> {
                           style: const TextStyle(color: Colors.red),
                         ),
                       )
-                    else if (state.registeredCourses.isEmpty)
-                      const Center(
-                          child: Text('Bạn chưa đăng ký học phần nào!'))
                     else
                       // Hiển thị các học phần đã đăng ký
                       const Text(

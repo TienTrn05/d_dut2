@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../../data/data_sourses/remote_data_sourse/course_section_service.dart';
-import '../../data/models/course_section.dart';
+import '../../data/models/course_section_response.dart';
 import '../../data/models/registered_course_section.dart';
 
 @injectable
@@ -10,14 +10,14 @@ class CourseSectionRepository {
 
   CourseSectionRepository(this._courseService);
 
-  Future<List<CourseSection>> fetchAvailableCourses(
+  Future<CourseSectionResponse> fetchAvailableCourses(
     String token,
   ) async {
     try {
-      final courses = await _courseService.getAvailableCourses(
+      final res = await _courseService.getAvailableCourses(
         token
       );
-      return courses;
+      return res;
     } catch (e) {
       throw Exception('Failed to load courses: $e');
     }

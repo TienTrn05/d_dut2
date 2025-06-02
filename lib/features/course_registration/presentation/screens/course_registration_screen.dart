@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/common/extensions/font_sizes.dart';
+import '/common/extensions/custom_theme_extension.dart';
 import '/common/utils/getit_utils.dart';
+import '/common/routes/routes.dart';
 import '/features/auth/bloc/auth_bloc.dart';
 
 import '../../domain/repositories/course_section_repository.dart';
-import '../../../dashboard/presentation/widgets/notification_button.dart';
+import '../../domain/repositories/registration_signalr_repository.dart';
 import '../../bloc/course_sections/course_sections_bloc.dart';
 import '../../bloc/registration_signalr/registration_signalr_bloc.dart';
 import '../containers/available_courses_view.dart';
 import '../containers/registered_courses_view.dart';
-import '/common/extensions/custom_theme_extension.dart';
+import '../widgets/buttons/grade_button.dart';
 
 class CourseRegistrationScreen extends StatelessWidget {
   const CourseRegistrationScreen({super.key});
@@ -19,6 +21,15 @@ class CourseRegistrationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context2, state) {
+      if (state is! AuthUserAuthenticated) {
+        return Center(
+          child: Text(
+            'Bạn cần đăng nhập để sử dụng tính năng này.',
+            style: TextStyle(fontSize: FontSizes.large),
+          ),
+        );
+      }
+
       return MultiBlocProvider(
         providers: [
           BlocProvider<CourseSectionsBloc>(
@@ -26,11 +37,16 @@ class CourseRegistrationScreen extends StatelessWidget {
               courseRepository: getIt.get<CourseSectionRepository>(),
             )
               ..add(AvailableCourseSectionsSubscriptionRequested(
-                token: (state as AuthUserAuthenticated).accessToken,
+                token: state.accessToken,
               ))
               ..add(RegisteredCourseSectionSubscriptionRequested(
                 token: state.accessToken,
               )),
+          ),
+          BlocProvider<RegistrationSignalRBloc>(
+            create: (context) => RegistrationSignalRBloc(
+              getIt.get<RegistrationSignalRRepository>(),
+            ),
           ),
         ],
         child: DefaultTabController(
@@ -59,13 +75,13 @@ class CourseRegistrationScreen extends StatelessWidget {
               ),
               centerTitle: true,
               actions: [
-                NotificationButton(
-                  notificationCount: 2,
-                  onTap: () {
-                    context
-                        .read<RegistrationSignalRBloc>()
-                        .add(RegistrationSignalRStarted());
-                  },
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: GradeButton(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(Routes.courseRegistrationGrade);
+                    },
+                  ),
                 ),
               ],
             ),
