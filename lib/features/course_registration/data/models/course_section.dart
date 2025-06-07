@@ -3,7 +3,6 @@ import 'lecturer.dart';
 
 class CourseSection {
   final String id;
-  final String courseSectionCode;
   final String courseName;
   final int capacity;
   final int registeredCount;
@@ -23,7 +22,6 @@ class CourseSection {
 
   CourseSection({
     required this.id,
-    required this.courseSectionCode,
     required this.courseName,
     required this.capacity,
     required this.registeredCount,
@@ -42,14 +40,13 @@ class CourseSection {
     required this.lecturer,
   });
 
-  String get courseSectionCodeSplited {
-    return "${courseSectionCode.substring(0, 7)}.${courseSectionCode.substring(7, 11)}.${courseSectionCode.substring(11, 13)}.${courseSectionCode.substring(13, courseSectionCode.length)}";
+  String get courseSectionIdSplited {
+    return "${id.substring(0, 7)}.${id.substring(7, 11)}.${id.substring(11, 13)}.${id.substring(13, id.length)}";
   }
 
   factory CourseSection.fromJson(Map<String, dynamic> json) {
     return CourseSection(
       id: json['id'],
-      courseSectionCode: json['courseSectionCode'],
       courseName: json['courseName'],
       capacity: json['capacity'],
       registeredCount: json['registeredCount'],
@@ -72,7 +69,6 @@ class CourseSection {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'courseSectionCode': courseSectionCode,
       'courseName': courseName,
       'capacity': capacity,
       'registeredCount': registeredCount,

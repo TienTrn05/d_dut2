@@ -7,8 +7,10 @@ import '/common/extensions/custom_theme_extension.dart';
 import '/common/utils/getit_utils.dart';
 
 import '../bloc/grade_bloc.dart';
+import '../data/models/grade.dart';
 import '../domain/repositories/grade_repository.dart';
 import './widgets/grade_list_tile.dart';
+import '../utils/grade_utils.dart';
 
 class GradeScreen extends StatelessWidget {
   const GradeScreen({super.key});
@@ -57,7 +59,10 @@ class GradeScreen extends StatelessWidget {
           body: BlocBuilder<GradeBloc, GradeState>(
             builder: (context, state) {
               if (state.status == GradeStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: context.theme.primaryColor,
+                ));
               } else if (state.status == GradeStatus.success) {
                 final grades = state.grades;
 
@@ -70,12 +75,53 @@ class GradeScreen extends StatelessWidget {
                   );
                 }
 
-                return ListView.builder(
-                  itemCount: grades.length,
-                  itemBuilder: (context, index) {
-                    final grade = grades[index];
-                    return GradeListTile(grade: grade);
+                var gradeGrouped = Grade.groupBySemesterCode(grades);
+
+                return RefreshIndicator(
+                  color: context.theme.primaryColor,
+                  onRefresh: () async {
+                    final authState = context.read<AuthBloc>().state;
+                    if (authState is AuthUserAuthenticated) {
+                      context.read<GradeBloc>().add(
+                            GradesSubscriptionRequested(
+                                token: authState.accessToken),
+                          );
+                    }
                   },
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: gradeGrouped.entries.map((entry) {
+                        final semesterCode = entry.key;
+                        final grades = entry.value;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                GradeUtils.getSemesterStr(semesterCode),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: FontSizes.medium,
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: grades.length,
+                              itemBuilder: (context, index) {
+                                final grade = grades[index];
+                                return GradeListTile(grade: grade);
+                              },
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 );
               } else if (state.status == GradeStatus.failure) {
                 return Center(
