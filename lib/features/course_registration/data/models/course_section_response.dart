@@ -17,7 +17,7 @@ class CourseSectionResponse {
           .map((e) => CourseSection.fromJson(e as Map<String, dynamic>))
           .toList(),
       registrationPhase: RegistrationPhase.values.firstWhere(
-        (e) => e.toString() == 'RegistrationPhase.${json['registrationType']}',
+        (e) => e.toString().toLowerCase() == 'RegistrationPhase.${json['metadata']['registrationType']}'.toLowerCase(),
         orElse: () => RegistrationPhase.group,
       ),
     );

@@ -94,7 +94,7 @@ class CourseSectionDialog {
                   children: [
                     CourseSectionInfoItem(
                       title: "Mã lớp h.phần",
-                      content: courseSection.courseSectionCodeSplited,
+                      content: courseSection.id,
                     ),
                     CourseSectionInfoItem(
                       title: "Số tín chỉ",

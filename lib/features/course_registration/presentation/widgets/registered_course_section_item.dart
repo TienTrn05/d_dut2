@@ -27,7 +27,7 @@ class RegisteredCourseSectionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                courseSection.courseSectionCodeSplited,
+                courseSection.courseSectionIdSplited,
                 style: TextStyle(
                   fontSize: FontSizes.medium - 1,
                   fontWeight: FontWeight.bold,

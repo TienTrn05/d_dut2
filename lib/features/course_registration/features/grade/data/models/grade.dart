@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 class Grade {
   final String id;
   final String courseName;
@@ -36,5 +38,33 @@ class Grade {
     return {
       'id': id,
     };
+  }
+
+  static Map<String, List<Grade>> groupBySemesterCode(List<Grade> grades) {
+    final Map<String, List<Grade>> grouped = {};
+
+    for (final grade in grades) {
+      final group = grade.semesterCode;
+      if (grouped.containsKey(group)) {
+        grouped[group]!.add(grade);
+      } else {
+        grouped[group] = [grade];
+      }
+    }
+
+    // Sort the keys (semesterCodes)
+    final sortedKeys = grouped.keys.toList()..sort();
+
+    // Build a LinkedHashMap to preserve the sorted order
+    final sortedGrouped = LinkedHashMap<String, List<Grade>>(
+      equals: (a, b) => a == b,
+      hashCode: (key) => key.hashCode,
+    );
+
+    for (final key in sortedKeys) {
+      sortedGrouped[key] = grouped[key]!;
+    }
+
+    return sortedGrouped;
   }
 }
