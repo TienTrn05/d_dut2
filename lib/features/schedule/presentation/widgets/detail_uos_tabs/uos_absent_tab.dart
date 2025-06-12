@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
@@ -16,8 +17,9 @@ class UosAbsentTab extends StatefulWidget {
 class _UosAbsentTabState extends State<UosAbsentTab> {
   bool isSellectedAll = false;
   DateTime currentDate = DateTime.now();
-  var selectedDate = "17/03/2025, tuần 3";
+  var selectedDate = "${DateTime.now()}, tuần 3";
   DateTime startdWeek = DateTime(2025, 3, 3);
+  bool _isAbsentDate = false;
   // Giả lập sinh viên
   List<Map<String, dynamic>> students = [
     {
@@ -50,6 +52,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
 // Cập nhập trang thái điểm danh
   void updateAbsentStatus(int index, bool isAbsent) {
     setState(() {
@@ -74,7 +81,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   }
 
   void _updateCurrentDate(DateTime newValue) {
-    currentDate = newValue;
+    setState(() {
+      currentDate = newValue;
+      _isAbsentDate = true;
+    });
+
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
     if (currentDate.isAfter(startdWeek)) {
       int weekDifference = currentDate.difference(startdWeek).inDays ~/ 7;
@@ -82,32 +93,27 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     } else {
       selectedDate = "$formattedDate, tuần 0";
     }
-    setState(() {});
     Navigator.pop(context);
   }
 
-  void _confirmAction(
-      BuildContext context, VoidCallback onConfirm, String confirmText) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Xác nhận"),
-        content: Text(confirmText),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Hủy"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              onConfirm();
-            },
-            child: Text("Xác nhận"),
-          ),
-        ],
-      ),
-    );
+  void _deleteAbsent() {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Xóa ngày điểm danh',
+        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $selectedDate không?',
+        AlertType.delete,
+        onConfirm: () => {setState(() {})},
+        textConfirm: "Xóa");
+  }
+
+  void _saveAbsent() {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Lưu ngày điểm danh',
+        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $selectedDate không?',
+        AlertType.confirm,
+        onConfirm: () => {setState(() {})},
+        textConfirm: "Lưu");
   }
 
   @override
@@ -116,14 +122,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        SearchBarCustom(),
-        if (widget.isCheckAbsent) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                flex: 5,
-                child: ElevatedButton(
+        if (!_isAbsentDate) ...[
+          Center(
+            child: Column(
+              children: [
+                ElevatedButton(
                   onPressed: () => {
                     showDialog(
                         context: context,
@@ -155,158 +158,204 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     ),
                   ),
                 ),
-              ),
-              Flexible(
-                flex: 4,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      child: OutlinedButton(
-                        onPressed: () => {
-                          _confirmAction(context, () {},
-                              "Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $selectedDate không?")
-                        },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(
-                            color: context.theme.red ?? Colors.red,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 8,
-                          ),
-                        ),
-                        child: Text(
-                          'Xóa',
-                          style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            color: context.theme.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Flexible(
-                      child: OutlinedButton(
-                        onPressed: () => {
-                          _confirmAction(context, () {},
-                              "Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $selectedDate không?")
-                        },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor:
-                              context.theme.primaryColor ?? Colors.blue,
-                          side: BorderSide(
-                            color: context.theme.primaryColor ?? Colors.blue,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 8,
-                          ),
-                        ),
-                        child: Text(
-                          'Lưu',
-                          style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
+                Text(
+                  "Bạn không có tiết ngày này.",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: context.theme.grey,
+                  ),
+                )
+              ],
+            ),
+          )
         ],
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            if (!widget.isCheckAbsent) ...[
-              Text(
-                "Sinh viên (10)",
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
-                  color: context.theme.grey,
-                ),
-              ),
-              Text(
-                "Vắng",
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
-                  color: context.theme.red,
-                ),
-              )
-            ] else ...[
-              Row(
-                children: [
-                  SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: Checkbox(
-                      value: isSellectedAll,
-                      activeColor: context.theme.primaryColor,
-                      onChanged: (bool? newValue) {
-                        _toggleSelectAll();
-                      },
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        if (_isAbsentDate) ...[
+          SearchBarCustom(),
+          if (widget.isCheckAbsent) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 5,
+                  child: ElevatedButton(
+                    onPressed: () => {
+                      showDialog(
+                          context: context,
+                          builder: (context) => CalendarAbsent(
+                                initDate: currentDate,
+                                onValueChange: _updateCurrentDate,
+                              ))
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: BorderSide(
+                        color: context.theme.primaryColor ?? Colors.blue,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 8,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      selectedDate,
+                      style: TextStyle(
+                        fontSize: FontSizes.medium,
+                        color: context.theme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Text(
-                    "Chọn tất cả (10)",
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      color: context.theme.grey,
-                    ),
-                  )
-                ],
-              ),
-              Text(
-                "Điểm danh",
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
-                  color: context.theme.grey,
                 ),
-              ),
-            ]
+                Flexible(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: OutlinedButton(
+                          onPressed: _deleteAbsent,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(
+                              color: context.theme.red ?? Colors.red,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 8,
+                            ),
+                          ),
+                          child: Text(
+                            'Xóa',
+                            style: TextStyle(
+                              fontSize: FontSizes.medium,
+                              color: context.theme.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Flexible(
+                        child: OutlinedButton(
+                          onPressed: _saveAbsent,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor:
+                                context.theme.primaryColor ?? Colors.blue,
+                            side: BorderSide(
+                              color: context.theme.primaryColor ?? Colors.blue,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 8,
+                            ),
+                          ),
+                          child: Text(
+                            'Lưu',
+                            style: TextStyle(
+                              fontSize: FontSizes.medium,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ],
-        ),
-        Expanded(
-          child: ListView.builder(
-            // Thêm 1 phần tử cho SizedBox
-            itemCount: students.length + 1,
-            itemBuilder: (context, index) {
-              if (index == students.length) {
-                // Thêm khoảng trống cuối danh sách
-                return SizedBox(height: 56);
-              }
-              return StudentItem(
-                name: students[index]["name"],
-                mail: students[index]["mail"],
-                absentCount: students[index]["absentCount"],
-                isCheckAbsent: widget.isCheckAbsent,
-                isAbsentToday: students[index]["isAbsentToday"],
-                onAbsentChanged: (isAbsent) {
-                  updateAbsentStatus(index, isAbsent);
-                  setState(() {
-                    isSellectedAll =
-                        students.every((s) => s["isAbsentToday"] == true);
-                  });
-                },
-              );
-            },
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (!widget.isCheckAbsent) ...[
+                Text(
+                  "Sinh viên (10)",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: context.theme.grey,
+                  ),
+                ),
+                Text(
+                  "Vắng",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: context.theme.red,
+                  ),
+                )
+              ] else ...[
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: Checkbox(
+                        value: isSellectedAll,
+                        activeColor: context.theme.primaryColor,
+                        onChanged: (bool? newValue) {
+                          _toggleSelectAll();
+                        },
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Chọn tất cả (10)",
+                      style: TextStyle(
+                        fontSize: FontSizes.medium,
+                        color: context.theme.grey,
+                      ),
+                    )
+                  ],
+                ),
+                Text(
+                  "Điểm danh",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: context.theme.grey,
+                  ),
+                ),
+              ]
+            ],
           ),
-        ),
+          Expanded(
+            child: ListView.builder(
+              // Thêm 1 phần tử cho SizedBox
+              itemCount: students.length + 1,
+              itemBuilder: (context, index) {
+                if (index == students.length) {
+                  // Thêm khoảng trống cuối danh sách
+                  return SizedBox(height: 56);
+                }
+                return StudentItem(
+                  name: students[index]["name"],
+                  mail: students[index]["mail"],
+                  absentCount: students[index]["absentCount"],
+                  isCheckAbsent: widget.isCheckAbsent,
+                  isAbsentToday: students[index]["isAbsentToday"],
+                  onAbsentChanged: (isAbsent) {
+                    updateAbsentStatus(index, isAbsent);
+                    setState(() {
+                      isSellectedAll =
+                          students.every((s) => s["isAbsentToday"] == true);
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ],
     );
   }

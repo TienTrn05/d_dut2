@@ -24,6 +24,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
   bool isCheckAbsent = false;
   bool isOverlayVisible = false;
+  bool _isAbsentDate = true;
   late TabController _tabController;
 
   String currentLink = "";
@@ -233,7 +234,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               )
           ],
         ),
-        floatingActionButton: _tabController.index == 1
+        floatingActionButton: _tabController.index == 1 && _isAbsentDate
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
