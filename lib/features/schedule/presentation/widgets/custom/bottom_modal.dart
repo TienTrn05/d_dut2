@@ -6,6 +6,7 @@ class BottomModal extends StatefulWidget {
   final String title;
   final Widget? child;
   final VoidCallback mainAction;
+  final bool enabledMainAction;
   final VoidCallback? onClose;
 
   const BottomModal(
@@ -13,6 +14,7 @@ class BottomModal extends StatefulWidget {
       required this.title,
       this.child,
       required this.mainAction,
+      this.enabledMainAction = true,
       this.onClose});
 
   @override
@@ -91,9 +93,14 @@ class _BottomModalState extends State<BottomModal> {
                   Expanded(
                     child: TextButton(
                       style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                          context.theme.primaryColor ?? Colors.blue,
-                        ),
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                            (Set<WidgetState> states) {
+                          if (states.contains(WidgetState.disabled)) {
+                            return context.theme.grey?.withAlpha(40) ??
+                                Colors.grey.withAlpha(40);
+                          }
+                          return context.theme.primaryColor ?? Colors.blue;
+                        }),
                         padding: WidgetStateProperty.all(
                             EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                         shape: WidgetStateProperty.all(
@@ -102,7 +109,8 @@ class _BottomModalState extends State<BottomModal> {
                           ),
                         ),
                       ),
-                      onPressed: widget.mainAction,
+                      onPressed:
+                          widget.enabledMainAction ? widget.mainAction : null,
                       child: Center(
                         child: Text(
                           "Lưu",

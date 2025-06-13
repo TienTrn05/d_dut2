@@ -2,12 +2,12 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class CalendarCustom extends StatefulWidget {
   const CalendarCustom({super.key});
@@ -19,8 +19,8 @@ class CalendarCustom extends StatefulWidget {
 class _CalendarCustomState extends State<CalendarCustom> {
   DateTime _focusedDay = DateTime.now(); // Tháng hiện tại đang xem
   DateTime _selectedDay = DateTime.now(); // Lưu ngày được chọn
-  final DateTime _startdWeek = DateTime(2025, 3, 3);
-  int? _currentWeek;
+  // final DateTime _startdWeek = DateTime(2025, 3, 3);
+  late String _currentWeek = "Lỗi";
   Map<DateTime, List<int>> _eventMap = {};
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Lịch mặc định là tháng
@@ -41,12 +41,12 @@ class _CalendarCustomState extends State<CalendarCustom> {
 
     _loadCalendarEventsForMonth();
 
-    if (_focusedDay.isAfter(_startdWeek)) {
-      int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
-      _currentWeek = weekDifference + 1;
-    } else {
-      _currentWeek = 0;
-    }
+    // if (_focusedDay.isAfter(_startdWeek)) {
+    //   int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
+    //   _currentWeek = weekDifference + 1;
+    // } else {
+    //   _currentWeek = 0;
+    // }
   }
 
   String capitalizeFirstLetter(String text) {
@@ -54,80 +54,86 @@ class _CalendarCustomState extends State<CalendarCustom> {
     return text[0].toUpperCase() + text.substring(1);
   }
 
-  // Hàm để chọn tháng và năm
-  Future<void> _selectMonthYear() async {
-    final picked = await showMonthPicker(
-      context: context,
-      initialDate: _selectedDay ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      monthPickerDialogSettings: MonthPickerDialogSettings(
-          headerSettings: PickerHeaderSettings(
-              headerBackgroundColor: context.theme.primaryColor),
-          dialogSettings: PickerDialogSettings(
-            locale: Locale('vi'),
-            dialogRoundedCornersRadius: 16,
-            dialogBackgroundColor: Colors.white,
-          ),
-          dateButtonsSettings: PickerDateButtonsSettings(
-            selectedMonthBackgroundColor: context.theme.primaryColor,
-            selectedMonthTextColor: Colors.white,
-            unselectedMonthsTextColor: Colors.black,
-            currentMonthTextColor: context.theme.primaryColor,
-          ),
-          actionBarSettings: PickerActionBarSettings(
-            // cancelWidget: Padding(
-            //   padding: const EdgeInsets.only(bottom: 16),
-            //   child: ElevatedButton(
-            //     onPressed: () => Navigator.of(context).pop(),
-            //     style: ElevatedButton.styleFrom(
-            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //       backgroundColor: Colors.white,
-            //     ),
-            //     child: Text(
-            //       "Hủy",
-            //       style: TextStyle(
-            //         color: context.theme.primaryColor,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // confirmWidget: Padding(
-            //   padding: const EdgeInsets.only(bottom: 16),
-            //   child: ElevatedButton(
-            //     onPressed: () => Navigator.of(context).pop(),
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: context.theme.primaryColor ?? Colors.blue,
-            //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8),
-            //       ),
-            //     ),
-            //     child: Text(
-            //       "Chọn",
-            //       style: TextStyle(
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-          ),),
-    );
+  void _showMonthYearPicker() {
+    int tempMonth = _focusedDay.month;
+    int tempYear = _focusedDay.year;
 
-    if (picked != null) {
-      setState(() {
-        _focusedDay = picked;
-      });
-      context.read<CalendarBloc>().add(
-            LoadCalendarEvents(
-              month: _focusedDay.month,
-              year: _focusedDay.year,
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: SizedBox(
+            height: 250,
+            child: Row(
+              children: [
+                // Tháng
+                Expanded(
+                  child: CupertinoPicker(
+                    itemExtent: 40,
+                    scrollController:
+                        FixedExtentScrollController(initialItem: tempMonth - 1),
+                    onSelectedItemChanged: (index) {
+                      tempMonth = index + 1;
+                      setState(() {
+                        _focusedDay = DateTime(tempYear, tempMonth, 1);
+                      });
+                    },
+                    selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                      background: Colors.lightBlue.withAlpha(30),
+                    ),
+                    children: List.generate(
+                      12,
+                      (index) {
+                        return Center(
+                          child: Center(
+                            child: Text("${index + 1}"),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                // Năm
+                Expanded(
+                  child: CupertinoPicker(
+                      itemExtent: 40,
+                      scrollController: FixedExtentScrollController(
+                          initialItem: tempYear - 2000),
+                      onSelectedItemChanged: (index) {
+                        tempYear = index + 2000;
+                        setState(() {
+                          _focusedDay = DateTime(tempYear, tempMonth, 1);
+                        });
+                      },
+                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                        background: Colors.lightBlue.withAlpha(30),
+                      ),
+                      children: List.generate(
+                        50,
+                        (index) {
+                          return Center(
+                            child: Center(
+                              child: Text("${index + 2000}"),
+                            ),
+                          );
+                        },
+                      )),
+                ),
+                // Button
+              ],
             ),
-          );
-    }
+          ),
+        );
+      },
+    );
+  }
+
+  DateTime getMondayOfWeek(DateTime focusedDay) {
+    int difference = focusedDay.weekday - DateTime.monday;
+    return focusedDay.subtract(Duration(days: difference));
   }
 
   @override
@@ -163,6 +169,15 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 _eventMap = newEventMap;
               });
             }
+            if (state is CalendarWeekLoaded) {
+              setState(() {
+                if (state.noWeek.isNotEmpty) {
+                  _currentWeek = "Tuần ${state.noWeek}";
+                } else {
+                  _currentWeek = "Không phải tuần học";
+                }
+              });
+            }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
             if (state is CalendarEventLoaded) {
@@ -180,20 +195,20 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
 
             return GestureDetector(
-              onTap: _selectMonthYear,
+              onTap: _showMonthYearPicker,
               child: TableCalendar(
                 locale: 'vi',
                 focusedDay: _focusedDay,
                 onPageChanged: (focusDate) {
                   setState(() {
                     _focusedDay = focusDate;
-                    if (focusDate.isAfter(_startdWeek)) {
-                      int weekDifference =
-                          _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                      _currentWeek = weekDifference + 1;
-                    } else {
-                      _currentWeek = 0;
-                    }
+                    // if (focusDate.isAfter(_startdWeek)) {
+                    //   int weekDifference =
+                    //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
+                    //   _currentWeek = weekDifference + 1;
+                    // } else {
+                    //   _currentWeek = 0;
+                    // }
                   });
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
@@ -201,6 +216,12 @@ class _CalendarCustomState extends State<CalendarCustom> {
                           year: focusDate.year,
                         ),
                       );
+                  if (_calendarFormat == CalendarFormat.week) {
+                    context.read<CalendarBloc>().add(
+                          LoadCalendarWeek(
+                              inputDate: getMondayOfWeek(_focusedDay)),
+                        );
+                  }
                 },
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
@@ -320,19 +341,25 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   } else {
                     _calendarFormat = CalendarFormat.month;
                   }
-                  if (_focusedDay.isAfter(_startdWeek)) {
-                    int weekDifference =
-                        _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                    _currentWeek = weekDifference + 1;
-                  } else {
-                    _currentWeek = 0;
-                  }
+                  // if (_focusedDay.isAfter(_startdWeek)) {
+                  //   int weekDifference =
+                  //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
+                  //   _currentWeek = weekDifference + 1;
+                  // } else {
+                  //   _currentWeek = 0;
+                  // }
                 });
+                if (_calendarFormat == CalendarFormat.week) {
+                  context.read<CalendarBloc>().add(
+                        LoadCalendarWeek(
+                            inputDate: getMondayOfWeek(_focusedDay)),
+                      );
+                }
               },
               child: Text(
                 _calendarFormat == CalendarFormat.month
                     ? "- Thu gọn -"
-                    : "- Tuần ${_currentWeek.toString()} -",
+                    : "- $_currentWeek -",
                 style: TextStyle(color: Color.fromRGBO(116, 116, 116, 1)),
               ))
         ],

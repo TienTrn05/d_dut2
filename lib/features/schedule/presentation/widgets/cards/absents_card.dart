@@ -132,7 +132,7 @@ class AbsentsCard extends StatelessWidget {
                   'Các buổi vắng',
                   style: TextStyle(
                       fontSize: FontSizes.extraLarge,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                       color: context.theme.primaryColor ?? Colors.blue),
                 ),
               ],

@@ -25,93 +25,100 @@ class ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String userRole =
-        context.read<AuthBloc>().state is AuthUserAuthenticated
-            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
-                .userData
-                .role
-                .name
-            : RoleModel.roleStudent;
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed(
-            userRole == RoleModel.roleStudent
-                ? Routes.detailUnitOfStudy
-                : isExam
-                    ? Routes.detailExamShiftTeacher
-                    : Routes.detailUnitOfStudyTeacher,
-            arguments: idUos);
-      },
-      child: Container(
-        width: double.infinity,
-        margin: EdgeInsets.only(bottom: 4),
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(245, 245, 245, 1),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-                child: Container(
-              padding: EdgeInsets.only(left: 16),
-              decoration: BoxDecoration(
-                border: Border(
-                    left: BorderSide(
-                  color: isExam
-                      ? (context.theme.red ?? Colors.red)
-                      : (context.theme.primaryColor ?? Colors.blue),
-                  width: 4,
-                )),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+      return GestureDetector(
+        onTap: () {
+          Navigator.of(context).pushNamed(
+              userRole == RoleModel.roleTeacher
+                  ? isExam
+                      ? Routes.detailExamShiftTeacher
+                      : Routes.detailUnitOfStudyTeacher
+                  : Routes.detailUnitOfStudy,
+              arguments: idUos);
+        },
+        child: Container(
+          width: double.infinity,
+          margin: EdgeInsets.only(bottom: 4),
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: context.theme.lightGrey,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: Stack(
                 children: [
-                  Text(
-                    subject,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      fontWeight: FontWeight.bold,
-                      height: 1.25,
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 4,
+                      decoration: BoxDecoration(
+                        color: isExam
+                            ? (context.theme.red ?? Colors.red)
+                            : (context.theme.primaryColor ?? Colors.blue),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          time ?? "",
+                  Container(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          subject,
                           style: TextStyle(
                             fontSize: FontSizes.medium,
-                            height: 1,
+                            fontWeight: FontWeight.bold,
+                            height: 1.25,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(width: 24),
-                      Text(
-                        room,
-                        style: TextStyle(
-                          color: Color.fromRGBO(116, 116, 116, 1),
-                          fontSize: FontSizes.medium,
-                          fontWeight: FontWeight.bold,
-                          height: 1,
+                        SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                time ?? "",
+                                style: TextStyle(
+                                  fontSize: FontSizes.medium,
+                                  height: 1,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Text(
+                              room,
+                              style: TextStyle(
+                                color: Color.fromRGBO(116, 116, 116, 1),
+                                fontSize: FontSizes.medium,
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  )
                 ],
-              ),
-            )),
-          ],
+              )),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

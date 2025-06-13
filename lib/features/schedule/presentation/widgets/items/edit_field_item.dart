@@ -7,19 +7,29 @@ class EditFieldItem extends StatelessWidget {
   final TextEditingController controller;
   final int? minLine;
   final int? maxLine;
+  final bool hasError;
   const EditFieldItem(
       {super.key,
       required this.field,
       required this.controller,
       this.minLine = 1,
-      this.maxLine = 7});
+      this.maxLine = 7,
+      this.hasError = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(field, style: TextStyle(fontSize: FontSizes.medium)),
+        Row(
+          children: [
+            Text(field, style: TextStyle(fontSize: FontSizes.medium)),
+            if (hasError)
+              Text("*",
+                  style: TextStyle(
+                      fontSize: FontSizes.medium, color: context.theme.red)),
+          ],
+        ),
         const SizedBox(height: 4),
         TextField(
           controller: controller,

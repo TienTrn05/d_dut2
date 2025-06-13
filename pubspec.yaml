@@ -46,6 +46,8 @@ dependencies:
   card_loading: ^0.3.2
   month_picker_dialog: ^6.0.2
 
+  signalr_netcore: ^1.4.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

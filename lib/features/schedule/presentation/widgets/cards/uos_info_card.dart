@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,8 +27,8 @@ class _UosInfoCardState extends State<UosInfoCard> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(245, 245, 245, 1),
-        borderRadius: BorderRadius.circular(4),
+        color: context.theme.lightGrey,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
@@ -39,6 +40,8 @@ class _UosInfoCardState extends State<UosInfoCard> {
             },
             minWidth: double.infinity,
             padding: EdgeInsets.only(top: 16, right: 16, left: 16, bottom: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Row(
               children: [
                 TweenAnimationBuilder(

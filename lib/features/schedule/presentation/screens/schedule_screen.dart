@@ -11,6 +11,7 @@ import 'package:e_dut/features/schedule/presentation/widgets/schedule_mode/day_m
 import 'package:e_dut/features/schedule/presentation/widgets/schedule_mode/semester_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -143,26 +144,39 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       VoidCallback? onPressed,
       required BuildContext context}) {
     return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected
-              ? context.theme.primaryColor ?? Colors.blue
-              : Colors.white,
-          foregroundColor: isSelected ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-          elevation: isSelected ? 2 : 0,
-          padding: EdgeInsets.all(16)),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          title,
-          style: TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600),
-        ),
-      ),
-    );
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+            backgroundColor: isSelected
+                ? context.theme.primaryColor ?? Colors.blue
+                : Colors.white,
+            foregroundColor: isSelected ? Colors.white : Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: isSelected ? 2 : 0,
+            padding: EdgeInsets.all(16)),
+        child: Row(
+          children: [
+            SvgPicture.asset(
+              title == "Theo học kì"
+                  ? "assets/icons/svg/mdi_timeline-check-outline.svg"
+                  : "assets/icons/svg/system-uicons_calendar-date.svg",
+              colorFilter: ColorFilter.mode(
+                  isSelected ? Colors.white : Colors.black, BlendMode.srcIn),
+              width: 24,
+              height: 24,
+            ),
+            SizedBox(width: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                title,
+                style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600),
+              ),
+            ),
+          ],
+        ));
   }
 }

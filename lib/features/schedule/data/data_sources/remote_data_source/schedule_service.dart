@@ -141,7 +141,7 @@ class ScheduleService {
         final responseData = response.data;
         final data = responseData['data'];
 
-        final noWeek = data['noWeek'].toString();
+        final noWeek = data['noWeek'] != null ? data['noWeek'].toString() : "";
         return noWeek;
       } else {
         throw Exception(

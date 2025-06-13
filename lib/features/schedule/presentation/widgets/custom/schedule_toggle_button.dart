@@ -22,7 +22,9 @@ class _ScheduleToggleButtonState extends State<ScheduleToggleButton> {
   void toggleSelection(String option) {
     setState(() {
       if (selectedOptions.contains(option)) {
-        selectedOptions.remove(option); // Bỏ chọn nếu đã chọn trước đó
+        if (selectedOptions.length > 1) {
+          selectedOptions.remove(option); // Bỏ chọn nếu đã chọn trước đó
+        }
       } else {
         selectedOptions.add(option); // Chọn nếu chưa được chọn
       }
@@ -41,7 +43,7 @@ class _ScheduleToggleButtonState extends State<ScheduleToggleButton> {
             elevation: 0,
             backgroundColor: selectedOptions.contains('isStudy')
                 ? context.theme.primaryColor ?? Colors.blue
-                : Color.fromRGBO(245, 245, 245, 1),
+                : context.theme.lightGrey,
             foregroundColor: selectedOptions.contains('isStudy')
                 ? Colors.white
                 : Color(0xFF747474),
@@ -59,7 +61,7 @@ class _ScheduleToggleButtonState extends State<ScheduleToggleButton> {
             elevation: 0,
             backgroundColor: selectedOptions.contains('isExam')
                 ? context.theme.red ?? Colors.red
-                : Color.fromRGBO(245, 245, 245, 1),
+                : context.theme.lightGrey,
             foregroundColor: selectedOptions.contains('isExam')
                 ? Colors.white
                 : Color(0xFF747474),

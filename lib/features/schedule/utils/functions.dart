@@ -117,6 +117,33 @@ class Functions {
     return schedules;
   }
 
+  static int _getDaysFromMonday(DateTime date) {
+    // DateTime.weekday: 1 = Monday, 2 = Tuesday, ..., 7 = Sunday
+    return (date.weekday - 1) % 7;
+  }
+
+  static String getWeekStringFromBase(DateTime selected, String noWeek,
+      DateTime? baseDateForWeek, int? baseWeekNo) {
+    if (baseDateForWeek != null && baseWeekNo != null) {
+      // Tính số ngày từ thứ 2 đầu tuần của baseDate
+      final baseMondayDays = _getDaysFromMonday(baseDateForWeek);
+      final baseMondayDate =
+          baseDateForWeek.subtract(Duration(days: baseMondayDays));
+
+      // Tính số ngày từ thứ 2 đầu tuần của selected date
+      final selectedMondayDays = _getDaysFromMonday(selected);
+      final selectedMondayDate =
+          selected.subtract(Duration(days: selectedMondayDays));
+
+      // Tính số tuần chênh lệch giữa 2 ngày thứ 2
+      final diffDays = selectedMondayDate.difference(baseMondayDate).inDays;
+      final weekOffset = (diffDays / 7).round();
+      final calculatedWeek = baseWeekNo + weekOffset;
+
+      return "$calculatedWeek";
+    }
+    return noWeek;
+  }
   // static int getSemesterOrder(String noSemester) {
   //   switch (noSemester.toLowerCase()) {
   //     case "1":

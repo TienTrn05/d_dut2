@@ -39,6 +39,8 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
             },
             minWidth: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            elevation: 0,
+            highlightElevation: 0,
             child: Row(
               children: [
                 TweenAnimationBuilder(
