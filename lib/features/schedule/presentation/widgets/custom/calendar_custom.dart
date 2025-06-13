@@ -38,15 +38,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
   void initState() {
     super.initState();
     initializeDateFormatting(); // Khởi tạo locale để tránh lỗi
-
     _loadCalendarEventsForMonth();
-
-    // if (_focusedDay.isAfter(_startdWeek)) {
-    //   int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
-    //   _currentWeek = weekDifference + 1;
-    // } else {
-    //   _currentWeek = 0;
-    // }
   }
 
   String capitalizeFirstLetter(String text) {
@@ -202,13 +194,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 onPageChanged: (focusDate) {
                   setState(() {
                     _focusedDay = focusDate;
-                    // if (focusDate.isAfter(_startdWeek)) {
-                    //   int weekDifference =
-                    //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                    //   _currentWeek = weekDifference + 1;
-                    // } else {
-                    //   _currentWeek = 0;
-                    // }
                   });
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
