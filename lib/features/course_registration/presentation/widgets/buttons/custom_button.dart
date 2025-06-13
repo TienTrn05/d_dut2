@@ -5,19 +5,22 @@ import '/common/extensions/custom_theme_extension.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final bool disabled;
+  final Function()? onPressed;
 
   const CustomButton({
     super.key,
     required this.text,
+    this.disabled = false,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      onPressed: onPressed,
+      onPressed: disabled ? null : onPressed,
       color: context.theme.primaryColor,
+      disabledColor: context.theme.grey!.withValues(alpha: 0.8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
       ),

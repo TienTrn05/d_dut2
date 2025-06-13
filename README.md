@@ -11,4 +11,6 @@
     ```
 
 2. **Generate necessary files** (for packages like freezed, json_serializable, etc.):
+    ```
     flutter pub run build_runner build
+    ```

@@ -7,10 +7,12 @@ import '../../presentation/widgets/buttons/custom_button.dart';
 
 class CourseSectionItem extends StatelessWidget {
   final CourseSection courseSection;
+  final Function()? onDetail;
 
   const CourseSectionItem({
     super.key,
     required this.courseSection,
+    this.onDetail,
   });
 
   @override
@@ -25,7 +27,7 @@ class CourseSectionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                courseSection.courseSectionCode,
+                courseSection.courseSectionIdSplited,
                 style: TextStyle(
                   fontSize: FontSizes.medium - 1,
                   fontWeight: FontWeight.bold,
@@ -64,9 +66,7 @@ class CourseSectionItem extends StatelessWidget {
               )),
               CustomButton(
                 text: "Chi tiết",
-                onPressed: () {
-                  // Handle the action when the button is pressed
-                },
+                onPressed: onDetail,
               ),
             ],
           )
