@@ -74,9 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
+              top: 24,
               bottom: 74,
             ),
             child: Column(
@@ -97,14 +95,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Navigator.of(context).pushNamed(Routes.notification);
                       });
                 }),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   height: 150,
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -218,8 +217,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                     child: Column(
                       children: [
                         Expanded(
@@ -228,13 +227,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (state is! AuthUserAuthenticated) {
                                 return GridView(
                                     shrinkWrap: true,
+                                    clipBehavior: Clip.none,
                                     gridDelegate:
                                         SliverGridDelegateWithMaxCrossAxisExtent(
                                       maxCrossAxisExtent:
                                           200, // Chiều rộng tối đa của item
                                       crossAxisSpacing: 10,
                                       mainAxisSpacing: 10,
-                                      mainAxisExtent: 150,
+                                      mainAxisExtent: 130,
                                     ),
                                     children: [
                                       FeatureCardSkeleton(),
@@ -251,13 +251,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   userRole == RoleModel.roleAdmin) {
                                 return GridView(
                                   shrinkWrap: true,
+                                  clipBehavior: Clip.none,
                                   gridDelegate:
                                       SliverGridDelegateWithMaxCrossAxisExtent(
                                     maxCrossAxisExtent:
                                         200, // Chiều rộng tối đa của item
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    mainAxisExtent: 150,
+                                    mainAxisExtent: 130,
                                   ),
                                   children: [
                                     FeatureCard(
@@ -289,6 +290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               return SizedBox(
                                   height: 400,
                                   child: GridView(
+                                    clipBehavior: Clip.none,
                                     shrinkWrap: true,
                                     gridDelegate:
                                         SliverGridDelegateWithMaxCrossAxisExtent(
@@ -296,7 +298,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           200, // Chiều rộng tối đa của item
                                       crossAxisSpacing: 10,
                                       mainAxisSpacing: 10,
-                                      mainAxisExtent: 150,
+                                      mainAxisExtent: 130,
                                     ),
                                     children: [
                                       FeatureCard(

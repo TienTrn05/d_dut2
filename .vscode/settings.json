@@ -1,4 +1,5 @@
 {
     "cmake.sourceDirectory": "D:/LEARNING/DaiHoc/DUT/dDUT/d_dut/windows/flutter",
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "cmake.ignoreCMakeListsMissing": true
 }

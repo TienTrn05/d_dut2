@@ -5,17 +5,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../common/extensions/custom_theme_extension.dart';
 
 class FeatureCard extends StatelessWidget {
-  final String iconUrl;
-  final String title;
-  final String subtitle;
-  final Function()? onTap;
-
   const FeatureCard(
       {super.key,
       required this.iconUrl,
       required this.title,
       required this.subtitle,
       this.onTap});
+
+  final Function()? onTap;
+  final String iconUrl;
+  final String subtitle;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +24,19 @@ class FeatureCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(64),
+              blurRadius: 4,
+              spreadRadius: 0,
+              offset: Offset(2, 2)
+            )
+        ],
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SvgPicture.asset(
               iconUrl,
@@ -39,7 +47,6 @@ class FeatureCard extends StatelessWidget {
             Column(
               children: [
                 SizedBox(
-                  height: 35,
                   child: Text(
                     title,
                     maxLines: 2,
@@ -51,9 +58,8 @@ class FeatureCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                // const SizedBox(height: 5),
+                const SizedBox(height: 5),
                 SizedBox(
-                  height: 30,
                   child: Text(
                     subtitle,
                     maxLines: 2,

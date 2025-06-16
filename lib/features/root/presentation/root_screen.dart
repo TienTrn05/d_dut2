@@ -74,7 +74,7 @@ class _MainViewState extends State<_MainView> {
               height: 50,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(16)),
+                borderRadius: BorderRadius.all(Radius.circular(999)),
               ),
               child:
                   BlocBuilder<MainBloc, MainState>(builder: (context, state) {
