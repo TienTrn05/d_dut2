@@ -1,3 +1,4 @@
+import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
+
 class Routes {
   static const String root = "/";
   static const String auth = "/auth";
@@ -20,6 +22,7 @@ class Routes {
   static const String detailExamShiftTeacher = "/detailExamShiftTeacher";
   static const String courseRegistration = "/courseRegistration";
   static const String courseRegistrationGrade = "/courseRegistrationGrade";
+  static const String allCommunityActivities = "/allCommunityActivities";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -68,10 +71,14 @@ class Routes {
           builder: (context) => const CourseRegistrationScreen(),
         );
 
-        case courseRegistrationGrade:
+      case courseRegistrationGrade:
         return MaterialPageRoute(
           builder: (context) => const GradeScreen(),
         );
+
+      case allCommunityActivities:
+        return MaterialPageRoute(
+            builder: (context) => const CommunityActivitiesScreen());
 
       default:
         return MaterialPageRoute(

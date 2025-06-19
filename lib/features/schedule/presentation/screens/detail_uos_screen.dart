@@ -2,7 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_info_tab.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_info_tab.dart';
 import 'package:flutter/material.dart';
 
 class DetailUnitOfStudy extends StatelessWidget {

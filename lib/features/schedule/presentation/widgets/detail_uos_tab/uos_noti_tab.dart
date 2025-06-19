@@ -1,6 +1,6 @@
 import 'package:e_dut/features/notification/presentation/widgets/notification_card.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
-import 'package:e_dut/features/schedule/utils/functions.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 
 class UosNotiTab extends StatelessWidget {

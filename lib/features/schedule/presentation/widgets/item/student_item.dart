@@ -1,6 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/cards/absents_card.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/card/absents_card.dart';
 import 'package:flutter/material.dart';
 
 class StudentItem extends StatelessWidget {

@@ -4,7 +4,7 @@ import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/data/model/exam_shift_model.dart';
-import 'package:e_dut/features/schedule/utils/functions.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,6 +38,7 @@ class UnitOfStudyItem extends StatelessWidget {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      // logger.i("User Role: $userRole");
       return GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(

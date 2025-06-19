@@ -27,16 +27,15 @@ class FeatureCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(64),
-              blurRadius: 4,
-              spreadRadius: 0,
-              offset: Offset(2, 2)
-            )
-        ],
+                color: Colors.black.withAlpha(64),
+                blurRadius: 4,
+                spreadRadius: 0,
+                offset: Offset(2, 2))
+          ],
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(
               iconUrl,
@@ -47,6 +46,7 @@ class FeatureCard extends StatelessWidget {
             Column(
               children: [
                 SizedBox(
+                  // height: 35,
                   child: Text(
                     title,
                     maxLines: 2,
@@ -60,6 +60,7 @@ class FeatureCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 SizedBox(
+                  height: 30,
                   child: Text(
                     subtitle,
                     maxLines: 2,

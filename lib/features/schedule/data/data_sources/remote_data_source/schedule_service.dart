@@ -4,7 +4,7 @@ import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
-import 'package:e_dut/features/schedule/utils/functions.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 

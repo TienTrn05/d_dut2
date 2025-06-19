@@ -209,7 +209,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                             );
                           } else {
-                            return Text("loading");
+                            return const SizedBox.shrink();
                           }
                         },
                       )
@@ -217,146 +217,130 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       children: [
-                        Expanded(
-                          child: BlocBuilder<AuthBloc, AuthState>(
-                            builder: (context, state) {
-                              if (state is! AuthUserAuthenticated) {
-                                return GridView(
-                                    shrinkWrap: true,
-                                    clipBehavior: Clip.none,
-                                    gridDelegate:
-                                        SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent:
-                                          200, // Chiều rộng tối đa của item
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      mainAxisExtent: 130,
-                                    ),
-                                    children: [
-                                      FeatureCardSkeleton(),
-                                      FeatureCardSkeleton(),
-                                    ]);
-                              }
+                        BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, state) {
+                            List<Widget> gridItems = [];
 
+                            if (state is! AuthUserAuthenticated) {
+                              gridItems = [
+                                FeatureCardSkeleton(),
+                                FeatureCardSkeleton(),
+                              ];
+                            } else {
                               final List<ScopeModel> scopes =
                                   state.userData.scopes;
-
                               final String userRole = state.userData.role.name;
 
                               if (userRole == RoleModel.roleTeacher ||
                                   userRole == RoleModel.roleAdmin) {
-                                return GridView(
-                                  shrinkWrap: true,
-                                  clipBehavior: Clip.none,
-                                  gridDelegate:
-                                      SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent:
-                                        200, // Chiều rộng tối đa của item
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    mainAxisExtent: 130,
+                                gridItems = [
+                                  FeatureCard(
+                                    iconUrl:
+                                        "assets/icons/svg/solar_calendar-broken.svg",
+                                    title: "Thời khóa biểu",
+                                    subtitle: "Tra cứu \nthời khóa biểu",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, Routes.schedule));
+                                    },
                                   ),
-                                  children: [
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_calendar-broken.svg",
-                                      title: "Thời khóa biểu",
-                                      subtitle: "Tra cứu thời khóa biểu",
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.schedule));
-                                      },
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_calendar-broken.svg",
-                                      title: "Lịch tuần",
-                                      subtitle: "Lên lịch họp",
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, "/calendar"));
-                                      },
-                                    ),
-                                  ],
-                                );
+                                  FeatureCard(
+                                    iconUrl:
+                                        "assets/icons/svg/solar_calendar-broken.svg",
+                                    title: "Lịch tuần",
+                                    subtitle: "Lên lịch họp",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, "/calendar"));
+                                    },
+                                  ),
+                                ];
+                              } else {
+                                gridItems = [
+                                  FeatureCard(
+                                    iconUrl:
+                                        "assets/icons/svg/solar_calendar-broken.svg",
+                                    title: "Thời khóa biểu",
+                                    subtitle: "Xem lịch học & thi",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, Routes.schedule));
+                                    },
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/mage_goals.svg",
+                                    title: "Kết quả học tập",
+                                    subtitle: "Tra cứu \nkết quả học tập",
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/tabler_coin.svg",
+                                    title: "Học phí",
+                                    subtitle: "Học phí",
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
+                                    title: "Học phần",
+                                    subtitle: "Đăng ký học phần",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(scopes,
+                                              Routes.courseRegistration));
+                                    },
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
+                                    title: "MS Team tool",
+                                    subtitle: "Học trực tuyến",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, Routes.msteamtool));
+                                    },
+                                  ),
+                                  FeatureCard(
+                                    iconUrl:
+                                        "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
+                                    title: "Hoạt động \ncộng đồng",
+                                    subtitle:
+                                        "Theo dõi các \nhoạt động cộng đồng",
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          Routes.allCommunityActivities);
+                                    },
+                                  ),
+                                ];
                               }
+                            }
 
-                              return SizedBox(
-                                  height: 400,
-                                  child: GridView(
-                                    clipBehavior: Clip.none,
-                                    shrinkWrap: true,
-                                    gridDelegate:
-                                        SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent:
-                                          200, // Chiều rộng tối đa của item
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      mainAxisExtent: 130,
-                                    ),
-                                    children: [
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/solar_calendar-broken.svg",
-                                        title: "Thời khóa biểu",
-                                        subtitle: "Xem lịch học & thi",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                              DashboardNavigateRequested(
-                                                  scopes, Routes.schedule));
-                                        },
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/mage_goals.svg",
-                                        title: "Kết quả học tập",
-                                        subtitle: "Tra cứu kết quả học tập",
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/tabler_coin.svg",
-                                        title: "Học phí",
-                                        subtitle: "Học phí",
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/carbon_book.svg",
-                                        title: "Học phần",
-                                        subtitle: "Đăng ký học phần",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                    scopes, Routes.courseRegistration),
-                                              );
-                                        },
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/carbon_book.svg",
-                                        title: "MS Team tool",
-                                        subtitle: "Học trực tuyến",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                    scopes, Routes.msteamtool),
-                                              );
-                                        },
-                                      ),
-                                    ],
-                                  ));
-                            },
-                          ),
+                            return GridView(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              clipBehavior: Clip.none,
+                              gridDelegate:
+                                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 200,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                mainAxisExtent: 150,
+                              ),
+                              children: gridItems,
+                            );
+                          },
                         ),
+                        const SizedBox(height: 12)
                       ],
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),

@@ -145,7 +145,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25), // Màu của shadow
+            color: Colors.black.withAlpha(64), // Màu của shadow
             spreadRadius: 0, // Độ lan của shadow
             blurRadius: 12, // Độ mờ của shadow
             offset: Offset(0, 4), // Độ lệch (X, Y)

@@ -2,7 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/items/student_item.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
