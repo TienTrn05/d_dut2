@@ -37,6 +37,9 @@ class ActivityModel {
       required this.status});
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
+    final subJson = json['subcategory'] ?? {};
+    final categoryId = subJson['category']?['id']?.toString() ?? '';
+
     return ActivityModel(
         id: json['id'],
         name: json['name'],
@@ -52,28 +55,28 @@ class ActivityModel {
         startRegistration: DateTime.parse(json['startRegistration']),
         endRegistration: DateTime.parse(json['endRegistration']),
         isExternal: json['isExternal'],
-        subcategory: SubCategoryModel.fromJson(json['subcategory']),
+        subcategory: SubCategoryModel.fromJson(subJson, categoryId: categoryId),
         status: json['status']);
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'score': score,
-      'description': description,
-      'image': image,
-      'maxParticipants': maxParticipants,
-      'participants': participants,
-      'address': address,
-      'organization': organization,
-      'startDate': startDate,
-      'endDate': endDate,
-      'startRegistration': startRegistration,
-      'endRegistration': endRegistration,
-      'isExternal': isExternal,
-      'subcategory': subcategory.toJson(),
-      'status': status
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'name': name,
+  //     'score': score,
+  //     'description': description,
+  //     'image': image,
+  //     'maxParticipants': maxParticipants,
+  //     'participants': participants,
+  //     'address': address,
+  //     'organization': organization,
+  //     'startDate': startDate,
+  //     'endDate': endDate,
+  //     'startRegistration': startRegistration,
+  //     'endRegistration': endRegistration,
+  //     'isExternal': isExternal,
+  //     'subcategory': subcategory.toJson(),
+  //     'status': status
+  //   };
+  // }
 }

@@ -1,38 +1,38 @@
-import 'package:e_dut/features/community_activity/data/model/category_model.dart';
-
 class SubCategoryModel {
   final String id;
   final String name;
   final int minScore;
   final int maxScore;
-  final CategoryModel? category;
+  final String categoryId;
 
   SubCategoryModel({
     required this.id,
     required this.name,
     required this.minScore,
     required this.maxScore,
-    required this.category,
+    required this.categoryId,
   });
 
-  factory SubCategoryModel.fromJson(Map<String, dynamic> json) {
+  factory SubCategoryModel.fromJson(Map<String, dynamic> json,
+      {required String categoryId}) {
     return SubCategoryModel(
-        id: json['id'],
-        name: json['name'],
-        minScore: json['minScore'],
-        maxScore: json['maxScore'],
-        category: json['category'] != null
-            ? CategoryModel.fromJson(json['category'])
-            : null);
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      minScore: json['minScore'] is int
+          ? json['minScore']
+          : int.tryParse(json['minScore']?.toString() ?? '0') ?? 0,
+      maxScore: json['maxScore'] is int
+          ? json['maxScore']
+          : int.tryParse(json['maxScore']?.toString() ?? '0') ?? 0,
+      categoryId: categoryId,
+    );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'minScore': minScore,
-      'maxScore': maxScore,
-      'category': category?.toJson()
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'minScore': minScore,
+        'maxScore': maxScore,
+        'categoryId': categoryId,
+      };
 }

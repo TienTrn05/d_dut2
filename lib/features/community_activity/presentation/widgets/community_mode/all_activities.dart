@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/activity_card.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/custom/date_picker.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
@@ -21,8 +24,11 @@ class AllActivities extends StatefulWidget {
 }
 
 class _AllActivitiesState extends State<AllActivities> {
+  List<ActivityModel> activities = [];
+
   bool _isInitialized = false;
-  final TextEditingController _searchController = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   DateTime? endDateFilter;
   final List<String> scopes = [
@@ -45,21 +51,203 @@ class _AllActivitiesState extends State<AllActivities> {
 
   RangeValues _currentRange = const RangeValues(0, 30);
 
-  final List<String> categoryFilters = [
-    "Lĩnh vực công tác xã hội, tình nguyện, nhân đạo, từ thiện",
-    "Lĩnh vực các hoạt động mang tính học thuật",
-    "Công tác giáo dục",
-    "Tổ chức phong trào hành động cách mạng của thanh niên",
-    "Các chương trình đồng hành với thanh niên",
-    "Công tác quốc tế thanh niên",
-    "Công tác xây dựng tổ chức Đoàn, mở rộng mặt trận đoàn kết"
-  ];
-  Set<String> selectedCategoryFilters = {};
+  List<CategoryModel> categoryFilters = [];
+  Set<CategoryModel> selectedCategoryFilters = {};
   bool _isCategoryListVisible = false;
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 800), () {
+      final keyword = _searchController.text.trim();
+      context.read<AllActivitiesBloc>().add(
+            LoadActivities(
+              token: widget.authToken,
+              keyword: keyword,
+            ),
+          );
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final bloc = context.read<AllActivitiesBloc>();
+        bloc.add(LoadActivities(
+          token: widget.authToken,
+          keyword: _searchController.text.trim(),
+        ));
+      });
+      _isInitialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildContent();
+  }
+
+  Widget _buildContent() {
+    return SafeArea(
+      child: Column(
+        children: [
+          /// 🔹 Phần loading indicator (nằm cố định đầu màn hình)
+          BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
+            buildWhen: (previous, current) =>
+                current is AllActivitiesLoading ||
+                current is AllActivitiesLoaded,
+            builder: (context, state) {
+              if (state is AllActivitiesLoading) {
+                return CustomLoadingIndicator.primary(); // Hiện ở trên cùng
+              }
+              return const SizedBox
+                  .shrink(); // Không chiếm không gian nếu không loading
+            },
+          ),
+
+          /// 🔹 Phần nội dung có thể cuộn
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// Ô tìm kiếm
+                  TextField(
+                    controller: _searchController,
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: context.theme.grey,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      hintText: "Tìm kiếm ...",
+                      hintStyle: TextStyle(
+                        fontSize: FontSizes.medium,
+                        color: context.theme.grey,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/svg/tabler_filter-search.svg",
+                          width: 18,
+                          height: 18,
+                          colorFilter: ColorFilter.mode(
+                            context.theme.grey ?? Colors.grey,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        onPressed: () => _showFilterModal(context),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// Bộ lọc scope
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: scopes.map((label) {
+                        final bool isSelected = selectedFilter == label;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedFilter = label;
+                              });
+                            },
+                            style: TextButton.styleFrom(
+                              textStyle:
+                                  const TextStyle(fontWeight: FontWeight.w600),
+                              backgroundColor: isSelected
+                                  ? context.theme.primaryColor
+                                  : Colors.white,
+                              foregroundColor: isSelected
+                                  ? Colors.white
+                                  : context.theme.grey,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            child: Text(label),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 Danh sách hoạt động
+                  BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
+                    buildWhen: (previous, current) =>
+                        current is AllActivitiesLoaded ||
+                        current is AllActivitiesError,
+                    builder: (context, state) {
+                      if (state is AllActivitiesLoaded) {
+                        activities = state.activities;
+                        categoryFilters = state.categories;
+                        return Column(
+                          children: activities
+                              .map((activity) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: ActivityCard(activity: activity),
+                                  ))
+                              .toList(),
+                        );
+                      } else if (state is AllActivitiesError) {
+                        return const Center(
+                            child: Text(
+                                'Không thể tải dữ liệu hoạt động cộng đồng'));
+                      } else {
+                        return const SizedBox
+                            .shrink(); // Tránh flicker khi loading
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showFilterModal(BuildContext context) {
     Set<String> localSelectedState = {...selectedStateFilters};
-    Set<String> localSelectedCategory = {...selectedCategoryFilters};
+    Set<CategoryModel> localSelectedCategory = {...selectedCategoryFilters};
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -354,7 +542,7 @@ class _AllActivitiesState extends State<AllActivities> {
   }
 
   Widget _categoryFilter(
-      Set<String> localSelectedCategory, StateSetter setModalState) {
+      Set<CategoryModel> localSelectedCategory, StateSetter setModalState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -391,7 +579,7 @@ class _AllActivitiesState extends State<AllActivities> {
                         child: Wrap(
                           spacing: 5,
                           runSpacing: 5,
-                          children: localSelectedCategory.map((label) {
+                          children: localSelectedCategory.map((category) {
                             return Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
@@ -404,7 +592,7 @@ class _AllActivitiesState extends State<AllActivities> {
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      label,
+                                      category.name,
                                       style: TextStyle(
                                         color: context.theme.primaryColor,
                                         fontSize: FontSizes.small,
@@ -418,7 +606,7 @@ class _AllActivitiesState extends State<AllActivities> {
                                   GestureDetector(
                                     onTap: () {
                                       setModalState(() {
-                                        localSelectedCategory.remove(label);
+                                        localSelectedCategory.remove(category);
                                       });
                                     },
                                     child: Icon(
@@ -451,7 +639,7 @@ class _AllActivitiesState extends State<AllActivities> {
   }
 
   Widget _buildCategoryList(
-      Set<String> localSelectedCategory, StateSetter setModalState) {
+      Set<CategoryModel> localSelectedCategory, StateSetter setModalState) {
     return Container(
       height: 140,
       margin: const EdgeInsets.only(top: 10),
@@ -469,21 +657,21 @@ class _AllActivitiesState extends State<AllActivities> {
   }
 
   List<Widget> buildCategoryFilterButtons(
-      Set<String> localSelectedCategory, StateSetter setModalState) {
+      Set<CategoryModel> localSelectedCategory, StateSetter setModalState) {
     List<Widget> widgets = [];
 
     for (int i = 0; i < categoryFilters.length; i++) {
-      final label = categoryFilters[i];
-      final bool isSelected = localSelectedCategory.contains(label);
+      final category = categoryFilters[i];
+      final bool isSelected = localSelectedCategory.contains(category);
 
       widgets.add(
         TextButton(
           onPressed: () {
             setModalState(() {
               if (isSelected) {
-                localSelectedCategory.remove(label);
+                localSelectedCategory.remove(category);
               } else {
-                localSelectedCategory.add(label);
+                localSelectedCategory.add(category);
               }
             });
           },
@@ -501,7 +689,7 @@ class _AllActivitiesState extends State<AllActivities> {
           ),
           child: Row(
             children: [
-              Expanded(child: Text(label, softWrap: true)),
+              Expanded(child: Text(category.name, softWrap: true)),
               if (isSelected)
                 Icon(Icons.check, color: context.theme.primaryColor, size: 12),
             ],
@@ -516,139 +704,5 @@ class _AllActivitiesState extends State<AllActivities> {
     }
 
     return widgets;
-  }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   if (!_isInitialized) {
-  //     _bloc = context.read<AllActivitiesBloc>();
-  //     _bloc.add(LoadActivities(
-  //       token: widget.authToken,
-  //       keyword: _searchController.text.trim(),
-  //     ));
-  //     _isInitialized = true;
-  //   }
-  // }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isInitialized) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final bloc = context.read<AllActivitiesBloc>();
-        bloc.add(LoadActivities(
-          token: widget.authToken,
-          keyword: _searchController.text.trim(),
-        ));
-      });
-      _isInitialized = true;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
-        builder: (context, state) {
-      if (state is AllActivitiesLoading) {
-        return CustomLoadingIndicator.primary();
-      } else if (state is AllActivitiesLoaded) {
-        return _buildContent(state.activities);
-      } else {
-        return const Center(
-            child: Text('Không thể tải dữ liệu hoạt động cộng đồng'));
-      }
-    });
-  }
-
-  Widget _buildContent(List<ActivityModel> state) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              style: TextStyle(
-                fontSize: FontSizes.medium,
-                color: context.theme.grey,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                hintText: "Tìm kiếm ...",
-                hintStyle: TextStyle(
-                  fontSize: FontSizes.medium,
-                  color: context.theme.grey,
-                ),
-                suffixIcon: IconButton(
-                  icon: SvgPicture.asset(
-                    "assets/icons/svg/tabler_filter-search.svg",
-                    width: 18,
-                    height: 18,
-                    colorFilter: ColorFilter.mode(
-                      context.theme.grey ?? Colors.grey,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  onPressed: () => _showFilterModal(context),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: scopes.map((label) {
-                  final bool isSelected = selectedFilter == label;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          selectedFilter = label;
-                        });
-                      },
-                      style: TextButton.styleFrom(
-                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                        backgroundColor: isSelected
-                            ? context.theme.primaryColor
-                            : Colors.white,
-                        foregroundColor:
-                            isSelected ? Colors.white : context.theme.grey,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                      child: Text(label),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ...state.map((activity) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: ActivityCard(activity: activity),
-                )),
-          ],
-        ),
-      ),
-    );
   }
 }

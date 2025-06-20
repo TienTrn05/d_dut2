@@ -18,6 +18,7 @@ class AllActivitiesError extends AllActivitiesState {
 
 class AllActivitiesLoaded extends AllActivitiesState {
   final List<ActivityModel> activities;
+  final List<CategoryModel> categories;
 
-  AllActivitiesLoaded(this.activities);
+  AllActivitiesLoaded(this.activities, this.categories);
 }

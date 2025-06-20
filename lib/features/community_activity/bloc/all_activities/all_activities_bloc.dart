@@ -1,4 +1,5 @@
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,10 +21,10 @@ class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
     try {
       final token = event.token;
       final keyword = event.keyword;
-
+      final categories = await _repository.getCategories(token, keyword);
       final activities = await _repository.getActivities(token, keyword);
 
-      emit(AllActivitiesLoaded(activities));
+      emit(AllActivitiesLoaded(activities, categories));
     } catch (e) {
       emit(AllActivitiesError(e.toString()));
     }
