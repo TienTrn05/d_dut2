@@ -1,6 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
+import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/constant/activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/status_label.dart';
@@ -115,40 +116,39 @@ class DetailActivityScreen extends StatelessWidget {
                     title: "Ngày diễn ra",
                     content:
                         "Bắt đầu: ${Functions.formatDate(activity.startDate)} \nKết thúc: ${Functions.formatDate(activity.endDate)}",
-                    iconPath: "assets/icons/svg/solar_calendar-bold.svg",
+                    iconPath: ActivityIconPath.calendar,
                   ),
                   const SizedBox(height: 10),
                   ActivityDetailItem(
                     title: "Ngày đăng ký",
                     content:
                         "Bắt đầu: ${Functions.formatDate(activity.startRegistration)} \nKết thúc: ${Functions.formatDate(activity.endRegistration)}",
-                    iconPath:
-                        "assets/icons/svg/material-symbols_app-registration-rounded.svg",
+                    iconPath: ActivityIconPath.registration,
                   ),
                   const SizedBox(height: 10),
                   ActivityDetailItem(
                     title: "Địa điểm",
                     content: activity.address,
-                    iconPath: "assets/icons/svg/weui_location-filled.svg",
+                    iconPath: ActivityIconPath.location,
                   ),
                   const SizedBox(height: 10),
                   ActivityDetailItem(
                     title: "Người tham gia",
                     content:
                         "Tối đa: ${activity.maxParticipants} \nĐã đăng ký: ${activity.participants}",
-                    iconPath: "assets/icons/svg/heroicons_user-group-solid.svg",
+                    iconPath: ActivityIconPath.participants,
                   ),
                   const SizedBox(height: 10),
                   ActivityDetailItem(
                     title: "Điểm số",
                     content: activity.score.toString(),
-                    iconPath: "assets/icons/svg/mingcute_star-fill.svg",
+                    iconPath: ActivityIconPath.score,
                   ),
                   const SizedBox(height: 10),
                   ActivityDetailItem(
                     title: "Bên ngoài",
                     content: activity.isExternal ? "Có" : "Không",
-                    iconPath: "assets/icons/svg/ep_circle-check-filled.svg",
+                    iconPath: ActivityIconPath.external,
                   ),
                 ],
               ),

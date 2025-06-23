@@ -157,7 +157,7 @@ class _AllActivitiesState extends State<AllActivities> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -253,7 +253,11 @@ class _AllActivitiesState extends State<AllActivities> {
                           children: filteredActivities
                               .map((activity) => Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: ActivityCard(activity: activity),
+                                    child: ActivityCard(
+                                      activity: activity,
+                                      authToken: widget.authToken,
+                                      keyword: _searchController.text.trim(),
+                                    ),
                                   ))
                               .toList(),
                         );
@@ -674,9 +678,6 @@ class _AllActivitiesState extends State<AllActivities> {
       height: 140,
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-          color: context.theme.lightGrey,
-          borderRadius: BorderRadius.circular(4)),
       child: SingleChildScrollView(
         child: Column(
           children:

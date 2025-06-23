@@ -11,3 +11,12 @@ class LoadActivities extends AllActivitiesEvent {
 
   LoadActivities({required this.token, required this.keyword});
 }
+
+class RegistActivity extends AllActivitiesEvent {
+  final String token;
+  final String keyword;
+  final String idActivity;
+
+  RegistActivity(
+      {required this.token, required this.keyword, required this.idActivity});
+}

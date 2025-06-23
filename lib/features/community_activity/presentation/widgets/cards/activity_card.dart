@@ -1,7 +1,10 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
+import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/constant/activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/status_label.dart';
@@ -12,10 +15,29 @@ import 'package:flutter_svg/svg.dart';
 
 class ActivityCard extends StatelessWidget {
   final ActivityModel activity;
+  final String authToken;
+  final String keyword;
 
-  const ActivityCard({super.key, required this.activity});
+  const ActivityCard(
+      {super.key,
+      required this.activity,
+      required this.authToken,
+      required this.keyword});
+
   @override
   Widget build(BuildContext context) {
+    void registActivity() {
+      dialog.CustomAlertDialog.showCustomDialog(
+          context,
+          "Xác nhận đăng ký",
+          "Bạn có chắc chắn đăng ký tham gia hoạt động \"${activity.name}\"?",
+          textConfirm: "Đăng ký",
+          dialog.AlertType.confirm, onConfirm: () {
+        context.read<AllActivitiesBloc>().add(RegistActivity(
+            token: authToken, keyword: keyword, idActivity: activity.id));
+      });
+    }
+
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
       // final String userRole = authState is AuthUserAuthenticated
       //     ? authState.userData.role.name
@@ -100,7 +122,7 @@ class ActivityCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SvgPicture.asset(
-                                "assets/icons/svg/mingcute_star-fill.svg",
+                                ActivityIconPath.score,
                                 colorFilter: ColorFilter.mode(
                                     Color(0XFFFFFF01), BlendMode.srcIn),
                                 width: 13,
@@ -139,7 +161,7 @@ class ActivityCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          "assets/icons/svg/heroicons_user-group-solid.svg",
+                          ActivityIconPath.participants,
                           colorFilter: ColorFilter.mode(
                               context.theme.grey ?? Colors.grey,
                               BlendMode.srcIn),
@@ -162,7 +184,7 @@ class ActivityCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          "assets/icons/svg/solar_calendar-bold.svg",
+                          ActivityIconPath.calendar,
                           colorFilter: ColorFilter.mode(
                               context.theme.grey ?? Colors.grey,
                               BlendMode.srcIn),
@@ -185,7 +207,7 @@ class ActivityCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                          "assets/icons/svg/weui_location-filled.svg",
+                          ActivityIconPath.location,
                           colorFilter: ColorFilter.mode(
                               context.theme.grey ?? Colors.grey,
                               BlendMode.srcIn),
@@ -219,7 +241,7 @@ class ActivityCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(999),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: registActivity,
                           child: Text(
                             "Đăng ký ngay",
                           ),

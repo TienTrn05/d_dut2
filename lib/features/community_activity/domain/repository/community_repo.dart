@@ -22,4 +22,8 @@ class CommunityRepository {
   Future<UserInfoModel> getUserInfo(String token) {
     return _communityService.getUserInfo(token);
   }
+
+  Future<bool> registActivity(String token, String idActivity) {
+    return _communityService.registActivity(token, idActivity);
+  }
 }

@@ -12,6 +12,7 @@ class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
 
   AllActivitiesBloc(this._repository) : super(AllActivitiesInitial()) {
     on<LoadActivities>(_onLoadAllActivities);
+    on<RegistActivity>(_onRegistActivity);
   }
 
   Future<void> _onLoadAllActivities(
@@ -25,6 +26,28 @@ class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
       final activities = await _repository.getActivities(token, keyword);
 
       emit(AllActivitiesLoaded(activities, categories));
+    } catch (e) {
+      emit(AllActivitiesError(e.toString()));
+    }
+  }
+
+  Future<void> _onRegistActivity(
+      RegistActivity event, Emitter<AllActivitiesState> emit) async {
+    emit(AllActivitiesLoading());
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+      final idActivity = event.idActivity;
+
+      final isRegistSuccess =
+          await _repository.registActivity(token, idActivity);
+
+      if (isRegistSuccess) {
+        final categories = await _repository.getCategories(token, keyword);
+        final activities = await _repository.getActivities(token, keyword);
+
+        emit(AllActivitiesLoaded(activities, categories));
+      }
     } catch (e) {
       emit(AllActivitiesError(e.toString()));
     }

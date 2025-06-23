@@ -88,4 +88,19 @@ class CommunityService {
       rethrow;
     }
   }
+
+  Future<bool> registActivity(String token, String idActivity) async {
+    try {
+      final response =
+          await _dio.post("$_url/api/activities/$idActivity/register",
+              options: Options(headers: {
+                "Authorization": "Bearer $token",
+              }));
+
+      return response.statusCode == 201 && response.data['success'] == true;
+    } catch (e) {
+      logger.e("Error regist activity: $e");
+      rethrow;
+    }
+  }
 }
