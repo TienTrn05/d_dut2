@@ -6,12 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 class DatePicker extends StatefulWidget {
-  const DatePicker(
-      {super.key,
-      required this.initDate,
-      required this.onValueChange,
-      this.minSelectableDate});
-  final DateTime initDate;
+  const DatePicker({
+    super.key,
+    required this.onValueChange,
+    this.initDate,
+    this.minSelectableDate,
+  });
+
+  final DateTime? initDate;
   final Function(DateTime) onValueChange;
   final DateTime? minSelectableDate;
 
@@ -20,10 +22,10 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  late DateTime _focusedDay; // Tháng hiện tại đang xem
-  late DateTime _selectedDay; // Lưu ngày được chọn
+  late DateTime _focusedDay;
+  DateTime? _selectedDay;
 
-  List<DateTime> events = [
+  final List<DateTime> events = [
     DateTime.utc(2025, 3, 10),
     DateTime.utc(2025, 3, 15),
     DateTime.utc(2025, 3, 20),
@@ -32,30 +34,24 @@ class _DatePickerState extends State<DatePicker> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting(); // Khởi tạo locale để tránh lỗi
-    _focusedDay = widget.initDate;
+    initializeDateFormatting();
+    _focusedDay = widget.initDate ?? DateTime.now();
     _selectedDay = widget.initDate;
-  }
-
-  String capitalizeFirstLetter(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
   }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(64), // Màu của shadow
-              spreadRadius: 0, // Độ lan của shadow
-              blurRadius: 12, // Độ mờ của shadow
-              offset: Offset(0, 4), // Độ lệch (X, Y)
+              color: Colors.black.withAlpha(64),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -65,22 +61,12 @@ class _DatePickerState extends State<DatePicker> {
             TableCalendar(
               locale: 'vi',
               focusedDay: _focusedDay,
-              onPageChanged: (focusDate) {
-                setState(() {
-                  _focusedDay = focusDate;
-                });
-              },
-              firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
-              availableCalendarFormats: {
-                CalendarFormat.month: 'Month',
-                CalendarFormat.week: 'Week',
-              },
+              firstDay: DateTime.utc(2010, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
               calendarFormat: CalendarFormat.month,
               startingDayOfWeek: StartingDayOfWeek.monday,
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day); // Kiểm tra ngày được chọn
-              },
+              selectedDayPredicate: (day) =>
+                  _selectedDay != null && isSameDay(_selectedDay, day),
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   _selectedDay = selectedDay;
@@ -88,51 +74,54 @@ class _DatePickerState extends State<DatePicker> {
                 });
                 widget.onValueChange(selectedDay);
               },
+              onPageChanged: (focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay;
+                });
+              },
               enabledDayPredicate: (day) {
                 if (widget.minSelectableDate == null) return true;
                 return !day.isBefore(widget.minSelectableDate!);
               },
               headerStyle: HeaderStyle(
                 titleCentered: true,
-                titleTextStyle: TextStyle(
+                formatButtonVisible: false,
+                titleTextStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color.fromRGBO(42, 116, 189, 1),
                   fontSize: FontSizes.medium,
                 ),
                 titleTextFormatter: (date, locale) {
-                  String monthNumber =
-                      DateFormat.M(locale).format(date); // Lấy số tháng
-                  String formatted = "Tháng $monthNumber, ${date.year}";
-
-                  return formatted;
+                  final month = DateFormat.M(locale).format(date);
+                  return 'Tháng $month, ${date.year}';
                 },
-                formatButtonVisible: false,
               ),
-              daysOfWeekStyle: DaysOfWeekStyle(
+              daysOfWeekStyle: const DaysOfWeekStyle(
                 weekdayStyle: TextStyle(fontSize: FontSizes.small),
                 weekendStyle: TextStyle(fontSize: FontSizes.small),
               ),
               calendarStyle: CalendarStyle(
-                defaultTextStyle: TextStyle(fontSize: FontSizes.medium),
-                weekendTextStyle: TextStyle(fontSize: FontSizes.medium),
+                defaultTextStyle: const TextStyle(fontSize: FontSizes.medium),
+                weekendTextStyle: const TextStyle(fontSize: FontSizes.medium),
                 outsideTextStyle: TextStyle(
-                    fontSize: FontSizes.small, color: context.theme.grey),
-                cellMargin: EdgeInsets.all(0),
-                todayDecoration: BoxDecoration(
-                  color:
-                      Color.fromRGBO(245, 245, 245, 1), // Màu nền ngày hôm nay
+                  fontSize: FontSizes.small,
+                  color: context.theme.grey,
+                ),
+                cellMargin: EdgeInsets.zero,
+                todayDecoration: const BoxDecoration(
+                  color: Color.fromRGBO(245, 245, 245, 1),
                   shape: BoxShape.circle,
                 ),
-                todayTextStyle: TextStyle(
-                    color: Colors.black, // Màu chữ của ngày hôm nay
-                    fontWeight: FontWeight.bold,
-                    fontSize: FontSizes.small),
-                selectedDecoration: BoxDecoration(
-                  color: Color.fromRGBO(
-                      203, 221, 235, 1), // Màu nền ngày được chọn
+                todayTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: FontSizes.small,
+                ),
+                selectedDecoration: const BoxDecoration(
+                  color: Color.fromRGBO(203, 221, 235, 1),
                   shape: BoxShape.circle,
                 ),
-                selectedTextStyle: TextStyle(
+                selectedTextStyle: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
@@ -147,24 +136,23 @@ class _DatePickerState extends State<DatePicker> {
                   return Center(
                     child: Text(
                       text,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          height: 1),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        height: 1,
+                      ),
                     ),
                   );
                 },
                 markerBuilder: (context, date, eventsList) {
-                  bool hasEvent =
-                      events.any((eventDate) => isSameDay(eventDate, date));
+                  final hasEvent = events.any((e) => isSameDay(e, date));
                   if (hasEvent) {
                     return Positioned(
                       bottom: 12,
                       child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 2),
                         width: 5,
                         height: 5,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color.fromRGBO(42, 116, 189, 1),
                         ),

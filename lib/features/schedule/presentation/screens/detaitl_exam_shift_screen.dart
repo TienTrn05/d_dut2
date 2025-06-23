@@ -1,12 +1,11 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.dart';
 import 'package:flutter/material.dart';
-import 'package:e_dut/common/routes/routes.dart';
-import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 
 class DetaitlExamShiftScreen extends StatefulWidget {
   const DetaitlExamShiftScreen({super.key});
@@ -22,35 +21,7 @@ class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
       length: 2,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: context.theme.primaryColor,
-          elevation: 0, // Xóa bóng dưới AppBar
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context); // Quay lại màn hình trước
-              },
-            ),
-          ),
-          title: Text(
-            'Thông tin chi tiết ca thi',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: FontSizes.medium,
-            ),
-          ),
-          centerTitle: true,
-          actions: [
-            NotificationButton(
-              notificationCount: 2,
-              onTap: () =>
-                  {Navigator.of(context).pushNamed(Routes.notification)},
-            ),
-          ],
-        ),
+        appBar: CustomAppbar(label: "Thông tin chi tiết ca thi"),
         body: Container(
           margin: EdgeInsets.all(24),
           child: Column(

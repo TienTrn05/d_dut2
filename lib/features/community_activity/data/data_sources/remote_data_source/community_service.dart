@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -27,7 +28,6 @@ class CommunityService {
         final List<dynamic> data = responseData['data'];
 
         final activities = data.map((e) => ActivityModel.fromJson(e)).toList();
-
         return activities;
       } else {
         throw Exception(
@@ -61,6 +61,30 @@ class CommunityService {
       }
     } catch (e) {
       logger.e("Error fetching all categories: $e");
+      rethrow;
+    }
+  }
+
+  Future<UserInfoModel> getUserInfo(String token) async {
+    try {
+      final response = await _dio.get("$_url/api/users/me/info",
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final responseData = response.data;
+
+        final dynamic data = responseData['data']['user'];
+
+        final userInfo = UserInfoModel.fromJson(data);
+
+        return userInfo;
+      } else {
+        throw Exception(
+            "Failed to load user info : ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching user info: $e");
       rethrow;
     }
   }

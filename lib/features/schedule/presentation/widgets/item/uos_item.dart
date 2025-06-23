@@ -38,7 +38,6 @@ class UnitOfStudyItem extends StatelessWidget {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
-      // logger.i("User Role: $userRole");
       return GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(

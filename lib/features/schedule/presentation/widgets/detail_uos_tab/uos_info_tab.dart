@@ -7,7 +7,7 @@ import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/absents_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
+import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/edit_field_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/uos_info_item.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';

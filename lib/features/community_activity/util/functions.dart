@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Functions {
   static String getActivityStatusLabel({
     required int status,
@@ -20,5 +22,9 @@ class Functions {
     }
 
     return 'Không xác định';
+  }
+
+  static formatDate(DateTime dt) {
+    return DateFormat('dd/MM/yyyy').format(dt);
   }
 }

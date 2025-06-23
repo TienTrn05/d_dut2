@@ -4,7 +4,7 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/loading_progress_bar.dart';
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/uos_item.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/cupertino.dart';

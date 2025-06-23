@@ -314,7 +314,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         "Theo dõi các \nhoạt động cộng đồng",
                                     onTap: () {
                                       Navigator.of(context).pushNamed(
-                                          Routes.allCommunityActivities);
+                                          Routes.communityActivities);
                                     },
                                   ),
                                 ];

@@ -5,7 +5,7 @@ import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/loading_progress_bar.dart';
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_custom.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/schedule_toggle_button.dart';

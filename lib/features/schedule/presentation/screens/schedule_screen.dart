@@ -1,8 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
-import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
+import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
@@ -35,36 +34,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: context.theme.primaryColor ?? Colors.blue,
-            elevation: 0, // Xóa bóng dưới AppBar
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: IconButton(
-                icon:
-                    Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context); // Quay lại màn hình trước
-                },
-              ),
-            ),
-            title: Text(
-              'Thời khóa biểu',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: FontSizes.medium,
-              ),
-            ),
-            centerTitle: true,
-            actions: [
-              NotificationButton(
-                notificationCount: 2,
-                onTap: () =>
-                    {Navigator.of(context).pushNamed(Routes.notification)},
-              ),
-            ],
-          ),
+          appBar: CustomAppbar(label: "Thời khóa biểu"),
           body: _isDayView ? const DayMode() : const SemesterMode(),
           floatingActionButton: Builder(
             builder: (context) => Container(

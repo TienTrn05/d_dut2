@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
+import 'package:e_dut/features/community_activity/bloc/user_info/user_info_bloc.dart';
+import 'package:e_dut/features/community_activity/constant/constant.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/activity_card.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/custom/date_picker.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/loading_progress_bar.dart';
+import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -25,35 +28,28 @@ class AllActivities extends StatefulWidget {
 
 class _AllActivitiesState extends State<AllActivities> {
   List<ActivityModel> activities = [];
+  UserInfoModel? userInfo;
 
   bool _isInitialized = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
 
-  DateTime? endDateFilter;
-  final List<String> scopes = [
-    "Tất cả",
-    "ĐH Đà Nẵng",
-    "ĐH Bách khoa",
-    "Khoa",
-  ];
+  List<Map<String, String>> scopes = [];
 
-  String selectedFilter = "Tất cả";
-  Set<String> selectedStateFilters = {};
+  String selectedScope = "";
+
   DateTime? startDateFilter;
-  final List<String> stateFilters = [
-    "Đã đăng ký",
-    "Mở đăng ký",
-    "Hoàn thành",
-    "Đã đầy",
-    "Hết hạn đăng ký"
-  ];
+  DateTime? endDateFilter;
+
+  Set<String> selectedStateFilters = {};
 
   RangeValues _currentRange = const RangeValues(0, 30);
 
   List<CategoryModel> categoryFilters = [];
   Set<CategoryModel> selectedCategoryFilters = {};
+
   bool _isCategoryListVisible = false;
+
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 800), () {
@@ -65,6 +61,34 @@ class _AllActivitiesState extends State<AllActivities> {
             ),
           );
     });
+  }
+
+  List<ActivityModel> get filteredActivities {
+    final selectedCategoryIds =
+        selectedCategoryFilters.map((cat) => cat.id).toSet();
+    return activities.where((activity) {
+      final matchStatus = selectedStateFilters.isEmpty ||
+          selectedStateFilters.contains(activity.status);
+
+      final matchStartDate = startDateFilter == null ||
+          (activity.startDate.isAfter(startDateFilter!) ||
+              activity.startDate.isAtSameMomentAs(startDateFilter!));
+
+      final matchEndDate = endDateFilter == null ||
+          (activity.endDate.isBefore(endDateFilter!) ||
+              activity.endDate.isAtSameMomentAs(endDateFilter!));
+      final matchScore = activity.score >= _currentRange.start &&
+          activity.score <= _currentRange.end;
+
+      final matchCategory = selectedCategoryIds.isEmpty ||
+          selectedCategoryIds.contains(activity.subcategory.categoryId);
+
+      final matchScope = selectedScope.isEmpty ||
+          activity.organization.contains(selectedScope);
+      return matchStatus &&
+          matchStartDate &&
+          matchEndDate & matchScore & matchCategory & matchScope;
+    }).toList();
   }
 
   @override
@@ -83,6 +107,8 @@ class _AllActivitiesState extends State<AllActivities> {
           token: widget.authToken,
           keyword: _searchController.text.trim(),
         ));
+        final userInfoBloc = context.read<UserInfoBloc>();
+        userInfoBloc.add(LoadUserInfo(token: widget.authToken));
       });
       _isInitialized = true;
     }
@@ -102,30 +128,39 @@ class _AllActivitiesState extends State<AllActivities> {
 
   Widget _buildContent() {
     return SafeArea(
+        child: BlocListener<UserInfoBloc, UserInfoState>(
+      listener: (context, infoState) {
+        if (infoState is UserInfoLoaded) {
+          setState(() {
+            scopes = [
+              {"key": "", "label": "Tất cả"},
+              {"key": "Đại học Đà Nẵng", "label": "Đại học Đà Nẵng"},
+              {"key": "Đại học Bách Khoa", "label": "Đại học Bách Khoa"},
+              {"key": infoState.userInfo.clazz.faculty.name, "label": "Khoa"},
+            ];
+            selectedScope = scopes.first['key']!;
+          });
+        }
+      },
       child: Column(
         children: [
-          /// 🔹 Phần loading indicator (nằm cố định đầu màn hình)
           BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
             buildWhen: (previous, current) =>
                 current is AllActivitiesLoading ||
                 current is AllActivitiesLoaded,
             builder: (context, state) {
               if (state is AllActivitiesLoading) {
-                return CustomLoadingIndicator.primary(); // Hiện ở trên cùng
+                return CustomLoadingIndicator.primary();
               }
-              return const SizedBox
-                  .shrink(); // Không chiếm không gian nếu không loading
+              return const SizedBox.shrink();
             },
           ),
-
-          /// 🔹 Phần nội dung có thể cuộn
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// Ô tìm kiếm
                   TextField(
                     controller: _searchController,
                     style: TextStyle(
@@ -168,21 +203,20 @@ class _AllActivitiesState extends State<AllActivities> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
-                  /// Bộ lọc scope
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: scopes.map((label) {
-                        final bool isSelected = selectedFilter == label;
+                      children: scopes.map((scope) {
+                        final scopeKey = scope['key']!;
+                        final label = scope['label']!;
+                        final bool isSelected = selectedScope == scopeKey;
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: TextButton(
                             onPressed: () {
                               setState(() {
-                                selectedFilter = label;
+                                selectedScope = scopeKey;
                               });
                             },
                             style: TextButton.styleFrom(
@@ -206,10 +240,7 @@ class _AllActivitiesState extends State<AllActivities> {
                       }).toList(),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  /// 🔹 Danh sách hoạt động
                   BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
                     buildWhen: (previous, current) =>
                         current is AllActivitiesLoaded ||
@@ -219,7 +250,7 @@ class _AllActivitiesState extends State<AllActivities> {
                         activities = state.activities;
                         categoryFilters = state.categories;
                         return Column(
-                          children: activities
+                          children: filteredActivities
                               .map((activity) => Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: ActivityCard(activity: activity),
@@ -231,8 +262,7 @@ class _AllActivitiesState extends State<AllActivities> {
                             child: Text(
                                 'Không thể tải dữ liệu hoạt động cộng đồng'));
                       } else {
-                        return const SizedBox
-                            .shrink(); // Tránh flicker khi loading
+                        return const SizedBox.shrink();
                       }
                     },
                   ),
@@ -242,7 +272,7 @@ class _AllActivitiesState extends State<AllActivities> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   void _showFilterModal(BuildContext context) {
@@ -257,19 +287,17 @@ class _AllActivitiesState extends State<AllActivities> {
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
-        // Dùng biến local để thay đổi trong modal
-
         return StatefulBuilder(builder: (modalContext, setModalState) {
           _searchController.addListener(() => setModalState(() {}));
 
           return BottomModal(
             title: "Bộ lọc",
             mainAction: () {
-              // Cập nhật state chính khi xác nhận
               setState(() {
                 selectedStateFilters = localSelectedState;
                 selectedCategoryFilters = localSelectedCategory;
               });
+
               Navigator.pop(modalContext);
             },
             onClose: () {
@@ -279,31 +307,29 @@ class _AllActivitiesState extends State<AllActivities> {
                 startDateFilter = null;
                 endDateFilter = null;
                 _currentRange = const RangeValues(0, 30);
-                _isCategoryListVisible = false; // giá trị mặc định
+                _isCategoryListVisible = false;
+              });
+
+              setState(() {
+                selectedStateFilters.clear();
+                selectedCategoryFilters.clear();
               });
             },
             heightFactor: 0.9,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height *
-                        0.9, // Giới hạn chiều cao modal
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _stateFilter(localSelectedState, setModalState),
-                      const SizedBox(height: 24),
-                      _dateFilter(setModalState),
-                      const SizedBox(height: 24),
-                      _gradeFilter(setModalState),
-                      const SizedBox(height: 24),
-                      _categoryFilter(localSelectedCategory, setModalState),
-                    ],
-                  ),
-                );
-              },
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _stateFilter(localSelectedState, setModalState),
+                  const SizedBox(height: 24),
+                  _dateFilter(setModalState),
+                  const SizedBox(height: 24),
+                  _gradeFilter(setModalState),
+                  const SizedBox(height: 24),
+                  _categoryFilter(localSelectedCategory, setModalState),
+                ],
+              ),
             ),
           );
         });
@@ -333,49 +359,52 @@ class _AllActivitiesState extends State<AllActivities> {
         Wrap(
           spacing: 5,
           runSpacing: 5,
-          children: stateFilters.map((label) {
-            final bool isSelected = localSelectedState.contains(label);
+          children: Constant.activityStatusKeys.map((statusKey) {
+            final bool isSelected = localSelectedState.contains(statusKey);
+            final style = Constant.activityStatusStyles[statusKey];
+            final label = style?.label ?? statusKey;
+
             return TextButton(
-                onPressed: () {
-                  setModalState(() {
-                    if (isSelected) {
-                      localSelectedState.remove(label);
-                    } else {
-                      localSelectedState.add(label);
-                    }
-                  });
-                },
-                style: TextButton.styleFrom(
-                  textStyle: const TextStyle(
-                      fontWeight: FontWeight.w400, fontSize: FontSizes.small),
-                  backgroundColor: isSelected
-                      ? context.theme.primaryColor
-                      : context.theme.lightGrey,
-                  foregroundColor:
-                      isSelected ? Colors.white : context.theme.grey,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
-                  ),
+              onPressed: () {
+                setModalState(() {
+                  if (isSelected) {
+                    localSelectedState.remove(statusKey);
+                  } else {
+                    localSelectedState.add(statusKey);
+                  }
+                });
+              },
+              style: TextButton.styleFrom(
+                textStyle: const TextStyle(
+                    fontWeight: FontWeight.w400, fontSize: FontSizes.small),
+                backgroundColor: isSelected
+                    ? context.theme.primaryColor
+                    : context.theme.lightGrey,
+                foregroundColor: isSelected ? Colors.white : context.theme.grey,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(label),
-                    if (isSelected)
-                      Container(
-                        margin: const EdgeInsets.only(left: 8),
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 12,
-                        ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label),
+                  if (isSelected)
+                    Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 12,
                       ),
-                  ],
-                ));
+                    ),
+                ],
+              ),
+            );
           }).toList(),
-        ),
+        )
       ],
     );
   }
@@ -385,7 +414,7 @@ class _AllActivitiesState extends State<AllActivities> {
       if (isStart) {
         startDateFilter = newValue;
         if (endDateFilter != null && newValue.isAfter(endDateFilter!)) {
-          endDateFilter = null;
+          endDateFilter = newValue;
         }
       } else {
         endDateFilter = newValue;
@@ -445,8 +474,7 @@ class _AllActivitiesState extends State<AllActivities> {
         showDialog(
           context: context,
           builder: (context) => DatePicker(
-            initDate: selectedDate ??
-                (isStart ? DateTime.now() : startDateFilter ?? DateTime.now()),
+            initDate: selectedDate,
             onValueChange: (date) =>
                 {_updateCurrentDate(date, isStart), setModalState(() {})},
             minSelectableDate: isStart ? null : startDateFilter,
@@ -563,75 +591,77 @@ class _AllActivitiesState extends State<AllActivities> {
               });
             },
             child: Container(
-                width: double.infinity,
-                height: 88,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: context.theme.lightGrey),
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          right: 24), // để tránh trùng với icon
-                      child: SingleChildScrollView(
-                        child: Wrap(
-                          spacing: 5,
-                          runSpacing: 5,
-                          children: localSelectedCategory.map((category) {
-                            return Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: context.theme.lightBlue,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      category.name,
-                                      style: TextStyle(
-                                        color: context.theme.primaryColor,
-                                        fontSize: FontSizes.small,
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setModalState(() {
-                                        localSelectedCategory.remove(category);
-                                      });
-                                    },
-                                    child: Icon(
-                                      Icons.close_rounded,
-                                      size: 12,
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                minHeight: 88,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: context.theme.lightGrey,
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 24),
+                    child: SingleChildScrollView(
+                      physics:
+                          const NeverScrollableScrollPhysics(), // để tránh scroll trong scroll
+                      child: Wrap(
+                        spacing: 5,
+                        runSpacing: 5,
+                        children: localSelectedCategory.map((category) {
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: context.theme.lightBlue,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    category.name,
+                                    style: TextStyle(
                                       color: context.theme.primaryColor,
+                                      fontSize: FontSizes.small,
                                     ),
+                                    softWrap: true,
                                   ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                                ),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      localSelectedCategory.remove(category);
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    size: 12,
+                                    color: context.theme.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: context.theme.grey,
-                      ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: context.theme.grey,
                     ),
-                  ],
-                ))),
+                  ),
+                ],
+              ),
+            )),
         if (_isCategoryListVisible)
           _buildCategoryList(localSelectedCategory, setModalState),
       ],
@@ -696,8 +726,6 @@ class _AllActivitiesState extends State<AllActivities> {
           ),
         ),
       );
-
-      // Thêm SizedBox nếu không phải phần tử cuối
       if (i != categoryFilters.length - 1) {
         widgets.add(const SizedBox(height: 8));
       }

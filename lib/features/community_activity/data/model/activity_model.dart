@@ -58,7 +58,10 @@ class ActivityModel {
         subcategory: SubCategoryModel.fromJson(subJson, categoryId: categoryId),
         status: json['status']);
   }
-
+  @override
+  String toString() {
+    return 'ActivityModel(id: $id, name: $name, status: $status)';
+  }
   // Map<String, dynamic> toJson() {
   //   return {
   //     'id': id,
