@@ -8,15 +8,15 @@ class ActivityModel {
   final String? image;
   final int maxParticipants;
   final int participants;
-  final SubCategoryModel subcategory;
   final String address;
-  final String organization;
   final DateTime startDate;
   final DateTime endDate;
   final DateTime startRegistration;
   final DateTime endRegistration;
   final bool isExternal;
-  final String status;
+  final SubCategoryModel subcategory;
+  final String? status;
+  final String createdBy;
 
   ActivityModel(
       {required this.id,
@@ -27,36 +27,39 @@ class ActivityModel {
       required this.maxParticipants,
       required this.participants,
       required this.address,
-      required this.organization,
       required this.startDate,
       required this.endDate,
       required this.startRegistration,
       required this.endRegistration,
       required this.isExternal,
       required this.subcategory,
-      required this.status});
+      this.status,
+      required this.createdBy});
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
     final subJson = json['subcategory'] ?? {};
     final categoryId = subJson['category']?['id']?.toString() ?? '';
 
     return ActivityModel(
-        id: json['id'],
-        name: json['name'],
-        score: json['score'],
-        description: json['description'],
-        image: json['image'],
-        maxParticipants: json['maxParticipants'],
-        participants: json['participants'],
-        address: json['address'],
-        organization: json['organization'],
-        startDate: DateTime.parse(json['startDate']),
-        endDate: DateTime.parse(json['endDate']),
-        startRegistration: DateTime.parse(json['startRegistration']),
-        endRegistration: DateTime.parse(json['endRegistration']),
-        isExternal: json['isExternal'],
-        subcategory: SubCategoryModel.fromJson(subJson, categoryId: categoryId),
-        status: json['status']);
+      id: json['id'],
+      name: json['name'],
+      score: json['score'],
+      description: json['description'],
+      image: json['image'],
+      maxParticipants: json['maxParticipants'],
+      participants: json['participants'],
+      address: json['address'],
+      startDate: DateTime.parse(json['startDate']),
+      endDate: DateTime.parse(json['endDate']),
+      startRegistration: DateTime.parse(json['startRegistration']),
+      endRegistration: DateTime.parse(json['endRegistration']),
+      isExternal: json['isExternal'],
+      subcategory: SubCategoryModel.fromJson(subJson, categoryId: categoryId),
+      status: json.containsKey('status') ? json['status'] : null,
+      createdBy: json['createdBy'] != null
+          ? json['createdBy']['name']
+          : 'Đoàn Thanh niên Trường Đại học Bách khoa - ĐHĐN',
+    );
   }
   @override
   String toString() {

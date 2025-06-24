@@ -81,12 +81,13 @@ class DetailActivityScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           StatusLabel(
-                            statusCode: activity.status,
+                            statusType: StatusType.activity,
+                            statusCode: activity.status ?? '',
                             isFullWidth: false,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            activity.organization,
+                            activity.createdBy,
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: FontSizes.small,

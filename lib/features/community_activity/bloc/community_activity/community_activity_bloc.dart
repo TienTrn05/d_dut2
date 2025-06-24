@@ -1,23 +1,26 @@
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'all_activities_event.dart';
-part 'all_activities_state.dart';
+part 'community_activity_event.dart';
+part 'community_activity_state.dart';
 
-class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
+class CommunityActivityBloc
+    extends Bloc<CommunityActivityEvent, CommunityActivityState> {
   final CommunityRepository _repository;
 
-  AllActivitiesBloc(this._repository) : super(AllActivitiesInitial()) {
-    on<LoadActivities>(_onLoadAllActivities);
+  CommunityActivityBloc(this._repository) : super(CommunityActivityInitial()) {
+    on<LoadAllActivities>(_onLoadAllActivities);
     on<RegistActivity>(_onRegistActivity);
+    on<LoadUserActivities>(_onLoadUserActivities);
   }
 
   Future<void> _onLoadAllActivities(
-      LoadActivities event, Emitter<AllActivitiesState> emit) async {
-    emit(AllActivitiesLoading());
+      LoadAllActivities event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
 
     try {
       final token = event.token;
@@ -27,13 +30,13 @@ class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
 
       emit(AllActivitiesLoaded(activities, categories));
     } catch (e) {
-      emit(AllActivitiesError(e.toString()));
+      emit(CommunityActivityError(e.toString()));
     }
   }
 
   Future<void> _onRegistActivity(
-      RegistActivity event, Emitter<AllActivitiesState> emit) async {
-    emit(AllActivitiesLoading());
+      RegistActivity event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
     try {
       final token = event.token;
       final keyword = event.keyword;
@@ -49,7 +52,23 @@ class AllActivitiesBloc extends Bloc<AllActivitiesEvent, AllActivitiesState> {
         emit(AllActivitiesLoaded(activities, categories));
       }
     } catch (e) {
-      emit(AllActivitiesError(e.toString()));
+      emit(CommunityActivityError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadUserActivities(
+      LoadUserActivities event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
+
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+      final userActivities =
+          await _repository.getUserActivities(token, keyword);
+
+      emit(UserActivitiesLoaded(userActivities));
+    } catch (e) {
+      emit(CommunityActivityError(e.toString()));
     }
   }
 }

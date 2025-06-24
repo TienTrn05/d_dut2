@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:injectable/injectable.dart';
 
@@ -100,6 +101,33 @@ class CommunityService {
       return response.statusCode == 201 && response.data['success'] == true;
     } catch (e) {
       logger.e("Error regist activity: $e");
+      rethrow;
+    }
+  }
+
+  Future<List<UserActivityModel>> getUserActivities(
+      String token, String keyword) async {
+    try {
+      final response = await _dio.get("$_url/api/my-activities",
+          queryParameters: {"keyword": keyword},
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final responseData = response.data;
+
+        final List<dynamic> data = responseData['data'];
+
+        final userActivities =
+            data.map((e) => UserActivityModel.fromJson(e)).toList();
+
+        return userActivities;
+      } else {
+        throw Exception(
+            "Failed to load my activities: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching my activities: $e");
       rethrow;
     }
   }

@@ -1,44 +1,130 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
-import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
-import 'package:e_dut/features/community_activity/constant/constant.dart';
+import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
+import 'package:e_dut/features/community_activity/constant/user_activity_status.dart';
+import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/cards/user_activity_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MyActivities extends StatefulWidget {
-  const MyActivities({super.key});
+class UserActivities extends StatefulWidget {
+  final String authToken;
+  const UserActivities({super.key, required this.authToken});
 
   @override
-  State<MyActivities> createState() => _MyActivitiesState();
+  State<UserActivities> createState() => _UserActivitiesState();
 }
 
-class _MyActivitiesState extends State<MyActivities> {
-  final TextEditingController _searchController = TextEditingController();
+class _UserActivitiesState extends State<UserActivities> {
+  List<UserActivityModel> userActivites = [];
+  bool _isInitialized = false;
 
-  bool _isSortFieldVisible = false;
-  bool sortAscending = false;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 800), () {
+      final keyword = _searchController.text.trim();
+      context.read<CommunityActivityBloc>().add(
+            LoadUserActivities(
+              token: widget.authToken,
+              keyword: keyword,
+            ),
+          );
+    });
+  }
+
   List<Map<String, String>> sortFields = [
     {"key": "startDate", "label": "Ngày bắt đầu"},
     {"key": "endDate", "label": "Ngày kết thúc"},
     {"key": "score", "label": "Điểm số"}
   ];
   String selectedSortField = "startDate";
+  bool _isSortFieldVisible = false;
+  bool sortAscending = false;
 
   Set<String> selectedStateFilters = {};
+
+  dynamic _getSortValue(UserActivityModel activity) {
+    switch (selectedSortField) {
+      case 'startDate':
+        return activity.activity.startDate;
+      case 'endDate':
+        return activity.activity.endDate;
+      case 'score':
+        return activity.activity.score;
+      default:
+        return ''; // fallback
+    }
+  }
+
+  List<UserActivityModel> get filteredActivities {
+    final filtered = userActivites.where((activity) {
+      final matchStatus = selectedStateFilters.isEmpty ||
+          selectedStateFilters.contains(activity.status);
+      return matchStatus;
+    }).toList();
+
+    filtered.sort((a, b) {
+      final aValue = _getSortValue(a);
+      final bValue = _getSortValue(b);
+
+      if (sortAscending) {
+        return aValue.compareTo(bValue);
+      } else {
+        return bValue.compareTo(aValue);
+      }
+    });
+
+    return filtered;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final bloc = context.read<CommunityActivityBloc>();
+        bloc.add(LoadUserActivities(
+          token: widget.authToken,
+          keyword: _searchController.text.trim(),
+        ));
+      });
+      _isInitialized = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Column(
       children: [
-        BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
+        BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
           buildWhen: (previous, current) =>
-              current is AllActivitiesLoading || current is AllActivitiesLoaded,
+              current is CommunityActivityLoading ||
+              current is UserActivitiesLoaded,
           builder: (context, state) {
-            if (state is AllActivitiesLoading) {
+            if (state is CommunityActivityLoading) {
               return CustomLoadingIndicator.primary();
             }
             return const SizedBox.shrink();
@@ -93,6 +179,28 @@ class _MyActivitiesState extends State<MyActivities> {
                 ),
               ),
               const SizedBox(height: 10),
+              BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+                buildWhen: (previous, current) =>
+                    current is UserActivitiesLoaded ||
+                    current is CommunityActivityError,
+                builder: (context, state) {
+                  if (state is UserActivitiesLoaded) {
+                    userActivites = state.activities;
+                    return Column(
+                      children: filteredActivities
+                          .map((activity) =>
+                              UserActivityCard(userActivity: activity))
+                          .toList(),
+                    );
+                  } else if (state is CommunityActivityError) {
+                    return const Center(
+                        child:
+                            Text('Không thể tải dữ liệu hoạt động cộng đồng'));
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              )
             ],
           ),
         ))
@@ -116,6 +224,7 @@ class _MyActivitiesState extends State<MyActivities> {
 
           return BottomModal(
             title: "Sắp xếp và lọc",
+            mainActionText: "Áp dụng",
             mainAction: () {
               setState(() {
                 selectedStateFilters = localSelectedState;
@@ -123,16 +232,20 @@ class _MyActivitiesState extends State<MyActivities> {
 
               Navigator.pop(modalContext);
             },
+            onCloseText: "Đặt lại",
             onClose: () {
               setModalState(() {
                 localSelectedState.clear();
+                selectedSortField = sortFields.first['key']!;
+                sortAscending = false;
+                _isSortFieldVisible = false;
               });
 
               setState(() {
                 selectedStateFilters.clear();
               });
             },
-            heightFactor: 0.9,
+            heightFactor: 0.7,
             child: SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 24),
               child: Column(
@@ -149,6 +262,7 @@ class _MyActivitiesState extends State<MyActivities> {
       },
     ).whenComplete(() {
       selectedStateFilters = localSelectedState;
+      _isSortFieldVisible = false;
     });
   }
 
@@ -277,9 +391,9 @@ class _MyActivitiesState extends State<MyActivities> {
         Wrap(
           spacing: 5,
           runSpacing: 5,
-          children: Constant.activityStatusKeys.map((statusKey) {
+          children: UserActivityStatus.activityStatusKeys.map((statusKey) {
             final bool isSelected = localSelectedState.contains(statusKey);
-            final style = Constant.activityStatusStyles[statusKey];
+            final style = UserActivityStatus.activityStatusStyles[statusKey];
             final label = style?.label ?? statusKey;
 
             return TextButton(

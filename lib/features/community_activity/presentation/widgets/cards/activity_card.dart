@@ -3,7 +3,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
+import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/constant/activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
@@ -33,7 +33,7 @@ class ActivityCard extends StatelessWidget {
           "Bạn có chắc chắn đăng ký tham gia hoạt động \"${activity.name}\"?",
           textConfirm: "Đăng ký",
           dialog.AlertType.confirm, onConfirm: () {
-        context.read<AllActivitiesBloc>().add(RegistActivity(
+        context.read<CommunityActivityBloc>().add(RegistActivity(
             token: authToken, keyword: keyword, idActivity: activity.id));
       });
     }
@@ -88,7 +88,8 @@ class ActivityCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     StatusLabel(
-                      statusCode: activity.status,
+                      statusType: StatusType.activity,
+                      statusCode: activity.status ?? '',
                     )
                   ],
                 ),
@@ -140,7 +141,7 @@ class ActivityCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      activity.organization,
+                      activity.createdBy,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontSize: FontSizes.small,

@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 class BottomModal extends StatelessWidget {
   final String title;
   final Widget? child;
+  final String? mainActionText;
   final VoidCallback mainAction;
   final bool enabledMainAction;
+  final String? onCloseText;
   final VoidCallback? onClose;
   final double heightFactor;
 
@@ -14,8 +16,10 @@ class BottomModal extends StatelessWidget {
     super.key,
     required this.title,
     this.child,
+    this.mainActionText,
     required this.mainAction,
     this.enabledMainAction = true,
+    this.onCloseText,
     this.onClose,
     this.heightFactor = 0.6,
   });
@@ -78,7 +82,7 @@ class BottomModal extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      "Hủy",
+                      onCloseText ?? 'Hủy',
                       style: TextStyle(
                         color: context.theme.primaryColor ?? Colors.blue,
                         fontWeight: FontWeight.bold,
@@ -111,8 +115,8 @@ class BottomModal extends StatelessWidget {
                         ),
                       ),
                     ),
-                    child: const Text(
-                      "Lưu",
+                    child: Text(
+                      mainActionText ?? 'Lưu',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
+import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/user_info/user_info_bloc.dart';
-import 'package:e_dut/features/community_activity/constant/constant.dart';
+import 'package:e_dut/features/community_activity/constant/activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
@@ -34,10 +34,6 @@ class _AllActivitiesState extends State<AllActivities> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
 
-  List<Map<String, String>> scopes = [];
-
-  String selectedScope = "";
-
   DateTime? startDateFilter;
   DateTime? endDateFilter;
 
@@ -54,8 +50,8 @@ class _AllActivitiesState extends State<AllActivities> {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 800), () {
       final keyword = _searchController.text.trim();
-      context.read<AllActivitiesBloc>().add(
-            LoadActivities(
+      context.read<CommunityActivityBloc>().add(
+            LoadAllActivities(
               token: widget.authToken,
               keyword: keyword,
             ),
@@ -83,11 +79,9 @@ class _AllActivitiesState extends State<AllActivities> {
       final matchCategory = selectedCategoryIds.isEmpty ||
           selectedCategoryIds.contains(activity.subcategory.categoryId);
 
-      final matchScope = selectedScope.isEmpty ||
-          activity.organization.contains(selectedScope);
       return matchStatus &&
           matchStartDate &&
-          matchEndDate & matchScore & matchCategory & matchScope;
+          matchEndDate & matchScore & matchCategory;
     }).toList();
   }
 
@@ -102,8 +96,8 @@ class _AllActivitiesState extends State<AllActivities> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final bloc = context.read<AllActivitiesBloc>();
-        bloc.add(LoadActivities(
+        final bloc = context.read<CommunityActivityBloc>();
+        bloc.add(LoadAllActivities(
           token: widget.authToken,
           keyword: _searchController.text.trim(),
         ));
@@ -128,28 +122,14 @@ class _AllActivitiesState extends State<AllActivities> {
 
   Widget _buildContent() {
     return SafeArea(
-        child: BlocListener<UserInfoBloc, UserInfoState>(
-      listener: (context, infoState) {
-        if (infoState is UserInfoLoaded) {
-          setState(() {
-            scopes = [
-              {"key": "", "label": "Tất cả"},
-              {"key": "Đại học Đà Nẵng", "label": "Đại học Đà Nẵng"},
-              {"key": "Đại học Bách Khoa", "label": "Đại học Bách Khoa"},
-              {"key": infoState.userInfo.clazz.faculty.name, "label": "Khoa"},
-            ];
-            selectedScope = scopes.first['key']!;
-          });
-        }
-      },
       child: Column(
         children: [
-          BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
+          BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
             buildWhen: (previous, current) =>
-                current is AllActivitiesLoading ||
+                current is CommunityActivityLoading ||
                 current is AllActivitiesLoaded,
             builder: (context, state) {
-              if (state is AllActivitiesLoading) {
+              if (state is CommunityActivityLoading) {
                 return CustomLoadingIndicator.primary();
               }
               return const SizedBox.shrink();
@@ -204,47 +184,11 @@ class _AllActivitiesState extends State<AllActivities> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: scopes.map((scope) {
-                        final scopeKey = scope['key']!;
-                        final label = scope['label']!;
-                        final bool isSelected = selectedScope == scopeKey;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                selectedScope = scopeKey;
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              textStyle:
-                                  const TextStyle(fontWeight: FontWeight.w600),
-                              backgroundColor: isSelected
-                                  ? context.theme.primaryColor
-                                  : Colors.white,
-                              foregroundColor: isSelected
-                                  ? Colors.white
-                                  : context.theme.grey,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                            ),
-                            child: Text(label),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
                   const SizedBox(height: 20),
-                  BlocBuilder<AllActivitiesBloc, AllActivitiesState>(
+                  BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
                     buildWhen: (previous, current) =>
                         current is AllActivitiesLoaded ||
-                        current is AllActivitiesError,
+                        current is CommunityActivityError,
                     builder: (context, state) {
                       if (state is AllActivitiesLoaded) {
                         activities = state.activities;
@@ -261,7 +205,7 @@ class _AllActivitiesState extends State<AllActivities> {
                                   ))
                               .toList(),
                         );
-                      } else if (state is AllActivitiesError) {
+                      } else if (state is CommunityActivityError) {
                         return const Center(
                             child: Text(
                                 'Không thể tải dữ liệu hoạt động cộng đồng'));
@@ -276,7 +220,7 @@ class _AllActivitiesState extends State<AllActivities> {
           ),
         ],
       ),
-    ));
+    );
   }
 
   void _showFilterModal(BuildContext context) {
@@ -296,6 +240,7 @@ class _AllActivitiesState extends State<AllActivities> {
 
           return BottomModal(
             title: "Bộ lọc",
+            mainActionText: "Áp dụng",
             mainAction: () {
               setState(() {
                 selectedStateFilters = localSelectedState;
@@ -304,6 +249,7 @@ class _AllActivitiesState extends State<AllActivities> {
 
               Navigator.pop(modalContext);
             },
+            onCloseText: "Đặt lại",
             onClose: () {
               setModalState(() {
                 localSelectedState.clear();
@@ -363,9 +309,9 @@ class _AllActivitiesState extends State<AllActivities> {
         Wrap(
           spacing: 5,
           runSpacing: 5,
-          children: Constant.activityStatusKeys.map((statusKey) {
+          children: ActivityStatus.activityStatusKeys.map((statusKey) {
             final bool isSelected = localSelectedState.contains(statusKey);
-            final style = Constant.activityStatusStyles[statusKey];
+            final style = ActivityStatus.activityStatusStyles[statusKey];
             final label = style?.label ?? statusKey;
 
             return TextButton(

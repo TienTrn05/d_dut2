@@ -3,12 +3,12 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/community_activity/bloc/all_activities/all_activities_bloc.dart';
+import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/user_info/user_info_bloc.dart';
 import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/activity_grade.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/all_activities.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/my_activities.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_activities.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/proof_activity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,7 +57,7 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
           providers: [
             BlocProvider(
                 create: (_) =>
-                    AllActivitiesBloc(getIt.get<CommunityRepository>())),
+                    CommunityActivityBloc(getIt.get<CommunityRepository>())),
             BlocProvider(
                 create: (_) => UserInfoBloc(getIt.get<CommunityRepository>()))
           ],
@@ -179,7 +179,7 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
       case "Tất cả hoạt động":
         return AllActivities(authToken: authToken);
       case "Hoạt động của tôi":
-        return const MyActivities();
+        return UserActivities(authToken: authToken);
       case "Minh chứng của tôi":
         return const ProofActivity();
       case "Điểm của tôi":
