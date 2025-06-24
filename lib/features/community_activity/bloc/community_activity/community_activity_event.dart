@@ -27,3 +27,36 @@ class RegistActivity extends CommunityActivityEvent {
   RegistActivity(
       {required this.token, required this.keyword, required this.idActivity});
 }
+
+class CancelRegistration extends CommunityActivityEvent {
+  final String token;
+  final String keyword;
+  final String idActivity;
+
+  CancelRegistration(
+      {required this.token, required this.keyword, required this.idActivity});
+}
+
+class ReRegistActivity extends CommunityActivityEvent {
+  final String token;
+  final String keyword;
+  final String idActivity;
+
+  ReRegistActivity(
+      {required this.token, required this.keyword, required this.idActivity});
+}
+
+class SubmitProof extends CommunityActivityEvent {
+  final String token;
+  final String keyword;
+  final String idActivity;
+  final File image;
+  final String description;
+
+  SubmitProof(
+      {required this.token,
+      required this.keyword,
+      required this.idActivity,
+      required this.image,
+      required this.description});
+}

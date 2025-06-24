@@ -188,8 +188,10 @@ class _UserActivitiesState extends State<UserActivities> {
                     userActivites = state.activities;
                     return Column(
                       children: filteredActivities
-                          .map((activity) =>
-                              UserActivityCard(userActivity: activity))
+                          .map((activity) => UserActivityCard(
+                                userActivity: activity,
+                                keyword: _searchController.text.trim(),
+                              ))
                           .toList(),
                     );
                   } else if (state is CommunityActivityError) {

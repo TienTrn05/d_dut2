@@ -1,6 +1,8 @@
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_activity_screen.dart';
+import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,7 @@ class Routes {
   static const String courseRegistrationGrade = "/courseRegistrationGrade";
   static const String communityActivities = "/communityActivities";
   static const String detailCommunityActivity = "/detailCommunityActivity";
+  static const String detailUserActivityScreen = "/detailUserActivityScreen";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -43,7 +46,7 @@ class Routes {
         return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
       case detailUnitOfStudy:
-        final idUos = settings.arguments as String; // Lấy id từ arguments
+        final idUos = settings.arguments as String;
         return MaterialPageRoute(
           builder: (context) => DetailUnitOfStudy(idUos: idUos),
         );
@@ -51,9 +54,7 @@ class Routes {
       case detailUnitOfStudyTeacher:
         final idUos = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (context) => DetailUOSTeacherScreen(
-            idUos: idUos,
-          ),
+          builder: (context) => DetailUOSTeacherScreen(idUos: idUos),
         );
 
       case detailExamShiftTeacher:
@@ -63,9 +64,7 @@ class Routes {
       case msteamtool:
         return MaterialPageRoute(
           builder: (context) => const Scaffold(
-            body: Center(
-              child: Text('MSTeamTool Screen'),
-            ),
+            body: Center(child: Text('MSTeamTool Screen')),
           ),
         );
 
@@ -86,10 +85,12 @@ class Routes {
       case detailCommunityActivity:
         final activity = settings.arguments as ActivityModel;
         return MaterialPageRoute(
-            builder: (context) => DetailActivityScreen(
-                  activity: activity,
-                ));
-
+            builder: (context) => DetailActivityScreen(activity: activity));
+      case detailUserActivityScreen:
+        final userActivity = settings.arguments as UserActivityModel;
+        return MaterialPageRoute(
+            builder: (context) =>
+                DetailUserActivityScreen(userActivity: userActivity));
       default:
         return MaterialPageRoute(
           builder: (context) => const Scaffold(

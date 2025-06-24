@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
@@ -16,6 +18,9 @@ class CommunityActivityBloc
     on<LoadAllActivities>(_onLoadAllActivities);
     on<RegistActivity>(_onRegistActivity);
     on<LoadUserActivities>(_onLoadUserActivities);
+    on<CancelRegistration>(_onCancelRegistration);
+    on<ReRegistActivity>(_onReRegisterActivity);
+    on<SubmitProof>(_onSubmitProof);
   }
 
   Future<void> _onLoadAllActivities(
@@ -63,10 +68,79 @@ class CommunityActivityBloc
     try {
       final token = event.token;
       final keyword = event.keyword;
+
       final userActivities =
           await _repository.getUserActivities(token, keyword);
 
       emit(UserActivitiesLoaded(userActivities));
+    } catch (e) {
+      emit(CommunityActivityError(e.toString()));
+    }
+  }
+
+  Future<void> _onCancelRegistration(
+      CancelRegistration event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+      final idActivity = event.idActivity;
+
+      final isCancelSuccess =
+          await _repository.cancelRegistration(token, idActivity);
+
+      if (isCancelSuccess) {
+        final userActivities =
+            await _repository.getUserActivities(token, keyword);
+
+        emit(UserActivitiesLoaded(userActivities));
+      }
+    } catch (e) {
+      emit(CommunityActivityError(e.toString()));
+    }
+  }
+
+  Future<void> _onReRegisterActivity(
+      ReRegistActivity event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+      final idActivity = event.idActivity;
+
+      final isRegistSuccess =
+          await _repository.registActivity(token, idActivity);
+
+      if (isRegistSuccess) {
+        final userActivities =
+            await _repository.getUserActivities(token, keyword);
+
+        emit(UserActivitiesLoaded(userActivities));
+      }
+    } catch (e) {
+      emit(CommunityActivityError(e.toString()));
+    }
+  }
+
+  Future<void> _onSubmitProof(
+      SubmitProof event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+      final idActivity = event.idActivity;
+      final image = event.image;
+      final description = event.description;
+
+      final isSubmitProofSuccess =
+          await _repository.submitProof(token, idActivity, image, description);
+
+      if (isSubmitProofSuccess) {
+        final userActivities =
+            await _repository.getUserActivities(token, keyword);
+
+        emit(UserActivitiesLoaded(userActivities));
+      }
     } catch (e) {
       emit(CommunityActivityError(e.toString()));
     }

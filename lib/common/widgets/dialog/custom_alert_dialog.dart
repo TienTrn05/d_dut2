@@ -12,6 +12,7 @@ class CustomAlertDialog {
     AlertType alertType, {
     String? textConfirm,
     VoidCallback? onConfirm,
+    String? textCancel,
     VoidCallback? onCancel,
   }) {
     showDialog(
@@ -90,7 +91,7 @@ class CustomAlertDialog {
                       },
                       child: Center(
                         child: Text(
-                          "Hủy",
+                          textCancel ?? "Hủy",
                           style: TextStyle(
                               color: _getColor(alertType, context),
                               fontWeight: FontWeight.bold,

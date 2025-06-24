@@ -25,13 +25,13 @@ class UserActivityStatus {
       textColor: Color(0xFF7CB305),
     ),
     UserActivityStatus.canceled: ActivityStatusStyle(
-      label: 'Mở đăng ký',
+      label: 'Đã hủy',
       bgColor: Color(0xFFFFFBE6),
       borderColor: Color(0xFFFFE58F),
       textColor: Color(0xFFD48806),
     ),
     UserActivityStatus.submitted: ActivityStatusStyle(
-      label: 'Hoàn thành',
+      label: 'Đã nộp',
       bgColor: Color(0xFFE6FFFB),
       borderColor: Color(0xFFC3F4EE),
       textColor: Color(0xFF47B5C1),

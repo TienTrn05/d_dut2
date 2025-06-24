@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:e_dut/features/community_activity/data/data_sources/remote_data_source/community_service.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
@@ -31,5 +33,19 @@ class CommunityRepository {
   Future<List<UserActivityModel>> getUserActivities(
       String token, String keyword) {
     return _communityService.getUserActivities(token, keyword);
+  }
+
+  Future<bool> cancelRegistration(String token, String idActivity) {
+    return _communityService.cancelRegistration(token, idActivity);
+  }
+
+  Future<bool> submitProof(
+    String token,
+    String idActivity,
+    File imageFile,
+    String description,
+  ) {
+    return _communityService.submitProof(
+        token, idActivity, imageFile, description);
   }
 }

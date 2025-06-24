@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
@@ -128,6 +130,48 @@ class CommunityService {
       }
     } catch (e) {
       logger.e("Error fetching my activities: $e");
+      rethrow;
+    }
+  }
+
+  Future<bool> cancelRegistration(String token, String idActivity) async {
+    try {
+      final response =
+          await _dio.post("$_url/api/activities/$idActivity/cancel",
+              options: Options(headers: {
+                "Authorization": "Bearer $token",
+              }));
+
+      return response.statusCode == 201 && response.data['success'] == true;
+    } catch (e) {
+      logger.e("Error cancel registration: $e");
+      rethrow;
+    }
+  }
+
+  Future<bool> submitProof(
+    String token,
+    String idActivity,
+    File imageFile,
+    String description,
+  ) async {
+    try {
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+        'description': description,
+      });
+      final response = await _dio.post("$_url/api/proofs/$idActivity/submit",
+          data: formData,
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+
+      return response.statusCode == 201 && response.data['success'] == true;
+    } catch (e) {
+      logger.e("Error submit proof: $e");
       rethrow;
     }
   }
