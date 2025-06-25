@@ -89,7 +89,7 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
                     widget.bloc.add(SubmitProof(
                       token: widget.token,
                       keyword: widget.keyword,
-                      idActivity: widget.userActivity.id,
+                      idRegistration: widget.userActivity.id,
                       image: File(pickedImage!.path),
                       description: descriptionController.text.trim(),
                     ));
