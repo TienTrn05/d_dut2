@@ -151,27 +151,28 @@ class CommunityService {
 
   Future<bool> submitProof(
     String token,
-    String idActivity,
+    String idRegistration,
     File imageFile,
-    String description,
+    String? description,
   ) async {
     try {
       final formData = FormData.fromMap({
+        'name': 'Proof Image',
+        'description': description ?? '',
         'image': await MultipartFile.fromFile(
           imageFile.path,
           filename: imageFile.path.split('/').last,
-        ),
-        'description': description,
+        )
       });
-      final response = await _dio.post("$_url/api/proofs/$idActivity/submit",
-          data: formData,
-          options: Options(headers: {
-            "Authorization": "Bearer $token",
-          }));
-
+      final response =
+          await _dio.post("$_url/api/proofs/$idRegistration/submit",
+              data: formData,
+              options: Options(headers: {
+                "Authorization": "Bearer $token",
+              }));
       return response.statusCode == 201 && response.data['success'] == true;
-    } catch (e) {
-      logger.e("Error submit proof: $e");
+    } on DioException catch (e) {
+      logger.e("Error submit proof: ${e.message}");
       rethrow;
     }
   }

@@ -41,11 +41,11 @@ class CommunityRepository {
 
   Future<bool> submitProof(
     String token,
-    String idActivity,
+    String idRegistration,
     File imageFile,
-    String description,
+    String? description,
   ) {
     return _communityService.submitProof(
-        token, idActivity, imageFile, description);
+        token, idRegistration, imageFile, description);
   }
 }

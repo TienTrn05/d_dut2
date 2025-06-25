@@ -21,6 +21,7 @@ class CommunityActivityBloc
     on<CancelRegistration>(_onCancelRegistration);
     on<ReRegistActivity>(_onReRegisterActivity);
     on<SubmitProof>(_onSubmitProof);
+    on<UpdateUserActivitiesAfterSubmit>(_onUpdateActivitiesAfterSubmit);
   }
 
   Future<void> _onLoadAllActivities(
@@ -134,15 +135,34 @@ class CommunityActivityBloc
 
       final isSubmitProofSuccess =
           await _repository.submitProof(token, idActivity, image, description);
-
+      final userActivities =
+          await _repository.getUserActivities(token, keyword);
       if (isSubmitProofSuccess) {
-        final userActivities =
-            await _repository.getUserActivities(token, keyword);
-
-        emit(UserActivitiesLoaded(userActivities));
+        emit(ProofSubmitted(success: true, updatedActivities: userActivities));
+      } else {
+        emit(ProofSubmitted(
+            success: false,
+            message: "Lỗi khi nộp minh chứng",
+            updatedActivities: userActivities));
       }
     } catch (e) {
-      emit(CommunityActivityError(e.toString()));
+      try {
+        final userActivities =
+            await _repository.getUserActivities(event.token, event.keyword);
+        emit(ProofSubmitted(
+          success: false,
+          message: e.toString(),
+          updatedActivities: userActivities,
+        ));
+      } catch (loadError) {
+        emit(CommunityActivityError(e.toString()));
+      }
     }
+  }
+
+  Future<void> _onUpdateActivitiesAfterSubmit(
+      UpdateUserActivitiesAfterSubmit event,
+      Emitter<CommunityActivityState> emit) async {
+    emit(UserActivitiesLoaded(event.activities));
   }
 }

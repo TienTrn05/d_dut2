@@ -122,7 +122,8 @@ class _UserActivitiesState extends State<UserActivities> {
         BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
           buildWhen: (previous, current) =>
               current is CommunityActivityLoading ||
-              current is UserActivitiesLoaded,
+              current is UserActivitiesLoaded ||
+              current is CommunityActivityError,
           builder: (context, state) {
             if (state is CommunityActivityLoading) {
               return CustomLoadingIndicator.primary();
@@ -222,8 +223,6 @@ class _UserActivitiesState extends State<UserActivities> {
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (modalContext, setModalState) {
-          _searchController.addListener(() => setModalState(() {}));
-
           return BottomModal(
             title: "Sắp xếp và lọc",
             mainActionText: "Áp dụng",

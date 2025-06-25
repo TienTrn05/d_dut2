@@ -49,14 +49,20 @@ class ReRegistActivity extends CommunityActivityEvent {
 class SubmitProof extends CommunityActivityEvent {
   final String token;
   final String keyword;
-  final String idActivity;
+  final String idRegistration;
   final File image;
-  final String description;
+  final String? description;
 
   SubmitProof(
       {required this.token,
       required this.keyword,
-      required this.idActivity,
+      required this.idRegistration,
       required this.image,
-      required this.description});
+      this.description});
+}
+
+class UpdateUserActivitiesAfterSubmit extends CommunityActivityEvent {
+  final List<UserActivityModel> activities;
+
+  UpdateUserActivitiesAfterSubmit({required this.activities});
 }

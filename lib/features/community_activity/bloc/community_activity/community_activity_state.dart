@@ -28,3 +28,12 @@ class UserActivitiesLoaded extends CommunityActivityState {
 
   UserActivitiesLoaded(this.activities);
 }
+
+class ProofSubmitted extends CommunityActivityState {
+  final bool success;
+  final String? message;
+  final List<UserActivityModel> updatedActivities;
+
+  ProofSubmitted(
+      {required this.success, this.message, required this.updatedActivities});
+}

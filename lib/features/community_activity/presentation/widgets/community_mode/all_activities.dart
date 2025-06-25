@@ -127,7 +127,8 @@ class _AllActivitiesState extends State<AllActivities> {
           BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
             buildWhen: (previous, current) =>
                 current is CommunityActivityLoading ||
-                current is AllActivitiesLoaded,
+                current is AllActivitiesLoaded ||
+                current is CommunityActivityError,
             builder: (context, state) {
               if (state is CommunityActivityLoading) {
                 return CustomLoadingIndicator.primary();

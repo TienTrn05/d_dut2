@@ -2,6 +2,8 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
@@ -35,7 +37,25 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: CustomAppbar(label: "Thời khóa biểu"),
-          body: _isDayView ? const DayMode() : const SemesterMode(),
+          body: BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+            final String userRole = authState is AuthUserAuthenticated
+                ? authState.userData.role.name
+                : '';
+            if (userRole == RoleModel.roleStudent ||
+                userRole == RoleModel.roleTeacher) {
+              return _isDayView ? const DayMode() : const SemesterMode();
+            } else {
+              return Center(
+                child: Text(
+                  'Bạn không có quyền truy cập vào chức năng này',
+                  style: TextStyle(
+                    fontSize: FontSizes.large,
+                    fontStyle: FontStyle.normal,
+                  ),
+                ),
+              );
+            }
+          }),
           floatingActionButton: Builder(
             builder: (context) => Container(
               decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [

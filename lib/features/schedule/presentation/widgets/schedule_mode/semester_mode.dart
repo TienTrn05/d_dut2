@@ -267,33 +267,39 @@ class _SemesterModeState extends State<SemesterMode> {
     return UosCard(
       title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
       isExam: true,
-      child: listUOS.any((uos) => uos.examShift != null)
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < listUOS.length; i++)
-                  if (listUOS[i].examShift != null) ...[
-                    UnitOfStudyItem(
-                      idUos: listUOS[i].idUnitOfStudy,
-                      noUOS: listUOS[i].noUOS,
-                      nameSubject: listUOS[i].subjectName,
-                      room: listUOS[i].subjectName,
-                      examShift: listUOS[i].examShift,
-                      isExam: true,
-                    ),
-                    if (i < listUOS.length - 1 &&
-                        listUOS.sublist(i + 1).any((e) => e.examShift != null))
-                      const SizedBox(height: 10),
+      child:
+          listUOS.any((uos) => (uos.examShifts as List?)?.isNotEmpty ?? false)
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < listUOS.length; i++)
+                      if ((listUOS[i].examShifts as List?)?.isNotEmpty ??
+                          false) ...[
+                        for (var shift in listUOS[i].examShifts)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              UnitOfStudyItem(
+                                idUos: listUOS[i].idUnitOfStudy,
+                                noUOS: listUOS[i].noUOS,
+                                nameSubject: listUOS[i].subjectName,
+                                room: listUOS[i].subjectName,
+                                examShift: shift,
+                                isExam: true,
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                      ],
                   ],
-              ],
-            )
-          : const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "Hiện chưa có lịch thi",
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
+                )
+              : const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Hiện chưa có lịch thi",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
     );
   }
 }
