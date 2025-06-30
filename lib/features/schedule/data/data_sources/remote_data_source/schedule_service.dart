@@ -4,7 +4,7 @@ import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
 import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
-import 'package:e_dut/features/schedule/utils/functions.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
@@ -38,11 +38,19 @@ class ScheduleService {
     }
   }
 
-  Future<List<UosItemModel>> getListUOSBySemester(String idSemester) async {
+  Future<List<UosItemModel>> getListUOSBySemester(
+      String idSemester, bool isTeacher) async {
     try {
-      final response = await _dio.get(
-          "$_url/api/Timetable/GetListTimetablesBySemester",
-          queryParameters: {'idSemester': idSemester});
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListTeacherTimetablesBySemester",
+            queryParameters: {'idSemester': idSemester});
+      } else {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListStudentTimetablesBySemester",
+            queryParameters: {'idSemester': idSemester});
+      }
 
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
@@ -51,20 +59,31 @@ class ScheduleService {
         return data.map((e) => UosItemModel.fromJson(e)).toList();
       } else {
         throw Exception(
-            "[51:schedule_service]Failed to load list UOSItem : ${response.data['message']}");
+            "Failed to load list UOSItem : ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("[54:schedule_service]Failed to load UOSItem: $e");
+      logger.e("Failed to load UOSItem: $e");
       throw Exception("Failed to fetch UOSItem: $e");
     }
   }
 
-  Future<List<ScheduleItemModel>> getSchedulesByDate(DateTime inputDate) async {
+  Future<List<ScheduleItemModel>> getSchedulesByDate(
+      DateTime inputDate, bool isTeacher) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Timetable/GetListTimetablesByDate", queryParameters: {
-        'date': DateFormat('yyyy-MM-dd').format(inputDate),
-      });
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListTeacherTimetablesByDate",
+            queryParameters: {
+              'date': DateFormat('yyyy-MM-dd').format(inputDate),
+            });
+      } else {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListStudentTimetablesByDate",
+            queryParameters: {
+              'date': DateFormat('yyyy-MM-dd').format(inputDate),
+            });
+      }
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final List<dynamic> data = responseData['data'];
@@ -74,10 +93,10 @@ class ScheduleService {
         return schedules;
       } else {
         throw Exception(
-            "[69:schedule_service]Failed to load list ScheduleItem : ${response.data['message']}");
+            "Failed to load list ScheduleItem : ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("[72:schedule_service]Failed to load ScheduleItem: $e");
+      logger.e("Failed to load ScheduleItem: $e");
       throw Exception("Failed to fetch ScheduleItem: $e");
     }
   }
@@ -85,11 +104,12 @@ class ScheduleService {
   Future<List<CalendarEventModel>> getCalendarEvents(
       int month, int year) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Timetable/GetCalendarEvents", queryParameters: {
-        'month': month,
-        'year': year,
-      });
+      final response = await _dio.get(
+          "$_url/api/Timetable/GetStudentCalendarEvents",
+          queryParameters: {
+            'month': month,
+            'year': year,
+          });
 
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;

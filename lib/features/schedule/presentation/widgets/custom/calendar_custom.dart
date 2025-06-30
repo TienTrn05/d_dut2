@@ -1,5 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/cupertino.dart';
@@ -137,7 +139,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25), // Màu của shadow
+            color: Colors.black.withAlpha(64), // Màu của shadow
             spreadRadius: 0, // Độ lan của shadow
             blurRadius: 12, // Độ mờ của shadow
             offset: Offset(0, 4), // Độ lệch (X, Y)
@@ -225,9 +227,14 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     _selectedDay = selectedDay; // Cập nhật ngày được chọn
                     _focusedDay = selectedDay; // Cập nhật tiêu đề tháng
                   });
-                  context
-                      .read<ScheduleBloc>()
-                      .add(LoadSchedulesByDate(inputDate: _selectedDay));
+                  final authState = context.read<AuthBloc>().state;
+
+                  final String userRole = authState is AuthUserAuthenticated
+                      ? authState.userData.role.name
+                      : '';
+                  context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+                      inputDate: _selectedDay,
+                      isTeacher: userRole == RoleModel.roleTeacher));
                 },
                 headerStyle: HeaderStyle(
                   titleCentered: true,

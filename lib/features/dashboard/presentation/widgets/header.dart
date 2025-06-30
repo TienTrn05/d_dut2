@@ -29,10 +29,11 @@ class Header extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: 72,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(0),
       decoration: BoxDecoration(
         color: context.theme.primaryColor,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

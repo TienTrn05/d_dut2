@@ -24,14 +24,11 @@ class ScheduleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String userRole =
-        context.read<AuthBloc>().state is AuthUserAuthenticated
-            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
-                .userData
-                .role
-                .name
-            : RoleModel.roleStudent;
-    return GestureDetector(
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+      return GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(
               userRole == RoleModel.roleStudent
@@ -46,7 +43,8 @@ class ScheduleItem extends StatelessWidget {
           margin: EdgeInsets.only(bottom: 4),
           padding: EdgeInsets.only(left: 6, right: 8, top: 4, bottom: 4),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(245, 245, 245, 1),
+            color: context.theme.lightGrey,
+            // borderRadius: BorderRadius.circular(16),
             border: Border(
               left: BorderSide(
                 color: isExam
@@ -102,5 +100,6 @@ class ScheduleItem extends StatelessWidget {
             ],
           ),
         ));
+    });
   }
 }
