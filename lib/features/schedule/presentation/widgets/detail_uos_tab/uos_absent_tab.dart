@@ -1,10 +1,14 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
+import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class UosAbsentTab extends StatefulWidget {
@@ -17,9 +21,10 @@ class UosAbsentTab extends StatefulWidget {
 class _UosAbsentTabState extends State<UosAbsentTab> {
   bool isSellectedAll = false;
   DateTime currentDate = DateTime.now();
-  var selectedDate = "${DateTime.now()}, tuần 3";
+  var selectedDate =
+      "${DateFormat('dd/MM/yyyy').format(DateTime.now())}, tuần 3";
   DateTime startdWeek = DateTime(2025, 3, 3);
-  bool _isAbsentDate = false;
+  bool _isAbsentDate = true;
   // Giả lập sinh viên
   List<Map<String, dynamic>> students = [
     {
@@ -80,10 +85,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     });
   }
 
-  void _updateCurrentDate(DateTime newValue) {
+  void _updateCurrentDate(DateTime newValue, bool isAbsentDate) {
     setState(() {
       currentDate = newValue;
-      _isAbsentDate = true;
+      _isAbsentDate = isAbsentDate;
     });
 
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
@@ -130,9 +135,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   onPressed: () => {
                     showDialog(
                         context: context,
-                        builder: (context) => CalendarAbsent(
-                              initDate: currentDate,
-                              onValueChange: _updateCurrentDate,
+                        builder: (context) => BlocProvider(
+                              create: (_) =>
+                                  CalendarBloc(getIt.get<ScheduleRepository>()),
+                              child: CalendarAbsent(
+                                initDate: currentDate,
+                                onValueChange: _updateCurrentDate,
+                              ),
                             ))
                   },
                   style: ElevatedButton.styleFrom(
@@ -141,7 +150,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       color: context.theme.primaryColor ?? Colors.blue,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(999),
                     ),
                     padding: EdgeInsets.symmetric(
                       vertical: 4,
@@ -181,9 +190,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     onPressed: () => {
                       showDialog(
                           context: context,
-                          builder: (context) => CalendarAbsent(
-                                initDate: currentDate,
-                                onValueChange: _updateCurrentDate,
+                          builder: (context) => BlocProvider(
+                                create: (_) => CalendarBloc(
+                                    getIt.get<ScheduleRepository>()),
+                                child: CalendarAbsent(
+                                  initDate: currentDate,
+                                  onValueChange: _updateCurrentDate,
+                                ),
                               ))
                     },
                     style: ElevatedButton.styleFrom(
@@ -192,7 +205,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                         color: context.theme.primaryColor ?? Colors.blue,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(999),
                       ),
                       padding: EdgeInsets.symmetric(
                         vertical: 4,
@@ -224,7 +237,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               color: context.theme.red ?? Colors.red,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(999),
                             ),
                             padding: EdgeInsets.symmetric(
                               vertical: 4,
@@ -252,7 +265,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               color: context.theme.primaryColor ?? Colors.blue,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(999),
                             ),
                             padding: EdgeInsets.symmetric(
                               vertical: 4,

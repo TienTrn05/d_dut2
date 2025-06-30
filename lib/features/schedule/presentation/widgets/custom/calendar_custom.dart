@@ -178,20 +178,19 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
-            if (state is CalendarEventLoaded) {
-              _eventMap = {};
-              for (var event in state.calendarEvents) {
-                final date =
-                    DateTime(event.date.year, event.date.month, event.date.day);
-                if (!_eventMap.containsKey(date)) {
-                  _eventMap[date] = [];
-                }
-                for (var eventType in event.eventTypes) {
-                  _eventMap[date]!.add(eventType.eventType);
-                }
-              }
-            }
-
+            // if (state is CalendarEventLoaded) {
+            //   _eventMap = {};
+            //   for (var event in state.calendarEvents) {
+            //     final date =
+            //         DateTime(event.date.year, event.date.month, event.date.day);
+            //     if (!_eventMap.containsKey(date)) {
+            //       _eventMap[date] = [];
+            //     }
+            //     for (var eventType in event.eventTypes) {
+            //       _eventMap[date]!.add(eventType.eventType);
+            //     }
+            //   }
+            // }
             return GestureDetector(
               onTap: _showMonthYearPicker,
               child: TableCalendar(
