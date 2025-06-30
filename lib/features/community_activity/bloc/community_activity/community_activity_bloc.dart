@@ -129,12 +129,12 @@ class CommunityActivityBloc
     try {
       final token = event.token;
       final keyword = event.keyword;
-      final idActivity = event.idActivity;
+      final idRegistration = event.idRegistration;
       final image = event.image;
       final description = event.description;
 
-      final isSubmitProofSuccess =
-          await _repository.submitProof(token, idActivity, image, description);
+      final isSubmitProofSuccess = await _repository.submitProof(
+          token, idRegistration, image, description);
       final userActivities =
           await _repository.getUserActivities(token, keyword);
       if (isSubmitProofSuccess) {

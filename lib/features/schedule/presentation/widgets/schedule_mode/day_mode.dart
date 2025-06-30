@@ -39,9 +39,14 @@ class _DayModeState extends State<DayMode> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<ScheduleBloc>()
-        .add(LoadSchedulesByDate(inputDate: selectedDay));
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+          inputDate: selectedDay,
+          isTeacher: userRole == RoleModel.roleTeacher,
+        ));
   }
 
   @override

@@ -31,6 +31,7 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
         emit(TimetableError("Không có học kỳ nào."));
         return;
       }
+
       final currentIdSemester =
           await _repository.getSemesterByDate(DateTime.now());
       final updatedSemesters = semesters.map((s) {
@@ -47,9 +48,9 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
               ? updatedSemesters.indexWhere((s) => s.isCurrentSemester)
               : 0;
       final selectedSemester = updatedSemesters[selectedIndex];
-
-      final listUOS =
-          await _repository.getListUOSBySemester(selectedSemester.idSemester);
+      final isTeacher = event.isTeacher;
+      final listUOS = await _repository.getListUOSBySemester(
+          selectedSemester.idSemester, isTeacher);
 
       emit(TimetableDataLoaded(semesters, listUOS, selectedIndex));
     } catch (e) {
@@ -67,6 +68,7 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
         final index = event.selectedIndex;
 
         final idSemester = event.idSemester;
+        final isTeacher = event.isTeacher;
 
         if (_uosCache.containsKey(idSemester)) {
           emit(TimetableDataLoaded(
@@ -75,7 +77,8 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
             index,
           ));
         } else {
-          final listUOS = await _repository.getListUOSBySemester(idSemester);
+          final listUOS =
+              await _repository.getListUOSBySemester(idSemester, isTeacher);
           if (_uosCache.length >= _cacheLimit) {
             _uosCache.remove(_uosCache.keys.first);
           }

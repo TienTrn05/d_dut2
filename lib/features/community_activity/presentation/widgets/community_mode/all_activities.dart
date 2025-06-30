@@ -9,6 +9,7 @@ import 'package:e_dut/features/community_activity/data/model/activity_model.dart
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/activity_card.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/common/search_text_field.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/custom/date_picker.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
@@ -142,47 +143,10 @@ class _AllActivitiesState extends State<AllActivities> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextField(
+                  SearchTextField(
                     controller: _searchController,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      color: context.theme.grey,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      hintText: "Tìm kiếm ...",
-                      hintStyle: TextStyle(
-                        fontSize: FontSizes.medium,
-                        color: context.theme.grey,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: SvgPicture.asset(
-                          "assets/icons/svg/tabler_filter-search.svg",
-                          width: 18,
-                          height: 18,
-                          colorFilter: ColorFilter.mode(
-                            context.theme.grey ?? Colors.grey,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                        onPressed: () => _showFilterModal(context),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(999),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(999),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(999),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+                    onFilterPressed: () => _showFilterModal(context),
+                    textColor: context.theme.grey ?? Colors.grey,
                   ),
                   const SizedBox(height: 10),
                   const SizedBox(height: 20),

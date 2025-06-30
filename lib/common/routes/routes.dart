@@ -1,7 +1,5 @@
-import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
-import 'package:e_dut/features/community_activity/presentation/screens/detail_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
@@ -82,10 +80,6 @@ class Routes {
         return MaterialPageRoute(
             builder: (context) => const CommunityActivitiesScreen());
 
-      case detailCommunityActivity:
-        final activity = settings.arguments as ActivityModel;
-        return MaterialPageRoute(
-            builder: (context) => DetailActivityScreen(activity: activity));
       case detailUserActivityScreen:
         final userActivity = settings.arguments as UserActivityModel;
         return MaterialPageRoute(

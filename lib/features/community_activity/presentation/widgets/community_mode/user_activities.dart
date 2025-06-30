@@ -8,6 +8,7 @@ import 'package:e_dut/features/community_activity/bloc/community_activity/commun
 import 'package:e_dut/features/community_activity/constant/user_activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/user_activity_card.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/common/search_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -137,47 +138,10 @@ class _UserActivitiesState extends State<UserActivities> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
+              SearchTextField(
                 controller: _searchController,
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
-                  color: context.theme.grey,
-                ),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  hintText: "Tìm kiếm ...",
-                  hintStyle: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: SvgPicture.asset(
-                      "assets/icons/svg/tabler_filter-search.svg",
-                      width: 18,
-                      height: 18,
-                      colorFilter: ColorFilter.mode(
-                        context.theme.grey ?? Colors.grey,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onPressed: () => _showFilterModal(context),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+                onFilterPressed: () => _showFilterModal(context),
+                textColor: context.theme.grey ?? Colors.grey,
               ),
               const SizedBox(height: 10),
               BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
@@ -189,9 +153,12 @@ class _UserActivitiesState extends State<UserActivities> {
                     userActivites = state.activities;
                     return Column(
                       children: filteredActivities
-                          .map((activity) => UserActivityCard(
-                                userActivity: activity,
-                                keyword: _searchController.text.trim(),
+                          .map((activity) => Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: UserActivityCard(
+                                  userActivity: activity,
+                                  keyword: _searchController.text.trim(),
+                                ),
                               ))
                           .toList(),
                     );

@@ -3,11 +3,10 @@ import 'dart:ui';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
-import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/common/dialog_content.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/common/user_option_dialog.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/status_label.dart';
 import 'package:e_dut/features/community_activity/util/functions.dart';
 import 'package:flutter/material.dart';
@@ -97,8 +96,6 @@ class _UserActivityCardState extends State<UserActivityCard>
 
   void _showOptionsDialog(BuildContext context) {
     final communitybloc = context.read<CommunityActivityBloc>();
-    final authBloc = context.read<AuthBloc>();
-
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -111,11 +108,10 @@ class _UserActivityCardState extends State<UserActivityCard>
           child: Center(
             child: Material(
               color: Colors.transparent,
-              child: DialogContent(
+              child: UserOptionDialog(
                 userActivity: widget.userActivity,
                 keyword: widget.keyword,
                 communityBloc: communitybloc,
-                authBloc: authBloc,
               ),
             ),
           ),

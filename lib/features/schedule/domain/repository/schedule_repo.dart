@@ -15,12 +15,14 @@ class ScheduleRepository {
     return _scheduleService.getListSemester();
   }
 
-  Future<List<UosItemModel>> getListUOSBySemester(String idSemester) {
-    return _scheduleService.getListUOSBySemester(idSemester);
+  Future<List<UosItemModel>> getListUOSBySemester(
+      String idSemester, bool isTeacher) {
+    return _scheduleService.getListUOSBySemester(idSemester, isTeacher);
   }
 
-  Future<List<ScheduleItemModel>> getSchedulesByDate(DateTime inputDate) {
-    return _scheduleService.getSchedulesByDate(inputDate);
+  Future<List<ScheduleItemModel>> getSchedulesByDate(
+      DateTime inputDate, bool isTeacher) {
+    return _scheduleService.getSchedulesByDate(inputDate, isTeacher);
   }
 
   Future<List<CalendarEventModel>> getCalendarEvents(int month, int year) {

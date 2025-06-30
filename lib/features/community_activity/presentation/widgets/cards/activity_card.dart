@@ -1,12 +1,12 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/constant/activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/presentation/screens/detail_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/status_label.dart';
 import 'package:e_dut/features/community_activity/util/functions.dart';
 import 'package:flutter/material.dart';
@@ -39,13 +39,14 @@ class ActivityCard extends StatelessWidget {
     }
 
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-      // final String userRole = authState is AuthUserAuthenticated
-      //     ? authState.userData.role.name
-      //     : '';
       return GestureDetector(
         onTap: () {
-          Navigator.of(context)
-              .pushNamed(Routes.detailCommunityActivity, arguments: activity);
+          final communityBloc = context.read<CommunityActivityBloc>();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => DetailActivityScreen(
+                      activity: activity, communityBloc: communityBloc)));
         },
         child: Container(
           width: double.infinity,

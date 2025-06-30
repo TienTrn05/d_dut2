@@ -38,11 +38,19 @@ class ScheduleService {
     }
   }
 
-  Future<List<UosItemModel>> getListUOSBySemester(String idSemester) async {
+  Future<List<UosItemModel>> getListUOSBySemester(
+      String idSemester, bool isTeacher) async {
     try {
-      final response = await _dio.get(
-          "$_url/api/Timetable/GetListStudentTimetablesBySemester",
-          queryParameters: {'idSemester': idSemester});
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListTeacherTimetablesBySemester",
+            queryParameters: {'idSemester': idSemester});
+      } else {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListStudentTimetablesBySemester",
+            queryParameters: {'idSemester': idSemester});
+      }
 
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
@@ -59,13 +67,23 @@ class ScheduleService {
     }
   }
 
-  Future<List<ScheduleItemModel>> getSchedulesByDate(DateTime inputDate) async {
+  Future<List<ScheduleItemModel>> getSchedulesByDate(
+      DateTime inputDate, bool isTeacher) async {
     try {
-      final response = await _dio.get(
-          "$_url/api/Timetable/GetListStudentTimetablesByDate",
-          queryParameters: {
-            'date': DateFormat('yyyy-MM-dd').format(inputDate),
-          });
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListTeacherTimetablesByDate",
+            queryParameters: {
+              'date': DateFormat('yyyy-MM-dd').format(inputDate),
+            });
+      } else {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetListStudentTimetablesByDate",
+            queryParameters: {
+              'date': DateFormat('yyyy-MM-dd').format(inputDate),
+            });
+      }
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final List<dynamic> data = responseData['data'];
@@ -75,10 +93,10 @@ class ScheduleService {
         return schedules;
       } else {
         throw Exception(
-            "[69:schedule_service]Failed to load list ScheduleItem : ${response.data['message']}");
+            "Failed to load list ScheduleItem : ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("[72:schedule_service]Failed to load ScheduleItem: $e");
+      logger.e("Failed to load ScheduleItem: $e");
       throw Exception("Failed to fetch ScheduleItem: $e");
     }
   }

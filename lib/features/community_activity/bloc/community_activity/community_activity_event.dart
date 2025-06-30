@@ -19,6 +19,12 @@ class LoadUserActivities extends CommunityActivityEvent {
   LoadUserActivities({required this.token, required this.keyword});
 }
 
+class LoadDetailActivity extends CommunityActivityEvent {
+  final ActivityModel activity;
+
+  LoadDetailActivity({required this.activity});
+}
+
 class RegistActivity extends CommunityActivityEvent {
   final String token;
   final String keyword;
@@ -28,21 +34,21 @@ class RegistActivity extends CommunityActivityEvent {
       {required this.token, required this.keyword, required this.idActivity});
 }
 
-class CancelRegistration extends CommunityActivityEvent {
-  final String token;
-  final String keyword;
-  final String idActivity;
-
-  CancelRegistration(
-      {required this.token, required this.keyword, required this.idActivity});
-}
-
 class ReRegistActivity extends CommunityActivityEvent {
   final String token;
   final String keyword;
   final String idActivity;
 
   ReRegistActivity(
+      {required this.token, required this.keyword, required this.idActivity});
+}
+
+class CancelRegistration extends CommunityActivityEvent {
+  final String token;
+  final String keyword;
+  final String idActivity;
+
+  CancelRegistration(
       {required this.token, required this.keyword, required this.idActivity});
 }
 

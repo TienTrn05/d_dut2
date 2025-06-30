@@ -51,11 +51,16 @@ class _SemesterModeState extends State<SemesterMode> {
                       setState(() {
                         selectedIndex = index;
                       });
+                      final authState = context.read<AuthBloc>().state;
+
+                      final String userRole = authState is AuthUserAuthenticated
+                          ? authState.userData.role.name
+                          : '';
                       context.read<TimetableBloc>().add(
                             LoadListUOSBySemester(
-                              idSemester: semesterList[index].idSemester,
-                              selectedIndex: index,
-                            ),
+                                idSemester: semesterList[index].idSemester,
+                                selectedIndex: index,
+                                isTeacher: userRole == RoleModel.roleTeacher),
                           );
                     }
                   },
@@ -92,11 +97,17 @@ class _SemesterModeState extends State<SemesterMode> {
       setState(() {
         selectedIndex++;
       });
+      final authState = context.read<AuthBloc>().state;
+
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
-              idSemester: semesterList[selectedIndex].idSemester,
-              selectedIndex: selectedIndex,
-            ),
+                idSemester: semesterList[selectedIndex].idSemester,
+                selectedIndex: selectedIndex,
+                isTeacher: userRole == RoleModel.roleTeacher),
           );
     }
   }
@@ -106,11 +117,17 @@ class _SemesterModeState extends State<SemesterMode> {
       setState(() {
         selectedIndex--;
       });
+      final authState = context.read<AuthBloc>().state;
+
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
-              idSemester: semesterList[selectedIndex].idSemester,
-              selectedIndex: selectedIndex,
-            ),
+                idSemester: semesterList[selectedIndex].idSemester,
+                selectedIndex: selectedIndex,
+                isTeacher: userRole == RoleModel.roleTeacher),
           );
     }
   }
@@ -118,7 +135,14 @@ class _SemesterModeState extends State<SemesterMode> {
   @override
   void initState() {
     super.initState();
-    context.read<TimetableBloc>().add(LoadListSemesters());
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+
+    context
+        .read<TimetableBloc>()
+        .add(LoadListSemesters(isTeacher: userRole == RoleModel.roleTeacher));
   }
 
   @override

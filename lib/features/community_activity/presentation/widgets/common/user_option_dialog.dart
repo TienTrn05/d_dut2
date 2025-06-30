@@ -9,35 +9,34 @@ import 'package:e_dut/features/community_activity/data/model/user_activity_model
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/user_activity_card.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/submit_proof_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 
-class DialogContent extends StatefulWidget {
-  const DialogContent({
+class UserOptionDialog extends StatefulWidget {
+  const UserOptionDialog({
     super.key,
     required this.userActivity,
     required this.keyword,
     required this.communityBloc,
-    required this.authBloc,
   });
 
-  final AuthBloc authBloc;
   final CommunityActivityBloc communityBloc;
   final String keyword;
   final UserActivityModel userActivity;
 
   @override
-  State<DialogContent> createState() => _DialogContentState();
+  State<UserOptionDialog> createState() => _UserOptionDialogState();
 }
 
-class _DialogContentState extends State<DialogContent> {
+class _UserOptionDialogState extends State<UserOptionDialog> {
   XFile? pickedImage;
   bool isImageValid = true;
   final descriptionController = TextEditingController();
   final picker = ImagePicker();
 
   void _showProofSubmission() {
-    final authState = widget.authBloc.state;
+    final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       final token = authState.accessToken;
 
@@ -62,7 +61,7 @@ class _DialogContentState extends State<DialogContent> {
   }
 
   void _cancelRegistration() {
-    final authState = widget.authBloc.state;
+    final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       final token = authState.accessToken;
       dialog.CustomAlertDialog.showCustomDialog(
@@ -84,7 +83,7 @@ class _DialogContentState extends State<DialogContent> {
   }
 
   void _reRegisterActivity() {
-    final authState = widget.authBloc.state;
+    final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       final token = authState.accessToken;
       dialog.CustomAlertDialog.showCustomDialog(

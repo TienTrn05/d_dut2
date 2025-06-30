@@ -52,8 +52,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
         ),
         BlocProvider(
-          create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
-            ..add(LoadSchedulesByDate(inputDate: DateTime.now())),
+          create: (context) {
+            final authState = context.read<AuthBloc>().state;
+
+            final String userRole = authState is AuthUserAuthenticated
+                ? authState.userData.role.name
+                : '';
+
+            final bloc = ScheduleBloc(getIt.get<ScheduleRepository>());
+            bloc.add(LoadSchedulesByDate(
+              inputDate: DateTime.now(),
+              isTeacher: userRole == RoleModel.roleTeacher,
+            ));
+            return bloc;
+          },
         ),
       ],
       child: BlocListener<DashboardBloc, DashboardState>(

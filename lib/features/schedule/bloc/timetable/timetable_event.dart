@@ -5,14 +5,21 @@ class TimetableEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadListSemesters extends TimetableEvent {}
+class LoadListSemesters extends TimetableEvent {
+  final bool isTeacher;
+
+  LoadListSemesters({required this.isTeacher});
+}
 
 class LoadListUOSBySemester extends TimetableEvent {
   final String idSemester;
   final int selectedIndex;
+  final bool isTeacher;
 
   LoadListUOSBySemester(
-      {required this.idSemester, required this.selectedIndex});
+      {required this.idSemester,
+      required this.selectedIndex,
+      required this.isTeacher});
 
   @override
   List<Object?> get props => [
