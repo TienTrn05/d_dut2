@@ -358,7 +358,7 @@ class CustomTabBar extends StatelessWidget {
                           ? context.theme.primaryColor
                           : Colors.transparent,
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(4))),
+                          const BorderRadius.vertical(top: Radius.circular(8))),
                   alignment: Alignment.center,
                   child: Text(
                     tabs[index],
