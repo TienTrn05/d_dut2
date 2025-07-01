@@ -1,5 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,11 +28,15 @@ class _CalendarCustomState extends State<CalendarCustom> {
       CalendarFormat.month; // Lịch mặc định là tháng
 
   void _loadCalendarEventsForMonth() {
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
     context.read<CalendarBloc>().add(
           LoadCalendarEvents(
-            month: _focusedDay.month,
-            year: _focusedDay.year,
-          ),
+              month: _focusedDay.month,
+              year: _focusedDay.year,
+              isTeacher: userRole == RoleModel.roleTeacher),
         );
   }
 
@@ -137,7 +143,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25), // Màu của shadow
+            color: Colors.black.withAlpha(64), // Màu của shadow
             spreadRadius: 0, // Độ lan của shadow
             blurRadius: 12, // Độ mờ của shadow
             offset: Offset(0, 4), // Độ lệch (X, Y)
@@ -172,20 +178,19 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
-            if (state is CalendarEventLoaded) {
-              _eventMap = {};
-              for (var event in state.calendarEvents) {
-                final date =
-                    DateTime(event.date.year, event.date.month, event.date.day);
-                if (!_eventMap.containsKey(date)) {
-                  _eventMap[date] = [];
-                }
-                for (var eventType in event.eventTypes) {
-                  _eventMap[date]!.add(eventType.eventType);
-                }
-              }
-            }
-
+            // if (state is CalendarEventLoaded) {
+            //   _eventMap = {};
+            //   for (var event in state.calendarEvents) {
+            //     final date =
+            //         DateTime(event.date.year, event.date.month, event.date.day);
+            //     if (!_eventMap.containsKey(date)) {
+            //       _eventMap[date] = [];
+            //     }
+            //     for (var eventType in event.eventTypes) {
+            //       _eventMap[date]!.add(eventType.eventType);
+            //     }
+            //   }
+            // }
             return GestureDetector(
               onTap: _showMonthYearPicker,
               child: TableCalendar(
@@ -195,11 +200,17 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   setState(() {
                     _focusedDay = focusDate;
                   });
+                  final authState = context.read<AuthBloc>().state;
+
+                  final String userRole = authState is AuthUserAuthenticated
+                      ? authState.userData.role.name
+                      : '';
+
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
-                          month: focusDate.month,
-                          year: focusDate.year,
-                        ),
+                            month: focusDate.month,
+                            year: focusDate.year,
+                            isTeacher: userRole == RoleModel.roleTeacher),
                       );
                   if (_calendarFormat == CalendarFormat.week) {
                     context.read<CalendarBloc>().add(
@@ -225,9 +236,14 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     _selectedDay = selectedDay; // Cập nhật ngày được chọn
                     _focusedDay = selectedDay; // Cập nhật tiêu đề tháng
                   });
-                  context
-                      .read<ScheduleBloc>()
-                      .add(LoadSchedulesByDate(inputDate: _selectedDay));
+                  final authState = context.read<AuthBloc>().state;
+
+                  final String userRole = authState is AuthUserAuthenticated
+                      ? authState.userData.role.name
+                      : '';
+                  context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+                      inputDate: _selectedDay,
+                      isTeacher: userRole == RoleModel.roleTeacher));
                 },
                 headerStyle: HeaderStyle(
                   titleCentered: true,
@@ -303,7 +319,8 @@ class _CalendarCustomState extends State<CalendarCustom> {
                               height: 5,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: type == 1 // Học
+                                  // 1: Study, 2: Exam, Teaching: 3
+                                  color: (type == 1 || type == 3)
                                       ? Color.fromRGBO(42, 116, 189, 1)
                                       : Color.fromRGBO(204, 1, 2, 1)),
                             );
@@ -326,13 +343,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   } else {
                     _calendarFormat = CalendarFormat.month;
                   }
-                  // if (_focusedDay.isAfter(_startdWeek)) {
-                  //   int weekDifference =
-                  //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                  //   _currentWeek = weekDifference + 1;
-                  // } else {
-                  //   _currentWeek = 0;
-                  // }
                 });
                 if (_calendarFormat == CalendarFormat.week) {
                   context.read<CalendarBloc>().add(

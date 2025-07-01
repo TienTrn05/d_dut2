@@ -13,22 +13,31 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
   final Color? mediumLightBlue;
   final Color? red;
   final Color? grey;
+  final Color? lightGrey;
 
   static const lightMode = CustomThemeExtension(
       primaryColor: CommonColors.primaryColor,
       lightBlue: CommonColors.lightBlueColor,
       mediumLightBlue: CommonColors.mediumLightBlueColor,
       red: CommonColors.redColor,
-      grey: CommonColors.greyColor);
+      grey: CommonColors.greyColor,
+      lightGrey: CommonColors.lightGreyColor);
 
   static const darkMode = CustomThemeExtension(
       primaryColor: CommonColors.primaryColor,
       lightBlue: CommonColors.lightBlueColor,
       mediumLightBlue: CommonColors.mediumLightBlueColor,
       red: CommonColors.redColor,
-      grey: CommonColors.greyColor);
+      grey: CommonColors.greyColor,
+      lightGrey: CommonColors.lightGreyColor);
 
-  const CustomThemeExtension({this.primaryColor, this.lightBlue, this.mediumLightBlue, this.red, this.grey});
+  const CustomThemeExtension(
+      {this.primaryColor,
+      this.lightBlue,
+      this.mediumLightBlue,
+      this.red,
+      this.grey,
+      this.lightGrey});
 
   @override
   ThemeExtension<CustomThemeExtension> copyWith({
@@ -37,14 +46,15 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
     Color? mediumLightBlue,
     Color? red,
     Color? grey,
+    Color? lightGrey,
   }) {
     return CustomThemeExtension(
-      primaryColor: primaryColor ?? this.primaryColor,
-      lightBlue: lightBlue ?? this.lightBlue,
-      mediumLightBlue: mediumLightBlue ?? this.mediumLightBlue,
-      red: red ?? this.red,
-      grey: grey ?? this.grey,
-    );
+        primaryColor: primaryColor ?? this.primaryColor,
+        lightBlue: lightBlue ?? this.lightBlue,
+        mediumLightBlue: mediumLightBlue ?? this.mediumLightBlue,
+        red: red ?? this.red,
+        grey: grey ?? this.grey,
+        lightGrey: lightGrey ?? this.lightGrey);
   }
 
   @override
@@ -54,11 +64,11 @@ class CustomThemeExtension extends ThemeExtension<CustomThemeExtension> {
       return this;
     }
     return CustomThemeExtension(
-      primaryColor: Color.lerp(primaryColor, other.primaryColor, t),
-      lightBlue: Color.lerp(lightBlue, other.lightBlue, t),
-      mediumLightBlue: Color.lerp(mediumLightBlue, other.mediumLightBlue, t),
-      red: Color.lerp(red, other.red, t),
-      grey: Color.lerp(grey, other.grey, t),
-    );
+        primaryColor: Color.lerp(primaryColor, other.primaryColor, t),
+        lightBlue: Color.lerp(lightBlue, other.lightBlue, t),
+        mediumLightBlue: Color.lerp(mediumLightBlue, other.mediumLightBlue, t),
+        red: Color.lerp(red, other.red, t),
+        grey: Color.lerp(grey, other.grey, t),
+        lightGrey: Color.lerp(lightGrey, other.lightGrey, t));
   }
 }

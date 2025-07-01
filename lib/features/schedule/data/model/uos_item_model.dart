@@ -8,7 +8,7 @@ class UosItemModel {
   final String subjectName;
   final String teacherName;
   final List<StudyShiftModel> studyShifts;
-  final ExamShiftModel? examShift;
+  final List<ExamShiftModel> examShifts;
 
   UosItemModel(
       {required this.idUnitOfStudy,
@@ -17,7 +17,7 @@ class UosItemModel {
       required this.subjectName,
       required this.teacherName,
       required this.studyShifts,
-      this.examShift});
+      required this.examShifts});
 
   factory UosItemModel.fromJson(Map<String, dynamic> json) {
     return UosItemModel(
@@ -29,9 +29,9 @@ class UosItemModel {
       studyShifts: (json['studyShifts'] as List)
           .map((studyShift) => StudyShiftModel.fromJson(studyShift))
           .toList(),
-      examShift: json['examShift'] != null
-          ? ExamShiftModel.fromJson(json['examShift'])
-          : null,
+      examShifts: (json['examShifts'] as List)
+          .map((examShift) => ExamShiftModel.fromJson(examShift))
+          .toList(),
     );
   }
   Map<String, dynamic> toJson() {
@@ -43,7 +43,7 @@ class UosItemModel {
       'teacherName': teacherName,
       'studyShifts':
           studyShifts.map((studyShift) => studyShift.toJson()).toList(),
-      'examShift': examShift?.toJson(),
+      'examShift': examShifts.map((examShift) => examShift.toJson()).toList(),
     };
   }
 }

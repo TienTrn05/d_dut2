@@ -26,8 +26,8 @@ class NotificationCard extends StatelessWidget {
     return Card(
       elevation: 0,
       margin: EdgeInsets.only(top: 0, bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      color: isRead ? Color(0xffF5F5F5) : Color(0xffE4EDF4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: isRead ? context.theme.lightBlue : context.theme.lightGrey,
       child: Padding(
         padding: EdgeInsets.all(12),
         child: Column(

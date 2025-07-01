@@ -111,61 +111,62 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
         backgroundColor: Colors.white,
         endDrawer: Drawer(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
             ),
-          ),
             child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Row(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/svg/solar_bell-bold.svg",
-                      colorFilter: ColorFilter.mode(
-                        context.theme.primaryColor ?? Colors.blue,
-                        BlendMode.srcIn,
-                      ),
-                      width: 24,
-                      height: 24,
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/svg/solar_bell-bold.svg",
+                          colorFilter: ColorFilter.mode(
+                            context.theme.primaryColor ?? Colors.blue,
+                            BlendMode.srcIn,
+                          ),
+                          width: 24,
+                          height: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Thông báo",
+                          style: TextStyle(
+                            fontSize: FontSizes.large,
+                            fontWeight: FontWeight.bold,
+                            color: context.theme.primaryColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Thông báo",
-                      style: TextStyle(
-                        fontSize: FontSizes.large,
-                        fontWeight: FontWeight.bold,
-                        color: context.theme.primaryColor,
-                      ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      height: 1,
+                      color: context.theme.primaryColor,
                     ),
+                    _buildSwitchTile(
+                        "Bật thông báo chung", isGeneralNotificationOn,
+                        (value) {
+                      setState(() {
+                        isGeneralNotificationOn = value;
+                      });
+                    }),
+                    _buildSwitchTile(
+                        "Bật thông báo của tôi", isMyNotificationOn, (value) {
+                      setState(() {
+                        isMyNotificationOn = value;
+                      });
+                    }),
+                    _buildDropdownTile(),
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  height: 1,
-                  color: context.theme.primaryColor,
-                ),
-                _buildSwitchTile("Bật thông báo chung", isGeneralNotificationOn,
-                    (value) {
-                  setState(() {
-                    isGeneralNotificationOn = value;
-                  });
-                }),
-                _buildSwitchTile("Bật thông báo của tôi", isMyNotificationOn,
-                    (value) {
-                  setState(() {
-                    isMyNotificationOn = value;
-                  });
-                }),
-                _buildDropdownTile(),
-              ],
-            ),
-          ),
-        )),
+              ),
+            )),
         body: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -173,8 +174,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(4),
+                  color: context.theme.lightGrey ?? Color(0xffFAFAFA),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: TextField(
                   decoration: InputDecoration(
@@ -195,8 +196,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   indicator: BoxDecoration(
                     color: context.theme.primaryColor, // Màu nền tab được chọn
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      topRight: Radius.circular(4),
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
                     ),
                   ),
                   labelColor: Colors.white, // Màu chữ của tab được chọn

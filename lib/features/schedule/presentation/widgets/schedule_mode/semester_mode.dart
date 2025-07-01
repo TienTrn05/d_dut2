@@ -3,9 +3,10 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/cards/uos_card.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/items/uos_item.dart';
-import 'package:e_dut/features/schedule/utils/functions.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/card/uos_card.dart';
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/item/uos_item.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,46 +27,67 @@ class _SemesterModeState extends State<SemesterMode> {
   void _showPicker(BuildContext context, List<SemesterModel> semesterList) {
     showCupertinoModalPopup(
       context: context,
-      builder: (_) => CupertinoActionSheet(
-        actions: [
-          SizedBox(
-            height: 200,
-            child: CupertinoPicker(
-              backgroundColor: Colors.white,
-              itemExtent: 52,
-              scrollController:
-                  FixedExtentScrollController(initialItem: selectedIndex),
-              onSelectedItemChanged: (int index) {
-                if (selectedIndex != index) {
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                  context.read<TimetableBloc>().add(
-                        LoadListUOSBySemester(
-                          idSemester: semesterList[selectedIndex].idSemester,
-                          selectedIndex: selectedIndex,
-                        ),
-                      );
-                }
-              },
-              selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                background: Colors.lightBlue.withAlpha(30),
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 200,
+                child: CupertinoPicker(
+                  backgroundColor: Colors.transparent,
+                  itemExtent: 52,
+                  scrollController:
+                      FixedExtentScrollController(initialItem: selectedIndex),
+                  onSelectedItemChanged: (int index) {
+                    if (selectedIndex != index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                      final authState = context.read<AuthBloc>().state;
+
+                      final String userRole = authState is AuthUserAuthenticated
+                          ? authState.userData.role.name
+                          : '';
+                      context.read<TimetableBloc>().add(
+                            LoadListUOSBySemester(
+                                idSemester: semesterList[index].idSemester,
+                                selectedIndex: index,
+                                isTeacher: userRole == RoleModel.roleTeacher),
+                          );
+                    }
+                  },
+                  selectionOverlay: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue.withAlpha(30),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  children: semesterList
+                      .map((e) => Center(
+                            child: Text(
+                              'Học kỳ ${e.noSemester}, ${e.startYear}-${e.endYear}',
+                              style: const TextStyle(
+                                fontSize: FontSizes.large,
+                                fontWeight: FontWeight.bold,
+                                height: 1.25,
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
               ),
-              children: semesterList
-                  .map((e) => Center(
-                        child: Text(
-                          'Học kỳ ${e.noSemester}, ${e.startYear}-${e.endYear}',
-                          style: const TextStyle(
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.bold,
-                            height: 1.25,
-                          ),
-                        ),
-                      ))
-                  .toList(),
-            ),
-          )
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -75,11 +97,17 @@ class _SemesterModeState extends State<SemesterMode> {
       setState(() {
         selectedIndex++;
       });
+      final authState = context.read<AuthBloc>().state;
+
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
-              idSemester: semesterList[selectedIndex].idSemester,
-              selectedIndex: selectedIndex,
-            ),
+                idSemester: semesterList[selectedIndex].idSemester,
+                selectedIndex: selectedIndex,
+                isTeacher: userRole == RoleModel.roleTeacher),
           );
     }
   }
@@ -89,11 +117,17 @@ class _SemesterModeState extends State<SemesterMode> {
       setState(() {
         selectedIndex--;
       });
+      final authState = context.read<AuthBloc>().state;
+
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
-              idSemester: semesterList[selectedIndex].idSemester,
-              selectedIndex: selectedIndex,
-            ),
+                idSemester: semesterList[selectedIndex].idSemester,
+                selectedIndex: selectedIndex,
+                isTeacher: userRole == RoleModel.roleTeacher),
           );
     }
   }
@@ -101,216 +135,195 @@ class _SemesterModeState extends State<SemesterMode> {
   @override
   void initState() {
     super.initState();
-    context.read<TimetableBloc>().add(LoadListSemesters());
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+
+    context
+        .read<TimetableBloc>()
+        .add(LoadListSemesters(isTeacher: userRole == RoleModel.roleTeacher));
   }
 
   @override
   Widget build(BuildContext context) {
-    final String userRole =
-        context.read<AuthBloc>().state is AuthUserAuthenticated
-            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
-                .userData
-                .role
-                .name
-            : RoleModel.roleStudent;
-
     return SafeArea(
-      child: BlocConsumer<TimetableBloc, TimetableState>(
-        //BlocConsumer: dùng bloc đã được cấp từ trước để listen + build UI -> không tạo bloc mới
-        listener: (context, state) {
-          if (state is TimetableDataLoaded) {
-            // Nếu muốn cập nhật selectedIndex ở đây (ví dụ từ event), bạn có thể gán vào biến trong State
-            // hoặc cập nhật setState nếu cần render gì đó nhẹ ở ngoài build
-            selectedIndex = state.selectedIndex;
-          }
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, authState) {
+          final String userRole = authState is AuthUserAuthenticated
+              ? authState.userData.role.name
+              : '';
 
-          if (state is TimetableError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is TimetableLoading) {
-            return LinearProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Color(0xFF0D99FF),
-              ),
-              backgroundColor: Colors.transparent,
-              minHeight: 2,
-            );
-          } else if (state is TimetableDataLoaded) {
-            final semesterList = state.semesters;
-            final listUOS = state.listUOS;
+          return BlocConsumer<TimetableBloc, TimetableState>(
+            listener: (context, state) {
+              if (state is TimetableDataLoaded) {
+                selectedIndex = state.selectedIndex;
+              }
 
-            if (selectedIndex >= semesterList.length) {
-              selectedIndex = 0;
-            }
-
-            final currentSemester = semesterList[selectedIndex];
-
-            return Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _previousSemester(semesterList),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded),
-                        ),
-                        GestureDetector(
-                          onTap: () => _showPicker(context, semesterList),
-                          child: Text(
-                            'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
-                            style: const TextStyle(
-                              fontSize: FontSizes.medium,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => _nextSemester(semesterList),
-                          child: const Icon(Icons.arrow_forward_ios_rounded),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    listUOS.isNotEmpty
-                        ? Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  UosCard(
-                                    title: userRole == RoleModel.roleStudent
-                                        ? "Lịch học"
-                                        : "Lịch dạy",
-                                    child: Column(
-                                      children: listUOS
-                                          .map((uos) => UnitOfStudyItem(
-                                                idUos: uos.idUnitOfStudy,
-                                                noUOS: uos.noUOS,
-                                                nameSubject: uos.subjectName,
-                                                credit: uos.credit,
-                                                timetable: Functions
-                                                    .analyzeStudyShifts(
-                                                        uos.studyShifts),
-
-                                                // timetable:
-                                                //     Functions.analyzeStudyShifts([
-                                                //   StudyShiftModel(
-                                                //       dayOfWeek: 3,
-                                                //       startPeriod: 1,
-                                                //       endPeriod: 3,
-                                                //       startWeek: 1,
-                                                //       endWeek: 9,
-                                                //       room: "E201A"),
-                                                //   StudyShiftModel(
-                                                //       dayOfWeek: 3,
-                                                //       startPeriod: 1,
-                                                //       endPeriod: 3,
-                                                //       startWeek: 16,
-                                                //       endWeek: 32,
-                                                //       room: "E201A"),
-                                                // ]),
-
-                                                // timetable:
-                                                //     Functions.analyzeStudyShifts([
-                                                //   StudyShiftModel(
-                                                //       dayOfWeek: 1,
-                                                //       startPeriod: 1,
-                                                //       endPeriod: 3,
-                                                //       startWeek: 3,
-                                                //       endWeek: 18,
-                                                //       room: "E201A"),
-                                                //   StudyShiftModel(
-                                                //       dayOfWeek: 2,
-                                                //       startPeriod: 1,
-                                                //       endPeriod: 3,
-                                                //       startWeek: 3,
-                                                //       endWeek: 19,
-                                                //       room: "E201A"),
-                                                //   StudyShiftModel(
-                                                //       dayOfWeek: 3,
-                                                //       startPeriod: 1,
-                                                //       endPeriod: 3,
-                                                //       startWeek: 3,
-                                                //       endWeek: 19,
-                                                //       room: "E201A"),
-                                                // ]),
-                                                teacher: uos.teacherName,
-                                              ))
-                                          .toList(),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  UosCard(
-                                    title: userRole == RoleModel.roleStudent
-                                        ? "Lịch thi"
-                                        : "Lịch coi thi",
-                                    isExam: true,
-                                    child: listUOS.any((uos) =>
-                                            uos.examShift !=
-                                            null) //kiểm tra có ít nhất 1 học phần có lịch thi
-                                        ? Column(
-                                            children: listUOS
-                                                .where((uos) =>
-                                                    uos.examShift !=
-                                                    null) //chỉ hiện những học phần có lịch thi
-                                                .map((uos) => UnitOfStudyItem(
-                                                      idUos: uos.idUnitOfStudy,
-                                                      noUOS: uos.noUOS,
-                                                      nameSubject:
-                                                          uos.subjectName,
-                                                      room: uos.subjectName,
-                                                      examShift: uos.examShift,
-                                                      isExam: true,
-                                                    ))
-                                                .toList(),
-                                          )
-                                        : const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Hiện chưa có lịch thi",
-                                              style:
-                                                  TextStyle(color: Colors.grey),
-                                            ),
-                                          ),
-                                  ),
-                                  const SizedBox(height: 40),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Expanded(
-                            // padding: EdgeInsets.all(8.0),
-                            child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/icons/svg/undraw_no-data.svg",
-                                  width: 120,
-                                  height: 120,
-                                ),
-                                const SizedBox(height: 16),
-                                Text("Hiện chưa có dữ liệu cho học kỳ này",
-                                    style: TextStyle(
-                                        fontSize: FontSizes.medium,
-                                        fontWeight: FontWeight.w600,
-                                        color:
-                                            context.theme.grey ?? Colors.grey)),
-                              ],
-                            ),
-                          )),
-                  ],
-                ));
-          } else {
-            return const Center(child: Text('Không thể tải dữ liệu học kỳ.'));
-          }
+              if (state is TimetableError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is TimetableLoading) {
+                return CustomLoadingIndicator.primary();
+              } else if (state is TimetableDataLoaded) {
+                return _buildContent(state, userRole);
+              } else {
+                return const Center(
+                    child: Text('Không thể tải dữ liệu học kỳ.'));
+              }
+            },
+          );
         },
       ),
+    );
+  }
+
+  Widget _buildContent(TimetableDataLoaded state, String userRole) {
+    final semesterList = state.semesters;
+    final listUOS = state.listUOS;
+
+    if (selectedIndex >= semesterList.length) {
+      selectedIndex = 0;
+    }
+
+    final currentSemester = semesterList[selectedIndex];
+
+    return Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: [
+            _buildSemesterSelector(semesterList, currentSemester),
+            const SizedBox(height: 20),
+            listUOS.isNotEmpty
+                ? _buildUOSContent(listUOS, userRole)
+                : Expanded(
+                    // padding: EdgeInsets.all(8.0),
+                    child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/svg/undraw_no-data.svg",
+                          width: 120,
+                          height: 120,
+                        ),
+                        const SizedBox(height: 16),
+                        Text("Hiện chưa có dữ liệu cho học kỳ này",
+                            style: TextStyle(
+                                fontSize: FontSizes.medium,
+                                fontWeight: FontWeight.w600,
+                                color: context.theme.grey ?? Colors.grey)),
+                      ],
+                    ),
+                  )),
+          ],
+        ));
+  }
+
+  Widget _buildSemesterSelector(
+      List<SemesterModel> semesterList, SemesterModel currentSemester) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: () => _previousSemester(semesterList),
+          child: const Icon(Icons.arrow_back_ios_new_rounded),
+        ),
+        GestureDetector(
+          onTap: () => _showPicker(context, semesterList),
+          child: Text(
+            'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
+            style: const TextStyle(
+              fontSize: FontSizes.medium,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () => _nextSemester(semesterList),
+          child: const Icon(Icons.arrow_forward_ios_rounded),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUOSContent(List listUOS, String userRole) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildStudyScheduleCard(listUOS, userRole),
+            const SizedBox(height: 20),
+            _buildExamScheduleCard(listUOS, userRole),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudyScheduleCard(List listUOS, String userRole) {
+    return UosCard(
+      title: userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
+      child: Column(
+        children: [
+          for (int i = 0; i < listUOS.length; i++) ...[
+            UnitOfStudyItem(
+              idUos: listUOS[i].idUnitOfStudy,
+              noUOS: listUOS[i].noUOS,
+              nameSubject: listUOS[i].subjectName,
+              credit: listUOS[i].credit,
+              timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
+              teacher: listUOS[i].teacherName,
+            ),
+            if (i < listUOS.length - 1) const SizedBox(height: 10),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExamScheduleCard(List listUOS, String userRole) {
+    return UosCard(
+      title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
+      isExam: true,
+      child:
+          listUOS.any((uos) => (uos.examShifts as List?)?.isNotEmpty ?? false)
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (int i = 0; i < listUOS.length; i++)
+                      if ((listUOS[i].examShifts as List?)?.isNotEmpty ??
+                          false) ...[
+                        for (var shift in listUOS[i].examShifts)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              UnitOfStudyItem(
+                                idUos: listUOS[i].idUnitOfStudy,
+                                noUOS: listUOS[i].noUOS,
+                                nameSubject: listUOS[i].subjectName,
+                                room: listUOS[i].subjectName,
+                                examShift: shift,
+                                isExam: true,
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                      ],
+                  ],
+                )
+              : const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Hiện chưa có lịch thi",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
     );
   }
 }

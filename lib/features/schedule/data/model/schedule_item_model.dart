@@ -1,5 +1,6 @@
 class ScheduleItemModel {
   final String idUnitOfStudy;
+  // final String idExamination;
   final String subjectName;
   final String room;
   final String? startStudyTime;

@@ -28,9 +28,9 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(
-                top: 16,
-                left: 16,
-                right: 16,
+                top: 24,
+                left: 24,
+                right: 24,
                 bottom: 74 + 10,
               ),
               child: Column(
@@ -40,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.theme.primaryColor,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,7 +50,8 @@ class ProfileScreen extends StatelessWidget {
                             height: 80,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              shape: BoxShape.rectangle,
+                              // shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: Colors.white,
                                 width: 1,

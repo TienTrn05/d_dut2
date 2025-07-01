@@ -8,8 +8,10 @@ class CalendarEvent extends Equatable {
 class LoadCalendarEvents extends CalendarEvent {
   final int month;
   final int year;
+  final bool isTeacher;
 
-  LoadCalendarEvents({required this.month, required this.year});
+  LoadCalendarEvents(
+      {required this.month, required this.year, required this.isTeacher});
 }
 
 class LoadCalendarWeek extends CalendarEvent {

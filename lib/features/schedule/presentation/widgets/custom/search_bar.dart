@@ -12,20 +12,21 @@ class SearchBarCustom extends StatefulWidget {
 class _SearchBarCustomState extends State<SearchBarCustom> {
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        prefixIcon: Icon(Icons.search, color: context.theme.grey),
-        hintText: "Tìm kiếm...",
-        hintStyle: TextStyle(color: context.theme.grey),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Color.fromRGBO(245, 245, 245, 1),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: context.theme.lightGrey ?? Color(0xffFAFAFA),
+        borderRadius: BorderRadius.circular(999),
       ),
-      style: TextStyle(fontSize: FontSizes.medium),
+      child: TextField(
+        decoration: InputDecoration(
+          icon: Icon(Icons.search, color: context.theme.grey),
+          hintText: "Tìm kiếm...",
+          hintStyle: TextStyle(color: context.theme.grey),
+          border: InputBorder.none,
+        ),
+        style: TextStyle(fontSize: FontSizes.medium),
+      ),
     );
   }
 }

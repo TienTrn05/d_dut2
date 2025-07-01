@@ -20,14 +20,14 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(25),
-            blurRadius: 5,
-            spreadRadius: 2,
-          )
-        ],
+        borderRadius: BorderRadius.circular(16),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withAlpha(25),
+        //     blurRadius: 5,
+        //     spreadRadius: 2,
+        //   )
+        // ],
       ),
       child: Column(
         children: [
@@ -38,7 +38,7 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
               });
             },
             minWidth: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            padding: EdgeInsets.all(16),
             elevation: 0,
             highlightElevation: 0,
             child: Row(

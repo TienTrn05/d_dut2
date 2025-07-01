@@ -1,15 +1,14 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
+import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/custom/bottom_modal.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_absent_tab.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_info_tab.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tabs/uos_noti_tab.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/items/edit_field_item.dart';
+import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_absent_tab.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_info_tab.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_noti_tab.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/item/edit_field_item.dart';
 import 'package:flutter/material.dart';
-import 'package:e_dut/common/routes/routes.dart';
-import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
@@ -48,25 +47,14 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     super.dispose();
   }
 
-  void _addNotification(String title, String content) {
-    final newItem = NotiModel(
-      title: title,
-      content: content,
-      date: DateTime.now(),
-    );
-    setState(() {
-      notifications.insert(0, newItem);
-    });
-  }
-
   void _deleteNotification(int index, String title) {
     String truncatedTitle =
         title.length > 50 ? '${title.substring(0, 47)}...' : title;
-    CustomAlertDialog.showCustomDialog(
+    dialog.CustomAlertDialog.showCustomDialog(
         context,
         'Xóa thông báo',
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
-        AlertType.delete,
+        dialog.AlertType.delete,
         onConfirm: () => setState(() {
               notifications.removeAt(index);
             }),
@@ -79,39 +67,64 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
       isScrollControlled: true,
       showDragHandle: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
-        return BottomModal(
-            title: "Thêm thông báo mới",
-            mainAction: () {
-              // Giả định bạn lấy dữ liệu từ các controller
-              final title = _titleController.text.trim();
-              final content = _contentController.text.trim();
-              _addNotification(title, content);
-              Navigator.pop(context);
-            },
-            onClose: () {
-              _titleController.clear();
-              _contentController.clear();
-            },
-            child: Column(
-              children: [
-                EditFieldItem(
-                  field: "Tiêu đề",
-                  controller: _titleController,
-                  minLine: 1,
-                  maxLine: 2,
-                ),
-                const SizedBox(height: 10),
-                EditFieldItem(
-                  field: "Nội dung",
-                  controller: _contentController,
-                  minLine: 3,
-                )
-              ],
-            ));
+        return StatefulBuilder(builder: (context, setModalState) {
+          _titleController.addListener(() => setModalState(() {}));
+          _contentController.addListener(() => setModalState(() {}));
+
+          final title = _titleController.text.trim();
+          final content = _contentController.text.trim();
+
+          void addNotification() {
+            if (title.isNotEmpty && content.isNotEmpty) {
+              String truncatedTitle =
+                  title.length > 50 ? '${title.substring(0, 47)}...' : title;
+              final newItem = NotiModel(
+                  date: DateTime.now(), title: title, content: content);
+
+              dialog.CustomAlertDialog.showCustomDialog(
+                  context,
+                  'Lưu thông báo',
+                  'Bạn có chắc chắn muốn lưu thông báo: $truncatedTitle?',
+                  dialog.AlertType.confirm,
+                  onConfirm: () => {
+                        setState(() {
+                          notifications.insert(0, newItem);
+                        }),
+                        Navigator.pop(context)
+                      },
+                  textConfirm: "Lưu");
+            }
+          }
+
+          return BottomModal(
+              title: "Thêm thông báo mới",
+              enabledMainAction: title.isNotEmpty && content.isNotEmpty,
+              mainAction: addNotification,
+              onClose: () {
+                _titleController.clear();
+                _contentController.clear();
+              },
+              child: Column(
+                children: [
+                  EditFieldItem(
+                    field: "Tiêu đề",
+                    controller: _titleController,
+                    minLine: 1,
+                    maxLine: 2,
+                  ),
+                  const SizedBox(height: 10),
+                  EditFieldItem(
+                    field: "Nội dung",
+                    controller: _contentController,
+                    minLine: 3,
+                  )
+                ],
+              ));
+        });
       },
     ).whenComplete(() {
       _titleController.clear();
@@ -125,35 +138,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
       length: 3,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: context.theme.primaryColor,
-          elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          title: Text(
-            'Thông tin chi tiết học phần',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: FontSizes.medium,
-            ),
-          ),
-          centerTitle: true,
-          actions: [
-            NotificationButton(
-              notificationCount: 2,
-              onTap: () =>
-                  {Navigator.of(context).pushNamed(Routes.notification)},
-            ),
-          ],
-        ),
+        appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
         body: Stack(
           children: [
             // Nội dung chính
@@ -307,7 +292,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                               : "assets/icons/svg/student_tracking_overview.svg",
                           width: 24,
                           height: 24,
-                          color: Colors.white,
+                          colorFilter:
+                              ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ],
@@ -372,7 +358,7 @@ class CustomTabBar extends StatelessWidget {
                           ? context.theme.primaryColor
                           : Colors.transparent,
                       borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(4))),
+                          const BorderRadius.vertical(top: Radius.circular(8))),
                   alignment: Alignment.center,
                   child: Text(
                     tabs[index],

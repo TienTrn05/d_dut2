@@ -5,9 +5,11 @@ import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
-import 'package:e_dut/features/schedule/presentation/widgets/items/schedule_item.dart';
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/item/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_custom.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/schedule_toggle_button.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +27,8 @@ class _DayModeState extends State<DayMode> {
   List<ScheduleItemModel> schedules = [];
   DateTime selectedDay = DateTime.now();
   String noWeek = "";
+  DateTime? baseDateForWeek;
+  int? baseWeekNo;
 
   void handleSelectionChanged(Set<String> newSelection) {
     setState(() {
@@ -35,29 +39,18 @@ class _DayModeState extends State<DayMode> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<ScheduleBloc>()
-        .add(LoadSchedulesByDate(inputDate: selectedDay));
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+          inputDate: selectedDay,
+          isTeacher: userRole == RoleModel.roleTeacher,
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final String userRole =
-        context.read<AuthBloc>().state is AuthUserAuthenticated
-            ? (context.read<AuthBloc>().state as AuthUserAuthenticated)
-                .userData
-                .role
-                .name
-            : RoleModel.roleStudent;
-    List<ScheduleItemModel> filteredItems = schedules.where((item) {
-      if (selectedOptions.contains('isStudy') && !item.isExam) {
-        return true;
-      }
-      if (selectedOptions.contains('isExam') && item.isExam) {
-        return true;
-      }
-      return false;
-    }).toList();
     return MultiBlocListener(
         listeners: [
           BlocListener<ScheduleBloc, ScheduleState>(listener: (context, state) {
@@ -66,104 +59,131 @@ class _DayModeState extends State<DayMode> {
                 selectedDay = state.selectedDay;
                 noWeek = state.noWeek;
                 schedules = state.schedules;
+
+                if (baseDateForWeek == null) {
+                  baseDateForWeek = state.selectedDay;
+                  baseWeekNo =
+                      int.tryParse(state.noWeek.replaceAll(RegExp(r'\D'), ''));
+                }
               });
             }
           }),
           BlocListener<CalendarBloc, CalendarState>(
               listener: (context, state) {})
         ],
-        child: Builder(builder: (context) {
-          final scheduleState = context.watch<ScheduleBloc>().state;
-          final calendarState = context.watch<CalendarBloc>().state;
+        child: BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+          final String userRole = authState is AuthUserAuthenticated
+              ? authState.userData.role.name
+              : '';
+          return BlocBuilder<ScheduleBloc, ScheduleState>(
+              builder: (builder, scheduleState) {
+            return BlocBuilder<CalendarBloc, CalendarState>(
+                builder: (builder, calendarState) {
+              final isLoading = scheduleState is ScheduleLoading ||
+                  calendarState is CalendarLoading;
 
-          final isLoading = scheduleState is ScheduleLoading ||
-              calendarState is CalendarLoading;
-          return Column(
-            children: [
-              SizedBox(
-                height: 2,
-                child: isLoading
-                    ? LinearProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF0D99FF),
-                        ),
-                        backgroundColor: Colors.transparent,
-                        minHeight: 2,
-                      )
-                    : SizedBox.shrink(), // không hiển thị gì nếu không loading
-              ),
-              Expanded(
-                  child: SingleChildScrollView(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CalendarCustom(),
-                    SizedBox(height: 20),
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      alignment: WrapAlignment.spaceBetween,
-                      runSpacing: 4,
-                      children: [
-                        Text(
-                          "Tuần 32, ${DateFormat('dd/MM/yyyy').format(selectedDay)}",
-                          style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.bold,
-                            height: 1,
-                          ),
-                        ),
-                        ScheduleToggleButton(
-                          studyLabel: userRole == RoleModel.roleStudent
-                              ? "Lịch học"
-                              : "Lịch dạy",
-                          examLabel: userRole == RoleModel.roleStudent
-                              ? "Lịch thi"
-                              : "Lịch coi thi",
-                          onSelectionChanged: handleSelectionChanged,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    if (scheduleState is ScheduleLoading)
-                      Center()
-                    else
-                    // Danh sách các ScheduleItem
-                    if (filteredItems.isEmpty)
-                      Center(
-                        child: Text(
-                          isSameDay(selectedDay, DateTime.now())
-                              ? "Hôm nay không có lịch nào"
-                              : "Không có lịch nào trong ngày này",
-                          style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.w600,
-                            color: context.theme.grey ?? Colors.grey,
-                          ),
-                        ),
-                      )
-                    else
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: filteredItems.map((item) {
-                          return ScheduleItem(
-                            idUos: item.idUnitOfStudy,
-                            subject: item.subjectName,
-                            time: item.isExam
-                                ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
-                                : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
-                            room: item.room,
-                            isExam: item.isExam,
-                          );
-                        }).toList(),
+              List<ScheduleItemModel> filteredItems = schedules.where((item) {
+                if (selectedOptions.contains('isStudy') && !item.isExam) {
+                  return true;
+                }
+                if (selectedOptions.contains('isExam') && item.isExam) {
+                  return true;
+                }
+                return false;
+              }).toList();
+
+              return Column(
+                children: [
+                  SizedBox(
+                    height: 2,
+                    child: isLoading
+                        ? CustomLoadingIndicator.primary()
+                        : SizedBox.shrink(),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          CalendarCustom(),
+                          SizedBox(height: 20),
+                          _buildHeaderSection(userRole),
+                          SizedBox(height: 10),
+                          _buildScheduleContent(scheduleState, filteredItems),
+                          SizedBox(height: 40),
+                        ],
                       ),
-
-                    SizedBox(height: 40), // Khoảng cách cuối cùng
-                  ],
-                ),
-              ))
-            ],
-          );
+                    ),
+                  )
+                ],
+              );
+            });
+          });
         }));
+  }
+
+  Widget _buildHeaderSection(String userRole) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.spaceBetween,
+      runSpacing: 4,
+      children: [
+        (noWeek.isNotEmpty && baseDateForWeek != null && baseWeekNo != null)
+            ? Text(
+                "Tuần ${Functions.getWeekStringFromBase(selectedDay, noWeek, baseDateForWeek, baseWeekNo)}, ${DateFormat('dd/MM/yyyy').format(selectedDay)}",
+                style: TextStyle(
+                  fontSize: FontSizes.medium,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
+                ),
+              )
+            : SizedBox.shrink(),
+        ScheduleToggleButton(
+          studyLabel:
+              userRole == RoleModel.roleTeacher ? "Lịch dạy" : "Lịch học",
+          examLabel:
+              userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
+          onSelectionChanged: handleSelectionChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScheduleContent(
+      ScheduleState scheduleState, List<ScheduleItemModel> filteredItems) {
+    if (scheduleState is ScheduleLoading) {
+      return Center();
+    }
+
+    if (filteredItems.isEmpty) {
+      return Center(
+        child: Text(
+          isSameDay(selectedDay, DateTime.now())
+              ? "Hôm nay không có lịch nào"
+              : "Không có lịch nào trong ngày này",
+          style: TextStyle(
+            fontSize: FontSizes.medium,
+            fontWeight: FontWeight.w600,
+            color: context.theme.grey ?? Colors.grey,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: filteredItems.map((item) {
+        return ScheduleItem(
+          idUos: item.idUnitOfStudy,
+          subject: item.subjectName,
+          time: item.isExam
+              ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
+              : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+          room: item.room,
+          isExam: item.isExam,
+        );
+      }).toList(),
+    );
   }
 }
