@@ -28,11 +28,15 @@ class _CalendarCustomState extends State<CalendarCustom> {
       CalendarFormat.month; // Lịch mặc định là tháng
 
   void _loadCalendarEventsForMonth() {
+    final authState = context.read<AuthBloc>().state;
+
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
     context.read<CalendarBloc>().add(
           LoadCalendarEvents(
-            month: _focusedDay.month,
-            year: _focusedDay.year,
-          ),
+              month: _focusedDay.month,
+              year: _focusedDay.year,
+              isTeacher: userRole == RoleModel.roleTeacher),
         );
   }
 
@@ -40,15 +44,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
   void initState() {
     super.initState();
     initializeDateFormatting(); // Khởi tạo locale để tránh lỗi
-
     _loadCalendarEventsForMonth();
-
-    // if (_focusedDay.isAfter(_startdWeek)) {
-    //   int weekDifference = _focusedDay.difference(_startdWeek).inDays ~/ 7;
-    //   _currentWeek = weekDifference + 1;
-    // } else {
-    //   _currentWeek = 0;
-    // }
   }
 
   String capitalizeFirstLetter(String text) {
@@ -182,20 +178,19 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
-            if (state is CalendarEventLoaded) {
-              _eventMap = {};
-              for (var event in state.calendarEvents) {
-                final date =
-                    DateTime(event.date.year, event.date.month, event.date.day);
-                if (!_eventMap.containsKey(date)) {
-                  _eventMap[date] = [];
-                }
-                for (var eventType in event.eventTypes) {
-                  _eventMap[date]!.add(eventType.eventType);
-                }
-              }
-            }
-
+            // if (state is CalendarEventLoaded) {
+            //   _eventMap = {};
+            //   for (var event in state.calendarEvents) {
+            //     final date =
+            //         DateTime(event.date.year, event.date.month, event.date.day);
+            //     if (!_eventMap.containsKey(date)) {
+            //       _eventMap[date] = [];
+            //     }
+            //     for (var eventType in event.eventTypes) {
+            //       _eventMap[date]!.add(eventType.eventType);
+            //     }
+            //   }
+            // }
             return GestureDetector(
               onTap: _showMonthYearPicker,
               child: TableCalendar(
@@ -204,19 +199,18 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 onPageChanged: (focusDate) {
                   setState(() {
                     _focusedDay = focusDate;
-                    // if (focusDate.isAfter(_startdWeek)) {
-                    //   int weekDifference =
-                    //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                    //   _currentWeek = weekDifference + 1;
-                    // } else {
-                    //   _currentWeek = 0;
-                    // }
                   });
+                  final authState = context.read<AuthBloc>().state;
+
+                  final String userRole = authState is AuthUserAuthenticated
+                      ? authState.userData.role.name
+                      : '';
+
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
-                          month: focusDate.month,
-                          year: focusDate.year,
-                        ),
+                            month: focusDate.month,
+                            year: focusDate.year,
+                            isTeacher: userRole == RoleModel.roleTeacher),
                       );
                   if (_calendarFormat == CalendarFormat.week) {
                     context.read<CalendarBloc>().add(
@@ -325,7 +319,8 @@ class _CalendarCustomState extends State<CalendarCustom> {
                               height: 5,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: type == 1 // Học
+                                  // 1: Study, 2: Exam, Teaching: 3
+                                  color: (type == 1 || type == 3)
                                       ? Color.fromRGBO(42, 116, 189, 1)
                                       : Color.fromRGBO(204, 1, 2, 1)),
                             );
@@ -348,13 +343,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   } else {
                     _calendarFormat = CalendarFormat.month;
                   }
-                  // if (_focusedDay.isAfter(_startdWeek)) {
-                  //   int weekDifference =
-                  //       _focusedDay.difference(_startdWeek).inDays ~/ 7;
-                  //   _currentWeek = weekDifference + 1;
-                  // } else {
-                  //   _currentWeek = 0;
-                  // }
                 });
                 if (_calendarFormat == CalendarFormat.week) {
                   context.read<CalendarBloc>().add(

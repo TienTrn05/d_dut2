@@ -102,14 +102,24 @@ class ScheduleService {
   }
 
   Future<List<CalendarEventModel>> getCalendarEvents(
-      int month, int year) async {
+      int month, int year, bool isTeacher) async {
     try {
-      final response = await _dio.get(
-          "$_url/api/Timetable/GetStudentCalendarEvents",
-          queryParameters: {
-            'month': month,
-            'year': year,
-          });
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetTeacherCalendarEvents",
+            queryParameters: {
+              'month': month,
+              'year': year,
+            });
+      } else {
+        response = await _dio.get(
+            "$_url/api/Timetable/GetStudentCalendarEvents",
+            queryParameters: {
+              'month': month,
+              'year': year,
+            });
+      }
 
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
