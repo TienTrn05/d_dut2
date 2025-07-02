@@ -4,12 +4,14 @@ import 'package:flutter_svg/svg.dart';
 class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onFilterPressed;
+  final String iconUrl;
   final Color textColor;
   final String hintText;
   const SearchTextField(
       {super.key,
       required this.controller,
       required this.onFilterPressed,
+      required this.iconUrl,
       required this.textColor,
       this.hintText = "Tìm kiếm..."});
 
@@ -33,7 +35,7 @@ class SearchTextField extends StatelessWidget {
         ),
         suffixIcon: IconButton(
           icon: SvgPicture.asset(
-            "assets/icons/svg/tabler_filter-search.svg",
+            iconUrl,
             width: 18,
             height: 18,
             colorFilter: ColorFilter.mode(

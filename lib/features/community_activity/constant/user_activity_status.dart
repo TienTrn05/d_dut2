@@ -37,13 +37,13 @@ class UserActivityStatus {
       textColor: Color(0xFF47B5C1),
     ),
     UserActivityStatus.approved: ActivityStatusStyle(
-      label: 'Được chấp nhận',
+      label: 'Đã chấp nhận',
       bgColor: Color(0xFFF6FFED),
       borderColor: Color(0xFFB7EB8F),
       textColor: Color(0xFF389E0D),
     ),
     UserActivityStatus.rejected: ActivityStatusStyle(
-      label: 'Bị từ chối',
+      label: 'Đã từ chối',
       bgColor: Color(0xFFFFF1F0),
       borderColor: Color(0xFFFFA39E),
       textColor: Color(0xFFCF1322),

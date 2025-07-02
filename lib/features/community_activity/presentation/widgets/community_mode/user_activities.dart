@@ -110,8 +110,9 @@ class _UserActivitiesState extends State<UserActivities> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -141,9 +142,10 @@ class _UserActivitiesState extends State<UserActivities> {
               SearchTextField(
                 controller: _searchController,
                 onFilterPressed: () => _showFilterModal(context),
+                iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
                 textColor: context.theme.grey ?? Colors.grey,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
                 buildWhen: (previous, current) =>
                     current is UserActivitiesLoaded ||
@@ -158,6 +160,13 @@ class _UserActivitiesState extends State<UserActivities> {
                                 child: UserActivityCard(
                                   userActivity: activity,
                                   keyword: _searchController.text.trim(),
+                                  onRefresh: () {
+                                    context.read<CommunityActivityBloc>().add(
+                                        LoadUserActivities(
+                                            token: widget.authToken,
+                                            keyword:
+                                                _searchController.text.trim()));
+                                  },
                                 ),
                               ))
                           .toList(),
@@ -341,6 +350,35 @@ class _UserActivitiesState extends State<UserActivities> {
     );
   }
 
+  List<Widget> buildSortFieldButtons(StateSetter setModalState) {
+    return sortFields.map((field) {
+      final isSelected = selectedSortField == field['key'];
+      return GestureDetector(
+        onTap: () {
+          setModalState(() {
+            selectedSortField = field['key']!;
+            _isSortFieldVisible = false;
+          });
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? context.theme.lightBlue : Colors.transparent,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            field['label'] ?? '',
+            style: TextStyle(
+              color: context.theme.grey,
+              fontSize: FontSizes.small,
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
   Widget _stateFilter(
       Set<String> localSelectedState, StateSetter setModalState) {
     return Column(
@@ -407,34 +445,5 @@ class _UserActivitiesState extends State<UserActivities> {
         )
       ],
     );
-  }
-
-  List<Widget> buildSortFieldButtons(StateSetter setModalState) {
-    return sortFields.map((field) {
-      final isSelected = selectedSortField == field['key'];
-      return GestureDetector(
-        onTap: () {
-          setModalState(() {
-            selectedSortField = field['key']!;
-            _isSortFieldVisible = false;
-          });
-        },
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? context.theme.lightBlue : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            field['label'] ?? '',
-            style: TextStyle(
-              color: context.theme.grey,
-              fontSize: FontSizes.small,
-            ),
-          ),
-        ),
-      );
-    }).toList();
   }
 }

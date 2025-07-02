@@ -1,6 +1,8 @@
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
+import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +27,9 @@ class Routes {
   static const String courseRegistration = "/courseRegistration";
   static const String courseRegistrationGrade = "/courseRegistrationGrade";
   static const String communityActivities = "/communityActivities";
-  static const String detailCommunityActivity = "/detailCommunityActivity";
-  static const String detailUserActivityScreen = "/detailUserActivityScreen";
+  // static const String detailCommunityActivity = "/detailCommunityActivity";
+  static const String detailUserActivity = "/detailUserActivityScreen";
+  static const String detailUserProof = "/detailUserProof";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -80,11 +83,16 @@ class Routes {
         return MaterialPageRoute(
             builder: (context) => const CommunityActivitiesScreen());
 
-      case detailUserActivityScreen:
+      case detailUserActivity:
         final userActivity = settings.arguments as UserActivityModel;
         return MaterialPageRoute(
             builder: (context) =>
                 DetailUserActivityScreen(userActivity: userActivity));
+
+      case detailUserProof:
+        final userProof = settings.arguments as UserProofModel;
+        return MaterialPageRoute(
+            builder: (context) => DetailUserProofScreen(userProof: userProof));
       default:
         return MaterialPageRoute(
           builder: (context) => const Scaffold(

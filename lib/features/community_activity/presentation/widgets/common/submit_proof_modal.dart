@@ -18,13 +18,15 @@ class SubmitProofModal extends StatefulWidget {
   final String keyword;
   final CommunityActivityBloc bloc;
   final UserActivityModel userActivity;
+  final bool fromCard;
 
   const SubmitProofModal(
       {super.key,
       required this.token,
       required this.keyword,
       required this.bloc,
-      required this.userActivity});
+      required this.userActivity,
+      this.fromCard = true});
 
   @override
   State<SubmitProofModal> createState() => _SubmitProofModalState();
@@ -43,8 +45,13 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
         listener: (context, state) {
           if (state is ProofSubmitted) {
             if (state.success) {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              if (widget.fromCard) {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              } else {
+                Navigator.pop(context);
+              }
+
               CustomSnackbar.showSnackBar(
                 context,
                 "Thành công",
@@ -121,7 +128,7 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
                             if (picked != null) {
                               final file = File(picked.path);
                               final isValid =
-                                  await file.length() < 5 * 1024 * 1024;
+                                  await file.length() < 100 * 1024 * 1024;
                               setModalState(() {
                                 pickedImage = picked;
                                 isImageValid = isValid;

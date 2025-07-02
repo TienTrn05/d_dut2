@@ -111,8 +111,9 @@ class _AllActivitiesState extends State<AllActivities> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -146,9 +147,9 @@ class _AllActivitiesState extends State<AllActivities> {
                   SearchTextField(
                     controller: _searchController,
                     onFilterPressed: () => _showFilterModal(context),
+                    iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
                     textColor: context.theme.grey ?? Colors.grey,
                   ),
-                  const SizedBox(height: 10),
                   const SizedBox(height: 20),
                   BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
                     buildWhen: (previous, current) =>

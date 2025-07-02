@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,7 @@ class CommunityActivityBloc
     on<ReRegistActivity>(_onReRegisterActivity);
     on<SubmitProof>(_onSubmitProof);
     on<UpdateUserActivitiesAfterSubmit>(_onUpdateActivitiesAfterSubmit);
+    on<LoadUserProofs>(_onLoadUserProofs);
   }
 
   Future<void> _onLoadAllActivities(
@@ -97,7 +99,7 @@ class CommunityActivityBloc
         emit(UserActivitiesLoaded(userActivities));
       }
     } catch (e) {
-      emit(CommunityActivityError(e.toString()));
+      emit(CommunityActivityError('Hủy đăng ký thất bại'));
     }
   }
 
@@ -119,7 +121,7 @@ class CommunityActivityBloc
         emit(UserActivitiesLoaded(userActivities));
       }
     } catch (e) {
-      emit(CommunityActivityError(e.toString()));
+      emit(CommunityActivityError('Đăng ký thất bại'));
     }
   }
 
@@ -164,5 +166,21 @@ class CommunityActivityBloc
       UpdateUserActivitiesAfterSubmit event,
       Emitter<CommunityActivityState> emit) async {
     emit(UserActivitiesLoaded(event.activities));
+  }
+
+  Future<void> _onLoadUserProofs(
+      LoadUserProofs event, Emitter<CommunityActivityState> emit) async {
+    emit(CommunityActivityLoading());
+
+    try {
+      final token = event.token;
+      final keyword = event.keyword;
+
+      final userProofs = await _repository.getUserProofs(token, keyword);
+
+      emit(UserProofsLoaded(userProofs));
+    } catch (e) {
+      emit(CommunityActivityError(e.toString()));
+    }
   }
 }

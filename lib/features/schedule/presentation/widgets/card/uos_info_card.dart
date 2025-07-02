@@ -39,7 +39,8 @@ class _UosInfoCardState extends State<UosInfoCard> {
               });
             },
             minWidth: double.infinity,
-            padding: EdgeInsets.only(top: 16, right: 16, left: 16, bottom: 10),
+            padding: EdgeInsets.only(
+                top: 16, right: 16, left: 16, bottom: isShowing ? 10 : 16),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Row(

@@ -107,6 +107,7 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
   @override
   Widget build(BuildContext context) {
     final status = widget.userActivity.status;
+    final startDate = widget.userActivity.activity.startDate;
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -137,7 +138,7 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                       onTap: () {
                         Navigator.pop(context);
                         Navigator.of(context).pushNamed(
-                          Routes.detailUserActivityScreen,
+                          Routes.detailUserActivity,
                           arguments: widget.userActivity,
                         );
                       },
@@ -151,11 +152,13 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                         onTap: _cancelRegistration,
                       ),
                       _buildDialogAction(
-                        label: "Nộp minh chứng",
-                        icon: "assets/icons/svg/lucide_file-check-2.svg",
-                        color: const Color(0xFF47B5C1),
-                        onTap: _showProofSubmission,
-                      ),
+                          label: "Nộp minh chứng",
+                          icon: "assets/icons/svg/lucide_file-check-2.svg",
+                          color: const Color(0xFF47B5C1),
+                          onTap: _showProofSubmission,
+                          isEnabled: (startDate.isAfter(DateTime.now())
+                              ? false
+                              : true)),
                     ],
                     if (status == UserActivityStatus.canceled)
                       _buildDialogAction(
@@ -180,28 +183,33 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
     required String icon,
     required Color color,
     required VoidCallback onTap,
+    bool isEnabled = true,
   }) {
+    final actionContent = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(color: color, fontSize: FontSizes.small)),
+          SvgPicture.asset(
+            icon,
+            height: 18,
+            width: 18,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+          )
+        ],
+      ),
+    );
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label,
-                style: TextStyle(color: color, fontSize: FontSizes.small)),
-            SvgPicture.asset(
-              icon,
-              height: 18,
-              width: 18,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            )
-          ],
-        ),
+      onTap: isEnabled ? onTap : null,
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: actionContent,
       ),
     );
   }

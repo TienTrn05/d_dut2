@@ -37,3 +37,9 @@ class ProofSubmitted extends CommunityActivityState {
   ProofSubmitted(
       {required this.success, this.message, required this.updatedActivities});
 }
+
+class UserProofsLoaded extends CommunityActivityState {
+  final List<UserProofModel> userProofs;
+
+  UserProofsLoaded(this.userProofs);
+}
