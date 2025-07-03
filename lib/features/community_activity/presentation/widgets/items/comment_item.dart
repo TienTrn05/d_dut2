@@ -29,13 +29,13 @@ class CommentItem extends StatelessWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
-                            'assets/images/default_image.jpg',
+                            'assets/images/default_avatar.jpg',
                             fit: BoxFit.cover,
                           );
                         },
                       )
                     : Image.asset(
-                        'assets/images/default_image.jpg',
+                        'assets/images/default_avatar.jpg',
                         fit: BoxFit.cover,
                       ),
               ),
