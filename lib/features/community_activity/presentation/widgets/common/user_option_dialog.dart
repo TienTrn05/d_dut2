@@ -1,11 +1,13 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/user_activity_status.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
+import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/user_activity_card.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/submit_proof_modal.dart';
 import 'package:flutter/material.dart';
@@ -14,16 +16,17 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserOptionDialog extends StatefulWidget {
-  const UserOptionDialog({
-    super.key,
-    required this.userActivity,
-    required this.keyword,
-    required this.communityBloc,
-  });
+  const UserOptionDialog(
+      {super.key,
+      required this.userActivity,
+      required this.keyword,
+      required this.communityBloc,
+      this.onRefresh});
 
   final CommunityActivityBloc communityBloc;
   final String keyword;
   final UserActivityModel userActivity;
+  final VoidCallback? onRefresh;
 
   @override
   State<UserOptionDialog> createState() => _UserOptionDialogState();
@@ -135,12 +138,20 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                       label: "Xem chi tiết",
                       icon: "assets/icons/svg/heroicons_viewfinder-circle.svg",
                       color: context.theme.grey!,
-                      onTap: () {
+                      onTap: () async {
                         Navigator.pop(context);
-                        Navigator.of(context).pushNamed(
-                          Routes.detailUserActivity,
-                          arguments: widget.userActivity,
-                        );
+                        final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                      create: (_) => CommunityActivityBloc(
+                                          getIt.get<CommunityRepository>()),
+                                      child: DetailUserActivityScreen(
+                                          userActivity: widget.userActivity),
+                                    )));
+                        if (result == true) {
+                          widget.onRefresh?.call();
+                        }
                       },
                     ),
                     if (status == UserActivityStatus.registered) ...[
