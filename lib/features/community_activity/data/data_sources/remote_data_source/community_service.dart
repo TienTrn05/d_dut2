@@ -136,10 +136,6 @@ class CommunityService {
   }
 
   Future<bool> cancelRegistration(String token, String idActivity) async {
-    logger.i("Sending cancel registration with:");
-    logger.i("Token: $token");
-    logger.i("Activity ID: $idActivity"); // nếu có
-    logger.i("URL: ${_dio.options.baseUrl}/api/activities/$idActivity/cancel");
     try {
       final response =
           await _dio.post("$_url/api/activities/$idActivity/cancel",
