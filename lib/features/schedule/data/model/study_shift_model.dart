@@ -6,22 +6,23 @@ class StudyShiftModel {
   final int endWeek;
   final String room;
 
-  StudyShiftModel(
-      {required this.dayOfWeek,
-      required this.startPeriod,
-      required this.endPeriod,
-      required this.startWeek,
-      required this.endWeek,
-      required this.room});
+  StudyShiftModel({
+    required this.dayOfWeek,
+    required this.startPeriod,
+    required this.endPeriod,
+    required this.startWeek,
+    required this.endWeek,
+    required this.room,
+  });
 
   factory StudyShiftModel.fromJson(Map<String, dynamic> json) {
     return StudyShiftModel(
-      dayOfWeek: json['dayOfWeek'],
-      startPeriod: json['startPeriod'],
-      endPeriod: json['endPeriod'],
-      startWeek: json['startWeek'],
-      endWeek: json['endWeek'],
-      room: json['room'],
+      dayOfWeek: json['dayOfWeek'] ?? 0,
+      startPeriod: json['startPeriod'] ?? 0,
+      endPeriod: json['endPeriod'] ?? 0,
+      startWeek: json['startWeek'] ?? 0,
+      endWeek: json['endWeek'] ?? 0,
+      room: json['room'] ?? '',
     );
   }
 
@@ -32,7 +33,7 @@ class StudyShiftModel {
       'endPeriod': endPeriod,
       'startWeek': startWeek,
       'endWeek': endWeek,
-      'room': room
+      'room': room,
     };
   }
 }

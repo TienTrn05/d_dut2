@@ -175,7 +175,7 @@ class _DayModeState extends State<DayMode> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: filteredItems.map((item) {
         return ScheduleItem(
-          idUos: item.idUnitOfStudy,
+          idUos: (item.idUnitOfStudy ?? item.idExamShift)!,
           subject: item.subjectName,
           time: item.isExam
               ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"

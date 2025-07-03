@@ -149,14 +149,14 @@ class ScheduleService {
         if (idSemester != null && idSemester.isNotEmpty) {
           return idSemester;
         } else {
-          throw Exception("[getSemesterByDate] idSemester is null or empty.");
+          throw Exception("idSemester is null or empty.");
         }
       } else {
         throw Exception(
-            "[118:schedule_service]Failed to load idSemester: ${response.data['message']}");
+            "Failed to load idSemester: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("[121:schedule_service]Failed to load ScheduleItem: $e");
+      logger.e("]Failed to load ScheduleItem: $e");
       throw Exception("Failed to fetch ScheduleItem: $e");
     }
   }
@@ -174,11 +174,10 @@ class ScheduleService {
         final noWeek = data['noWeek'] != null ? data['noWeek'].toString() : "";
         return noWeek;
       } else {
-        throw Exception(
-            "[152:schedule_service]Failed to load noWeek: ${response.data['message']}");
+        throw Exception("Failed to load noWeek: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("[155:schedule_service]Failed to load week: $e");
+      logger.e("Failed to load week: $e");
       throw Exception("Failed to fetch week: $e");
     }
   }

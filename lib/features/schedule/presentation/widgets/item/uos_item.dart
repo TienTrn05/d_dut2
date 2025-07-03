@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UnitOfStudyItem extends StatelessWidget {
-  final String idUos;
-  final String noUOS;
+  final String? idUos;
+  final String? noUOS;
   final String nameSubject;
   final bool isExam;
   final int? credit;
@@ -59,27 +59,28 @@ class UnitOfStudyItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    noUOS,
-                    style: TextStyle(
-                        fontSize: FontSizes.small,
-                        fontWeight: FontWeight.w500,
-                        height: 1.25,
-                        color: context.theme.grey ?? Colors.grey),
-                  ),
-                  Text(
-                    credit != null ? '$credit tín chỉ' : '',
-                    style: TextStyle(
-                        fontSize: FontSizes.small,
-                        fontWeight: FontWeight.w500,
-                        height: 1.25,
-                        color: context.theme.grey ?? Colors.grey),
-                  ),
-                ],
-              ),
+              if (noUOS != null)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      noUOS!,
+                      style: TextStyle(
+                          fontSize: FontSizes.small,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                          color: context.theme.grey ?? Colors.grey),
+                    ),
+                    Text(
+                      credit != null ? '$credit tín chỉ' : '',
+                      style: TextStyle(
+                          fontSize: FontSizes.small,
+                          fontWeight: FontWeight.w500,
+                          height: 1.25,
+                          color: context.theme.grey ?? Colors.grey),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 4),
               Text(
                 nameSubject,

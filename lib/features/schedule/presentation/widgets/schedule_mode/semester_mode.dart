@@ -271,17 +271,25 @@ class _SemesterModeState extends State<SemesterMode> {
       title: userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
       child: Column(
         children: [
-          for (int i = 0; i < listUOS.length; i++) ...[
-            UnitOfStudyItem(
-              idUos: listUOS[i].idUnitOfStudy,
-              noUOS: listUOS[i].noUOS,
-              nameSubject: listUOS[i].subjectName,
-              credit: listUOS[i].credit,
-              timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
-              teacher: listUOS[i].teacherName,
-            ),
-            if (i < listUOS.length - 1) const SizedBox(height: 10),
-          ],
+          for (int i = 0; i < listUOS.length; i++)
+            // Only show UOS items that have valid idUnitOfStudy and noUOS
+            if (listUOS[i].idUnitOfStudy?.isNotEmpty == true &&
+                listUOS[i].noUOS?.isNotEmpty == true) ...[
+              UnitOfStudyItem(
+                idUos: listUOS[i].idUnitOfStudy,
+                noUOS: listUOS[i].noUOS,
+                nameSubject: listUOS[i].subjectName,
+                credit: listUOS[i].credit,
+                timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
+                teacher: listUOS[i].teacherName,
+              ),
+              if (i < listUOS.length - 1 &&
+                  // Check if there are more valid items after current index
+                  listUOS.skip(i + 1).any((uos) =>
+                      uos.idUnitOfStudy?.isNotEmpty == true &&
+                      uos.noUOS?.isNotEmpty == true))
+                const SizedBox(height: 10),
+            ],
         ],
       ),
     );
