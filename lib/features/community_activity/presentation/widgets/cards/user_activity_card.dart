@@ -2,10 +2,12 @@ import 'dart:ui';
 
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/activity_icon_path.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
+import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/user_option_dialog.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/status_label.dart';
 import 'package:e_dut/features/community_activity/util/functions.dart';
@@ -15,10 +17,14 @@ import 'package:flutter_svg/svg.dart';
 
 class UserActivityCard extends StatefulWidget {
   const UserActivityCard(
-      {super.key, required this.userActivity, required this.keyword});
+      {super.key,
+      required this.userActivity,
+      required this.keyword,
+      this.onRefresh});
 
   final String keyword;
   final UserActivityModel userActivity;
+  final VoidCallback? onRefresh;
 
   @override
   State<UserActivityCard> createState() => _UserActivityCardState();
@@ -154,11 +160,19 @@ class _UserActivityCardState extends State<UserActivityCard>
         return Transform.scale(
           scale: _scaleAnimation.value,
           child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushNamed(
-                Routes.detailUserActivityScreen,
-                arguments: widget.userActivity,
-              );
+            onTap: () async {
+              final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                            create: (_) => CommunityActivityBloc(
+                                getIt.get<CommunityRepository>()),
+                            child: DetailUserActivityScreen(
+                                userActivity: widget.userActivity),
+                          )));
+              if (result == true) {
+                widget.onRefresh?.call();
+              }
             },
             onLongPress: _handleLongPressStart,
             child: Container(

@@ -44,7 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final DateTime today = DateTime.now();
     final String weekday = DateFormat.EEEE('vi').format(today);
     final String month = 'Tháng ${today.month}';
-    final String day = '${today.day}';
+    final String day = today.day.toString().padLeft(2, '0');
 
     return MultiBlocProvider(
       providers: [
@@ -150,6 +150,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 fontWeight: FontWeight.bold,
                                 height: 1,
                               ),
+                              textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -184,7 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(12),
                                             child: SvgPicture.asset(
-                                              "assets/icons/svg/undraw_online-calendar_zaoc.svg",
+                                              "assets/images/free-schedule.svg",
                                               fit: BoxFit.contain,
                                             ),
                                           ),
@@ -208,7 +209,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             CrossAxisAlignment.start,
                                         children: state.schedules.map((item) {
                                           return ScheduleItem(
-                                            idSubject: item.idUnitOfStudy,
+                                            idSubject: (item.idUnitOfStudy ??
+                                                item.idExamShift)!,
                                             subject: item.subjectName,
                                             time: item.isExam
                                                 ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"

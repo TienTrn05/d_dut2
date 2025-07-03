@@ -6,10 +6,10 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/user_info/user_info_bloc.dart';
 import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/activity_grade.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_scores.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/all_activities.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_activities.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/proof_activity.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_proofs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -181,9 +181,9 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
       case "Hoạt động của tôi":
         return UserActivities(authToken: authToken);
       case "Minh chứng của tôi":
-        return const ProofActivity();
+        return UserProofs();
       case "Điểm của tôi":
-        return const ActivityGrade();
+        return const UserScores();
       default:
         return const Center(child: Text("Không tìm thấy nội dung"));
     }

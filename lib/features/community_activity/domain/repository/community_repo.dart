@@ -5,6 +5,7 @@ import 'package:e_dut/features/community_activity/data/model/activity_model.dart
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -47,5 +48,9 @@ class CommunityRepository {
   ) {
     return _communityService.submitProof(
         token, idRegistration, imageFile, description);
+  }
+
+  Future<List<UserProofModel>> getUserProofs(String token, String keyword) {
+    return _communityService.getUserProofs(token, keyword);
   }
 }

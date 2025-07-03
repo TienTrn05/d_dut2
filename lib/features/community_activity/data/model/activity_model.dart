@@ -56,9 +56,8 @@ class ActivityModel {
       isExternal: json['isExternal'],
       subcategory: SubCategoryModel.fromJson(subJson, categoryId: categoryId),
       status: json.containsKey('status') ? json['status'] : null,
-      createdBy: json['createdBy'] != null
-          ? json['createdBy']['name']
-          : 'Đoàn Thanh niên Trường Đại học Bách khoa - ĐHĐN',
+      createdBy: json['createdBy']?['name']?.toString() ??
+          'Đoàn Thanh niên Trường Đại học Bách khoa - ĐHĐN',
     );
   }
   @override

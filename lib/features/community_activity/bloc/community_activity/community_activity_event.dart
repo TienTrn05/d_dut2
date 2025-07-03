@@ -72,3 +72,10 @@ class UpdateUserActivitiesAfterSubmit extends CommunityActivityEvent {
 
   UpdateUserActivitiesAfterSubmit({required this.activities});
 }
+
+class LoadUserProofs extends CommunityActivityEvent {
+  final String token;
+  final String keyword;
+
+  LoadUserProofs({required this.keyword, required this.token});
+}

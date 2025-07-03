@@ -6,6 +6,7 @@ import 'package:e_dut/features/community_activity/data/model/activity_model.dart
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
+import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -135,11 +136,16 @@ class CommunityService {
   }
 
   Future<bool> cancelRegistration(String token, String idActivity) async {
+    logger.i("Sending cancel registration with:");
+    logger.i("Token: $token");
+    logger.i("Activity ID: $idActivity"); // nếu có
+    logger.i("URL: ${_dio.options.baseUrl}/api/activities/$idActivity/cancel");
     try {
       final response =
           await _dio.post("$_url/api/activities/$idActivity/cancel",
               options: Options(headers: {
                 "Authorization": "Bearer $token",
+                "Content-Type": "application/json",
               }));
 
       return response.statusCode == 201 && response.data['success'] == true;
@@ -173,6 +179,32 @@ class CommunityService {
       return response.statusCode == 201 && response.data['success'] == true;
     } on DioException catch (e) {
       logger.e("Error submit proof: ${e.message}");
+      rethrow;
+    }
+  }
+
+  Future<List<UserProofModel>> getUserProofs(
+      String token, String keyword) async {
+    try {
+      final response = await _dio.get("$_url/api/proofs/me",
+          queryParameters: {"keyword": keyword},
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final responseData = response.data;
+
+        final List<dynamic> data = responseData['data'];
+
+        final userProofs = data.map((e) => UserProofModel.fromJson(e)).toList();
+
+        return userProofs;
+      } else {
+        throw Exception(
+            "Failed to load my proofs: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching my proofs: $e");
       rethrow;
     }
   }
