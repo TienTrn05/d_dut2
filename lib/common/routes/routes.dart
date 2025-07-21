@@ -8,7 +8,7 @@ import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
-import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
+import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -72,7 +72,7 @@ class Routes {
                         idExamShift: args.idExamShift,
                         keyword: '',
                         pageNumber: 1)),
-                  child: DetaitlExamShiftScreen(
+                  child: DetailExamShiftScreen(
                     idExamShift: args.idExamShift,
                     examShiftName: args.examShiftName,
                   ),

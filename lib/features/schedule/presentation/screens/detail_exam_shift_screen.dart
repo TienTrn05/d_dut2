@@ -13,17 +13,17 @@ import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DetaitlExamShiftScreen extends StatefulWidget {
+class DetailExamShiftScreen extends StatefulWidget {
   final String idExamShift;
   final String examShiftName;
-  const DetaitlExamShiftScreen(
+  const DetailExamShiftScreen(
       {super.key, required this.idExamShift, required this.examShiftName});
 
   @override
-  State<DetaitlExamShiftScreen> createState() => _DetaitlExamShiftScreenState();
+  State<DetailExamShiftScreen> createState() => _DetailExamShiftScreenState();
 }
 
-class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
+class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
 
@@ -385,7 +385,7 @@ class _DetaitlExamShiftScreenState extends State<DetaitlExamShiftScreen> {
                                                             name: student
                                                                 .studentName,
                                                             mail: student
-                                                                .dutAccount,
+                                                                .noStudent,
                                                           );
                                                         },
                                                       ),

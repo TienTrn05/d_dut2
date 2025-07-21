@@ -50,6 +50,7 @@ class _RegisteredCoursesViewState extends State<RegisteredCoursesView> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 12),
               Text(
                 "Số tín chỉ tối đa cho phép đăng ký: ${30}",
                 style: TextStyle(
@@ -59,41 +60,51 @@ class _RegisteredCoursesViewState extends State<RegisteredCoursesView> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text("Bạn đã đăng ký: $numOfRegisteredCredits tín chỉ",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: context.theme.primaryColor,
-                  )),
-              const SizedBox(height: 16),
               Expanded(
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
                   children: [
-                    if (state.registeredCoursesStatus ==
-                        RegisteredCoursesStatus.failure)
-                      Center(
-                        child: Text(
-                          state.errorRegisteredCoursesMessage,
-                          style: const TextStyle(color: Colors.red),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (state.registeredCoursesStatus ==
+                            RegisteredCoursesStatus.failure)
+                          Center(
+                            child: Text(
+                              state.errorRegisteredCoursesMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          )
+                        else
+                          // Hiển thị các học phần đã đăng ký
+                          const Text(
+                            'Các học phần đã đăng ký',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "$numOfRegisteredCredits tín chỉ",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: context.theme.grey,
+                          ),
                         ),
-                      )
-                    else
-                      // Hiển thị các học phần đã đăng ký
-                      const Text(
-                        'Các học phần đã đăng ký:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      ],
+                    ),
                     const SizedBox(height: 4),
-                    state.registeredCourses.where((c) => !c.isRegistering).isEmpty
-                        ? const Center(child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Bạn chưa đăng ký học phần nào!'),
-                        ))
+                    state.registeredCourses
+                            .where((c) => !c.isRegistering)
+                            .isEmpty
+                        ? const Center(
+                            child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Bạn chưa đăng ký học phần nào!'),
+                          ))
                         : const SizedBox.shrink(),
                     ...state.registeredCourses
                         .where((c) => !c.isRegistering)
@@ -119,19 +130,24 @@ class _RegisteredCoursesViewState extends State<RegisteredCoursesView> {
                             },
                           ),
                         ),
+                    const SizedBox(height: 20),
                     const Text(
-                      'Các học phần đang đăng ký:',
+                      'Các học phần đang đăng ký',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    state.registeredCourses.where((c) => c.isRegistering).isEmpty
-                        ? const Center(child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Bạn không có học phần nào đang đăng ký!'),
-                        ))
+                    state.registeredCourses
+                            .where((c) => c.isRegistering)
+                            .isEmpty
+                        ? const Center(
+                            child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                                Text('Bạn không có học phần nào đang đăng ký!'),
+                          ))
                         : const SizedBox.shrink(),
                     ...state.registeredCourses
                         .where((c) => c.isRegistering)

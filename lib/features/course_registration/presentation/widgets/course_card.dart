@@ -20,12 +20,8 @@ class _CourseCartState extends State<CourseCard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-      ),
       child: Column(
         children: [
           MaterialButton(
@@ -39,37 +35,50 @@ class _CourseCartState extends State<CourseCard> with TickerProviderStateMixin {
             color: Color(0xFFF5F5F5),
             elevation: 0,
             highlightElevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.course.id,
-                        style: TextStyle(
-                          fontSize: FontSizes.medium - 1,
-                          fontWeight: FontWeight.normal,
-                          color: Color(0xFF747474),
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            '${widget.course.id} ',
+                            style: TextStyle(
+                              fontSize: FontSizes.medium - 1,
+                              fontWeight: FontWeight.normal,
+                              color: Color(0xFF747474),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.fiber_manual_record,
+                            size: 6,
+                            color: Color(0xFF747474),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${widget.course.credits} tín chỉ',
+                            style: TextStyle(
+                              fontSize: FontSizes.medium - 1,
+                              fontWeight: FontWeight.normal,
+                              color: Color(0xFF747474),
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 4),
                       Text(
                         widget.course.courseName,
                         style: TextStyle(
-                          fontSize: FontSizes.extraLarge,
+                          fontSize: FontSizes.large,
                           fontWeight: FontWeight.bold,
                           color: context.theme.primaryColor,
                           height: 1,
-                        ),
-                      ),
-                      Text(
-                        "Số tín chỉ: ${widget.course.credits}",
-                        style: TextStyle(
-                          fontSize: FontSizes.large,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF747474),
-                          fontStyle: FontStyle.italic,
-                          height: 1.25,
                         ),
                       ),
                     ],
@@ -105,9 +114,7 @@ class _CourseCartState extends State<CourseCard> with TickerProviderStateMixin {
                       bottom: 8,
                     ),
                     child: Container(
-                        padding: EdgeInsets.only(top: 8),
-                        
-                        child: widget.child),
+                        padding: EdgeInsets.only(top: 8), child: widget.child),
                   )
                 : const SizedBox(),
           ),

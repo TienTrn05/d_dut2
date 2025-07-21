@@ -18,31 +18,34 @@ class CourseSectionInfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          flex: 4,
-          child: Text(
-            '$title:',
-            style: TextStyle(
-              fontSize: FontSizes.medium,
-              color: Color(0xFF747474),
-              height: 1.5,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Text(
+              '$title:',
+              style: TextStyle(
+                fontSize: FontSizes.medium,
+                color: Color(0xFF747474),
+                height: 1.5,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          flex: 6,
-          child: Text(
-            content,
-            style: TextStyle(
-              fontSize: FontSizes.medium,
+          Expanded(
+            flex: 6,
+            child: Text(
+              content,
+              style: TextStyle(
+                fontSize: FontSizes.medium,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

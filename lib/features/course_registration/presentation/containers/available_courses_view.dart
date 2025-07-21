@@ -38,7 +38,8 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
           backgroundColor: Colors.white,
           child: BlocBuilder<CourseSectionsBloc, CourseSectionsState>(
             builder: (context, state) {
-              if (state.availableCoursesStatus == AvailableCoursesStatus.loading) {
+              if (state.availableCoursesStatus ==
+                  AvailableCoursesStatus.loading) {
                 return Center(
                     child: CircularProgressIndicator(
                   color: context.theme.primaryColor,
@@ -53,20 +54,20 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 12),
                   Text(
                       "Học kỳ này bạn phải đăng ký các môn:", // Replace with actual logic to calculate registered credits
                       style: TextStyle(
                         fontSize: 14,
                         color: context.theme.primaryColor,
                       )),
-                  const SizedBox(height: 16),
                   Expanded(
                     child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       children: [
-                        if (state.availableCoursesStatus == AvailableCoursesStatus.failure)
+                        if (state.availableCoursesStatus ==
+                            AvailableCoursesStatus.failure)
                           Center(
                             child: Text(
                               state.errorCourseSectionMessage,
@@ -74,9 +75,11 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                             ),
                           )
                         else if (groupedCourses.isEmpty)
-                          const Center(child: Text("Không có học phần nào khả dụng"))
+                          const Center(
+                              child: Text("Không có học phần nào khả dụng"))
                         else if (state.registrationPhase ==
-                            RegistrationPhase.cohort || state.registrationPhase == RegistrationPhase.global)
+                                RegistrationPhase.cohort ||
+                            state.registrationPhase == RegistrationPhase.global)
                           ...groupedCourses.entries.map((entry) {
                             final course = entry.key;
                             final sections = entry.value;
@@ -118,76 +121,76 @@ class _AvailableCoursesViewState extends State<AvailableCoursesView> {
                                             .toList(),
                                       ),
                                     ),
+                                    const SizedBox(height: 12),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                        if (state.registrationPhase == RegistrationPhase.group)
+                          ...groupedCoursesByScheduleGroup.entries.map((entry) {
+                            final scheduleGroup = entry.key;
+                            final sections = entry.value;
+
+                            return Column(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ScheduleGroupCard(
+                                      scheduleGroup: scheduleGroup,
+                                      child: Column(
+                                        children: [
+                                          CustomButton(
+                                              text:
+                                                  "Đ.ký tất cả các học phần nhóm này",
+                                              onPressed: () {
+                                                context
+                                                    .read<
+                                                        RegistrationSignalRBloc>()
+                                                    .add(
+                                                        RegistrationSignalRStarted());
+                                              }),
+                                          Column(
+                                              children: sections
+                                                  .map(
+                                                      (section) =>
+                                                          CourseSectionItem(
+                                                            courseSection:
+                                                                section,
+                                                            onDetail: () {
+                                                              CourseSectionDialog
+                                                                  .showCustomDialog(
+                                                                context,
+                                                                section,
+                                                                () {
+                                                                  context
+                                                                      .read<
+                                                                          CourseSectionsBloc>()
+                                                                      .add(
+                                                                        RegisterCourseRequested(
+                                                                          token:
+                                                                              (stateAuth as AuthUserAuthenticated).accessToken,
+                                                                          courseSectionId:
+                                                                              section.id,
+                                                                        ),
+                                                                      );
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                              );
+                                                            },
+                                                          ))
+                                                  .toList()),
+                                        ],
+                                      ),
+                                    ),
                                     const SizedBox(height: 16),
                                   ],
                                 ),
                               ],
                             );
                           }),
-
-                        if (state.registrationPhase ==
-                            RegistrationPhase.group)
-                        ...groupedCoursesByScheduleGroup.entries.map((entry) {
-                          final scheduleGroup = entry.key;
-                          final sections = entry.value;
-
-                          return Column(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ScheduleGroupCard(
-                                    scheduleGroup: scheduleGroup,
-                                    child: Column(
-                                      children: [
-                                        CustomButton(
-                                            text:
-                                                "Đ.ký tất cả các học phần nhóm này",
-                                            onPressed: () {
-                                              context.read<RegistrationSignalRBloc>().add(
-                                                RegistrationSignalRStarted()
-                                              );
-                                            }),
-                                        Column(
-                                            children: sections
-                                                .map((section) =>
-                                                    CourseSectionItem(
-                                                      courseSection: section,
-                                                      onDetail: () {
-                                                        CourseSectionDialog
-                                                            .showCustomDialog(
-                                                          context,
-                                                          section,
-                                                          () {
-                                                            context
-                                                                .read<
-                                                                    CourseSectionsBloc>()
-                                                                .add(
-                                                                  RegisterCourseRequested(
-                                                                    token: (stateAuth
-                                                                            as AuthUserAuthenticated)
-                                                                        .accessToken,
-                                                                    courseSectionId:
-                                                                        section
-                                                                            .id,
-                                                                  ),
-                                                                );
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        );
-                                                      },
-                                                    ))
-                                                .toList()),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
-                            ],
-                          );
-                        }),
                       ],
                     ),
                   ),

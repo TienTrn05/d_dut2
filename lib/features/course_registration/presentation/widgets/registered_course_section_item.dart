@@ -20,19 +20,42 @@ class RegisteredCourseSectionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+          color: Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                courseSection.courseSectionIdSplited,
-                style: TextStyle(
-                  fontSize: FontSizes.medium - 1,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Text(
+                    '${courseSection.courseSectionIdSplited} ',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium - 1,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.fiber_manual_record,
+                    size: 6,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${courseSection.course.credits} tín chỉ',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium - 1,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
               Text(
                 'SL: ${courseSection.registeredCount}/${courseSection.capacity}',
@@ -40,7 +63,9 @@ class RegisteredCourseSectionItem extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 4),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                   child: Column(
@@ -52,9 +77,10 @@ class RegisteredCourseSectionItem extends StatelessWidget {
                       fontSize: FontSizes.large,
                       fontWeight: FontWeight.bold,
                       color: context.theme.primaryColor,
-                      height: 1,
+                      height: 1.2,
                     ),
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     CourseDateUtils.formatStudyWeeks(courseSection.schedule),
                     style: TextStyle(
@@ -65,6 +91,7 @@ class RegisteredCourseSectionItem extends StatelessWidget {
                   ),
                 ],
               )),
+              const SizedBox(width: 4),
               CustomButton(
                 text: "Chi tiết",
                 onPressed: onDetail,
