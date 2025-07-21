@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/extensions/font_sizes.dart';
 
+import '../../../common/utils/course_date_utils.dart';
 import '../../../data/models/course_section.dart';
 import '../../../presentation/widgets/buttons/custom_button.dart';
 import 'widgets/course_section_info_item.dart';
@@ -110,7 +111,7 @@ class CourseSectionDialog {
                     ),
                     CourseSectionInfoItem(
                       title: "Thời khóa biểu",
-                      content: courseSection.schedule,
+                      content: CourseDateUtils.formatStudyWeeks(courseSection.schedule),
                     ),
                     CourseSectionInfoItem(
                       title: "Số lượng",

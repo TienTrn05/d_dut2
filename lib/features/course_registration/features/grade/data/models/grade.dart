@@ -24,9 +24,9 @@ class Grade {
   factory Grade.fromJson(Map<String, dynamic> json) {
     return Grade(
       id: json['id'],
-      courseName: json['course']['courseName'],
+      courseName: json['courseName'],
       semesterCode: json['semesterCode'],
-      credits: json['course']['credits'] as int,
+      credits: json['credits'] as int,
       courseSectionCode: json['courseSectionCode'],
       score10Scale: (json['score10Scale'] as num).toDouble(),
       letterGrade: json['letterGrade'],

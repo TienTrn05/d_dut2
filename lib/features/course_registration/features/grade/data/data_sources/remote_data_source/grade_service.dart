@@ -22,7 +22,7 @@ class GradeService {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = response.data['data'];
 
         final List<Grade> grades =
             (data as List).map((grade) => Grade.fromJson(grade)).toList();
@@ -32,7 +32,7 @@ class GradeService {
         throw Exception("Failed to load courses: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("Error fetching available courses: $e");
+      logger.e("Error fetching grades: $e");
       rethrow;
     }
   }

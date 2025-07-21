@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../common/utils/course_date_utils.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '../../data/models/registered_course_section.dart';
@@ -55,7 +56,7 @@ class RegisteredCourseSectionItem extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Thời khóa biểu: ${courseSection.schedule}',
+                    CourseDateUtils.formatStudyWeeks(courseSection.schedule),
                     style: TextStyle(
                       fontSize: FontSizes.medium - 1,
                       color: Color(0xFF747474),
