@@ -3,7 +3,14 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class SearchBarCustom extends StatefulWidget {
-  const SearchBarCustom({super.key});
+  final TextEditingController controller;
+  final Function(String)? onChanged;
+
+  const SearchBarCustom({
+    super.key,
+    required this.controller,
+    this.onChanged,
+  });
 
   @override
   State<SearchBarCustom> createState() => _SearchBarCustomState();
@@ -19,6 +26,8 @@ class _SearchBarCustomState extends State<SearchBarCustom> {
         borderRadius: BorderRadius.circular(999),
       ),
       child: TextField(
+        controller: widget.controller,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           icon: Icon(Icons.search, color: context.theme.grey),
           hintText: "Tìm kiếm...",

@@ -40,6 +40,7 @@ class CourseSectionItem extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 4),
           Row(
             children: [
               Expanded(
@@ -52,9 +53,10 @@ class CourseSectionItem extends StatelessWidget {
                       fontSize: FontSizes.large,
                       fontWeight: FontWeight.bold,
                       color: context.theme.primaryColor,
-                      height: 1,
+                      height: 1.2,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     CourseDateUtils.formatStudyWeeks(courseSection.schedule),
                     style: TextStyle(
@@ -65,6 +67,7 @@ class CourseSectionItem extends StatelessWidget {
                   ),
                 ],
               )),
+              const SizedBox(width: 4),
               CustomButton(
                 text: "Chi tiết",
                 onPressed: onDetail,

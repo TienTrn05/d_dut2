@@ -2,7 +2,10 @@ import 'package:e_dut/features/schedule/data/data_sources/remote_data_source/sch
 import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
-import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_detail_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton
@@ -25,7 +28,8 @@ class ScheduleRepository {
     return _scheduleService.getSchedulesByDate(inputDate, isTeacher);
   }
 
-  Future<List<CalendarEventModel>> getCalendarEvents(int month, int year, bool isTeacher) {
+  Future<List<CalendarEventModel>> getCalendarEvents(
+      int month, int year, bool isTeacher) {
     return _scheduleService.getCalendarEvents(month, year, isTeacher);
   }
 
@@ -35,5 +39,20 @@ class ScheduleRepository {
 
   Future<String> getWeekByDate(DateTime inputDate) {
     return _scheduleService.getWeekByDate(inputDate);
+  }
+
+  Future<FullInfoUosDetailModel> getFullInfoUosDetail(
+      String idUos, bool isTeacher) {
+    return _scheduleService.getFullInfoUosDetail(idUos, isTeacher);
+  }
+
+  Future<ExamShiftDetailModel> getTeacherExamShiftDetail(String idExamShift) {
+    return _scheduleService.getTeacherExamShiftDetail(idExamShift);
+  }
+
+  Future<StudentsExamShiftModel> getListStudentsByExamShift(
+      String idExamShift, String keyword, int pageNumber) {
+    return _scheduleService.getListStudentsByExamShift(
+        idExamShift, keyword, pageNumber);
   }
 }

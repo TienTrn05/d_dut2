@@ -3,17 +3,18 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
-import 'package:e_dut/features/schedule/data/model/exam_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_model.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UnitOfStudyItem extends StatelessWidget {
   final String? idUos;
-  final String? noUOS;
+  final String noUOS;
   final String nameSubject;
   final bool isExam;
-  final int? credit;
+  final num? credit;
   final Map<String, List<String>>? timetable;
   final ExamShiftModel? examShift;
   final String? room;
@@ -34,6 +35,18 @@ class UnitOfStudyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasShift = examShift?.noExamShift.isNotEmpty ?? false;
+    final hasGroup = examShift?.noExamGroup.isNotEmpty ?? false;
+
+    String displayGroupShiftText = '';
+    if (hasShift && hasGroup) {
+      displayGroupShiftText =
+          'Xuất ${examShift!.noExamShift}, nhóm ${examShift!.noExamGroup}';
+    } else if (hasShift) {
+      displayGroupShiftText = 'Xuất ${examShift!.noExamShift}';
+    } else if (hasGroup) {
+      displayGroupShiftText = 'Nhóm ${examShift!.noExamGroup}';
+    }
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
@@ -46,7 +59,16 @@ class UnitOfStudyItem extends StatelessWidget {
                   : isExam
                       ? Routes.detailExamShiftTeacher
                       : Routes.detailUnitOfStudyTeacher,
-              arguments: idUos);
+              arguments: userRole == RoleModel.roleStudent
+                  ? idUos
+                  : isExam
+                      ? ExamShiftArgs(
+                          idExamShift: examShift!.idExamShift,
+                          examShiftName: userRole == RoleModel.roleTeacher
+                              ? examShift!.examShiftName
+                              : nameSubject,
+                        )
+                      : idUos);
         },
         child: Container(
           width: double.infinity,
@@ -59,12 +81,16 @@ class UnitOfStudyItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (noUOS != null)
+              if (noUOS.isNotEmpty || examShift!.examShiftName.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      noUOS!,
+                      isExam
+                          ? userRole == RoleModel.roleTeacher
+                              ? examShift!.examCode
+                              : noUOS
+                          : noUOS,
                       style: TextStyle(
                           fontSize: FontSizes.small,
                           fontWeight: FontWeight.w500,
@@ -83,7 +109,11 @@ class UnitOfStudyItem extends StatelessWidget {
                 ),
               const SizedBox(height: 4),
               Text(
-                nameSubject,
+                isExam
+                    ? userRole == RoleModel.roleTeacher
+                        ? examShift!.examShiftName
+                        : nameSubject
+                    : nameSubject,
                 style: TextStyle(
                   fontSize: FontSizes.large,
                   fontWeight: FontWeight.bold,
@@ -143,29 +173,31 @@ class UnitOfStudyItem extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${Functions.formatDateTime(examShift!.examDate)},  ${examShift!.room}',
-                      style: TextStyle(
-                        fontSize: FontSizes.medium,
-                        height: 1.25,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Xuất ${examShift!.noExamShift}, nhóm ${examShift!.noExamGroup}',
-                          style: TextStyle(
-                            color: context.theme.grey ?? Colors.grey,
-                            fontSize: FontSizes.medium,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            height: 1.25,
-                          ),
+                    if (examShift!.examDate != null)
+                      Text(
+                        '${Functions.formatDateTime(examShift!.examDate!)},  ${examShift!.room}',
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          height: 1.25,
                         ),
-                      ],
-                    )
+                      ),
+                    const SizedBox(height: 4),
+                    if (displayGroupShiftText.trim().isNotEmpty)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            displayGroupShiftText,
+                            style: TextStyle(
+                              color: context.theme.grey ?? Colors.grey,
+                              fontSize: FontSizes.medium,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                              height: 1.25,
+                            ),
+                          ),
+                        ],
+                      )
                   ],
                 ),
               (teacher != null)

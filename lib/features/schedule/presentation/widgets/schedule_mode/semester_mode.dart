@@ -3,6 +3,8 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/timetable/timetable_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_exam_shift_pair_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_card.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/uos_item.dart';
@@ -251,7 +253,7 @@ class _SemesterModeState extends State<SemesterMode> {
     );
   }
 
-  Widget _buildUOSContent(List listUOS, String userRole) {
+  Widget _buildUOSContent(List<UosItemModel> listUOS, String userRole) {
     return Expanded(
       child: SingleChildScrollView(
         child: Column(
@@ -266,7 +268,7 @@ class _SemesterModeState extends State<SemesterMode> {
     );
   }
 
-  Widget _buildStudyScheduleCard(List listUOS, String userRole) {
+  Widget _buildStudyScheduleCard(List<UosItemModel> listUOS, String userRole) {
     return UosCard(
       title: userRole == RoleModel.roleStudent ? "Lịch học" : "Lịch dạy",
       child: Column(
@@ -277,8 +279,8 @@ class _SemesterModeState extends State<SemesterMode> {
                 listUOS[i].noUOS?.isNotEmpty == true) ...[
               UnitOfStudyItem(
                 idUos: listUOS[i].idUnitOfStudy,
-                noUOS: listUOS[i].noUOS,
-                nameSubject: listUOS[i].subjectName,
+                noUOS: listUOS[i].noUOS!,
+                nameSubject: listUOS[i].subjectName!,
                 credit: listUOS[i].credit,
                 timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
                 teacher: listUOS[i].teacherName,
@@ -295,43 +297,62 @@ class _SemesterModeState extends State<SemesterMode> {
     );
   }
 
-  Widget _buildExamScheduleCard(List listUOS, String userRole) {
+  Widget _buildExamScheduleCard(List<UosItemModel> listUOS, String userRole) {
+    final allExamShifts = <UosExamShiftPairModel>[];
+    final seenExamShiftIds = <String>{};
+
+    for (final uos in listUOS) {
+      if (uos.examShifts.isNotEmpty) {
+        for (final examShift in uos.examShifts) {
+          final id = examShift.idExamShift;
+          if (!seenExamShiftIds.contains(id)) {
+            seenExamShiftIds.add(id);
+            allExamShifts
+                .add(UosExamShiftPairModel(uos: uos, examShift: examShift));
+          }
+        }
+      }
+    }
+
+    allExamShifts.sort((a, b) {
+      if (a.examShift.examDate == null && b.examShift.examDate == null)
+        return 0;
+      if (a.examShift.examDate == null) return 1;
+      if (b.examShift.examDate == null) return -1;
+      return a.examShift.examDate!.compareTo(b.examShift.examDate!);
+    });
+
     return UosCard(
-      title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
-      isExam: true,
-      child:
-          listUOS.any((uos) => (uos.examShifts as List?)?.isNotEmpty ?? false)
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (int i = 0; i < listUOS.length; i++)
-                      if ((listUOS[i].examShifts as List?)?.isNotEmpty ??
-                          false) ...[
-                        for (var shift in listUOS[i].examShifts)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              UnitOfStudyItem(
-                                idUos: listUOS[i].idUnitOfStudy,
-                                noUOS: listUOS[i].noUOS,
-                                nameSubject: listUOS[i].subjectName,
-                                room: listUOS[i].subjectName,
-                                examShift: shift,
-                                isExam: true,
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                          ),
-                      ],
-                  ],
-                )
-              : const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Hiện chưa có lịch thi",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+        title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
+        isExam: true,
+        child: allExamShifts.isNotEmpty
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: allExamShifts.map((pair) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      UnitOfStudyItem(
+                        idUos: pair.uos.idUnitOfStudy,
+                        noUOS: pair.uos.noUOS!,
+                        nameSubject: pair.uos.subjectName!,
+                        room: pair.uos.subjectName,
+                        examShift: pair.examShift,
+                        isExam: true,
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                }).toList(),
+              )
+            : Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  userRole == RoleModel.roleTeacher
+                      ? "Hiện chưa có lịch coi thi"
+                      : "Hiện chưa có lịch thi",
+                  style: TextStyle(color: Colors.grey),
                 ),
-    );
+              ));
   }
 }

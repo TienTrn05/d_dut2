@@ -1,5 +1,5 @@
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
-import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/study_shift_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -21,6 +21,59 @@ class Functions {
     return a.length == b.length && a.containsAll(b);
   }
 
+  static Map<String, dynamic> parseShiftString(String shiftStr) {
+    // Format: "Thứ 2, 6-7, E402"
+    final parts = shiftStr.split(', ');
+    final dayStr = parts[0];
+    final periodParts = parts[1].split('-');
+    final startPeriod = int.parse(periodParts[0]);
+    final endPeriod = int.parse(periodParts[1]);
+    final room = parts[2];
+
+    // Convert day string back to dayOfWeek number
+    const dayMap = {
+      'Chủ nhật': 0,
+      'Thứ 2': 1,
+      'Thứ 3': 2,
+      'Thứ 4': 3,
+      'Thứ 5': 4,
+      'Thứ 6': 5,
+      'Thứ 7': 6,
+    };
+
+    return {
+      'dayOfWeek': dayMap[dayStr] ?? 0,
+      'startPeriod': startPeriod,
+      'endPeriod': endPeriod,
+      'room': room,
+      'originalString': shiftStr,
+    };
+  }
+
+  // Hàm sắp xếp shifts theo thứ tự trong tuần và tiết học
+  static List<String> sortShifts(List<String> shifts) {
+    final parsed = shifts.map((shift) => parseShiftString(shift)).toList();
+
+    // Sắp xếp theo:
+    // 1. Thứ tự trong tuần (dayOfWeek)
+    // 2. Tiết bắt đầu (startPeriod)
+    // 3. Phòng học (room) - nếu cùng ngày cùng tiết
+    parsed.sort((a, b) {
+      // So sánh theo thứ trong tuần
+      int dayCompare = a['dayOfWeek'].compareTo(b['dayOfWeek']);
+      if (dayCompare != 0) return dayCompare;
+
+      // Nếu cùng thứ, so sánh theo tiết bắt đầu
+      int periodCompare = a['startPeriod'].compareTo(b['startPeriod']);
+      if (periodCompare != 0) return periodCompare;
+
+      // Nếu cùng thứ và cùng tiết, so sánh theo phòng
+      return a['room'].compareTo(b['room']);
+    });
+
+    return parsed.map<String>((item) => item['originalString']).toList();
+  }
+
   static Map<String, List<String>> analyzeStudyShifts(
       List<StudyShiftModel> shifts) {
     Map<int, Set<String>> weekToShifts = {};
@@ -29,7 +82,6 @@ class Functions {
       String dayStr = getDayOfWeekStr(shift.dayOfWeek);
       String shiftStr =
           '$dayStr, ${shift.startPeriod}-${shift.endPeriod}, ${shift.room}';
-
       for (int week = shift.startWeek; week <= shift.endWeek; week++) {
         weekToShifts.putIfAbsent(week, () => <String>{});
         weekToShifts[week]!.add(shiftStr);
@@ -37,7 +89,6 @@ class Functions {
     }
 
     List<int> sortedWeeks = weekToShifts.keys.toList()..sort();
-
     Map<String, List<String>> result = {};
     int? startWeek;
     int? previousWeek;
@@ -45,23 +96,24 @@ class Functions {
 
     for (var week in sortedWeeks) {
       var currentShifts = weekToShifts[week]!;
-
       // Kiểm tra: khác ca học HOẶC tuần không liền kề
       if (previousShifts == null ||
           !setEquals(previousShifts, currentShifts) ||
           (previousWeek != null && week != previousWeek + 1)) {
         if (startWeek != null && previousWeek != null) {
-          result['$startWeek-$previousWeek'] = previousShifts!.toList();
+          // Sắp xếp shifts trước khi thêm vào result
+          result['$startWeek-$previousWeek'] =
+              sortShifts(previousShifts!.toList());
         }
         startWeek = week;
       }
-
       previousWeek = week;
       previousShifts = currentShifts;
     }
 
     if (startWeek != null && previousWeek != null && previousShifts != null) {
-      result['$startWeek-$previousWeek'] = previousShifts.toList();
+      // Sắp xếp shifts cho khoảng tuần cuối cùng
+      result['$startWeek-$previousWeek'] = sortShifts(previousShifts.toList());
     }
 
     return result;

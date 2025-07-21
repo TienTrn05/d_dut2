@@ -1,11 +1,16 @@
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
+import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
+import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
-import 'package:e_dut/features/schedule/presentation/screens/detaitl_exam_shift_screen.dart';
+import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
@@ -59,8 +64,19 @@ class Routes {
         );
 
       case detailExamShiftTeacher:
+        final args = settings.arguments as ExamShiftArgs;
         return MaterialPageRoute(
-            builder: (context) => DetaitlExamShiftScreen());
+            builder: (_) => BlocProvider(
+                  create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
+                    ..add(LoadExamShiftDetail(
+                        idExamShift: args.idExamShift,
+                        keyword: '',
+                        pageNumber: 1)),
+                  child: DetailExamShiftScreen(
+                    idExamShift: args.idExamShift,
+                    examShiftName: args.examShiftName,
+                  ),
+                ));
 
       case msteamtool:
         return MaterialPageRoute(

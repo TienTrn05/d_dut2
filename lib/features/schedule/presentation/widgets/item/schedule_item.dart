@@ -2,6 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,7 +38,14 @@ class ScheduleItem extends StatelessWidget {
                       ? Routes.detailExamShiftTeacher
                       : Routes.detailUnitOfStudyTeacher
                   : Routes.detailUnitOfStudy,
-              arguments: idUos);
+              arguments: userRole == RoleModel.roleTeacher
+                  ? isExam
+                      ? ExamShiftArgs(
+                          idExamShift: idUos,
+                          examShiftName: subject,
+                        )
+                      : idUos
+                  : idUos);
         },
         child: Container(
           width: double.infinity,

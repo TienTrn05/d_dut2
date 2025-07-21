@@ -68,10 +68,9 @@ class RegisteredCourseSectionDialog {
                         shape: const CircleBorder(),
                         elevation: 0,
                         highlightElevation: 0,
-                        color: Colors.white,
                         child: Icon(
-                          Icons.close,
-                          color: context.theme.primaryColor,
+                          Icons.close_rounded,
+                          color: Colors.white,
                         ),
                       ),
                     )
@@ -99,7 +98,7 @@ class RegisteredCourseSectionDialog {
                     ),
                     CourseSectionInfoItem(
                       title: "Số tín chỉ",
-                      content: '3',
+                      content: courseSection.course.credits.toString(),
                     ),
                     CourseSectionInfoItem(
                       title: "Giảng viên",
@@ -111,7 +110,8 @@ class RegisteredCourseSectionDialog {
                     ),
                     CourseSectionInfoItem(
                       title: "Thời khóa biểu",
-                      content: CourseDateUtils.formatStudyWeeks(courseSection.schedule),
+                      content: CourseDateUtils.formatStudyWeeks(
+                          courseSection.schedule),
                     ),
                     CourseSectionInfoItem(
                       title: "Số lượng",
@@ -125,7 +125,9 @@ class RegisteredCourseSectionDialog {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomButton(
-                          text: courseSection.isRegistering ? "Đang xử lý" : "Hủy đăng ký",
+                          text: courseSection.isRegistering
+                              ? "Đang xử lý"
+                              : "Hủy đăng ký",
                           disabled: courseSection.isRegistering,
                           onPressed: onRegister,
                         ),

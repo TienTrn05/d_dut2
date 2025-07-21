@@ -4,7 +4,9 @@ import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
-import 'package:e_dut/features/schedule/data/model/study_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/study_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_detail_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/absents_card.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
@@ -17,19 +19,40 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UosInfoTab extends StatefulWidget {
-  final String idUos;
-  const UosInfoTab({super.key, required this.idUos});
+  final UosDetailModel uosDetail;
+  final String? teacherName;
+  final int? absentTimes;
+  final List<StudyShiftModel> studyShifts;
+  final ExamShiftModel? examShift;
+  const UosInfoTab(
+      {super.key,
+      required this.uosDetail,
+      this.teacherName,
+      this.absentTimes,
+      required this.studyShifts,
+      this.examShift});
 
   @override
   State<UosInfoTab> createState() => _UosInfoTabState();
 }
 
 class _UosInfoTabState extends State<UosInfoTab> {
-  final TextEditingController _codeController =
-      TextEditingController(text: "012ajsh");
-  final TextEditingController _linkController = TextEditingController(
-      text:
-          "https://teams.microsoft.com/l/team/19%3Ad2pYw4aOqMVmggq1SStgmgoce9mEfA73aKGb_UzJbzQ1%40thread.tacv2/conversations?groupId=c2aeacc4-5d26-466b-a6be-ffb69ccfe8de&tenantId=42350984-d0f6-4a38-978a-aa84e495e429");
+  late TextEditingController _codeController;
+  late TextEditingController _linkController;
+
+  @override
+  void initState() {
+    super.initState();
+    _codeController = TextEditingController(text: widget.uosDetail.msTeamCode);
+    _linkController = TextEditingController(text: widget.uosDetail.msTeamLink);
+  }
+
+  @override
+  void dispose() {
+    _codeController.dispose();
+    _linkController.dispose();
+    super.dispose();
+  }
 
   void _showEditLinkModal(BuildContext context) {
     showModalBottomSheet(
@@ -67,29 +90,8 @@ class _UosInfoTabState extends State<UosInfoTab> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List<String>> timetable = Functions.analyzeStudyShifts([
-      StudyShiftModel(
-          dayOfWeek: 1,
-          startPeriod: 1,
-          endPeriod: 3,
-          startWeek: 3,
-          endWeek: 18,
-          room: "E201A"),
-      StudyShiftModel(
-          dayOfWeek: 2,
-          startPeriod: 1,
-          endPeriod: 3,
-          startWeek: 3,
-          endWeek: 19,
-          room: "E201A"),
-      StudyShiftModel(
-          dayOfWeek: 3,
-          startPeriod: 1,
-          endPeriod: 3,
-          startWeek: 3,
-          endWeek: 19,
-          room: "E201A"),
-    ]);
+    Map<String, List<String>> timetable =
+        Functions.analyzeStudyShifts(widget.studyShifts);
     final entries = timetable.entries.toList();
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
       final String userRole = authState is AuthUserAuthenticated
@@ -103,19 +105,19 @@ class _UosInfoTabState extends State<UosInfoTab> {
               child: Column(
                 children: [
                   InfoItem(
-                      field: "Mã lớp học phần", value: "1024010.2420.21.11"),
-                  InfoItem(field: "Mã môn", value: "123456"),
+                      field: "Mã lớp học phần", value: widget.uosDetail.noUOS),
+                  InfoItem(field: "Mã môn", value: widget.uosDetail.noSubject),
                   InfoItem(
                     field: "Hệ",
-                    value: "CLC",
+                    value: widget.uosDetail.clc == 1 ? "CLC" : "",
                   ),
                   InfoItem(
                     field: "Số tín chỉ",
-                    value: "03",
+                    value: widget.uosDetail.credit.toString(),
                   ),
                   InfoItem(
                     field: "Kỳ học",
-                    value: "Học kì 1, 2025-2026",
+                    value: widget.uosDetail.semester,
                   ),
                 ],
               ),
@@ -127,9 +129,11 @@ class _UosInfoTabState extends State<UosInfoTab> {
               action: () => _showEditLinkModal(context),
               child: Column(
                 children: [
-                  if (userRole != RoleModel.roleTeacher)
-                    InfoItem(field: "Giảng viên", value: "Đặng Thiên Bình"),
-                  InfoItem(field: "Hình thức GD", value: "Offline & Online"),
+                  if (userRole == RoleModel.roleStudent)
+                    InfoItem(field: "Giảng viên", value: widget.teacherName!),
+                  InfoItem(
+                      field: "Hình thức GD",
+                      value: widget.uosDetail.methodOfTeaching),
                   UosInfoItem(
                     field: "Mã truy cập",
                     value: (_codeController.text.trim().isNotEmpty)
@@ -261,7 +265,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                             );
                           },
                           child: Text(
-                            "3",
+                            widget.absentTimes!.toString(),
                             style: TextStyle(
                               fontSize: FontSizes.medium,
                               fontWeight: FontWeight.bold,
@@ -274,7 +278,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                         )),
                   InfoItem(
                       field: "Công thức điểm",
-                      value: "[GK]*0.20+[BT]*0.20+[CK]*0.60"),
+                      value: widget.uosDetail.scoreFormula),
                 ],
               ),
             ),
@@ -341,18 +345,29 @@ class _UosInfoTabState extends State<UosInfoTab> {
                 )),
             const SizedBox(height: 10),
             if (userRole == RoleModel.roleStudent)
-              UosInfoCard(
-                title: 'Lịch thi',
-                child: Column(
-                  children: [
-                    InfoItem(field: "Ngày giờ", value: "7:00, 14/5/2025"),
-                    InfoItem(field: "Phòng", value: "207"),
-                    InfoItem(field: "Xuất", value: "2C1"),
-                    InfoItem(field: "Nhóm", value: "A"),
-                    InfoItem(field: "Hình thức thi", value: "Thi chung"),
-                  ],
+              if (widget.examShift != null &&
+                  widget.examShift!.idExamShift.isNotEmpty)
+                UosInfoCard(
+                  title: 'Lịch thi',
+                  child: Column(
+                    children: [
+                      InfoItem(
+                          field: "Ngày giờ",
+                          value: widget.examShift!.examDate != null
+                              ? Functions.formatDateTime(
+                                  widget.examShift!.examDate!)
+                              : ''),
+                      InfoItem(field: "Phòng", value: widget.examShift!.room),
+                      InfoItem(
+                          field: "Xuất", value: widget.examShift!.noExamShift),
+                      InfoItem(
+                          field: "Nhóm", value: widget.examShift!.noExamGroup),
+                      InfoItem(
+                          field: "Hình thức thi",
+                          value: widget.examShift!.methodOfExam),
+                    ],
+                  ),
                 ),
-              ),
           ],
         ),
       );
