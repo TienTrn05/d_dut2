@@ -25,7 +25,7 @@ class CourseSectionService {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = response.data['data'];
 
         final CourseSectionResponse courseSectionResponse =
             CourseSectionResponse.fromJson(data);
@@ -50,7 +50,7 @@ class CourseSectionService {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200) {
-        final data = response.data['data'];
+        final data = response.data['data']['courseSections'];
 
         final List<RegisteredCourseSection> courses = (data as List)
             .map((course) => RegisteredCourseSection.fromJson(course))
@@ -60,7 +60,7 @@ class CourseSectionService {
         throw Exception("Failed to load courses: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("Error fetching available courses: $e");
+      logger.e("Error fetching my courses: $e");
       rethrow;
     }
   }

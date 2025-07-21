@@ -13,7 +13,7 @@ class CourseSectionResponse {
 
   factory CourseSectionResponse.fromJson(Map<String, dynamic> json) {
     return CourseSectionResponse(
-      courseSections: (json['data'] as List<dynamic>)
+      courseSections: (json['courseSections'] as List<dynamic>)
           .map((e) => CourseSection.fromJson(e as Map<String, dynamic>))
           .toList(),
       registrationPhase: RegistrationPhase.values.firstWhere(
