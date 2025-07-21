@@ -179,7 +179,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           )
         ],
         if (_isAbsentDate) ...[
-          SearchBarCustom(),
+          // SearchBarCustom(),
           if (widget.isCheckAbsent) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

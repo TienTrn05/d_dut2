@@ -3,7 +3,10 @@ import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
-import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_detail_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
@@ -62,7 +65,6 @@ class ScheduleService {
             "Failed to load list UOSItem : ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("Failed to load UOSItem: $e");
       throw Exception("Failed to fetch UOSItem: $e");
     }
   }
@@ -156,7 +158,7 @@ class ScheduleService {
             "Failed to load idSemester: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("]Failed to load ScheduleItem: $e");
+      logger.e("Failed to load ScheduleItem: $e");
       throw Exception("Failed to fetch ScheduleItem: $e");
     }
   }
@@ -179,6 +181,78 @@ class ScheduleService {
     } catch (e) {
       logger.e("Failed to load week: $e");
       throw Exception("Failed to fetch week: $e");
+    }
+  }
+
+  Future<FullInfoUosDetailModel> getFullInfoUosDetail(
+      String idUos, bool isTeacher) async {
+    try {
+      dynamic response;
+      if (isTeacher) {
+        response = await _dio.get("$_url/api/UOS/GetTeacherUosDetail",
+            queryParameters: {'idUos': idUos});
+      } else {
+        response = await _dio.get("$_url/api/UOS/GetStudentUosDetail",
+            queryParameters: {'idUos': idUos});
+      }
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final data = responseData['data'];
+        final detailStudentUos = FullInfoUosDetailModel.fromJson(data);
+
+        return detailStudentUos;
+      } else {
+        throw Exception(
+            "Failed to load student uos detail: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch student uos detail: $e");
+    }
+  }
+
+  Future<ExamShiftDetailModel> getTeacherExamShiftDetail(
+      String idExamShift) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/UOS/GetTeacherExamShiftDetail", queryParameters: {
+        'idExamShift': idExamShift,
+      });
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final data = responseData['data'];
+        final examShiftDetail = ExamShiftDetailModel.fromJson(data);
+
+        return examShiftDetail;
+      } else {
+        throw Exception(
+            "Failed to load exam shift detail: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch student uos detail: $e");
+    }
+  }
+
+  Future<StudentsExamShiftModel> getListStudentsByExamShift(
+      String idExamShift, String keyword, int pageNumber) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/UOS/GetListStudentsByExamShift", queryParameters: {
+        'idExamShift': idExamShift,
+        'keyword': keyword,
+        'pageNumber': pageNumber,
+      });
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final data = responseData['data'];
+        final listStudents = StudentsExamShiftModel.fromJson(data);
+
+        return listStudents;
+      } else {
+        throw Exception(
+            "Failed to load list students of examshift: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch list students of examshift: $e");
     }
   }
 }

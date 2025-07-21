@@ -36,6 +36,17 @@ class _DayModeState extends State<DayMode> {
     });
   }
 
+  String buildExamTimeText(ScheduleItemModel item) {
+    final time = DateFormat.Hm().format(item.examTime!);
+
+    final shiftText =
+        item.noExamShift.isNotEmpty ? ", xuất ${item.noExamShift}" : "";
+    final groupText =
+        item.noExamGroup.isNotEmpty ? ", nhóm ${item.noExamGroup}" : "";
+
+    return "$time$shiftText$groupText";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -59,12 +70,6 @@ class _DayModeState extends State<DayMode> {
                 selectedDay = state.selectedDay;
                 noWeek = state.noWeek;
                 schedules = state.schedules;
-
-                if (baseDateForWeek == null) {
-                  baseDateForWeek = state.selectedDay;
-                  baseWeekNo =
-                      int.tryParse(state.noWeek.replaceAll(RegExp(r'\D'), ''));
-                }
               });
             }
           }),
@@ -110,7 +115,8 @@ class _DayModeState extends State<DayMode> {
                           SizedBox(height: 20),
                           _buildHeaderSection(userRole),
                           SizedBox(height: 10),
-                          _buildScheduleContent(scheduleState, filteredItems),
+                          _buildScheduleContent(
+                              scheduleState, filteredItems, userRole),
                           SizedBox(height: 40),
                         ],
                       ),
@@ -129,9 +135,9 @@ class _DayModeState extends State<DayMode> {
       alignment: WrapAlignment.spaceBetween,
       runSpacing: 4,
       children: [
-        (noWeek.isNotEmpty && baseDateForWeek != null && baseWeekNo != null)
+        (noWeek.isNotEmpty)
             ? Text(
-                "Tuần ${Functions.getWeekStringFromBase(selectedDay, noWeek, baseDateForWeek, baseWeekNo)}, ${DateFormat('dd/MM/yyyy').format(selectedDay)}",
+                "Tuần $noWeek, ${DateFormat('dd/MM/yyyy').format(selectedDay)}",
                 style: TextStyle(
                   fontSize: FontSizes.medium,
                   fontWeight: FontWeight.bold,
@@ -150,8 +156,8 @@ class _DayModeState extends State<DayMode> {
     );
   }
 
-  Widget _buildScheduleContent(
-      ScheduleState scheduleState, List<ScheduleItemModel> filteredItems) {
+  Widget _buildScheduleContent(ScheduleState scheduleState,
+      List<ScheduleItemModel> filteredItems, String userRole) {
     if (scheduleState is ScheduleLoading) {
       return Center();
     }
@@ -175,11 +181,17 @@ class _DayModeState extends State<DayMode> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: filteredItems.map((item) {
         return ScheduleItem(
-          idUos: (item.idUnitOfStudy ?? item.idExamShift)!,
-          subject: item.subjectName,
+          idUos: item.idUnitOfStudy.isNotEmpty
+              ? item.idUnitOfStudy
+              : item.idExamShift,
+          subject: userRole != RoleModel.roleTeacher
+              ? (item.subjectName.isNotEmpty
+                  ? item.subjectName
+                  : item.examShiftName)
+              : (item.isExam ? item.examShiftName : item.subjectName),
           time: item.isExam
-              ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
-              : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+              ? buildExamTimeText(item)
+              : "${item.startStudyTime.substring(0, 5)} - ${item.endStudyTime.substring(0, 5)}",
           room: item.room,
           isExam: item.isExam,
         );
