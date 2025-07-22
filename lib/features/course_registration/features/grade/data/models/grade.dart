@@ -53,7 +53,7 @@ class Grade {
     }
 
     // Sort the keys (semesterCodes)
-    final sortedKeys = grouped.keys.toList()..sort();
+    final sortedKeys = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
 
     // Build a LinkedHashMap to preserve the sorted order
     final sortedGrouped = LinkedHashMap<String, List<Grade>>(

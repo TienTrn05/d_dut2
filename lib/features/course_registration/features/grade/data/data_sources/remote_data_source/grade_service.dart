@@ -23,6 +23,7 @@ class GradeService {
           }));
       if (response.statusCode == 200) {
         final data = response.data['data'];
+        logger.i(data);
 
         final List<Grade> grades =
             (data as List).map((grade) => Grade.fromJson(grade)).toList();
