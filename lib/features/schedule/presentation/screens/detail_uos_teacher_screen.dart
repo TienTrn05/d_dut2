@@ -292,7 +292,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   },
                                   backgroundColor: context.theme.lightBlue,
                                   shape: CircleBorder(),
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   child: SvgPicture.asset(
                                     isCheckAbsent
                                         ? "assets/icons/svg/student_tracking_overview.svg"
@@ -331,8 +331,12 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                             shape: CircleBorder(),
                             child: SvgPicture.asset(
                               isCheckAbsent
-                                  ? "assets/icons/svg/student_tracking.svg"
-                                  : "assets/icons/svg/student_tracking_overview.svg",
+                                  ? (!isOverlayVisible
+                                      ? "assets/icons/svg/student_tracking_overview.svg"
+                                      : "assets/icons/svg/student_tracking.svg")
+                                  : (!isOverlayVisible
+                                      ? "assets/icons/svg/student_tracking.svg"
+                                      : "assets/icons/svg/student_tracking_overview.svg"),
                               width: 24,
                               height: 24,
                               colorFilter: ColorFilter.mode(

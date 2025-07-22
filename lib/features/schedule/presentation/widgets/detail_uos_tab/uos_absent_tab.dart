@@ -6,6 +6,7 @@ import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
+import 'package:e_dut/features/schedule/presentation/widgets/item/student_absent_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +26,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       "${DateFormat('dd/MM/yyyy').format(DateTime.now())}, tuần 3";
   DateTime startdWeek = DateTime(2025, 3, 3);
   bool _isAbsentDate = true;
+  final TextEditingController _searchController = TextEditingController();
   // Giả lập sinh viên
   List<Map<String, dynamic>> students = [
     {
@@ -179,7 +181,12 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           )
         ],
         if (_isAbsentDate) ...[
-          // SearchBarCustom(),
+          SearchBarCustom(
+            controller: _searchController,
+          ),
+          SizedBox(
+            height: 8,
+          ),
           if (widget.isCheckAbsent) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -205,10 +212,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                         color: context.theme.primaryColor ?? Colors.blue,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       padding: EdgeInsets.symmetric(
-                        vertical: 4,
+                        vertical: 8,
                         horizontal: 8,
                       ),
                       elevation: 0,
@@ -237,10 +244,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               color: context.theme.red ?? Colors.red,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             padding: EdgeInsets.symmetric(
-                              vertical: 4,
+                              vertical: 8,
                               horizontal: 8,
                             ),
                           ),
@@ -265,10 +272,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               color: context.theme.primaryColor ?? Colors.blue,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             padding: EdgeInsets.symmetric(
-                              vertical: 4,
+                              vertical: 8,
                               horizontal: 8,
                             ),
                           ),
@@ -288,6 +295,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               ],
             ),
           ],
+          SizedBox(
+            height: 8,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -307,40 +317,40 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   ),
                 )
               ] else ...[
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: Checkbox(
-                        value: isSellectedAll,
-                        activeColor: context.theme.primaryColor,
-                        onChanged: (bool? newValue) {
-                          _toggleSelectAll();
-                        },
-                        visualDensity: VisualDensity.compact,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                GestureDetector(
+                  onTap: () => _toggleSelectAll(),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Checkbox(
+                          value: isSellectedAll,
+                          activeColor: context.theme.primaryColor,
+                          onChanged: (bool? newValue) {
+                            _toggleSelectAll();
+                          },
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      "Chọn tất cả (10)",
-                      style: TextStyle(
-                        fontSize: FontSizes.medium,
-                        color: context.theme.grey,
-                      ),
-                    )
-                  ],
-                ),
-                Text(
-                  "Điểm danh",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
+                      SizedBox(width: 8),
+                      Text(
+                        "Điểm danh tất cả (10)",
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          color: context.theme.grey,
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ]
             ],
+          ),
+          SizedBox(
+            height: 8,
           ),
           Expanded(
             child: ListView.builder(
@@ -351,20 +361,24 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   // Thêm khoảng trống cuối danh sách
                   return SizedBox(height: 56);
                 }
-                return StudentItem(
-                  name: students[index]["name"],
-                  mail: students[index]["mail"],
-                  absentCount: students[index]["absentCount"],
-                  isCheckAbsent: widget.isCheckAbsent,
-                  isAbsentToday: students[index]["isAbsentToday"],
-                  onAbsentChanged: (isAbsent) {
-                    updateAbsentStatus(index, isAbsent);
-                    setState(() {
-                      isSellectedAll =
-                          students.every((s) => s["isAbsentToday"] == true);
-                    });
-                  },
-                );
+                return widget.isCheckAbsent
+                    ? StudentAbsentItem(
+                        name: students[index]["name"],
+                        mail: students[index]["mail"],
+                        isAbsentToday: students[index]["isAbsentToday"],
+                        onAbsentChanged: (isAbsent) {
+                          updateAbsentStatus(index, isAbsent);
+                          setState(() {
+                            isSellectedAll = students
+                                .every((s) => s["isAbsentToday"] == true);
+                          });
+                        },
+                      )
+                    : StudentItem(
+                        name: students[index]["name"],
+                        mail: students[index]["mail"],
+                        absentCount: students[index]["absentCount"],
+                      );
               },
             ),
           ),

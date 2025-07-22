@@ -35,31 +35,6 @@ class AbsentsCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1,
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.error,
-                                    size: 40,
-                                    color: Colors.red); // Hiển thị icon lỗi
-                              },
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
