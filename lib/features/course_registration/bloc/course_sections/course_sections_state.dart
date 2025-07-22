@@ -2,6 +2,7 @@ part of 'course_sections_bloc.dart';
 
 enum AvailableCoursesStatus { initial, loading, success, failure }
 enum RegisteredCoursesStatus { initial, loading, success, failure }
+enum RegistrationStatus { initial, loading, success, failure }
 
 class CourseSectionsState extends Equatable {
   final AvailableCoursesStatus availableCoursesStatus;
@@ -12,6 +13,9 @@ class CourseSectionsState extends Equatable {
   final List<RegisteredCourseSection> registeredCourses;
   final String errorRegisteredCoursesMessage;
 
+  final RegistrationStatus registrationStatus;
+  final String registrationMessage;
+
   final RegistrationPhase registrationPhase;
 
   const CourseSectionsState({
@@ -21,6 +25,8 @@ class CourseSectionsState extends Equatable {
     this.registeredCourses = const <RegisteredCourseSection>[],
     this.errorCourseSectionMessage = '',
     this.errorRegisteredCoursesMessage = '',
+    this.registrationStatus = RegistrationStatus.initial,
+    this.registrationMessage = '',
     this.registrationPhase = RegistrationPhase.group,
   });
 
@@ -31,6 +37,8 @@ class CourseSectionsState extends Equatable {
     List<RegisteredCourseSection> Function()? registeredCourses,
     String Function()? errorCourseSectionMessage,
     String Function()? errorRegisteredCoursesMessage,
+    RegistrationStatus Function()? registrationStatus,
+    String Function()? registrationMessage,
     RegistrationPhase Function()? registrationPhase,
   }) {
     return CourseSectionsState(
@@ -48,6 +56,12 @@ class CourseSectionsState extends Equatable {
       errorRegisteredCoursesMessage: errorRegisteredCoursesMessage != null
           ? errorRegisteredCoursesMessage()
           : this.errorRegisteredCoursesMessage,
+      registrationStatus: registrationStatus != null
+          ? registrationStatus()
+          : this.registrationStatus,
+      registrationMessage: registrationMessage != null
+          ? registrationMessage()
+          : this.registrationMessage,
       registrationPhase: registrationPhase != null
           ? registrationPhase()
           : this.registrationPhase,
@@ -62,6 +76,8 @@ class CourseSectionsState extends Equatable {
     registeredCourses,
     errorCourseSectionMessage,
     errorRegisteredCoursesMessage,
+    registrationStatus,
+    registrationMessage,
     registrationPhase,
   ];
 }
