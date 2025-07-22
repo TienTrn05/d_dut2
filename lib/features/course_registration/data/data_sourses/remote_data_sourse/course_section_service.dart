@@ -78,7 +78,7 @@ class CourseSectionService {
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 202) {
         return true;
       } else {
         throw Exception("Failed to register course: ${response.data['message']}");
@@ -102,7 +102,7 @@ class CourseSectionService {
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 202) {
         return true;
       } else {
         throw Exception("Failed to unregister course: ${response.data['message']}");
