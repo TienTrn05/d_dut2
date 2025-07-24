@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
@@ -14,7 +15,7 @@ class CalendarAbsent extends StatefulWidget {
   const CalendarAbsent(
       {super.key, required this.initDate, required this.onValueChange});
   final DateTime initDate;
-  final Function(DateTime, bool) onValueChange;
+  final Function(DateTime) onValueChange;
 
   @override
   State<CalendarAbsent> createState() => _CalendarAbsentState();
@@ -42,6 +43,15 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
               year: widget.initDate.year,
               isTeacher: userRole == RoleModel.roleTeacher),
         );
+  }
+
+  void _warningNotAbsentDate() {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Bạn không có tiết ngày này.',
+        'Vui lòng chọn ngày bạn có tiết dạy để thực hiện điểm danh.',
+        AlertType.warning,
+        textCancel: "Đóng");
   }
 
   @override
@@ -180,20 +190,6 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
             }, child: BlocBuilder<CalendarBloc, CalendarState>(
                     // Dùng state để build lại giao diện
                     builder: (context, state) {
-              // if (state is CalendarEventLoaded) {
-              //   _eventMap = {};
-              //   for (var event in state.calendarEvents) {
-              //     final date = DateTime(
-              //         event.date.year, event.date.month, event.date.day);
-              //     if (!_eventMap.containsKey(date)) {
-              //       _eventMap[date] = [];
-              //     }
-              //     for (var eventType in event.eventTypes) {
-              //       _eventMap[date]!.add(eventType.eventType);
-              //     }
-              //   }
-              // }
-
               return GestureDetector(
                 onTap: _showMonthYearPicker,
                 child: TableCalendar(
@@ -229,9 +225,13 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                   onDaySelected: (selectedDay, focusedDay) {
                     bool isAbsentDate = _eventMap.keys
                         .any((date) => isSameDate(date, selectedDay));
-                    setState(() {
-                      widget.onValueChange(selectedDay, isAbsentDate);
-                    });
+                    if (!isAbsentDate) {
+                      _warningNotAbsentDate();
+                    } else {
+                      setState(() {
+                        widget.onValueChange(selectedDay);
+                      });
+                    }
                   },
                   headerStyle: HeaderStyle(
                     titleCentered: true,

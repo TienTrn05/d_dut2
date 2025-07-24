@@ -13,18 +13,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class UosAbsentTab extends StatefulWidget {
-  const UosAbsentTab({super.key, required this.isCheckAbsent});
   final bool isCheckAbsent;
+  final DateTime selectedDay;
+
+  const UosAbsentTab(
+      {super.key, required this.isCheckAbsent, required this.selectedDay});
   @override
   State<UosAbsentTab> createState() => _UosAbsentTabState();
 }
 
 class _UosAbsentTabState extends State<UosAbsentTab> {
   bool isSellectedAll = false;
-  DateTime currentDate = DateTime.now();
-  var selectedDate =
-      "${DateFormat('dd/MM/yyyy').format(DateTime.now())}, tuần 3";
-  DateTime startdWeek = DateTime(2025, 3, 3);
+  late DateTime _currentDate;
+  // var _selectedDate;
+  late String _currentWeek = "";
+  // DateTime startdWeek = DateTime(2025, 3, 3);
   bool _isAbsentDate = true;
   final TextEditingController _searchController = TextEditingController();
   // Giả lập sinh viên
@@ -59,9 +62,22 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     },
   ];
 
+  DateTime getMondayOfWeek(DateTime focusedDay) {
+    int difference = focusedDay.weekday - DateTime.monday;
+    return focusedDay.subtract(Duration(days: difference));
+  }
+
   @override
   void initState() {
     super.initState();
+    context.read<CalendarBloc>().add(
+          LoadCalendarWeek(inputDate: getMondayOfWeek(widget.selectedDay)),
+        );
+    setState(() {
+      _currentDate = widget.selectedDay;
+      // _selectedDate =
+      //     "${DateFormat('dd/MM/yyyy').format(widget.selectedDay)}, tuần 3";
+    });
   }
 
 // Cập nhập trang thái điểm danh
@@ -87,19 +103,19 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     });
   }
 
-  void _updateCurrentDate(DateTime newValue, bool isAbsentDate) {
+  void _updateCurrentDate(DateTime newValue) {
     setState(() {
-      currentDate = newValue;
-      _isAbsentDate = isAbsentDate;
+      _currentDate = newValue;
+      // _isAbsentDate = isAbsentDate;
     });
 
-    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
-    if (currentDate.isAfter(startdWeek)) {
-      int weekDifference = currentDate.difference(startdWeek).inDays ~/ 7;
-      selectedDate = "$formattedDate, tuần ${weekDifference + 1}";
-    } else {
-      selectedDate = "$formattedDate, tuần 0";
-    }
+    // String formattedDate = DateFormat('dd/MM/yyyy').format(_currentDate);
+    // if (_currentDate.isAfter(startdWeek)) {
+    //   int weekDifference = _currentDate.difference(startdWeek).inDays ~/ 7;
+    //   _selectedDate = "$formattedDate, tuần ${weekDifference + 1}";
+    // } else {
+    //   _selectedDate = "$formattedDate, tuần 0";
+    // }
     Navigator.pop(context);
   }
 
@@ -107,7 +123,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     CustomAlertDialog.showCustomDialog(
         context,
         'Xóa ngày điểm danh',
-        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $selectedDate không?',
+        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $_currentDate không?',
         AlertType.delete,
         onConfirm: () => {setState(() {})},
         textConfirm: "Xóa");
@@ -117,7 +133,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     CustomAlertDialog.showCustomDialog(
         context,
         'Lưu ngày điểm danh',
-        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $selectedDate không?',
+        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $_currentDate không?',
         AlertType.confirm,
         onConfirm: () => {setState(() {})},
         textConfirm: "Lưu");
@@ -129,57 +145,57 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        if (!_isAbsentDate) ...[
-          Center(
-            child: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () => {
-                    showDialog(
-                        context: context,
-                        builder: (context) => BlocProvider(
-                              create: (_) =>
-                                  CalendarBloc(getIt.get<ScheduleRepository>()),
-                              child: CalendarAbsent(
-                                initDate: currentDate,
-                                onValueChange: _updateCurrentDate,
-                              ),
-                            ))
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: BorderSide(
-                      color: context.theme.primaryColor ?? Colors.blue,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 8,
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    selectedDate,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      color: context.theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  "Bạn không có tiết ngày này.",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
+        // if (!_isAbsentDate) ...[
+        //   Center(
+        //     child: Column(
+        //       children: [
+        //         ElevatedButton(
+        //           onPressed: () => {
+        //             showDialog(
+        //                 context: context,
+        //                 builder: (context) => BlocProvider(
+        //                       create: (_) =>
+        //                           CalendarBloc(getIt.get<ScheduleRepository>()),
+        //                       child: CalendarAbsent(
+        //                         initDate: currentDate,
+        //                         onValueChange: _updateCurrentDate,
+        //                       ),
+        //                     ))
+        //           },
+        //           style: ElevatedButton.styleFrom(
+        //             backgroundColor: Colors.white,
+        //             side: BorderSide(
+        //               color: context.theme.primaryColor ?? Colors.blue,
+        //             ),
+        //             shape: RoundedRectangleBorder(
+        //               borderRadius: BorderRadius.circular(999),
+        //             ),
+        //             padding: EdgeInsets.symmetric(
+        //               vertical: 4,
+        //               horizontal: 8,
+        //             ),
+        //             elevation: 0,
+        //           ),
+        //           child: Text(
+        //             selectedDate,
+        //             style: TextStyle(
+        //               fontSize: FontSizes.medium,
+        //               color: context.theme.primaryColor,
+        //               fontWeight: FontWeight.bold,
+        //             ),
+        //           ),
+        //         ),
+        //         Text(
+        //           "Bạn không có tiết ngày này.",
+        //           style: TextStyle(
+        //             fontSize: FontSizes.medium,
+        //             color: context.theme.grey,
+        //           ),
+        //         )
+        //       ],
+        //     ),
+        //   )
+        // ],
         if (_isAbsentDate) ...[
           SearchBarCustom(
             controller: _searchController,
@@ -192,44 +208,58 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  flex: 5,
-                  child: ElevatedButton(
-                    onPressed: () => {
-                      showDialog(
-                          context: context,
-                          builder: (context) => BlocProvider(
-                                create: (_) => CalendarBloc(
-                                    getIt.get<ScheduleRepository>()),
-                                child: CalendarAbsent(
-                                  initDate: currentDate,
-                                  onValueChange: _updateCurrentDate,
-                                ),
-                              ))
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: BorderSide(
-                        color: context.theme.primaryColor ?? Colors.blue,
+                    flex: 5,
+                    child: BlocListener<CalendarBloc, CalendarState>(
+                      listenWhen: (previous, current) =>
+                          current is CalendarWeekLoaded,
+                      listener: (context, state) {
+                        if (state is CalendarWeekLoaded) {
+                          setState(() {
+                            if (state.noWeek.isNotEmpty) {
+                              _currentWeek = "tuần ${state.noWeek}";
+                            } else {
+                              _currentWeek = "Không phải tuần học";
+                            }
+                          });
+                        }
+                      },
+                      child: ElevatedButton(
+                        onPressed: () => {
+                          showDialog(
+                              context: context,
+                              builder: (context) => BlocProvider(
+                                    create: (_) => CalendarBloc(
+                                        getIt.get<ScheduleRepository>()),
+                                    child: CalendarAbsent(
+                                      initDate: _currentDate,
+                                      onValueChange: _updateCurrentDate,
+                                    ),
+                                  ))
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(
+                            color: context.theme.primaryColor ?? Colors.blue,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 8,
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          "${DateFormat('dd/MM/yyyy').format(widget.selectedDay)}, $_currentWeek",
+                          style: TextStyle(
+                            fontSize: FontSizes.medium,
+                            color: context.theme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 8,
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      selectedDate,
-                      style: TextStyle(
-                        fontSize: FontSizes.medium,
-                        color: context.theme.primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                    )),
                 Flexible(
                   flex: 4,
                   child: Row(

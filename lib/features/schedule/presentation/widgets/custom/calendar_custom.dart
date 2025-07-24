@@ -21,7 +21,6 @@ class CalendarCustom extends StatefulWidget {
 class _CalendarCustomState extends State<CalendarCustom> {
   DateTime _focusedDay = DateTime.now(); // Tháng hiện tại đang xem
   DateTime _selectedDay = DateTime.now(); // Lưu ngày được chọn
-  // final DateTime _startdWeek = DateTime(2025, 3, 3);
   late String _currentWeek = "Lỗi";
   Map<DateTime, List<int>> _eventMap = {};
   CalendarFormat _calendarFormat =
@@ -32,6 +31,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
 
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+
     context.read<CalendarBloc>().add(
           LoadCalendarEvents(
               month: _focusedDay.month,
@@ -178,19 +178,6 @@ class _CalendarCustomState extends State<CalendarCustom> {
             }
           }, child: BlocBuilder<CalendarBloc, CalendarState>(
               builder: (context, state) {
-            // if (state is CalendarEventLoaded) {
-            //   _eventMap = {};
-            //   for (var event in state.calendarEvents) {
-            //     final date =
-            //         DateTime(event.date.year, event.date.month, event.date.day);
-            //     if (!_eventMap.containsKey(date)) {
-            //       _eventMap[date] = [];
-            //     }
-            //     for (var eventType in event.eventTypes) {
-            //       _eventMap[date]!.add(eventType.eventType);
-            //     }
-            //   }
-            // }
             return GestureDetector(
               onTap: _showMonthYearPicker,
               child: TableCalendar(

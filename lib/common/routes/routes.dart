@@ -6,6 +6,7 @@ import 'package:e_dut/features/community_activity/presentation/screens/detail_us
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
@@ -58,9 +59,12 @@ class Routes {
         );
 
       case detailUnitOfStudyTeacher:
-        final idUos = settings.arguments as String;
+        final args = settings.arguments as UosAbsentArgs;
         return MaterialPageRoute(
-          builder: (context) => DetailUOSTeacherScreen(idUos: idUos),
+          builder: (context) => DetailUOSTeacherScreen(
+            idUos: args.idUos,
+            selectedDay: args.selectedDay,
+          ),
         );
 
       case detailExamShiftTeacher:

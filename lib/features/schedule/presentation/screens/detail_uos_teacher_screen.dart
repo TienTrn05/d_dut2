@@ -6,6 +6,7 @@ import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
@@ -20,7 +21,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   final String idUos;
-  const DetailUOSTeacherScreen({super.key, required this.idUos});
+  final DateTime selectedDay;
+  const DetailUOSTeacherScreen(
+      {super.key, required this.idUos, required this.selectedDay});
 
   @override
   State<DetailUOSTeacherScreen> createState() => _DetailUOSTeacherScreenState();
@@ -30,7 +33,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
   bool isCheckAbsent = false;
   bool isOverlayVisible = false;
-  bool _isAbsentDate = true;
+  // bool _isAbsentDate = true;
   late TabController _tabController;
 
   String currentLink = "";
@@ -145,7 +148,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
         providers: [
           BlocProvider(
               create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
-                ..add(LoadFullInfoUosDetail(idUos: widget.idUos)))
+                ..add(LoadFullInfoUosDetail(idUos: widget.idUos))),
+          BlocProvider(
+              create: (_) => CalendarBloc(getIt.get<ScheduleRepository>()))
         ],
         child: DefaultTabController(
           length: 3,
@@ -208,6 +213,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           studyShifts: uosFullInfo.studyShifts),
                                       UosAbsentTab(
                                         isCheckAbsent: isCheckAbsent,
+                                        selectedDay: widget.selectedDay,
                                       ),
                                       UosNotiTab(
                                         notifications: notifications,
@@ -262,7 +268,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                 );
               }
             }),
-            floatingActionButton: _tabController.index == 1 && _isAbsentDate
+            floatingActionButton: _tabController.index == 1
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
