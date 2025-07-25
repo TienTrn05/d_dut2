@@ -230,6 +230,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                     } else {
                       setState(() {
                         widget.onValueChange(selectedDay);
+                        print("selectedDay: $selectedDay");
                       });
                     }
                   },

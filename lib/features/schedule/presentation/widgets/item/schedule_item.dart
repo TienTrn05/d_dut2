@@ -16,6 +16,7 @@ class ScheduleItem extends StatelessWidget {
   final String room;
   final bool isExam;
   final DateTime? selectedDay;
+  final String noWeek;
 
   const ScheduleItem({
     super.key,
@@ -25,6 +26,7 @@ class ScheduleItem extends StatelessWidget {
     required this.room,
     this.isExam = false,
     this.selectedDay,
+    this.noWeek = "",
   });
 
   @override
@@ -49,7 +51,9 @@ class ScheduleItem extends StatelessWidget {
                         )
                       : UosAbsentArgs(
                           idUos: idUos,
-                          selectedDay: selectedDay ?? DateTime.now())
+                          selectedDay: selectedDay ?? DateTime.now(),
+                          noWeek: noWeek,
+                        )
                   : idUos);
         },
         child: Container(

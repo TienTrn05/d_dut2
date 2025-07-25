@@ -15,9 +15,13 @@ import 'package:intl/intl.dart';
 class UosAbsentTab extends StatefulWidget {
   final bool isCheckAbsent;
   final DateTime selectedDay;
+  final String noWeek;
 
   const UosAbsentTab(
-      {super.key, required this.isCheckAbsent, required this.selectedDay});
+      {super.key,
+      required this.isCheckAbsent,
+      required this.selectedDay,
+      required this.noWeek});
   @override
   State<UosAbsentTab> createState() => _UosAbsentTabState();
 }
@@ -27,8 +31,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   late DateTime _currentDate;
   // var _selectedDate;
   late String _currentWeek = "";
-  // DateTime startdWeek = DateTime(2025, 3, 3);
-  bool _isAbsentDate = true;
+  bool _isCheckedIn = false;
   final TextEditingController _searchController = TextEditingController();
   // Giả lập sinh viên
   List<Map<String, dynamic>> students = [
@@ -70,13 +73,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   @override
   void initState() {
     super.initState();
-    context.read<CalendarBloc>().add(
-          LoadCalendarWeek(inputDate: getMondayOfWeek(widget.selectedDay)),
-        );
     setState(() {
       _currentDate = widget.selectedDay;
-      // _selectedDate =
-      //     "${DateFormat('dd/MM/yyyy').format(widget.selectedDay)}, tuần 3";
+      _currentWeek = "tuần ${widget.noWeek}";
     });
   }
 
@@ -106,16 +105,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void _updateCurrentDate(DateTime newValue) {
     setState(() {
       _currentDate = newValue;
-      // _isAbsentDate = isAbsentDate;
+      _isCheckedIn = !_isCheckedIn;
     });
-
-    // String formattedDate = DateFormat('dd/MM/yyyy').format(_currentDate);
-    // if (_currentDate.isAfter(startdWeek)) {
-    //   int weekDifference = _currentDate.difference(startdWeek).inDays ~/ 7;
-    //   _selectedDate = "$formattedDate, tuần ${weekDifference + 1}";
-    // } else {
-    //   _selectedDate = "$formattedDate, tuần 0";
-    // }
+    context.read<CalendarBloc>().add(
+          LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
+        );
     Navigator.pop(context);
   }
 
@@ -123,7 +117,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     CustomAlertDialog.showCustomDialog(
         context,
         'Xóa ngày điểm danh',
-        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày $_currentDate không?',
+        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
         AlertType.delete,
         onConfirm: () => {setState(() {})},
         textConfirm: "Xóa");
@@ -133,7 +127,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     CustomAlertDialog.showCustomDialog(
         context,
         'Lưu ngày điểm danh',
-        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày $_currentDate không?',
+        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
         AlertType.confirm,
         onConfirm: () => {setState(() {})},
         textConfirm: "Lưu");
@@ -145,71 +139,21 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 4,
       children: [
-        // if (!_isAbsentDate) ...[
-        //   Center(
-        //     child: Column(
-        //       children: [
-        //         ElevatedButton(
-        //           onPressed: () => {
-        //             showDialog(
-        //                 context: context,
-        //                 builder: (context) => BlocProvider(
-        //                       create: (_) =>
-        //                           CalendarBloc(getIt.get<ScheduleRepository>()),
-        //                       child: CalendarAbsent(
-        //                         initDate: currentDate,
-        //                         onValueChange: _updateCurrentDate,
-        //                       ),
-        //                     ))
-        //           },
-        //           style: ElevatedButton.styleFrom(
-        //             backgroundColor: Colors.white,
-        //             side: BorderSide(
-        //               color: context.theme.primaryColor ?? Colors.blue,
-        //             ),
-        //             shape: RoundedRectangleBorder(
-        //               borderRadius: BorderRadius.circular(999),
-        //             ),
-        //             padding: EdgeInsets.symmetric(
-        //               vertical: 4,
-        //               horizontal: 8,
-        //             ),
-        //             elevation: 0,
-        //           ),
-        //           child: Text(
-        //             selectedDate,
-        //             style: TextStyle(
-        //               fontSize: FontSizes.medium,
-        //               color: context.theme.primaryColor,
-        //               fontWeight: FontWeight.bold,
-        //             ),
-        //           ),
-        //         ),
-        //         Text(
-        //           "Bạn không có tiết ngày này.",
-        //           style: TextStyle(
-        //             fontSize: FontSizes.medium,
-        //             color: context.theme.grey,
-        //           ),
-        //         )
-        //       ],
-        //     ),
-        //   )
-        // ],
-        if (_isAbsentDate) ...[
+        if (!(widget.isCheckAbsent && !_isCheckedIn)) ...[
           SearchBarCustom(
             controller: _searchController,
           ),
           SizedBox(
             height: 8,
           ),
-          if (widget.isCheckAbsent) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                    flex: 5,
-                    child: BlocListener<CalendarBloc, CalendarState>(
+        ],
+        if (widget.isCheckAbsent) ...[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                  flex: 5,
+                  child: BlocListener<CalendarBloc, CalendarState>(
                       listenWhen: (previous, current) =>
                           current is CalendarWeekLoaded,
                       listener: (context, state) {
@@ -223,43 +167,46 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                           });
                         }
                       },
-                      child: ElevatedButton(
-                        onPressed: () => {
-                          showDialog(
-                              context: context,
-                              builder: (context) => BlocProvider(
-                                    create: (_) => CalendarBloc(
-                                        getIt.get<ScheduleRepository>()),
-                                    child: CalendarAbsent(
-                                      initDate: _currentDate,
-                                      onValueChange: _updateCurrentDate,
-                                    ),
-                                  ))
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(
-                            color: context.theme.primaryColor ?? Colors.blue,
+                      child: BlocBuilder<CalendarBloc, CalendarState>(
+                          builder: (context, state) {
+                        return ElevatedButton(
+                          onPressed: () => {
+                            showDialog(
+                                context: context,
+                                builder: (context) => BlocProvider(
+                                      create: (_) => CalendarBloc(
+                                          getIt.get<ScheduleRepository>()),
+                                      child: CalendarAbsent(
+                                        initDate: _currentDate,
+                                        onValueChange: _updateCurrentDate,
+                                      ),
+                                    ))
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: BorderSide(
+                              color: context.theme.primaryColor ?? Colors.blue,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 8,
+                            ),
+                            elevation: 0,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                          child: Text(
+                            "${DateFormat('dd/MM/yyyy').format(_currentDate)}, $_currentWeek",
+                            style: TextStyle(
+                              fontSize: FontSizes.medium,
+                              color: context.theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 8,
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          "${DateFormat('dd/MM/yyyy').format(widget.selectedDay)}, $_currentWeek",
-                          style: TextStyle(
-                            fontSize: FontSizes.medium,
-                            color: context.theme.primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    )),
+                        );
+                      }))),
+              if (_isCheckedIn) ...[
                 Flexible(
                   flex: 4,
                   child: Row(
@@ -322,9 +269,69 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     ],
                   ),
                 )
+              ]
+            ],
+          ),
+        ],
+        if (!_isCheckedIn && widget.isCheckAbsent) ...[
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Bạn có muốn tạo danh sách điểm danh hôm nay không?",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: context.theme.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                OutlinedButton(
+                    onPressed: _saveAbsent,
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          context.theme.primaryColor ?? Colors.blue,
+                      side: BorderSide(
+                        color: context.theme.primaryColor ?? Colors.blue,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          'Tạo điểm danh hôm nay',
+                          style: TextStyle(
+                            fontSize: FontSizes.medium,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    )),
               ],
             ),
-          ],
+          ),
+        ] else
+          // Body: list students
+          ...[
           SizedBox(
             height: 8,
           ),
@@ -412,7 +419,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               },
             ),
           ),
-        ],
+        ]
       ],
     );
   }

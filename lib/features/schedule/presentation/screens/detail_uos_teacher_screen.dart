@@ -22,8 +22,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 class DetailUOSTeacherScreen extends StatefulWidget {
   final String idUos;
   final DateTime selectedDay;
+  final String noWeek;
+
   const DetailUOSTeacherScreen(
-      {super.key, required this.idUos, required this.selectedDay});
+      {super.key,
+      required this.idUos,
+      required this.selectedDay,
+      required this.noWeek});
 
   @override
   State<DetailUOSTeacherScreen> createState() => _DetailUOSTeacherScreenState();
@@ -214,6 +219,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                       UosAbsentTab(
                                         isCheckAbsent: isCheckAbsent,
                                         selectedDay: widget.selectedDay,
+                                        noWeek: widget.noWeek,
                                       ),
                                       UosNotiTab(
                                         notifications: notifications,

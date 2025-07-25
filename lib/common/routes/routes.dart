@@ -64,6 +64,7 @@ class Routes {
           builder: (context) => DetailUOSTeacherScreen(
             idUos: args.idUos,
             selectedDay: args.selectedDay,
+            noWeek: args.noWeek,
           ),
         );
 

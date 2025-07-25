@@ -195,6 +195,7 @@ class _DayModeState extends State<DayMode> {
           room: item.room,
           isExam: item.isExam,
           selectedDay: selectedDay,
+          noWeek: noWeek,
         );
       }).toList(),
     );
