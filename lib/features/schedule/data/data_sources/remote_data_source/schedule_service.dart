@@ -7,6 +7,7 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_deta
 import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_students_absent_model.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
@@ -253,6 +254,50 @@ class ScheduleService {
       }
     } catch (e) {
       throw Exception("Failed to fetch list students of examshift: $e");
+    }
+  }
+
+  Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
+      int pageNumber, String? keyword, DateTime? absenceDate) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/UOS/GetListStudentsByUos", queryParameters: {
+        "idUos": idUos,
+        "pageNumber": pageNumber,
+        if (keyword != null) "keyword": keyword,
+        if (absenceDate != null) "absenceDate": absenceDate,
+      });
+      if (response.data["statusCode"] == 200) {
+        print("===>>> GetListStudentsByUos: ${response.data["data"]}");
+        final data = response.data["data"];
+        final listStudentAbsent = UosStudentsAbsentModel.fromJson(data);
+        return listStudentAbsent;
+      } else {
+        throw Exception(
+            "Failed to load list students of uos: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch list students of uos: $e");
+    }
+  }
+
+  Future<bool> isAttendanceDate(String idUos, DateTime? attendanceDate) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/Absence/IsAttendanceDate", queryParameters: {
+        "idUos": idUos,
+        "attendanceDate": attendanceDate,
+      });
+      if (response.data["statusCode"] == 200) {
+        print("===>>> IsAttendanceDate: ${response.data["data"]}");
+        final data = response.data["data"];
+        return data;
+      } else {
+        throw Exception(
+            "Failed to check isAttendanceDate: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to check isAttendanceDate: $e");
     }
   }
 }

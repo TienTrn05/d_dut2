@@ -6,6 +6,7 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_deta
 import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_students_absent_model.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton
@@ -54,5 +55,15 @@ class ScheduleRepository {
       String idExamShift, String keyword, int pageNumber) {
     return _scheduleService.getListStudentsByExamShift(
         idExamShift, keyword, pageNumber);
+  }
+
+  Future<UosStudentsAbsentModel> getListStudentsByUos(
+      String idUos, int pageNumber, String? keyword, DateTime? absenceDate) {
+    return _scheduleService.getListStudentsByUos(
+        idUos, pageNumber, keyword, absenceDate);
+  }
+
+  Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate) {
+    return _scheduleService.isAttendanceDate(idUos, attendanceDate);
   }
 }

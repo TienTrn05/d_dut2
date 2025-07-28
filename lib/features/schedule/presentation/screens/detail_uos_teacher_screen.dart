@@ -7,6 +7,8 @@ import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_event.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
@@ -155,7 +157,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
                 ..add(LoadFullInfoUosDetail(idUos: widget.idUos))),
           BlocProvider(
-              create: (_) => CalendarBloc(getIt.get<ScheduleRepository>()))
+              create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
+          BlocProvider(
+              create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>()))
         ],
         child: DefaultTabController(
           length: 3,
@@ -217,6 +221,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           uosDetail: uosFullInfo.uosDetail,
                                           studyShifts: uosFullInfo.studyShifts),
                                       UosAbsentTab(
+                                        idUos: widget.idUos,
                                         isCheckAbsent: isCheckAbsent,
                                         selectedDay: widget.selectedDay,
                                         noWeek: widget.noWeek,
