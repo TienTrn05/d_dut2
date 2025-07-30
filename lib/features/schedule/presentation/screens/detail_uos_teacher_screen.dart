@@ -8,7 +8,6 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
-import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_event.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';

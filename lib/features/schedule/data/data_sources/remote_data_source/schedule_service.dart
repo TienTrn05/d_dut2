@@ -268,7 +268,6 @@ class ScheduleService {
         if (absenceDate != null) "absenceDate": absenceDate,
       });
       if (response.data["statusCode"] == 200) {
-        print("===>>> GetListStudentsByUos: ${response.data["data"]}");
         final data = response.data["data"];
         final listStudentAbsent = UosStudentsAbsentModel.fromJson(data);
         return listStudentAbsent;
@@ -289,7 +288,6 @@ class ScheduleService {
         "attendanceDate": attendanceDate,
       });
       if (response.data["statusCode"] == 200) {
-        print("===>>> IsAttendanceDate: ${response.data["data"]}");
         final data = response.data["data"];
         return data;
       } else {
@@ -298,6 +296,51 @@ class ScheduleService {
       }
     } catch (e) {
       throw Exception("Failed to check isAttendanceDate: $e");
+    }
+  }
+
+  Future<bool> takeAttendance({
+    required String idUnitOfStudy,
+    required DateTime absenceDate,
+    required List<String> idStudentsAbsent,
+  }) async {
+    try {
+      final response =
+          await _dio.post("$_url/api/Absence/TakeAttendance", data: {
+        "idUnitOfStudy": idUnitOfStudy,
+        "absenceDate": absenceDate.toIso8601String(),
+        "idStudentsAbsent": idStudentsAbsent,
+      });
+      if (response.data["statusCode"] == 200) {
+        final data = response.data["data"];
+        return data == "Điểm danh thành công.";
+      } else {
+        throw Exception(
+            "Failed to takeAttendance: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to takeAttendance: $e");
+    }
+  }
+
+  Future<bool> deleteAttendanceHistory(
+      String idUos, DateTime? attendanceDate) async {
+    try {
+      final response = await _dio.delete(
+          "$_url/api/Absence/DeleteAttendanceHistory",
+          queryParameters: {
+            "idUos": idUos,
+            "attendanceDate": attendanceDate,
+          });
+      if (response.data["statusCode"] == 200) {
+        final data = response.data["data"];
+        return data == "Xoá lịch sử điểm danh thành công.";
+      } else {
+        throw Exception(
+            "Failed to deleteAttendanceHistory: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to deleteAttendanceHistory: $e");
     }
   }
 }

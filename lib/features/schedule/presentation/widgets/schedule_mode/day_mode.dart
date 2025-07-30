@@ -9,7 +9,6 @@ import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_custom.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/schedule_toggle_button.dart';
-import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';

@@ -2,7 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-enum AlertType { confirm, delete, warning }
+enum AlertType { confirm, delete, warning, success, failure }
 
 class CustomAlertDialog {
   static void showCustomDialog(
@@ -99,7 +99,8 @@ class CustomAlertDialog {
                         ),
                       ),
                     )),
-                    if (alertType != AlertType.warning) ...[
+                    if (alertType != AlertType.warning &&
+                        alertType != AlertType.success) ...[
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextButton(
@@ -151,6 +152,10 @@ class CustomAlertDialog {
         return Icon(Icons.info_outline_rounded, color: iconColor, size: size);
       case AlertType.delete:
         return Icon(Icons.delete_outline, color: iconColor, size: size);
+      case AlertType.success:
+        return Icon(Icons.check_rounded, color: iconColor, size: size);
+      case AlertType.failure:
+        return Icon(Icons.close_rounded, color: iconColor, size: size);
     }
   }
 
@@ -158,7 +163,9 @@ class CustomAlertDialog {
     switch (type) {
       case AlertType.confirm:
       case AlertType.warning:
+      case AlertType.success:
         return context.theme.primaryColor ?? Colors.blue;
+      case AlertType.failure:
       case AlertType.delete:
         return context.theme.red ?? Colors.red;
     }

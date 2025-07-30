@@ -8,7 +8,10 @@ class UosAbsentState extends Equatable {
 
 class UosAbsentInitial extends UosAbsentState {}
 
-class UosAbsentLoading extends UosAbsentState {}
+class UosStudentsAbsentLoading extends UosAbsentState {}
+class UosCheckIsAttendanceDateLoading extends UosAbsentState {}
+class UosTakeAttendanceLoading extends UosAbsentState {}
+class UosDeleteAttendanceHistoryLoading extends UosAbsentState {}
 
 class UosAbsentError extends UosAbsentState {
   final String message;
@@ -19,11 +22,20 @@ class UosAbsentError extends UosAbsentState {
 
 class UosAbsentLoaded extends UosAbsentState {
   final UosStudentsAbsentModel listStudentAbsent;
-
   UosAbsentLoaded({required this.listStudentAbsent});
 }
 
 class UosCheckIsAttendanceDateLoaded extends UosAbsentState {
   final bool isAttendanceDate;
   UosCheckIsAttendanceDateLoaded({required this.isAttendanceDate});
+}
+
+class UosTakeAttendanceLoaded extends UosAbsentState {
+  final bool isSuccess;
+  UosTakeAttendanceLoaded({required this.isSuccess});
+}
+
+class UosDeleteAttendanceHistoryLoaded extends UosAbsentState {
+  final bool isSuccess;
+  UosDeleteAttendanceHistoryLoaded({required this.isSuccess});
 }

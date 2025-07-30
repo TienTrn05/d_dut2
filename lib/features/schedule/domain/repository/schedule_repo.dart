@@ -66,4 +66,16 @@ class ScheduleRepository {
   Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate) {
     return _scheduleService.isAttendanceDate(idUos, attendanceDate);
   }
+
+  Future<bool> takeAttendance(String idUnitOfStudy, DateTime absenceDate,
+      List<String> idStudentsAbsent) {
+    return _scheduleService.takeAttendance(
+        idUnitOfStudy: idUnitOfStudy,
+        absenceDate: absenceDate,
+        idStudentsAbsent: idStudentsAbsent);
+  }
+
+  Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate) {
+    return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate);
+  }
 }

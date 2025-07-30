@@ -8,11 +8,13 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
   UosAbsentBloc(this._repository) : super(UosAbsentInitial()) {
     on<LoadStudentsAbsent>(_onLoadStudentAbsent);
     on<LoadIsAttendanceDate>(_onLoadIsAttendanceDate);
+    on<TakeAttendance>(_onLoadTakeAttendance);
+    on<DeleteAttendanceHistory>(_onLoadDeleteAttendanceHistory);
   }
 
   Future<void> _onLoadStudentAbsent(
       LoadStudentsAbsent event, Emitter<UosAbsentState> emit) async {
-    emit(UosAbsentLoading());
+    emit(UosStudentsAbsentLoading());
     try {
       final idUos = event.idUos;
       final pageNumber = event.pageNumber;
@@ -21,17 +23,15 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
       final listStudentAbsent = await _repository.getListStudentsByUos(
           idUos, pageNumber, keyword, absenceDate);
 
-      print("===>>> listStudentAbsent: ${listStudentAbsent}");
       emit(UosAbsentLoaded(listStudentAbsent: listStudentAbsent));
     } catch (e) {
-      print("===>>> Error: $e");
       emit(UosAbsentError(message: e.toString()));
     }
   }
 
   Future<void> _onLoadIsAttendanceDate(
       LoadIsAttendanceDate event, Emitter<UosAbsentState> emit) async {
-    emit(UosAbsentLoading());
+    emit(UosCheckIsAttendanceDateLoading());
     try {
       final idUos = event.idUos;
       final attendanceDate = event.attendanceDate;
@@ -39,6 +39,37 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           await _repository.getIsAttendanceDate(idUos, attendanceDate!);
       emit(UosCheckIsAttendanceDateLoaded(isAttendanceDate: isAttendanceDate));
     } catch (e) {
+      emit(UosAbsentError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadTakeAttendance(
+      TakeAttendance event, Emitter<UosAbsentState> emit) async {
+    emit(UosTakeAttendanceLoading());
+    try {
+      final idUnitOfStudy = event.idUnitOfStudy;
+      final absenceDate = event.absenceDate;
+      final idStudentsAbsent = event.idStudentsAbsent;
+      final isSuccess = await _repository.takeAttendance(
+          idUnitOfStudy, absenceDate, idStudentsAbsent);
+      emit(UosTakeAttendanceLoaded(isSuccess: isSuccess));
+    } catch (e) {
+      
+      emit(UosAbsentError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadDeleteAttendanceHistory(
+      DeleteAttendanceHistory event, Emitter<UosAbsentState> emit) async {
+    emit(UosDeleteAttendanceHistoryLoading());
+    try {
+      final idUos = event.idUos;
+      final attendanceDate = event.attendanceDate;
+      final isSuccess =
+          await _repository.deleteAttendanceHistory(idUos, attendanceDate);
+      emit(UosDeleteAttendanceHistoryLoaded(isSuccess: isSuccess));
+    } catch (e) {
+      print("=====>>>>> Error: ${e.toString()}");
       emit(UosAbsentError(message: e.toString()));
     }
   }

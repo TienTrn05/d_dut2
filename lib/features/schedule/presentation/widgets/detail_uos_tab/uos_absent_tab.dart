@@ -9,7 +9,6 @@ import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_event.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_state.dart';
 import 'package:e_dut/features/schedule/data/model/role/student_absent_model.dart';
-import 'package:e_dut/features/schedule/data/model/unit_of_study/students_paged_absent_model.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
@@ -59,6 +58,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void updateAbsentStatus(String idStudent, bool isAbsent) {
     setState(() {
       _studentStatus[idStudent] = isAbsent;
+      _isSellectedAll = _studentStatus.values.every((status) => status == true);
       if (isAbsent == false && _isSellectedAll) {
         _isSellectedAll = false;
       }
@@ -86,6 +86,87 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
             keyword: keyword,
           ));
     });
+  }
+
+  DateTime getMondayOfWeek(DateTime focusedDay) {
+    int difference = focusedDay.weekday - DateTime.monday;
+    return focusedDay.subtract(Duration(days: difference));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _currentDate = widget.selectedDay;
+      _currentWeek = "tuần ${widget.noWeek}";
+    });
+    if (widget.isCheckAbsent) {
+      context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+          idUos: widget.idUos, attendanceDate: widget.selectedDay));
+    }
+    context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+          idUos: widget.idUos,
+          pageNumber: 1,
+        ));
+  }
+
+  void _updateCurrentDate(DateTime newValue) {
+    setState(() {
+      _currentDate = newValue;
+      _isCheckedIn = !_isCheckedIn;
+    });
+    context.read<CalendarBloc>().add(
+          LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
+        );
+    Navigator.pop(context);
+  }
+
+  void _deleteAbsent() {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Xóa ngày điểm danh',
+        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
+        AlertType.delete, onConfirm: () {
+      context.read<UosAbsentBloc>().add(DeleteAttendanceHistory(
+          idUos: widget.idUos, attendanceDate: _currentDate));
+    }, textConfirm: "Xóa");
+  }
+
+  void _saveAbsent() {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Lưu ngày điểm danh',
+        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
+        AlertType.confirm, onConfirm: () {
+      List<String> idStudentsAbsent = _studentStatus.entries
+          .where((entry) => entry.value == false)
+          .map((entry) => entry.key)
+          .toList();
+      context.read<UosAbsentBloc>().add(TakeAttendance(
+          idUnitOfStudy: widget.idUos,
+          absenceDate: _currentDate,
+          idStudentsAbsent: idStudentsAbsent));
+    }, textConfirm: "Lưu");
+  }
+
+  void _alertSuccess({String type = "lưu"}) {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Thành công',
+        'Danh sách điểm danh của bạn đã được $type thành công.',
+        AlertType.success,
+        textCancel: "Đóng",
+        onCancel: () {});
+  }
+
+  void _alertFailure({String type = "lưu"}) {
+    CustomAlertDialog.showCustomDialog(
+        context,
+        'Thất bại',
+        'Đã có lỗi xảy ra trong quá trình $type, vui lòng thử lại sau.',
+        AlertType.failure,
+        textCancel: "Đóng",
+        onCancel: () {});
   }
 
   List<Widget> _buildPageButtons() {
@@ -185,59 +266,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     return buttons;
   }
 
-  DateTime getMondayOfWeek(DateTime focusedDay) {
-    int difference = focusedDay.weekday - DateTime.monday;
-    return focusedDay.subtract(Duration(days: difference));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      _currentDate = widget.selectedDay;
-      _currentWeek = "tuần ${widget.noWeek}";
-    });
-    if (widget.isCheckAbsent) {
-      context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-          idUos: widget.idUos, attendanceDate: widget.selectedDay));
-    }
-    context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-          idUos: widget.idUos,
-          pageNumber: 1,
-        ));
-  }
-
-  void _updateCurrentDate(DateTime newValue) {
-    setState(() {
-      _currentDate = newValue;
-      _isCheckedIn = !_isCheckedIn;
-    });
-    context.read<CalendarBloc>().add(
-          LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
-        );
-    Navigator.pop(context);
-  }
-
-  void _deleteAbsent() {
-    CustomAlertDialog.showCustomDialog(
-        context,
-        'Xóa ngày điểm danh',
-        'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
-        AlertType.delete,
-        onConfirm: () => {setState(() {})},
-        textConfirm: "Xóa");
-  }
-
-  void _saveAbsent() {
-    CustomAlertDialog.showCustomDialog(
-        context,
-        'Lưu ngày điểm danh',
-        'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
-        AlertType.confirm,
-        onConfirm: () => {setState(() {})},
-        textConfirm: "Lưu");
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<UosAbsentBloc, UosAbsentState>(listener:
@@ -247,16 +275,37 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _isCheckedIn = state.isAttendanceDate;
         });
       }
-      // if (state is UosAbsentLoaded) {
-      //   setState(() {
-      //     _currentPageStudents = state.listStudentAbsent.studentsPaged;
-      //   });
-      // }
+      if (state is UosTakeAttendanceLoaded) {
+        final result = state.isSuccess;
+        if (result) {
+          _alertSuccess(type: "lưu");
+          context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+                idUos: widget.idUos,
+                pageNumber: _currentPage,
+                absenceDate: _currentDate,
+              ));
+        } else {
+          _alertFailure(type: "lưu");
+        }
+      }
+      if (state is UosDeleteAttendanceHistoryLoaded) {
+        final result = state.isSuccess;
+        if (result) {
+          _alertSuccess(type: "xóa");
+          _studentStatus = {};
+          context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+              idUos: widget.idUos, attendanceDate: widget.selectedDay));
+          context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+                idUos: widget.idUos,
+                pageNumber: _currentPage,
+                absenceDate: _currentDate,
+              ));
+        } else {
+          _alertFailure(type: "xóa");
+        }
+      }
     }, child:
         BlocBuilder<UosAbsentBloc, UosAbsentState>(builder: (context, state) {
-      if (state is UosAbsentLoading) {
-        return Center(child: CircularProgressIndicator());
-      }
       if (state is UosAbsentLoaded) {
         final listStudentAbsent = state.listStudentAbsent.studentsPaged;
         mergeStudentList(listStudentAbsent.items);
@@ -557,10 +606,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               updateAbsentStatus(
                                   listStudentAbsent.items[index].idStudent,
                                   isAbsent);
-                              // setState(() {
-                              //   isSellectedAll =                             //       ._currentPageStudents
-                              //       .every((s) => s["isAbsentToday"] == true);
-                              // });
                             },
                           )
                         : StudentItem(
@@ -581,8 +626,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           ],
         );
       }
+
       return const Center(
-        child: Text("Không có dữ liệu danh sách sinh viên"),
+        child: CircularProgressIndicator(),
       );
     }));
   }

@@ -28,3 +28,25 @@ class LoadIsAttendanceDate extends UosAbsentEvent {
     this.attendanceDate,
   });
 }
+
+class TakeAttendance extends UosAbsentEvent {
+  final String idUnitOfStudy;
+  final DateTime absenceDate;
+  final List<String> idStudentsAbsent;
+
+  TakeAttendance({
+    required this.idUnitOfStudy,
+    required this.absenceDate,
+    required this.idStudentsAbsent,
+  });
+}
+
+class DeleteAttendanceHistory extends UosAbsentEvent {
+  final String idUos;
+  final DateTime attendanceDate;
+
+  DeleteAttendanceHistory({
+    required this.idUos,
+    required this.attendanceDate,
+  });
+}
