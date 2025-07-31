@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
@@ -27,6 +29,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
   Map<DateTime, List<int>> _eventMap = {};
 
   List<DateTime> events = [];
+  Timer? _debounce;
 
   void _loadCalendarEventsForMonth() {
     final authState = context.read<AuthBloc>().state;
@@ -57,6 +60,12 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
     _focusedDay = widget.initDate;
     _selectedDay = widget.initDate;
     _loadCalendarEventsForMonth();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   String capitalizeFirstLetter(String text) {
@@ -208,13 +217,15 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                   final String userRole = authState is AuthUserAuthenticated
                       ? authState.userData.role.name
                       : '';
-
-                  context.read<CalendarBloc>().add(
-                        LoadCalendarEvents(
-                            month: focusDate.month,
-                            year: focusDate.year,
-                            isTeacher: userRole == RoleModel.roleTeacher),
-                      );
+                  if (_debounce?.isActive ?? false) _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 800), () {
+                    context.read<CalendarBloc>().add(
+                          LoadCalendarEvents(
+                              month: focusDate.month,
+                              year: focusDate.year,
+                              isTeacher: userRole == RoleModel.roleTeacher),
+                        );
+                  });
                 },
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
@@ -265,6 +276,9 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                headerStyle: HeaderStyle(
+                  formatButtonVisible: false,
                 ),
                 calendarBuilders: CalendarBuilders(
                   headerTitleBuilder: (context, date) {

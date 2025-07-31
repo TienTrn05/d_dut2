@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
@@ -25,6 +27,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
   Map<DateTime, List<int>> _eventMap = {};
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Lịch mặc định là tháng
+  Timer? _debounce;
 
   void _loadCalendarEventsForMonth() {
     final authState = context.read<AuthBloc>().state;
@@ -45,6 +48,12 @@ class _CalendarCustomState extends State<CalendarCustom> {
     super.initState();
     initializeDateFormatting(); // Khởi tạo locale để tránh lỗi
     _loadCalendarEventsForMonth();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   String capitalizeFirstLetter(String text) {
@@ -191,18 +200,21 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     ? authState.userData.role.name
                     : '';
 
-                context.read<CalendarBloc>().add(
-                      LoadCalendarEvents(
-                          month: focusDate.month,
-                          year: focusDate.year,
-                          isTeacher: userRole == RoleModel.roleTeacher),
-                    );
-                if (_calendarFormat == CalendarFormat.week) {
+                if (_debounce?.isActive ?? false) _debounce?.cancel();
+                _debounce = Timer(const Duration(milliseconds: 800), () {
                   context.read<CalendarBloc>().add(
-                        LoadCalendarWeek(
-                            inputDate: getMondayOfWeek(_focusedDay)),
+                        LoadCalendarEvents(
+                            month: focusDate.month,
+                            year: focusDate.year,
+                            isTeacher: userRole == RoleModel.roleTeacher),
                       );
-                }
+                  if (_calendarFormat == CalendarFormat.week) {
+                    context.read<CalendarBloc>().add(
+                          LoadCalendarWeek(
+                              inputDate: getMondayOfWeek(_focusedDay)),
+                        );
+                  }
+                });
               },
               firstDay: DateTime.utc(2010, 10, 16),
               lastDay: DateTime.utc(2030, 3, 14),
@@ -257,6 +269,9 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
               ),
               calendarBuilders: CalendarBuilders(
                 headerTitleBuilder: (context, date) {

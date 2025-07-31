@@ -118,6 +118,12 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         ));
   }
 
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
   void _updateCurrentDate(DateTime newValue) {
     if (_statusCheckedIn != 0) {
       CustomAlertDialog.showCustomDialog(
