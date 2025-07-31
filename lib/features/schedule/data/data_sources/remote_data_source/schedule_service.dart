@@ -353,7 +353,6 @@ class ScheduleService {
         "idStudent": idStudent,
       });
       if (response.data["statusCode"] == 200) {
-        print("=====>>>>> GetListAbsentDate: ${response.data["data"]}");
         final List<dynamic> data = response.data["data"];
         return data.map((e) => DateTime.parse(e.toString())).toList();
       } else {
@@ -361,7 +360,6 @@ class ScheduleService {
             "Failed to getListAbsentDate: ${response.data['message']}");
       }
     } catch (e) {
-      print("=====>>>>> Failed to getListAbsentDate: $e");
       throw Exception("Failed to getListAbsentDate: $e");
     }
   }

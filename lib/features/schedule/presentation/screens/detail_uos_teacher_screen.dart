@@ -311,13 +311,14 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   },
                                   backgroundColor: context.theme.lightBlue,
                                   shape: CircleBorder(),
-                                  foregroundColor: Colors.black,
                                   child: SvgPicture.asset(
                                     isCheckAbsent
                                         ? "assets/icons/svg/student_tracking_overview.svg"
                                         : "assets/icons/svg/student_tracking.svg",
                                     width: 18,
                                     height: 18,
+                                    colorFilter: ColorFilter.mode(
+                                        Colors.black, BlendMode.srcIn),
                                   ),
                                 ),
                               ),

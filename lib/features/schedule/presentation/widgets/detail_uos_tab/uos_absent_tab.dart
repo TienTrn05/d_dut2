@@ -122,11 +122,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void _updateCurrentDate(DateTime newValue) {
     setState(() {
       _currentDate = newValue;
-      // _isCheckedIn = !_isCheckedIn;
+      _statusCheckedIn = 0;
     });
     context.read<CalendarBloc>().add(
           LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
         );
+    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+        idUos: widget.idUos, attendanceDate: _currentDate));
     Navigator.pop(context);
   }
 
@@ -281,7 +283,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     return BlocListener<UosAbsentBloc, UosAbsentState>(listener:
         (context, state) {
       if (state is UosCheckIsAttendanceDateLoaded) {
-        print("=====>>>>> state.isAttendanceDate: ${state.isAttendanceDate}");
         setState(() {
           _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
         });
@@ -383,9 +384,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               onPressed: () => {
                                 showDialog(
                                     context: context,
-                                    builder: (context) => BlocProvider(
-                                          create: (_) => CalendarBloc(
-                                              getIt.get<ScheduleRepository>()),
+                                    builder: (dialogContext) =>
+                                        BlocProvider.value(
+                                          value: context.read<CalendarBloc>(),
                                           child: CalendarAbsent(
                                             initDate: _currentDate,
                                             onValueChange: _updateCurrentDate,
@@ -605,6 +606,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               SizedBox(
                 height: 8,
               ),
+              Divider(
+                color: context.theme.grey,
+                thickness: 1,
+                height: 1,
+              ),
               Expanded(
                 child: ListView.builder(
                   // Thêm 1 phần tử cho SizedBox
@@ -649,8 +655,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         );
       }
 
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: CircularProgressIndicator(
+          color: context.theme.primaryColor,
+        ),
       );
     }));
   }
