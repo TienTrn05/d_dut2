@@ -54,7 +54,6 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           idUnitOfStudy, absenceDate, idStudentsAbsent);
       emit(UosTakeAttendanceLoaded(isSuccess: isSuccess));
     } catch (e) {
-      
       emit(UosAbsentError(message: e.toString()));
     }
   }
@@ -69,7 +68,6 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           await _repository.deleteAttendanceHistory(idUos, attendanceDate);
       emit(UosDeleteAttendanceHistoryLoaded(isSuccess: isSuccess));
     } catch (e) {
-      print("=====>>>>> Error: ${e.toString()}");
       emit(UosAbsentError(message: e.toString()));
     }
   }

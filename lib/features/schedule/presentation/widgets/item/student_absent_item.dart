@@ -30,7 +30,7 @@ class StudentAbsentItem extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 8),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: isAbsentToday ? context.theme.lightBlue : Colors.white,
+          color: !isAbsentToday ? context.theme.lightBlue : Colors.white,
           border: Border(
             bottom: BorderSide(
               color: Color.fromRGBO(116, 116, 116, 1),
@@ -49,7 +49,7 @@ class StudentAbsentItem extends StatelessWidget {
                     width: 48,
                     alignment: Alignment.center,
                     child: Checkbox(
-                      value: isAbsentToday,
+                      value: !isAbsentToday,
                       activeColor: context.theme.primaryColor,
                       onChanged: (bool? newValue) {
                         _toggleAbsent();

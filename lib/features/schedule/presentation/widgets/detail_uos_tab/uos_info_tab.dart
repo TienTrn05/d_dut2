@@ -257,12 +257,12 @@ class _UosInfoTabState extends State<UosInfoTab> {
                         field: "Số lần vắng",
                         value: GestureDetector(
                           onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const AbsentsCard(
-                                  isTeacher: false,
-                                  absentDates: ["10/09/2023", "11/09/2023"]),
-                            );
+                            // showDialog(
+                            //   context: context,
+                            //   builder: (context) => const AbsentsCard(
+                            //       isTeacher: false,
+                            //       absentDates: ["10/09/2023", "11/09/2023"]),
+                            // );
                           },
                           child: Text(
                             widget.absentTimes!.toString(),

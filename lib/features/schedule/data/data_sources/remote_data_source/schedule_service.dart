@@ -258,14 +258,14 @@ class ScheduleService {
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
-      int pageNumber, String? keyword, DateTime? absenceDate) async {
+      int pageNumber, String? keyword, DateTime absenceDate) async {
     try {
       final response = await _dio
           .get("$_url/api/UOS/GetListStudentsByUos", queryParameters: {
         "idUos": idUos,
         "pageNumber": pageNumber,
         if (keyword != null) "keyword": keyword,
-        if (absenceDate != null) "absenceDate": absenceDate,
+        "absenceDate": absenceDate,
       });
       if (response.data["statusCode"] == 200) {
         final data = response.data["data"];
@@ -283,7 +283,7 @@ class ScheduleService {
   Future<bool> isAttendanceDate(String idUos, DateTime? attendanceDate) async {
     try {
       final response = await _dio
-          .get("$_url/api/Absence/IsAttendanceDate", queryParameters: {
+          .get("$_url/api/Absence/CheckAttendanceDate", queryParameters: {
         "idUos": idUos,
         "attendanceDate": attendanceDate,
       });
@@ -341,6 +341,28 @@ class ScheduleService {
       }
     } catch (e) {
       throw Exception("Failed to deleteAttendanceHistory: $e");
+    }
+  }
+
+  Future<List<DateTime>> getListAbsentDate(
+      String idUos, String idStudent) async {
+    try {
+      final response = await _dio
+          .get("$_url/api/Absence/GetListAbsentDate", queryParameters: {
+        "idUos": idUos,
+        "idStudent": idStudent,
+      });
+      if (response.data["statusCode"] == 200) {
+        print("=====>>>>> GetListAbsentDate: ${response.data["data"]}");
+        final List<dynamic> data = response.data["data"];
+        return data.map((e) => DateTime.parse(e.toString())).toList();
+      } else {
+        throw Exception(
+            "Failed to getListAbsentDate: ${response.data['message']}");
+      }
+    } catch (e) {
+      print("=====>>>>> Failed to getListAbsentDate: $e");
+      throw Exception("Failed to getListAbsentDate: $e");
     }
   }
 }

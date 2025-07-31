@@ -35,22 +35,27 @@ class UosAbsentTab extends StatefulWidget {
 }
 
 class _UosAbsentTabState extends State<UosAbsentTab> {
-  bool _isSellectedAll = false;
+  bool _isSellectedAll = false; // True: có mặt
+  Map<int, bool> _listIsSellectedAll = {};
   late DateTime _currentDate;
   late String _currentWeek = "";
-  bool _isCheckedIn = false;
+  int _statusCheckedIn =
+      0; // 0: Chưa điểm danh, 1: Đã điểm danh, 2: Đang điểm danh
   final TextEditingController _searchController = TextEditingController();
   int _currentPage = 1;
   int _totalPages = 1;
 
-// key: studentId, value: true nếu có mặt, false nếu vắng
+// key: studentId, value: true nếu vắng, false nếu có mặt
   Map<String, bool> _studentStatus = {};
   Timer? _debounce;
 
   void mergeStudentList(List<StudentAbsentModel> newPageStudents) {
     for (var student in newPageStudents) {
-      // Nếu student chưa từng được lưu thì mặc định là vắng
-      _studentStatus.putIfAbsent(student.idStudent, () => false);
+      _studentStatus.putIfAbsent(
+          student.idStudent,
+          () => (_listIsSellectedAll[0] ?? false)
+              ? !(_listIsSellectedAll[_currentPage] ?? !student.isAbsent)
+              : student.isAbsent);
     }
   }
 
@@ -58,8 +63,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void updateAbsentStatus(String idStudent, bool isAbsent) {
     setState(() {
       _studentStatus[idStudent] = isAbsent;
-      _isSellectedAll = _studentStatus.values.every((status) => status == true);
-      if (isAbsent == false && _isSellectedAll) {
+      _isSellectedAll =
+          _studentStatus.values.every((status) => status == false);
+      if (isAbsent == true && _isSellectedAll) {
+        _listIsSellectedAll[_currentPage] = false;
         _isSellectedAll = false;
       }
     });
@@ -68,7 +75,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void _toggleSelectAll() {
     setState(() {
       _isSellectedAll = !_isSellectedAll;
-      _studentStatus.updateAll((key, value) => _isSellectedAll);
+      _studentStatus.updateAll((key, value) => !_isSellectedAll);
+      _listIsSellectedAll.updateAll((key, value) => _isSellectedAll);
+      // 0; True => Đã từng sellectedAll
+      _listIsSellectedAll[0] = true;
     });
   }
 
@@ -76,15 +86,14 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 800), () {
       final keyword = _searchController.text.trim();
-      print("====>>>> keyword: ${keyword}");
       setState(() {
         _currentPage = 1;
       });
       context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-            idUos: widget.idUos,
-            pageNumber: 1,
-            keyword: keyword,
-          ));
+          idUos: widget.idUos,
+          pageNumber: 1,
+          keyword: keyword,
+          absenceDate: _currentDate));
     });
   }
 
@@ -99,21 +108,21 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _currentDate = widget.selectedDay;
       _currentWeek = "tuần ${widget.noWeek}";
+      _studentStatus = {};
     });
-    if (widget.isCheckAbsent) {
-      context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-          idUos: widget.idUos, attendanceDate: widget.selectedDay));
-    }
+    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+        idUos: widget.idUos, attendanceDate: widget.selectedDay));
     context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
           idUos: widget.idUos,
           pageNumber: 1,
+          absenceDate: _currentDate,
         ));
   }
 
   void _updateCurrentDate(DateTime newValue) {
     setState(() {
       _currentDate = newValue;
-      _isCheckedIn = !_isCheckedIn;
+      // _isCheckedIn = !_isCheckedIn;
     });
     context.read<CalendarBloc>().add(
           LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
@@ -139,7 +148,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
         AlertType.confirm, onConfirm: () {
       List<String> idStudentsAbsent = _studentStatus.entries
-          .where((entry) => entry.value == false)
+          .where((entry) => entry.value == true)
           .map((entry) => entry.key)
           .toList();
       context.read<UosAbsentBloc>().add(TakeAttendance(
@@ -184,6 +193,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     idUos: widget.idUos,
                     pageNumber: _currentPage,
                     keyword: _searchController.text.trim(),
+                    absenceDate: _currentDate,
                   ));
             }
           },
@@ -271,14 +281,17 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     return BlocListener<UosAbsentBloc, UosAbsentState>(listener:
         (context, state) {
       if (state is UosCheckIsAttendanceDateLoaded) {
+        print("=====>>>>> state.isAttendanceDate: ${state.isAttendanceDate}");
         setState(() {
-          _isCheckedIn = state.isAttendanceDate;
+          _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
         });
       }
       if (state is UosTakeAttendanceLoaded) {
         final result = state.isSuccess;
         if (result) {
           _alertSuccess(type: "lưu");
+          context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+              idUos: widget.idUos, attendanceDate: widget.selectedDay));
           context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                 idUos: widget.idUos,
                 pageNumber: _currentPage,
@@ -293,8 +306,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         if (result) {
           _alertSuccess(type: "xóa");
           _studentStatus = {};
-          context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-              idUos: widget.idUos, attendanceDate: widget.selectedDay));
+          _statusCheckedIn = 0;
           context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                 idUos: widget.idUos,
                 pageNumber: _currentPage,
@@ -308,11 +320,17 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         BlocBuilder<UosAbsentBloc, UosAbsentState>(builder: (context, state) {
       if (state is UosAbsentLoaded) {
         final listStudentAbsent = state.listStudentAbsent.studentsPaged;
-        mergeStudentList(listStudentAbsent.items);
         final totalItems = listStudentAbsent.totalItems;
         final pageSize = listStudentAbsent.pageSize;
         _totalPages = (totalItems / pageSize).ceil();
         _currentPage = listStudentAbsent.pageNumber;
+        if (_listIsSellectedAll.isEmpty) {
+          _listIsSellectedAll = {
+            // 0; True => Đã từng sellectedAll
+            for (int i = 0; i <= _totalPages; i++) i: _isSellectedAll
+          };
+        }
+        mergeStudentList(listStudentAbsent.items);
 
         if (totalItems == 0) {
           return const Center(
@@ -330,7 +348,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 4,
           children: [
-            if (!(widget.isCheckAbsent && !_isCheckedIn)) ...[
+            if (!(widget.isCheckAbsent && _statusCheckedIn == 0)) ...[
               SearchBarCustom(
                 controller: _searchController,
                 onChanged: (_) => _onSearchChanged(),
@@ -399,38 +417,40 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               ),
                             );
                           }))),
-                  if (_isCheckedIn) ...[
+                  if (_statusCheckedIn != 0) ...[
                     Flexible(
                       flex: 4,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Flexible(
-                            child: OutlinedButton(
-                              onPressed: _deleteAbsent,
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                side: BorderSide(
-                                  color: context.theme.red ?? Colors.red,
+                          if (_statusCheckedIn == 1) ...[
+                            Flexible(
+                              child: OutlinedButton(
+                                onPressed: _deleteAbsent,
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(
+                                    color: context.theme.red ?? Colors.red,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 8,
+                                  ),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 8,
+                                child: Text(
+                                  'Xóa',
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    color: context.theme.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                'Xóa',
-                                style: TextStyle(
-                                  fontSize: FontSizes.medium,
-                                  color: context.theme.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
+                            )
+                          ],
                           SizedBox(width: 4),
                           Flexible(
                             child: OutlinedButton(
@@ -467,7 +487,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 ],
               ),
             ],
-            if (!_isCheckedIn && widget.isCheckAbsent) ...[
+            if (_statusCheckedIn == 0 && widget.isCheckAbsent) ...[
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -486,7 +506,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     ),
                     OutlinedButton(
                         onPressed: () => setState(() {
-                              _isCheckedIn = true;
+                              _statusCheckedIn = 2;
                             }),
                         style: OutlinedButton.styleFrom(
                           backgroundColor:
@@ -609,6 +629,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                             },
                           )
                         : StudentItem(
+                            idUos: widget.idUos,
+                            idStudent: listStudentAbsent.items[index].idStudent,
                             name: listStudentAbsent.items[index].studentName,
                             mail: listStudentAbsent.items[index].noStudent,
                             absentCount:

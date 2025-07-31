@@ -58,7 +58,7 @@ class ScheduleRepository {
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(
-      String idUos, int pageNumber, String? keyword, DateTime? absenceDate) {
+      String idUos, int pageNumber, String? keyword, DateTime absenceDate) {
     return _scheduleService.getListStudentsByUos(
         idUos, pageNumber, keyword, absenceDate);
   }
@@ -77,5 +77,9 @@ class ScheduleRepository {
 
   Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate) {
     return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate);
+  }
+
+  Future<List<DateTime>> getListAbsentDate(String idUos, String idStudent) {
+    return _scheduleService.getListAbsentDate(idUos, idStudent);
   }
 }

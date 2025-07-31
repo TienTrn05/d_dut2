@@ -6,6 +6,7 @@ import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
@@ -158,7 +159,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
           BlocProvider(
               create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
           BlocProvider(
-              create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>()))
+              create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>())),
+          BlocProvider(
+              create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
         ],
         child: DefaultTabController(
           length: 3,

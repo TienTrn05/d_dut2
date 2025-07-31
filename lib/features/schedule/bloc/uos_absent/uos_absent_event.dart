@@ -9,13 +9,13 @@ class LoadStudentsAbsent extends UosAbsentEvent {
   final String idUos;
   final int pageNumber;
   final String? keyword;
-  final DateTime? absenceDate;
+  final DateTime absenceDate;
 
   LoadStudentsAbsent({
     required this.idUos,
     required this.pageNumber,
     this.keyword,
-    this.absenceDate,
+    required this.absenceDate,
   });
 }
 

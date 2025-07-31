@@ -1,12 +1,13 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AbsentsCard extends StatelessWidget {
   final bool isTeacher;
   final String? name;
   final String? mail;
-  final List<String> absentDates;
+  final List<DateTime> absentDates;
   const AbsentsCard(
       {super.key,
       this.isTeacher = true,
@@ -79,7 +80,7 @@ class AbsentsCard extends StatelessWidget {
                       child: ListTile(
                         title: Center(
                           child: Text(
-                            absentDates[index],
+                            DateFormat('dd/MM/yyyy').format(absentDates[index]),
                             style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: FontSizes.medium),
