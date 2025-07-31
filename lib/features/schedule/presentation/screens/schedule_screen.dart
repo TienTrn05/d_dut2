@@ -101,7 +101,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     Divider(color: context.theme.primaryColor),
                     SizedBox(height: 10),
                     _buildMenuItem(
-                      'Theo học kì',
+                      'Theo học kỳ',
                       isSelected: !_isDayView,
                       onPressed: () {
                         setState(() {

@@ -81,6 +81,7 @@ class GradeScreen extends StatelessWidget {
 
                   return RefreshIndicator(
                     color: context.theme.primaryColor,
+                    backgroundColor: Colors.white,
                     onRefresh: () async {
                       final authState = context.read<AuthBloc>().state;
                       if (authState is AuthUserAuthenticated) {

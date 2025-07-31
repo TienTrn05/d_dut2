@@ -9,6 +9,7 @@ import 'package:e_dut/features/community_activity/data/model/activity_model.dart
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/activity_card.dart';
+import 'package:e_dut/features/community_activity/presentation/widgets/common/pagination.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/search_text_field.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/custom/date_picker.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
@@ -31,6 +32,9 @@ class _AllActivitiesState extends State<AllActivities> {
   List<ActivityModel> activities = [];
   UserInfoModel? userInfo;
 
+  int _currentPage = 1;
+  int _totalPages = 1;
+
   bool _isInitialized = false;
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -47,43 +51,34 @@ class _AllActivitiesState extends State<AllActivities> {
 
   bool _isCategoryListVisible = false;
 
-  void _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 800), () {
-      final keyword = _searchController.text.trim();
-      context.read<CommunityActivityBloc>().add(
-            LoadAllActivities(
-              token: widget.authToken,
-              keyword: keyword,
-            ),
-          );
+  void _loadActivities(int pageNumber) {
+    final keyword = _searchController.text.trim();
+
+    final Set<String> categoryIdSet =
+        selectedCategoryFilters.map((e) => e.id).toSet();
+    final String? categoryIds =
+        categoryIdSet.isNotEmpty ? categoryIdSet.join(',') : null;
+
+    final Set<String> statusSet = selectedStateFilters.map((e) => e).toSet();
+    final String? selectedStatus =
+        statusSet.isNotEmpty ? statusSet.join(',') : null;
+
+    context.read<CommunityActivityBloc>().add(
+          LoadAllActivities(
+            token: widget.authToken,
+            keyword: keyword,
+            pageNumber: pageNumber,
+            status: selectedStatus,
+            categoryIds: categoryIds,
+            startDate: startDateFilter,
+            endDate: endDateFilter,
+            minScrore: _currentRange.start.toInt(),
+            maxScore: _currentRange.end.toInt(),
+          ),
+        );
+    setState(() {
+      _currentPage = pageNumber;
     });
-  }
-
-  List<ActivityModel> get filteredActivities {
-    final selectedCategoryIds =
-        selectedCategoryFilters.map((cat) => cat.id).toSet();
-    return activities.where((activity) {
-      final matchStatus = selectedStateFilters.isEmpty ||
-          selectedStateFilters.contains(activity.status);
-
-      final matchStartDate = startDateFilter == null ||
-          (activity.startDate.isAfter(startDateFilter!) ||
-              activity.startDate.isAtSameMomentAs(startDateFilter!));
-
-      final matchEndDate = endDateFilter == null ||
-          (activity.endDate.isBefore(endDateFilter!) ||
-              activity.endDate.isAtSameMomentAs(endDateFilter!));
-      final matchScore = activity.score >= _currentRange.start &&
-          activity.score <= _currentRange.end;
-
-      final matchCategory = selectedCategoryIds.isEmpty ||
-          selectedCategoryIds.contains(activity.subcategory.categoryId);
-
-      return matchStatus &&
-          matchStartDate &&
-          matchEndDate & matchScore & matchCategory;
-    }).toList();
   }
 
   @override
@@ -97,11 +92,7 @@ class _AllActivitiesState extends State<AllActivities> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final bloc = context.read<CommunityActivityBloc>();
-        bloc.add(LoadAllActivities(
-          token: widget.authToken,
-          keyword: _searchController.text.trim(),
-        ));
+        _loadActivities(_currentPage);
         final userInfoBloc = context.read<UserInfoBloc>();
         userInfoBloc.add(LoadUserInfo(token: widget.authToken));
       });
@@ -139,54 +130,170 @@ class _AllActivitiesState extends State<AllActivities> {
             },
           ),
           Expanded(
+              child: RefreshIndicator(
+            color: context.theme.primaryColor,
+            backgroundColor: Colors.white,
+            onRefresh: () async {
+              final completer = Completer<void>();
+
+              // Listen để biết khi nào refresh hoàn tất
+              final subscription =
+                  context.read<CommunityActivityBloc>().stream.listen((state) {
+                if (state is AllActivitiesLoaded ||
+                    state is CommunityActivityError) {
+                  if (!completer.isCompleted) {
+                    completer.complete();
+                  }
+                }
+              });
+
+              _loadActivities(_currentPage);
+
+              // Đợi cho đến khi có kết quả
+              await completer.future.timeout(
+                Duration(seconds: 30),
+                onTimeout: () {
+                  // Handle timeout nếu cần
+                },
+              );
+
+              subscription.cancel();
+            },
             child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SearchTextField(
-                    controller: _searchController,
-                    onFilterPressed: () => _showFilterModal(context),
-                    iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
-                    textColor: context.theme.grey ?? Colors.grey,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height -
+                      kToolbarHeight - // nếu có AppBar
+                      100, // hoặc một giá trị ước lượng cho phần header đã chiếm chỗ
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SearchTextField(
+                        controller: _searchController,
+                        onFilterPressed: () => _showFilterModal(context),
+                        iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
+                        textColor: context.theme.grey ?? Colors.grey,
+                      ),
+                      const SizedBox(height: 20),
+                      BlocBuilder<CommunityActivityBloc,
+                          CommunityActivityState>(
+                        buildWhen: (previous, current) =>
+                            current is AllActivitiesLoaded ||
+                            current is CommunityActivityError,
+                        builder: (context, state) {
+                          if (state is AllActivitiesLoaded) {
+                            activities = state.pagedActivities.activities;
+
+                            final totalItems = state.pagedActivities.total;
+                            final pageSize =
+                                int.parse(state.pagedActivities.limit);
+                            _totalPages = (totalItems / pageSize).ceil();
+                            categoryFilters = state.categories;
+
+                            final Set<String> categoryIdSet =
+                                selectedCategoryFilters
+                                    .map((e) => e.id)
+                                    .toSet();
+                            final String? categoryIds = categoryIdSet.isNotEmpty
+                                ? categoryIdSet.join(',')
+                                : null;
+
+                            final String? selectedStatus =
+                                selectedCategoryFilters.isNotEmpty
+                                    ? selectedCategoryFilters.join(',')
+                                    : null;
+                            return Column(
+                              children: [
+                                Column(
+                                  children: activities.isNotEmpty
+                                      ? activities
+                                          .map((activity) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 10),
+                                                child: ActivityCard(
+                                                  activity: activity,
+                                                  authToken: widget.authToken,
+                                                  keyword: _searchController
+                                                      .text
+                                                      .trim(),
+                                                  pageOfItem: _currentPage,
+                                                  status: selectedStatus,
+                                                  categoryIds: categoryIds,
+                                                  startDate: startDateFilter,
+                                                  endDate: endDateFilter,
+                                                  minScrore: _currentRange.start
+                                                      .toInt(),
+                                                  maxScore:
+                                                      _currentRange.end.toInt(),
+                                                ),
+                                              ))
+                                          .toList()
+                                      : [
+                                          Center(
+                                              child: Text(
+                                                  'Hiện chưa có hoạt động nào được tổ chức.',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color:
+                                                          context.theme.grey ??
+                                                              Colors.grey)))
+                                        ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: activities.isNotEmpty
+                                      ? [_buildPageButtons()]
+                                      : [const SizedBox.shrink()],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            );
+                          } else if (state is CommunityActivityError) {
+                            return Center(
+                                child: Text(
+                                    'Không thể tải dữ liệu hoạt động cộng đồng',
+                                    style: TextStyle(
+                                        color: context.theme.grey ??
+                                            Colors.grey)));
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
-                    buildWhen: (previous, current) =>
-                        current is AllActivitiesLoaded ||
-                        current is CommunityActivityError,
-                    builder: (context, state) {
-                      if (state is AllActivitiesLoaded) {
-                        activities = state.activities;
-                        categoryFilters = state.categories;
-                        return Column(
-                          children: filteredActivities
-                              .map((activity) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: ActivityCard(
-                                      activity: activity,
-                                      authToken: widget.authToken,
-                                      keyword: _searchController.text.trim(),
-                                    ),
-                                  ))
-                              .toList(),
-                        );
-                      } else if (state is CommunityActivityError) {
-                        return const Center(
-                            child: Text(
-                                'Không thể tải dữ liệu hoạt động cộng đồng'));
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+          )),
         ],
       ),
     );
+  }
+
+  Widget _buildPageButtons() {
+    return Pagination(
+      currentPage: _currentPage,
+      totalPages: _totalPages,
+      onPageChanged: (int page) {
+        setState(() {
+          _currentPage = page;
+        });
+        _loadActivities(_currentPage);
+      },
+    );
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 800), () {
+      _loadActivities(1);
+    });
   }
 
   void _showFilterModal(BuildContext context) {
@@ -214,6 +321,7 @@ class _AllActivitiesState extends State<AllActivities> {
               });
 
               Navigator.pop(modalContext);
+              _loadActivities(1);
             },
             onCloseText: "Đặt lại",
             onClose: () {
@@ -230,6 +338,7 @@ class _AllActivitiesState extends State<AllActivities> {
                 selectedStateFilters.clear();
                 selectedCategoryFilters.clear();
               });
+              _loadActivities(1);
             },
             heightFactor: 0.9,
             child: SingleChildScrollView(

@@ -38,30 +38,39 @@ class DetailUnitOfStudy extends StatelessWidget {
                     return CustomLoadingIndicator.primary();
                   } else if (state is FullInfoUosLoaded) {
                     final uosFullInfo = state.fullInfoUosDetail;
-                    return Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            uosFullInfo.uosDetail.subjectName,
-                            style: TextStyle(
-                              fontSize: FontSizes.extraLarge,
-                              fontWeight: FontWeight.bold,
-                              height: 1.25,
-                              color: context.theme.primaryColor ?? Colors.blue,
+                    return RefreshIndicator(
+                      color: context.theme.primaryColor,
+                      backgroundColor: Colors.white,
+                      onRefresh: () async {
+                        context.read<UosDetailBloc>().add(LoadFullInfoUosDetail(
+                            idUos: idUos, isTeacher: false));
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              uosFullInfo.uosDetail.subjectName,
+                              style: TextStyle(
+                                fontSize: FontSizes.extraLarge,
+                                fontWeight: FontWeight.bold,
+                                height: 1.25,
+                                color:
+                                    context.theme.primaryColor ?? Colors.blue,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          Expanded(
-                              child: UosInfoTab(
-                            uosDetail: uosFullInfo.uosDetail,
-                            teacherName: uosFullInfo.teacherName,
-                            absentTimes: uosFullInfo.absentTimes,
-                            studyShifts: uosFullInfo.studyShifts,
-                            examShift: uosFullInfo.examShift,
-                          ))
-                        ],
+                            const SizedBox(height: 20),
+                            Expanded(
+                                child: UosInfoTab(
+                              uosDetail: uosFullInfo.uosDetail,
+                              teacherName: uosFullInfo.teacherName,
+                              absentTimes: uosFullInfo.absentTimes,
+                              studyShifts: uosFullInfo.studyShifts,
+                              examShift: uosFullInfo.examShift,
+                            ))
+                          ],
+                        ),
                       ),
                     );
                   } else {

@@ -17,12 +17,26 @@ class ActivityCard extends StatelessWidget {
   final ActivityModel activity;
   final String authToken;
   final String keyword;
+  final int pageOfItem;
+  final String? status;
+  final String? categoryIds;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final int minScrore;
+  final int maxScore;
 
   const ActivityCard(
       {super.key,
       required this.activity,
       required this.authToken,
-      required this.keyword});
+      required this.keyword,
+      required this.pageOfItem,
+      required this.status,
+      required this.categoryIds,
+      required this.startDate,
+      required this.endDate,
+      required this.minScrore,
+      required this.maxScore});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +48,16 @@ class ActivityCard extends StatelessWidget {
           textConfirm: "Đăng ký",
           dialog.AlertType.confirm, onConfirm: () {
         context.read<CommunityActivityBloc>().add(RegistActivity(
-            token: authToken, keyword: keyword, idActivity: activity.id));
+            token: authToken,
+            keyword: keyword,
+            idActivity: activity.id,
+            pageNumber: pageOfItem,
+            status: status,
+            categoryIds: categoryIds,
+            startDate: startDate,
+            endDate: endDate,
+            minScrore: minScrore,
+            maxScore: maxScore));
       });
     }
 
@@ -171,12 +194,14 @@ class ActivityCard extends StatelessWidget {
                           height: 13,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          "${activity.participants.toString()}/${activity.maxParticipants.toString()}",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: FontSizes.small,
-                              color: context.theme.grey),
+                        Expanded(
+                          child: Text(
+                            "${activity.participants.toString()}/${activity.maxParticipants.toString()}",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: FontSizes.small,
+                                color: context.theme.grey),
+                          ),
                         ),
                       ],
                     ),
@@ -194,12 +219,14 @@ class ActivityCard extends StatelessWidget {
                           height: 13,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '${Functions.formatDate(activity.startDate)} - ${Functions.formatDate(activity.endDate)}',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: FontSizes.small,
-                              color: context.theme.grey),
+                        Expanded(
+                          child: Text(
+                            '${Functions.formatDate(activity.startDate)} - ${Functions.formatDate(activity.endDate)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: FontSizes.small,
+                                color: context.theme.grey),
+                          ),
                         ),
                       ],
                     ),
@@ -217,12 +244,14 @@ class ActivityCard extends StatelessWidget {
                           height: 13,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          activity.address,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: FontSizes.small,
-                              color: context.theme.grey),
+                        Expanded(
+                          child: Text(
+                            activity.address,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: FontSizes.small,
+                                color: context.theme.grey),
+                          ),
                         ),
                       ],
                     ),

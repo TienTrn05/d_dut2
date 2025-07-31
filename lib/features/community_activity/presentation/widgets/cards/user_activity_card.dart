@@ -18,11 +18,17 @@ import 'package:flutter_svg/svg.dart';
 class UserActivityCard extends StatefulWidget {
   const UserActivityCard(
       {super.key,
-      required this.userActivity,
       required this.keyword,
+      required this.academicYearId,
+      required this.status,
+      required this.pageNumber,
+      required this.userActivity,
       this.onRefresh});
 
   final String keyword;
+  final String academicYearId;
+  final String? status;
+  final int pageNumber;
   final UserActivityModel userActivity;
   final VoidCallback? onRefresh;
 
@@ -117,7 +123,10 @@ class _UserActivityCardState extends State<UserActivityCard>
               child: UserOptionDialog(
                 userActivity: widget.userActivity,
                 keyword: widget.keyword,
+                academicYearId: widget.academicYearId,
                 communityBloc: communitybloc,
+                pageNumber: widget.pageNumber,
+                status: widget.status,
               ),
             ),
           ),
@@ -161,6 +170,7 @@ class _UserActivityCardState extends State<UserActivityCard>
           scale: _scaleAnimation.value,
           child: GestureDetector(
             onTap: () async {
+              final communityBloc = context.read<CommunityActivityBloc>();
               final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -168,7 +178,9 @@ class _UserActivityCardState extends State<UserActivityCard>
                             create: (_) => CommunityActivityBloc(
                                 getIt.get<CommunityRepository>()),
                             child: DetailUserActivityScreen(
-                                userActivity: widget.userActivity),
+                              userActivity: widget.userActivity,
+                              communityBloc: communityBloc,
+                            ),
                           )));
               if (result == true) {
                 widget.onRefresh?.call();

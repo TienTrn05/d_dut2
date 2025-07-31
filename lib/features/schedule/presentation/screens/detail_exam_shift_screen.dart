@@ -242,72 +242,91 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                     final examShiftDetail =
                                         state.examShiftDetail;
 
-                                    return SingleChildScrollView(
-                                      child: Column(
-                                        children: [
-                                          UosInfoCard(
-                                            title: 'Thông tin chung',
-                                            child: Column(
-                                              children: [
-                                                InfoItem(
-                                                  field: "Mã ca thi",
-                                                  value: examShiftDetail
-                                                      .examShift.examCode,
-                                                ),
-                                                InfoItem(
-                                                  field: "Thời gian làm bài",
-                                                  value: examShiftDetail
-                                                              .examShift
-                                                              .examDate !=
-                                                          null
-                                                      ? Functions
-                                                          .formatDateTime(
-                                                              examShiftDetail
-                                                                  .examShift
-                                                                  .examDate!)
-                                                      : "",
-                                                ),
-                                                InfoItem(
-                                                  field: "Phòng",
-                                                  value: examShiftDetail
-                                                      .examShift.room,
-                                                ),
-                                                InfoItem(
-                                                  field: "Xuất",
-                                                  value: examShiftDetail
-                                                      .examShift.noExamShift,
-                                                ),
-                                                InfoItem(
-                                                  field: "Dạng đề",
-                                                  value: examShiftDetail
-                                                      .examShift.examFormat,
-                                                ),
-                                              ],
+                                    return RefreshIndicator(
+                                      color: context.theme.primaryColor,
+                                      backgroundColor: Colors.white,
+                                      onRefresh: () async {
+                                        context.read<UosDetailBloc>().add(
+                                              LoadExamShiftDetail(
+                                                idExamShift: widget.idExamShift,
+                                                keyword: _searchController.text
+                                                    .trim(),
+                                                pageNumber: 1,
+                                              ),
+                                            );
+                                      },
+                                      child: SingleChildScrollView(
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
+                                        child: Column(
+                                          children: [
+                                            UosInfoCard(
+                                              title: 'Thông tin chung',
+                                              child: Column(
+                                                children: [
+                                                  InfoItem(
+                                                    field: "Mã ca thi",
+                                                    value: examShiftDetail
+                                                        .examShift.examCode,
+                                                  ),
+                                                  InfoItem(
+                                                    field: "Thời gian làm bài",
+                                                    value: examShiftDetail
+                                                                .examShift
+                                                                .examDate !=
+                                                            null
+                                                        ? Functions
+                                                            .formatDateTime(
+                                                                examShiftDetail
+                                                                    .examShift
+                                                                    .examDate!)
+                                                        : "",
+                                                  ),
+                                                  InfoItem(
+                                                    field: "Phòng",
+                                                    value: examShiftDetail
+                                                        .examShift.room,
+                                                  ),
+                                                  InfoItem(
+                                                    field: "Xuất",
+                                                    value: examShiftDetail
+                                                        .examShift.noExamShift,
+                                                  ),
+                                                  InfoItem(
+                                                    field: "Dạng đề",
+                                                    value: examShiftDetail
+                                                        .examShift.examFormat,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          UosInfoCard(
-                                            title: 'Cán bộ coi thi',
-                                            child: Column(
-                                              children: examShiftDetail
-                                                  .examSupervisors
-                                                  .asMap()
-                                                  .entries
-                                                  .map((entry) => InfoItem(
-                                                        field:
-                                                            "Cán bộ ${entry.key + 1}",
-                                                        value:
-                                                            "${entry.value.noTeacher} - ${entry.value.teacherName}",
-                                                      ))
-                                                  .toList(),
+                                            const SizedBox(height: 10),
+                                            UosInfoCard(
+                                              title: 'Cán bộ coi thi',
+                                              child: Column(
+                                                children: examShiftDetail
+                                                    .examSupervisors
+                                                    .asMap()
+                                                    .entries
+                                                    .map((entry) => InfoItem(
+                                                          field:
+                                                              "Cán bộ ${entry.key + 1}",
+                                                          value:
+                                                              "${entry.value.noTeacher} - ${entry.value.teacherName}",
+                                                        ))
+                                                    .toList(),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }
-                                  return const Center(
-                                      child: Text("Không có dữ liệu ca thi"));
+                                  return Center(
+                                      child: Text("Không có dữ liệu ca thi",
+                                          style: TextStyle(
+                                              color: context.theme.grey ??
+                                                  Colors.grey)));
                                 },
                               ),
 
@@ -364,40 +383,64 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                 ),
                                               ),
                                               Expanded(
-                                                child: SingleChildScrollView(
-                                                  child: Column(
-                                                    children: [
-                                                      ListView.builder(
-                                                        shrinkWrap: true,
-                                                        physics:
-                                                            const NeverScrollableScrollPhysics(),
-                                                        itemCount: listStudents
-                                                            .studentsPaged
-                                                            .items
-                                                            .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          final student =
+                                                child: RefreshIndicator(
+                                                  color: context
+                                                      .theme.primaryColor,
+                                                  backgroundColor: Colors.white,
+                                                  onRefresh: () async {
+                                                    context
+                                                        .read<UosDetailBloc>()
+                                                        .add(
+                                                          LoadExamShiftDetail(
+                                                            idExamShift: widget
+                                                                .idExamShift,
+                                                            keyword:
+                                                                _searchController
+                                                                    .text
+                                                                    .trim(),
+                                                            pageNumber: 1,
+                                                          ),
+                                                        );
+                                                  },
+                                                  child: SingleChildScrollView(
+                                                    physics:
+                                                        const AlwaysScrollableScrollPhysics(),
+                                                    child: Column(
+                                                      children: [
+                                                        ListView.builder(
+                                                          shrinkWrap: true,
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
+                                                          itemCount:
                                                               listStudents
                                                                   .studentsPaged
-                                                                  .items[index];
-                                                          return StudentItem(
-                                                            name: student
-                                                                .studentName,
-                                                            mail: student
-                                                                .noStudent,
-                                                          );
-                                                        },
-                                                      ),
-                                                      const SizedBox(height: 8),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children:
-                                                            _buildPageButtons(),
-                                                      ),
-                                                    ],
+                                                                  .items
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            final student =
+                                                                listStudents
+                                                                    .studentsPaged
+                                                                    .items[index];
+                                                            return StudentItem(
+                                                              name: student
+                                                                  .studentName,
+                                                              mail: student
+                                                                  .noStudent,
+                                                            );
+                                                          },
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children:
+                                                              _buildPageButtons(),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),

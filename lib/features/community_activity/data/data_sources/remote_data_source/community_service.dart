@@ -2,40 +2,67 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
-import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/constant/page_limit.dart';
+import 'package:e_dut/features/community_activity/data/model/academic_year_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/activities_paged_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
-import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/proofs_paged_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/user_activities_paged_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
 class CommunityService {
-  final String _url;
-  final Dio _dio;
-
   CommunityService(@Named('communityAPIUrl') String url)
       : _url = url,
         _dio = Dio();
 
-  Future<List<ActivityModel>> getActivities(
-      String token, String keyword) async {
+  final Dio _dio;
+  final String _url;
+
+  Future<ActivitiesPagedModel> getActivities(
+    String token,
+    String keyword,
+    int pageNumber,
+    String? status,
+    String? categoryIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    int minScrore,
+    int maxScore,
+  ) async {
     try {
-      final response = await _dio.get("$_url/api/activities",
-          queryParameters: {"keyword": keyword},
-          options: Options(headers: {
-            "Authorization": "Bearer $token",
-          }));
+      final Map<String, dynamic> queryParams = {
+        "keyword": keyword,
+        "page": pageNumber,
+        "limit": PageLimit.activitiesLimit,
+      };
+
+      if (status != null) queryParams["status"] = status;
+      if (categoryIds != null) queryParams["categoryIds"] = categoryIds;
+      if (startDate != null) {
+        queryParams["startDate"] = startDate.toIso8601String();
+      }
+      if (endDate != null) queryParams["endDate"] = endDate.toIso8601String();
+      queryParams["minScore"] = minScrore;
+      queryParams["maxScore"] = maxScore;
+
+      final response = await _dio.get(
+        "$_url/api/activities",
+        queryParameters: queryParams,
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+      );
+
       if (response.statusCode == 200 && response.data['success'] == true) {
-        final responseData = response.data;
-
-        final List<dynamic> data = responseData['data'];
-
-        final activities = data.map((e) => ActivityModel.fromJson(e)).toList();
-        return activities;
+        final data = response.data['data'];
+        final pagedActivities = ActivitiesPagedModel.fromJson(data);
+        return pagedActivities;
       } else {
         throw Exception(
-            "Failed to load activities : ${response.data['message']}");
+            "Failed to load activities: ${response.data['message']}");
       }
     } catch (e) {
       logger.e("Error fetching all activities: $e");
@@ -69,6 +96,31 @@ class CommunityService {
     }
   }
 
+  Future<List<AcademicYearModel>> getAcademicYears(String token) async {
+    try {
+      final response = await _dio.get("$_url/api/academic-year-activities",
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final responseData = response.data;
+
+        final List<dynamic> data = responseData['data'];
+
+        final academicYears =
+            data.map((e) => AcademicYearModel.fromJson(e)).toList();
+
+        return academicYears;
+      } else {
+        throw Exception(
+            "Failed to load academic year activities : ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching all academic year activities: $e");
+      rethrow;
+    }
+  }
+
   Future<UserInfoModel> getUserInfo(String token) async {
     try {
       final response = await _dio.get("$_url/api/users/me/info",
@@ -79,7 +131,6 @@ class CommunityService {
         final responseData = response.data;
 
         final dynamic data = responseData['data']['user'];
-
         final userInfo = UserInfoModel.fromJson(data);
 
         return userInfo;
@@ -108,21 +159,32 @@ class CommunityService {
     }
   }
 
-  Future<List<UserActivityModel>> getUserActivities(
-      String token, String keyword) async {
+  Future<UserActivitiesPagedModel> getUserActivities(
+    String token,
+    String keyword,
+    String academicYearId,
+    String? status,
+    int pageNumber,
+  ) async {
     try {
+      final Map<String, dynamic> queryParams = {
+        "keyword": keyword,
+        "page": pageNumber,
+        "academicYearId": academicYearId,
+        "limit": PageLimit.activitiesLimit
+      };
+      if (status != null) queryParams["status"] = status;
       final response = await _dio.get("$_url/api/my-activities",
-          queryParameters: {"keyword": keyword},
+          queryParameters: queryParams,
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200 && response.data['success'] == true) {
         final responseData = response.data;
 
-        final List<dynamic> data = responseData['data'];
+        final data = responseData['data'];
 
-        final userActivities =
-            data.map((e) => UserActivityModel.fromJson(e)).toList();
+        final userActivities = UserActivitiesPagedModel.fromJson(data);
 
         return userActivities;
       } else {
@@ -179,28 +241,62 @@ class CommunityService {
     }
   }
 
-  Future<List<UserProofModel>> getUserProofs(
-      String token, String keyword) async {
+  Future<ProofsPagedModel> getUserProofs(String token, String keyword,
+      int pageNumber, String academicYearId, String? status) async {
     try {
+      final Map<String, dynamic> queryParams = {
+        "keyword": keyword,
+        "page": pageNumber,
+        "academicYearId": academicYearId,
+        "limit": PageLimit.activitiesLimit
+      };
+      if (status != null) queryParams["status"] = status;
       final response = await _dio.get("$_url/api/proofs/me",
-          queryParameters: {"keyword": keyword},
+          queryParameters: queryParams,
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
       if (response.statusCode == 200 && response.data['success'] == true) {
         final responseData = response.data;
+        final data = responseData['data'];
 
-        final List<dynamic> data = responseData['data'];
+        final pagedProofs = ProofsPagedModel.fromJson(data);
 
-        final userProofs = data.map((e) => UserProofModel.fromJson(e)).toList();
-
-        return userProofs;
+        return pagedProofs;
       } else {
         throw Exception(
             "Failed to load my proofs: ${response.data['message']}");
       }
     } catch (e) {
       logger.e("Error fetching my proofs: $e");
+      rethrow;
+    }
+  }
+
+  Future<List<UserProofModel>> getUserScores(
+      String token, String keyword, String academicYearId) async {
+    try {
+      final response = await _dio.get("$_url/api/proofs/me",
+          queryParameters: {
+            "keyword": keyword,
+            "academicYearId": academicYearId,
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final responseData = response.data;
+        final List<dynamic> data = responseData['data']['scores'];
+
+        final userProofs = data.map((e) => UserProofModel.fromJson(e)).toList();
+
+        return userProofs;
+      } else {
+        throw Exception(
+            "Failed to load my scores: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching my scores: $e");
       rethrow;
     }
   }
