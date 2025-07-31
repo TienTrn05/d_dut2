@@ -43,7 +43,7 @@ class _AbsentsCardState extends State<AbsentsCard> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 300),
+          constraints: BoxConstraints(maxHeight: 500),
           child: Container(
             padding: EdgeInsets.all(24),
             child: Column(
@@ -93,7 +93,6 @@ class _AbsentsCardState extends State<AbsentsCard> {
                       return Flexible(
                           child: ListView.builder(
                         shrinkWrap: true,
-                        // physics: const BouncingScrollPhysics(),
                         itemCount: absentDates.length,
                         itemBuilder: (context, index) => Container(
                           margin: const EdgeInsets.only(top: 4),

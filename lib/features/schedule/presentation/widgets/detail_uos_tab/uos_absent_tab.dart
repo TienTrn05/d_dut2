@@ -2,14 +2,12 @@ import 'dart:async';
 
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_event.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_state.dart';
 import 'package:e_dut/features/schedule/data/model/role/student_absent_model.dart';
-import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_absent.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_absent_item.dart';
@@ -46,25 +44,25 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   int _totalPages = 1;
 
 // key: studentId, value: true nếu vắng, false nếu có mặt
-  Map<String, bool> _studentStatus = {};
+  Map<String, bool> _listStudentIsAbsent = {};
   Timer? _debounce;
 
   void mergeStudentList(List<StudentAbsentModel> newPageStudents) {
     for (var student in newPageStudents) {
-      _studentStatus.putIfAbsent(
+      _listStudentIsAbsent.putIfAbsent(
           student.idStudent,
           () => (_listIsSellectedAll[0] ?? false)
               ? !(_listIsSellectedAll[_currentPage] ?? !student.isAbsent)
-              : student.isAbsent);
+              : (_statusCheckedIn == 1 ? student.isAbsent : true));
     }
   }
 
   // Cập nhập trang thái điểm danh
   void updateAbsentStatus(String idStudent, bool isAbsent) {
     setState(() {
-      _studentStatus[idStudent] = isAbsent;
+      _listStudentIsAbsent[idStudent] = isAbsent;
       _isSellectedAll =
-          _studentStatus.values.every((status) => status == false);
+          _listStudentIsAbsent.values.every((status) => status == false);
       if (isAbsent == true && _isSellectedAll) {
         _listIsSellectedAll[_currentPage] = false;
         _isSellectedAll = false;
@@ -75,7 +73,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   void _toggleSelectAll() {
     setState(() {
       _isSellectedAll = !_isSellectedAll;
-      _studentStatus.updateAll((key, value) => !_isSellectedAll);
+      _listStudentIsAbsent.updateAll((key, value) => !_isSellectedAll);
       _listIsSellectedAll.updateAll((key, value) => _isSellectedAll);
       // 0; True => Đã từng sellectedAll
       _listIsSellectedAll[0] = true;
@@ -108,7 +106,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _currentDate = widget.selectedDay;
       _currentWeek = "tuần ${widget.noWeek}";
-      _studentStatus = {};
+      _listStudentIsAbsent = {};
     });
     context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
         idUos: widget.idUos, attendanceDate: widget.selectedDay));
@@ -116,20 +114,56 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           idUos: widget.idUos,
           pageNumber: 1,
           absenceDate: _currentDate,
+          keyword: _searchController.text.trim(),
         ));
   }
 
   void _updateCurrentDate(DateTime newValue) {
-    setState(() {
-      _currentDate = newValue;
-      _statusCheckedIn = 0;
-    });
-    context.read<CalendarBloc>().add(
-          LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
-        );
-    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-        idUos: widget.idUos, attendanceDate: _currentDate));
-    Navigator.pop(context);
+    if (_statusCheckedIn != 0) {
+      CustomAlertDialog.showCustomDialog(
+          context,
+          'Chuyển ngày điểm danh',
+          'Dữ liệu sẽ mất nếu bạn chưa lưu trước đó, bạn có chắc chắn muốn tiếp tục thao tác này không?',
+          AlertType.confirm, onConfirm: () {
+        setState(() {
+          _currentDate = newValue;
+          _statusCheckedIn = 0;
+          _isSellectedAll = false;
+          _listIsSellectedAll = {};
+          _listStudentIsAbsent = {};
+        });
+        context.read<CalendarBloc>().add(
+              LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
+            );
+        Navigator.pop(context);
+        context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+            idUos: widget.idUos, attendanceDate: newValue));
+        context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+              idUos: widget.idUos,
+              pageNumber: 1,
+              absenceDate: _currentDate,
+            ));
+      }, textConfirm: "Tiếp tục");
+    } else {
+      setState(() {
+        _currentDate = newValue;
+        _statusCheckedIn = 0;
+        _isSellectedAll = false;
+        _listIsSellectedAll = {};
+        _listStudentIsAbsent = {};
+      });
+      context.read<CalendarBloc>().add(
+            LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
+          );
+      Navigator.pop(context);
+      context.read<UosAbsentBloc>().add(
+          LoadIsAttendanceDate(idUos: widget.idUos, attendanceDate: newValue));
+      context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+            idUos: widget.idUos,
+            pageNumber: 1,
+            absenceDate: _currentDate,
+          ));
+    }
   }
 
   void _deleteAbsent() {
@@ -149,7 +183,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         'Lưu ngày điểm danh',
         'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
         AlertType.confirm, onConfirm: () {
-      List<String> idStudentsAbsent = _studentStatus.entries
+      List<String> idStudentsAbsent = _listStudentIsAbsent.entries
           .where((entry) => entry.value == true)
           .map((entry) => entry.key)
           .toList();
@@ -297,6 +331,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 idUos: widget.idUos,
                 pageNumber: _currentPage,
                 absenceDate: _currentDate,
+                keyword: _searchController.text.trim(),
               ));
         } else {
           _alertFailure(type: "lưu");
@@ -306,12 +341,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         final result = state.isSuccess;
         if (result) {
           _alertSuccess(type: "xóa");
-          _studentStatus = {};
+          _listStudentIsAbsent = {};
           _statusCheckedIn = 0;
           context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                 idUos: widget.idUos,
                 pageNumber: _currentPage,
                 absenceDate: _currentDate,
+                keyword: _searchController.text.trim(),
               ));
         } else {
           _alertFailure(type: "xóa");
@@ -333,18 +369,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         }
         mergeStudentList(listStudentAbsent.items);
 
-        if (totalItems == 0) {
-          return const Center(
-            child: Text(
-              'Không có dữ liệu danh sách sinh viên',
-              style: TextStyle(
-                fontSize: FontSizes.medium,
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-              ),
-            ),
-          );
-        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 4,
@@ -611,45 +635,61 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 thickness: 1,
                 height: 1,
               ),
-              Expanded(
-                child: ListView.builder(
-                  // Thêm 1 phần tử cho SizedBox
-                  itemCount: (listStudentAbsent.items.length) + 1,
-                  itemBuilder: (context, index) {
-                    if (index == (listStudentAbsent.items.length)) {
-                      // Thêm khoảng trống cuối danh sách
-                      return SizedBox(height: 56);
-                    }
+              if (totalItems == 0) ...[
+                Center(
+                  child: Text(
+                    'Không có dữ liệu',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.normal,
+                      color: context.theme.grey,
+                    ),
+                  ),
+                )
+              ],
+              if (totalItems > 0) ...[
+                Expanded(
+                  child: ListView.builder(
+                    // Thêm 1 phần tử cho SizedBox
+                    itemCount: (listStudentAbsent.items.length) + 1,
+                    itemBuilder: (context, index) {
+                      if (index == (listStudentAbsent.items.length)) {
+                        // Thêm khoảng trống cuối danh sách
+                        return SizedBox(height: 56);
+                      }
 
-                    return widget.isCheckAbsent
-                        ? StudentAbsentItem(
-                            name: listStudentAbsent.items[index].studentName,
-                            mail: listStudentAbsent.items[index].noStudent,
-                            isAbsentToday: _studentStatus[
-                                    listStudentAbsent.items[index].idStudent] ??
-                                false,
-                            onAbsentChanged: (isAbsent) {
-                              updateAbsentStatus(
+                      return widget.isCheckAbsent
+                          ? StudentAbsentItem(
+                              name: listStudentAbsent.items[index].studentName,
+                              mail: listStudentAbsent.items[index].noStudent,
+                              isAbsentToday: _listStudentIsAbsent[
+                                      listStudentAbsent
+                                          .items[index].idStudent] ??
+                                  false,
+                              onAbsentChanged: (isAbsent) {
+                                updateAbsentStatus(
+                                    listStudentAbsent.items[index].idStudent,
+                                    isAbsent);
+                              },
+                            )
+                          : StudentItem(
+                              idUos: widget.idUos,
+                              idStudent:
                                   listStudentAbsent.items[index].idStudent,
-                                  isAbsent);
-                            },
-                          )
-                        : StudentItem(
-                            idUos: widget.idUos,
-                            idStudent: listStudentAbsent.items[index].idStudent,
-                            name: listStudentAbsent.items[index].studentName,
-                            mail: listStudentAbsent.items[index].noStudent,
-                            absentCount:
-                                listStudentAbsent.items[index].absentTimes,
-                          );
-                  },
+                              name: listStudentAbsent.items[index].studentName,
+                              mail: listStudentAbsent.items[index].noStudent,
+                              absentCount:
+                                  listStudentAbsent.items[index].absentTimes,
+                            );
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _buildPageButtons(),
-              ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _buildPageButtons(),
+                ),
+              ]
             ]
           ],
         );
