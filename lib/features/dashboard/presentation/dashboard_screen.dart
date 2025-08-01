@@ -59,11 +59,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? authState.userData.role.name
                 : '';
 
+            final String authToken =
+                authState is AuthUserAuthenticated ? authState.accessToken : '';
+
             final bloc = ScheduleBloc(getIt.get<ScheduleRepository>());
             bloc.add(LoadSchedulesByDate(
-              inputDate: DateTime.now(),
-              isTeacher: userRole == RoleModel.roleTeacher,
-            ));
+                inputDate: DateTime.now(),
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken));
             return bloc;
           },
         ),

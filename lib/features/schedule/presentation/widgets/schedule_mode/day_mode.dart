@@ -55,10 +55,13 @@ class _DayModeState extends State<DayMode> {
 
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
     context.read<ScheduleBloc>().add(LoadSchedulesByDate(
-          inputDate: selectedDay,
-          isTeacher: userRole == RoleModel.roleTeacher,
-        ));
+        inputDate: selectedDay,
+        isTeacher: userRole == RoleModel.roleTeacher,
+        authToken: authToken));
   }
 
   @override
@@ -81,6 +84,8 @@ class _DayModeState extends State<DayMode> {
           final String userRole = authState is AuthUserAuthenticated
               ? authState.userData.role.name
               : '';
+          final String authToken =
+              authState is AuthUserAuthenticated ? authState.accessToken : '';
           return BlocBuilder<ScheduleBloc, ScheduleState>(
               builder: (builder, scheduleState) {
             return BlocBuilder<CalendarBloc, CalendarState>(
@@ -126,9 +131,9 @@ class _DayModeState extends State<DayMode> {
 
                         // Trigger refresh
                         context.read<ScheduleBloc>().add(LoadSchedulesByDate(
-                              inputDate: selectedDay,
-                              isTeacher: userRole == RoleModel.roleTeacher,
-                            ));
+                            inputDate: selectedDay,
+                            isTeacher: userRole == RoleModel.roleTeacher,
+                            authToken: authToken));
 
                         // Đợi cho đến khi có kết quả
                         await completer.future.timeout(

@@ -32,11 +32,14 @@ class _CalendarCustomState extends State<CalendarCustom> {
 
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
     context.read<CalendarBloc>().add(
           LoadCalendarEvents(
               month: _focusedDay.month,
               year: _focusedDay.year,
-              isTeacher: userRole == RoleModel.roleTeacher),
+              isTeacher: userRole == RoleModel.roleTeacher,
+              authToken: authToken),
         );
   }
 
@@ -205,17 +208,21 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   final String userRole = authState is AuthUserAuthenticated
                       ? authState.userData.role.name
                       : '';
-
+                  final String authToken = authState is AuthUserAuthenticated
+                      ? authState.accessToken
+                      : '';
                   context.read<CalendarBloc>().add(
                         LoadCalendarEvents(
                             month: focusDate.month,
                             year: focusDate.year,
-                            isTeacher: userRole == RoleModel.roleTeacher),
+                            isTeacher: userRole == RoleModel.roleTeacher,
+                            authToken: authToken),
                       );
                   if (_calendarFormat == CalendarFormat.week) {
                     context.read<CalendarBloc>().add(
                           LoadCalendarWeek(
-                              inputDate: getMondayOfWeek(_focusedDay)),
+                              inputDate: getMondayOfWeek(_focusedDay),
+                              authToken: authToken),
                         );
                   }
                 },
@@ -241,9 +248,14 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   final String userRole = authState is AuthUserAuthenticated
                       ? authState.userData.role.name
                       : '';
+
+                  final String authToken = authState is AuthUserAuthenticated
+                      ? authState.accessToken
+                      : '';
                   context.read<ScheduleBloc>().add(LoadSchedulesByDate(
                       inputDate: _selectedDay,
-                      isTeacher: userRole == RoleModel.roleTeacher));
+                      isTeacher: userRole == RoleModel.roleTeacher,
+                      authToken: authToken));
                 },
                 headerStyle: HeaderStyle(
                   titleCentered: true,
@@ -345,9 +357,14 @@ class _CalendarCustomState extends State<CalendarCustom> {
                   }
                 });
                 if (_calendarFormat == CalendarFormat.week) {
+                  final authState = context.read<AuthBloc>().state;
+                  final String authToken = authState is AuthUserAuthenticated
+                      ? authState.accessToken
+                      : '';
                   context.read<CalendarBloc>().add(
                         LoadCalendarWeek(
-                            inputDate: getMondayOfWeek(_focusedDay)),
+                            inputDate: getMondayOfWeek(_focusedDay),
+                            authToken: authToken),
                       );
                 }
               },

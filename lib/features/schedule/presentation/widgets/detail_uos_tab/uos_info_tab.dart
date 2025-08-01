@@ -98,12 +98,14 @@ class _UosInfoTabState extends State<UosInfoTab> {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
       return RefreshIndicator(
         color: context.theme.primaryColor,
         backgroundColor: Colors.white,
         onRefresh: () async {
-          context.read<UosDetailBloc>().add(
-              LoadFullInfoUosDetail(idUos: widget.uosDetail.idUnitOfStudy));
+          context.read<UosDetailBloc>().add(LoadFullInfoUosDetail(
+              idUos: widget.uosDetail.idUnitOfStudy, authToken: authToken));
         },
         child: SingleChildScrollView(
           child: Column(

@@ -25,7 +25,8 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
       LoadListSemesters event, Emitter<TimetableState> emit) async {
     emit(TimetableLoading());
     try {
-      final semesters = await _repository.getListSemester();
+      final authToken = event.authToken;
+      final semesters = await _repository.getListSemester(authToken);
 
       if (semesters.isEmpty) {
         emit(TimetableError("Không có học kỳ nào."));
@@ -33,7 +34,7 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
       }
 
       final currentIdSemester =
-          await _repository.getSemesterByDate(DateTime.now());
+          await _repository.getSemesterByDate(DateTime.now(), authToken);
       final updatedSemesters = semesters.map((s) {
         return SemesterModel(
             idSemester: s.idSemester,
@@ -50,7 +51,7 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
       final selectedSemester = updatedSemesters[selectedIndex];
       final isTeacher = event.isTeacher;
       final listUOS = await _repository.getListUOSBySemester(
-          selectedSemester.idSemester, isTeacher);
+          selectedSemester.idSemester, isTeacher, authToken);
 
       emit(TimetableDataLoaded(semesters, listUOS, selectedIndex));
     } catch (e) {
@@ -69,6 +70,7 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
 
         final idSemester = event.idSemester;
         final isTeacher = event.isTeacher;
+        final authToken = event.authToken;
 
         if (_uosCache.containsKey(idSemester)) {
           emit(TimetableDataLoaded(
@@ -77,8 +79,8 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
             index,
           ));
         } else {
-          final listUOS =
-              await _repository.getListUOSBySemester(idSemester, isTeacher);
+          final listUOS = await _repository.getListUOSBySemester(
+              idSemester, isTeacher, authToken);
           if (_uosCache.length >= _cacheLimit) {
             _uosCache.remove(_uosCache.keys.first);
           }

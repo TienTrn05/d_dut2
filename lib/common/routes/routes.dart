@@ -69,7 +69,8 @@ class Routes {
                     ..add(LoadExamShiftDetail(
                         idExamShift: args.idExamShift,
                         keyword: '',
-                        pageNumber: 1)),
+                        pageNumber: 1,
+                        authToken: args.authToken)),
                   child: DetailExamShiftScreen(
                     idExamShift: args.idExamShift,
                     examShiftName: args.examShiftName,

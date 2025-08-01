@@ -4,6 +4,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
@@ -38,13 +39,17 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
       setState(() {
         _currentPage = 1;
       });
+      final authState = context.read<AuthBloc>().state;
+
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
 
       context.read<UosDetailBloc>().add(
             LoadExamShiftDetail(
-              idExamShift: widget.idExamShift,
-              keyword: keyword,
-              pageNumber: 1,
-            ),
+                idExamShift: widget.idExamShift,
+                keyword: keyword,
+                pageNumber: 1,
+                authToken: authToken),
           );
     });
   }
@@ -60,11 +65,17 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
               setState(() {
                 _currentPage = i;
               });
+
+              final authState = context.read<AuthBloc>().state;
+
+              final String authToken = authState is AuthUserAuthenticated
+                  ? authState.accessToken
+                  : '';
               context.read<UosDetailBloc>().add(LoadExamShiftDetail(
-                    idExamShift: widget.idExamShift,
-                    keyword: _searchController.text.trim(),
-                    pageNumber: _currentPage,
-                  ));
+                  idExamShift: widget.idExamShift,
+                  keyword: _searchController.text.trim(),
+                  pageNumber: _currentPage,
+                  authToken: authToken));
             }
           },
           child: Container(
@@ -246,13 +257,21 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                       color: context.theme.primaryColor,
                                       backgroundColor: Colors.white,
                                       onRefresh: () async {
+                                        final authState =
+                                            context.read<AuthBloc>().state;
+                                        final String authToken =
+                                            authState is AuthUserAuthenticated
+                                                ? authState.accessToken
+                                                : '';
                                         context.read<UosDetailBloc>().add(
                                               LoadExamShiftDetail(
-                                                idExamShift: widget.idExamShift,
-                                                keyword: _searchController.text
-                                                    .trim(),
-                                                pageNumber: 1,
-                                              ),
+                                                  idExamShift:
+                                                      widget.idExamShift,
+                                                  keyword: _searchController
+                                                      .text
+                                                      .trim(),
+                                                  pageNumber: 1,
+                                                  authToken: authToken),
                                             );
                                       },
                                       child: SingleChildScrollView(
@@ -388,18 +407,28 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                       .theme.primaryColor,
                                                   backgroundColor: Colors.white,
                                                   onRefresh: () async {
+                                                    final authState = context
+                                                        .read<AuthBloc>()
+                                                        .state;
+                                                    final String authToken =
+                                                        authState
+                                                                is AuthUserAuthenticated
+                                                            ? authState
+                                                                .accessToken
+                                                            : '';
                                                     context
                                                         .read<UosDetailBloc>()
                                                         .add(
                                                           LoadExamShiftDetail(
-                                                            idExamShift: widget
-                                                                .idExamShift,
-                                                            keyword:
-                                                                _searchController
-                                                                    .text
-                                                                    .trim(),
-                                                            pageNumber: 1,
-                                                          ),
+                                                              idExamShift: widget
+                                                                  .idExamShift,
+                                                              keyword:
+                                                                  _searchController
+                                                                      .text
+                                                                      .trim(),
+                                                              pageNumber: 1,
+                                                              authToken:
+                                                                  authToken),
                                                         );
                                                   },
                                                   child: SingleChildScrollView(

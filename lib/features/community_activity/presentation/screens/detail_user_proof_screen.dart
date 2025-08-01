@@ -93,11 +93,16 @@ class DetailUserProofScreen extends StatelessWidget {
                               child: Stack(
                                 children: [
                                   PhotoView(
-                                    imageProvider:
-                                        NetworkImage(userProof.image!),
-                                    backgroundDecoration: const BoxDecoration(
-                                        color: Colors.transparent),
-                                  ),
+                                      imageProvider:
+                                          NetworkImage(userProof.image!),
+                                      backgroundDecoration: const BoxDecoration(
+                                          color: Colors.transparent),
+                                      minScale:
+                                          PhotoViewComputedScale.contained *
+                                              0.4,
+                                      maxScale:
+                                          PhotoViewComputedScale.contained *
+                                              4.0),
                                   Positioned(
                                     top: 10,
                                     right: 0,
@@ -146,28 +151,35 @@ class DetailUserProofScreen extends StatelessWidget {
                       ),
                       if (userProof.description != null &&
                           userProof.description!.trim().isNotEmpty)
+                        // Column(
+                        //   children: [
+                        //     const SizedBox(height: 10),
+                        //     Text(
+                        //       'Mô tả:',
+                        //       style: TextStyle(
+                        //         fontSize: FontSizes.medium,
+                        //         color: Color(0xFF747474),
+                        //         height: 1.5,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       userProof.description!,
+                        //       style: TextStyle(
+                        //         fontSize: FontSizes.medium,
+                        //         fontWeight: FontWeight.bold,
+                        //         color: Colors.black,
+                        //         height: 1.5,
+                        //       ),
+                        //       softWrap: true,
+                        //       overflow: TextOverflow.visible,
+                        //     ),
+                        //   ],
+                        // )
                         Column(
                           children: [
                             const SizedBox(height: 10),
-                            Text(
-                              'Mô tả:',
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                color: Color(0xFF747474),
-                                height: 1.5,
-                              ),
-                            ),
-                            Text(
-                              userProof.description!,
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                height: 1.5,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                            ),
+                            InfoItem(
+                                field: "Mô tả", value: userProof.description!),
                           ],
                         )
                     ],

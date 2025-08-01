@@ -18,80 +18,86 @@ class DetailUnitOfStudy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-            create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
-              ..add(LoadFullInfoUosDetail(idUos: idUos, isTeacher: false)))
-      ],
-      child: Scaffold(
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
+                ..add(LoadFullInfoUosDetail(
+                    idUos: idUos, isTeacher: false, authToken: authToken)))
+        ],
+        child: Scaffold(
           backgroundColor: Colors.white,
           appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
-          body: BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-            final String userRole = authState is AuthUserAuthenticated
-                ? authState.userData.role.name
-                : '';
-            if (userRole == RoleModel.roleStudent) {
-              return BlocBuilder<UosDetailBloc, UosDetailState>(
-                builder: (context, state) {
-                  if (state is UosDetailLoading) {
-                    return CustomLoadingIndicator.primary();
-                  } else if (state is FullInfoUosLoaded) {
-                    final uosFullInfo = state.fullInfoUosDetail;
-                    return RefreshIndicator(
-                      color: context.theme.primaryColor,
-                      backgroundColor: Colors.white,
-                      onRefresh: () async {
-                        context.read<UosDetailBloc>().add(LoadFullInfoUosDetail(
-                            idUos: idUos, isTeacher: false));
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              uosFullInfo.uosDetail.subjectName,
-                              style: TextStyle(
-                                fontSize: FontSizes.extraLarge,
-                                fontWeight: FontWeight.bold,
-                                height: 1.25,
-                                color:
-                                    context.theme.primaryColor ?? Colors.blue,
+          body: userRole == RoleModel.roleStudent
+              ? BlocBuilder<UosDetailBloc, UosDetailState>(
+                  builder: (context, state) {
+                    if (state is UosDetailLoading) {
+                      return CustomLoadingIndicator.primary();
+                    } else if (state is FullInfoUosLoaded) {
+                      final uosFullInfo = state.fullInfoUosDetail;
+                      return RefreshIndicator(
+                        color: context.theme.primaryColor,
+                        backgroundColor: Colors.white,
+                        onRefresh: () async {
+                          context.read<UosDetailBloc>().add(
+                              LoadFullInfoUosDetail(
+                                  idUos: idUos,
+                                  isTeacher: false,
+                                  authToken: authToken));
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                uosFullInfo.uosDetail.subjectName,
+                                style: TextStyle(
+                                  fontSize: FontSizes.extraLarge,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.25,
+                                  color:
+                                      context.theme.primaryColor ?? Colors.blue,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            Expanded(
+                              const SizedBox(height: 20),
+                              Expanded(
                                 child: UosInfoTab(
-                              uosDetail: uosFullInfo.uosDetail,
-                              teacherName: uosFullInfo.teacherName,
-                              absentTimes: uosFullInfo.absentTimes,
-                              studyShifts: uosFullInfo.studyShifts,
-                              examShift: uosFullInfo.examShift,
-                            ))
-                          ],
+                                  uosDetail: uosFullInfo.uosDetail,
+                                  teacherName: uosFullInfo.teacherName,
+                                  absentTimes: uosFullInfo.absentTimes,
+                                  studyShifts: uosFullInfo.studyShifts,
+                                  examShift: uosFullInfo.examShift,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  } else {
-                    return const Center(
-                        child: Text(
-                            'Không thể tải dữ liệu thông tin chi tiết học phần.'));
-                  }
-                },
-              );
-            } else {
-              return Center(
-                child: Text(
-                  'Bạn không có quyền truy cập vào chức năng này',
-                  style: TextStyle(
-                    fontSize: FontSizes.large,
-                    fontStyle: FontStyle.normal,
+                      );
+                    } else {
+                      return const Center(
+                          child: Text(
+                              'Không thể tải dữ liệu thông tin chi tiết học phần.'));
+                    }
+                  },
+                )
+              : Center(
+                  child: Text(
+                    'Bạn không có quyền truy cập vào chức năng này',
+                    style: TextStyle(
+                      fontSize: FontSizes.large,
+                      fontStyle: FontStyle.normal,
+                    ),
                   ),
                 ),
-              );
-            }
-          })),
-    );
+        ),
+      );
+    });
   }
 }

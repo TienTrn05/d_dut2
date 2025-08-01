@@ -29,6 +29,9 @@ class ScheduleItem extends StatelessWidget {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
+
       return GestureDetector(
           onTap: () {
             Navigator.of(context).pushNamed(
@@ -42,7 +45,7 @@ class ScheduleItem extends StatelessWidget {
                         ? ExamShiftArgs(
                             idExamShift: idSubject,
                             examShiftName: subject,
-                          )
+                            authToken: authToken)
                         : idSubject
                     : idSubject);
           },

@@ -60,11 +60,16 @@ class _SemesterModeState extends State<SemesterMode> {
                       final String userRole = authState is AuthUserAuthenticated
                           ? authState.userData.role.name
                           : '';
+                      final String authToken =
+                          authState is AuthUserAuthenticated
+                              ? authState.accessToken
+                              : '';
                       context.read<TimetableBloc>().add(
                             LoadListUOSBySemester(
                                 idSemester: semesterList[index].idSemester,
                                 selectedIndex: index,
-                                isTeacher: userRole == RoleModel.roleTeacher),
+                                isTeacher: userRole == RoleModel.roleTeacher,
+                                authToken: authToken),
                           );
                     }
                   },
@@ -107,11 +112,15 @@ class _SemesterModeState extends State<SemesterMode> {
           ? authState.userData.role.name
           : '';
 
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
                 idSemester: semesterList[selectedIndex].idSemester,
                 selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher),
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken),
           );
     }
   }
@@ -126,12 +135,15 @@ class _SemesterModeState extends State<SemesterMode> {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
 
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
                 idSemester: semesterList[selectedIndex].idSemester,
                 selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher),
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken),
           );
     }
   }
@@ -144,9 +156,11 @@ class _SemesterModeState extends State<SemesterMode> {
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
 
-    context
-        .read<TimetableBloc>()
-        .add(LoadListSemesters(isTeacher: userRole == RoleModel.roleTeacher));
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
+
+    context.read<TimetableBloc>().add(LoadListSemesters(
+        isTeacher: userRole == RoleModel.roleTeacher, authToken: authToken));
   }
 
   @override
@@ -157,6 +171,9 @@ class _SemesterModeState extends State<SemesterMode> {
           final String userRole = authState is AuthUserAuthenticated
               ? authState.userData.role.name
               : '';
+
+          final String authToken =
+              authState is AuthUserAuthenticated ? authState.accessToken : '';
 
           return BlocConsumer<TimetableBloc, TimetableState>(
             listener: (context, state) {
@@ -193,7 +210,8 @@ class _SemesterModeState extends State<SemesterMode> {
 
                       // Trigger refresh
                       context.read<TimetableBloc>().add(LoadListSemesters(
-                          isTeacher: userRole == RoleModel.roleTeacher));
+                          isTeacher: userRole == RoleModel.roleTeacher,
+                          authToken: authToken));
 
                       // Đợi cho đến khi có kết quả
                       await completer.future.timeout(
