@@ -40,6 +40,7 @@ class DetailUOSTeacherScreen extends StatefulWidget {
 class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
   bool _isCheckAbsent = false;
+  bool _isNotChecking = false;
   bool _isOverlayVisible = false;
   late TabController _tabController;
 
@@ -48,6 +49,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   List<NotiModel> notifications = NotiModel.mockData;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
+  void setIsNotChecking(bool isNotChecked) {
+    _isNotChecking = isNotChecked;
+  }
 
   @override
   void initState() {
@@ -205,11 +210,13 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   controller: _tabController,
                                   tabs: ["Thông tin", "Điểm danh", "Thông báo"],
                                   onTap: (newindex) {
-                                    if (newindex != 1 && _isCheckAbsent) {
+                                    if (newindex != 1 &&
+                                        _isCheckAbsent &&
+                                        !_isNotChecking) {
                                       CustomAlertDialog.showCustomDialog(
                                           context,
                                           'Lưu ý',
-                                          'Lịch sử điểm danh này sẽ không được lưu nếu rời trang, hãy chắc chắn bạn đã lưu nó trước khi tiếp tục hành động này.',
+                                          'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Tiếp tục?',
                                           AlertType.confirm, onConfirm: () {
                                         setState(() {
                                           _tabController.index = newindex;
@@ -240,6 +247,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                         isCheckAbsent: _isCheckAbsent,
                                         selectedDay: widget.selectedDay,
                                         noWeek: widget.noWeek,
+                                        setIsNotChecked: setIsNotChecking,
                                       ),
                                       UosNotiTab(
                                         notifications: notifications,

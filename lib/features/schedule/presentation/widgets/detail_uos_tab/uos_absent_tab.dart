@@ -21,13 +21,18 @@ class UosAbsentTab extends StatefulWidget {
   final bool isCheckAbsent;
   final DateTime selectedDay;
   final String noWeek;
+  final Function setIsNotChecked;
 
-  const UosAbsentTab(
-      {super.key,
-      required this.idUos,
-      required this.isCheckAbsent,
-      required this.selectedDay,
-      required this.noWeek});
+  const UosAbsentTab({
+    super.key,
+    required this.idUos,
+    required this.isCheckAbsent,
+    required this.selectedDay,
+    required this.noWeek,
+    this.setIsNotChecked = defaultFunc,
+  });
+
+  static void defaultFunc() {}
   @override
   State<UosAbsentTab> createState() => _UosAbsentTabState();
 }
@@ -317,6 +322,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
           _hasCheckedAttendanceStatus = true;
         });
+        widget.setIsNotChecked(state.isAttendanceDate ? false: true);
         context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
               idUos: widget.idUos,
               pageNumber: _currentPage,
@@ -341,6 +347,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _alertSuccess(type: "xóa");
           _listStudentIsAbsent = {};
           _statusCheckedIn = 0;
+          widget.setIsNotChecked(true);
           context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                 idUos: widget.idUos,
                 pageNumber: _currentPage,
@@ -535,9 +542,12 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       height: 8,
                     ),
                     OutlinedButton(
-                        onPressed: () => setState(() {
-                              _statusCheckedIn = 2;
-                            }),
+                        onPressed: () {
+                          setState(() {
+                            _statusCheckedIn = 2;
+                          });
+                          widget.setIsNotChecked(false);
+                        },
                         style: OutlinedButton.styleFrom(
                           backgroundColor:
                               context.theme.primaryColor ?? Colors.blue,
