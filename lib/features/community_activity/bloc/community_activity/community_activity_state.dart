@@ -17,29 +17,42 @@ class CommunityActivityError extends CommunityActivityState {
 }
 
 class AllActivitiesLoaded extends CommunityActivityState {
-  final List<ActivityModel> activities;
+  final ActivitiesPagedModel pagedActivities;
   final List<CategoryModel> categories;
 
-  AllActivitiesLoaded(this.activities, this.categories);
+  AllActivitiesLoaded(this.pagedActivities, this.categories);
+}
+
+class AcademicYearsLoaded extends CommunityActivityState {
+  final List<AcademicYearModel> academicYears;
+
+  AcademicYearsLoaded({required this.academicYears});
 }
 
 class UserActivitiesLoaded extends CommunityActivityState {
-  final List<UserActivityModel> activities;
+  final List<AcademicYearModel> academicYears;
+  final UserActivitiesPagedModel pagedActivities;
 
-  UserActivitiesLoaded(this.activities);
+  UserActivitiesLoaded(this.academicYears, this.pagedActivities);
 }
 
 class ProofSubmitted extends CommunityActivityState {
   final bool success;
   final String? message;
-  final List<UserActivityModel> updatedActivities;
+  final UserActivitiesPagedModel updatedActivities;
 
   ProofSubmitted(
       {required this.success, this.message, required this.updatedActivities});
 }
 
 class UserProofsLoaded extends CommunityActivityState {
-  final List<UserProofModel> userProofs;
+  final ProofsPagedModel userProofs;
 
   UserProofsLoaded(this.userProofs);
+}
+
+class UserScoresLoaded extends CommunityActivityState {
+  final List<UserProofModel> userScores;
+
+  UserScoresLoaded(this.userScores);
 }

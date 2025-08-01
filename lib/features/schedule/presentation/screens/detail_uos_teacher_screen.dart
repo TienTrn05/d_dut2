@@ -156,261 +156,261 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-        providers: [
-          BlocProvider(
-              create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
-                ..add(LoadFullInfoUosDetail(idUos: widget.idUos))),
-          BlocProvider(
-              create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
-          BlocProvider(
-              create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>())),
-          BlocProvider(
-              create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
-        ],
-        child: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
-            body:
-                BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-              final String userRole = authState is AuthUserAuthenticated
-                  ? authState.userData.role.name
-                  : '';
-              if (userRole == RoleModel.roleTeacher) {
-                return BlocBuilder<UosDetailBloc, UosDetailState>(
-                    builder: (context, infoState) {
-                  if (infoState is UosDetailLoading) {
-                    return CustomLoadingIndicator.primary();
-                  } else if (infoState is FullInfoUosLoaded) {
-                    final uosFullInfo = infoState.fullInfoUosDetail;
-                    return Stack(
-                      children: [
-                        // Nội dung chính
-                        Container(
-                          margin: EdgeInsets.all(24),
-                          child: Column(
-                            spacing: 10,
-                            children: [
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  uosFullInfo.uosDetail.subjectName,
-                                  style: TextStyle(
-                                    fontSize: FontSizes.extraLarge,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.theme.primaryColor,
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+      final String userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
+      return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+                create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
+                  ..add(LoadFullInfoUosDetail(
+                      idUos: widget.idUos, authToken: authToken))),
+            BlocProvider(
+                create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
+            BlocProvider(
+                create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>())),
+            BlocProvider(
+                create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
+          ],
+          child: DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
+              body: userRole == RoleModel.roleTeacher
+                  ? BlocBuilder<UosDetailBloc, UosDetailState>(
+                      builder: (context, infoState) {
+                      if (infoState is UosDetailLoading) {
+                        return CustomLoadingIndicator.primary();
+                      } else if (infoState is FullInfoUosLoaded) {
+                        final uosFullInfo = infoState.fullInfoUosDetail;
+                        return Stack(
+                          children: [
+                            // Nội dung chính
+                            Container(
+                              margin: EdgeInsets.all(24),
+                              child: Column(
+                                spacing: 10,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      uosFullInfo.uosDetail.subjectName,
+                                      style: TextStyle(
+                                        fontSize: FontSizes.extraLarge,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.theme.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    color: Colors.white,
+                                    child: CustomTabBar(
+                                      controller: _tabController,
+                                      tabs: [
+                                        "Thông tin",
+                                        "Điểm danh",
+                                        "Thông báo"
+                                      ],
+                                      onTap: (newindex) {
+                                        if (newindex != 1 &&
+                                            _isCheckAbsent &&
+                                            !_isNotChecking) {
+                                          CustomAlertDialog.showCustomDialog(
+                                              context,
+                                              'Lưu ý',
+                                              'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Tiếp tục?',
+                                              AlertType.confirm, onConfirm: () {
+                                            setState(() {
+                                              _tabController.index = newindex;
+                                              _isCheckAbsent = false;
+                                            });
+                                          }, textConfirm: "Tiếp tục");
+                                        } else {
+                                          _tabController.index = newindex;
+                                          setState(() {});
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  // TabBarView
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: TabBarView(
+                                        controller: _tabController,
+                                        physics:
+                                            ClampingScrollPhysics(), // Ngăn trượt quá đà khi bấm tab
+                                        children: [
+                                          UosInfoTab(
+                                              uosDetail: uosFullInfo.uosDetail,
+                                              studyShifts:
+                                                  uosFullInfo.studyShifts),
+                                          UosAbsentTab(
+                                            idUos: widget.idUos,
+                                            isCheckAbsent: _isCheckAbsent,
+                                            selectedDay: widget.selectedDay,
+                                            noWeek: widget.noWeek,
+                                            setIsNotChecked: setIsNotChecking,
+                                          ),
+                                          UosNotiTab(
+                                            notifications: notifications,
+                                            onDelete: _deleteNotification,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Overlay
+                            if (_isOverlayVisible)
+                              Positioned(
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _isOverlayVisible = !_isOverlayVisible;
+                                    });
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.topRight,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(255, 255, 255, 0.7),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                color: Colors.white,
-                                child: CustomTabBar(
-                                  controller: _tabController,
-                                  tabs: ["Thông tin", "Điểm danh", "Thông báo"],
-                                  onTap: (newindex) {
-                                    if (newindex != 1 &&
-                                        _isCheckAbsent &&
-                                        !_isNotChecking) {
-                                      CustomAlertDialog.showCustomDialog(
-                                          context,
-                                          'Lưu ý',
-                                          'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Tiếp tục?',
-                                          AlertType.confirm, onConfirm: () {
-                                        setState(() {
-                                          _tabController.index = newindex;
-                                          _isCheckAbsent = false;
-                                        });
-                                      }, textConfirm: "Tiếp tục");
-                                    } else {
-                                      _tabController.index = newindex;
-                                      setState(() {});
-                                    }
-                                  },
+                              )
+                          ],
+                        );
+                      } else {
+                        return const Center(
+                            child: Text(
+                                'Không thể tải dữ liệu thông tin chi tiết học phần.'));
+                      }
+                    })
+                  : Center(
+                      child: Text(
+                        'Bạn không có quyền truy cập vào chức năng này',
+                        style: TextStyle(
+                          fontSize: FontSizes.large,
+                          fontStyle: FontStyle.normal,
+                        ),
+                      ),
+                    ),
+              floatingActionButton: _tabController.index == 1
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_isOverlayVisible) ...[
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                                style: TextStyle(
+                                  fontSize: FontSizes.large,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
                               ),
-                              // TabBarView
-                              Expanded(
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: TabBarView(
-                                    controller: _tabController,
-                                    physics:
-                                        ClampingScrollPhysics(), // Ngăn trượt quá đà khi bấm tab
-                                    children: [
-                                      UosInfoTab(
-                                          uosDetail: uosFullInfo.uosDetail,
-                                          studyShifts: uosFullInfo.studyShifts),
-                                      UosAbsentTab(
-                                        idUos: widget.idUos,
-                                        isCheckAbsent: _isCheckAbsent,
-                                        selectedDay: widget.selectedDay,
-                                        noWeek: widget.noWeek,
-                                        setIsNotChecked: setIsNotChecking,
-                                      ),
-                                      UosNotiTab(
-                                        notifications: notifications,
-                                        onDelete: _deleteNotification,
-                                      )
-                                    ],
+                              SizedBox(width: 8),
+                              SizedBox(
+                                width: 56,
+                                height: 56,
+                                child: Center(
+                                  child: FloatingActionButton.small(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isCheckAbsent = !_isCheckAbsent;
+                                        _isOverlayVisible = !_isOverlayVisible;
+                                      });
+                                    },
+                                    backgroundColor: context.theme.lightBlue,
+                                    shape: CircleBorder(),
+                                    foregroundColor: Colors.white,
+                                    child: SvgPicture.asset(
+                                      _isCheckAbsent
+                                          ? "assets/icons/svg/student_tracking_overview.svg"
+                                          : "assets/icons/svg/student_tracking.svg",
+                                      width: 18,
+                                      height: 18,
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-
-                        // Overlay
-                        if (_isOverlayVisible)
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () {
+                          SizedBox(height: 8),
+                        ], // Khoảng cách giữa hai FAB]
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_isOverlayVisible) ...[
+                              Text(
+                                !_isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                                style: TextStyle(
+                                  fontSize: FontSizes.large,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                            ],
+                            FloatingActionButton(
+                              onPressed: () {
                                 setState(() {
                                   _isOverlayVisible = !_isOverlayVisible;
                                 });
                               },
-                              child: Container(
-                                alignment: Alignment.topRight,
-                                decoration: BoxDecoration(
-                                  color: Color.fromRGBO(255, 255, 255, 0.7),
-                                ),
+                              backgroundColor: context.theme.primaryColor,
+                              shape: CircleBorder(),
+                              child: SvgPicture.asset(
+                                _isCheckAbsent
+                                    ? "assets/icons/svg/student_tracking.svg"
+                                    : "assets/icons/svg/student_tracking_overview.svg",
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
                               ),
                             ),
-                          )
+                          ],
+                        ),
                       ],
-                    );
-                  } else {
-                    return const Center(
-                        child: Text(
-                            'Không thể tải dữ liệu thông tin chi tiết học phần.'));
-                  }
-                });
-              } else {
-                return Center(
-                  child: Text(
-                    'Bạn không có quyền truy cập vào chức năng này',
-                    style: TextStyle(
-                      fontSize: FontSizes.large,
-                      fontStyle: FontStyle.normal,
-                    ),
-                  ),
-                );
-              }
-            }),
-            floatingActionButton: _tabController.index == 1
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_isOverlayVisible) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _isCheckAbsent ? "Tổng quan" : "Điểm danh",
-                              style: TextStyle(
-                                fontSize: FontSizes.large,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            SizedBox(
-                              width: 56,
-                              height: 56,
-                              child: Center(
-                                child: FloatingActionButton.small(
-                                  onPressed: () {
-                                    setState(() {
-                                      _isCheckAbsent = !_isCheckAbsent;
-                                      _isOverlayVisible = !_isOverlayVisible;
-                                    });
-                                  },
-                                  backgroundColor: context.theme.lightBlue,
-                                  shape: CircleBorder(),
-                                  child: SvgPicture.asset(
-                                    _isCheckAbsent
-                                        ? "assets/icons/svg/student_tracking_overview.svg"
-                                        : "assets/icons/svg/student_tracking.svg",
-                                    width: 18,
-                                    height: 18,
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.black, BlendMode.srcIn),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                      ], // Khoảng cách giữa hai FAB]
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (_isOverlayVisible) ...[
-                            Text(
-                              !_isCheckAbsent ? "Tổng quan" : "Điểm danh",
-                              style: TextStyle(
-                                fontSize: FontSizes.large,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                          ],
-                          FloatingActionButton(
-                            onPressed: () {
-                              setState(() {
-                                _isOverlayVisible = !_isOverlayVisible;
-                              });
-                            },
+                    )
+                  : _tabController.index == 2
+                      ? Container(
+                          decoration:
+                              BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 4,
+                              spreadRadius: 0,
+                              offset: const Offset(2, 5),
+                            )
+                          ]),
+                          child: FloatingActionButton(
+                            elevation: 0,
+                            onPressed: () => _showCreatNewNoti(context),
                             backgroundColor: context.theme.primaryColor,
-                            shape: CircleBorder(),
-                            child: SvgPicture.asset(
-                              _isCheckAbsent
-                                  ? (!_isOverlayVisible
-                                      ? "assets/icons/svg/student_tracking_overview.svg"
-                                      : "assets/icons/svg/student_tracking.svg")
-                                  : (!_isOverlayVisible
-                                      ? "assets/icons/svg/student_tracking.svg"
-                                      : "assets/icons/svg/student_tracking_overview.svg"),
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                  Colors.white, BlendMode.srcIn),
-                            ),
+                            shape: const CircleBorder(),
+                            child: const Icon(Icons.add_rounded,
+                                size: 28, color: Colors.white),
                           ),
-                        ],
-                      ),
-                    ],
-                  )
-                : _tabController.index == 2
-                    ? Container(
-                        decoration:
-                            BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            blurRadius: 4,
-                            spreadRadius: 0,
-                            offset: const Offset(2, 5),
-                          )
-                        ]),
-                        child: FloatingActionButton(
-                          elevation: 0,
-                          onPressed: () => _showCreatNewNoti(context),
-                          backgroundColor: context.theme.primaryColor,
-                          shape: const CircleBorder(),
-                          child: const Icon(Icons.add_rounded,
-                              size: 28, color: Colors.white),
-                        ),
-                      )
-                    : null,
-          ),
-        ));
+                        )
+                      : null,
+            ),
+          ));
+    });
   }
 }
 

@@ -142,9 +142,9 @@ class Functions {
 
       if (a.isExam) {
         timeA = a.examTime;
-      } else if (a.startStudyTime != null) {
+      } else if (a.startStudyTime.isNotEmpty) {
         try {
-          timeA = DateFormat.Hms().parse(a.startStudyTime!);
+          timeA = DateFormat.Hms().parse(a.startStudyTime);
         } catch (_) {
           timeA = null;
         }
@@ -152,9 +152,9 @@ class Functions {
 
       if (b.isExam) {
         timeB = b.examTime;
-      } else if (b.startStudyTime != null) {
+      } else if (b.startStudyTime.isNotEmpty) {
         try {
-          timeB = DateFormat.Hms().parse(b.startStudyTime!);
+          timeB = DateFormat.Hms().parse(b.startStudyTime);
         } catch (_) {
           timeB = null;
         }

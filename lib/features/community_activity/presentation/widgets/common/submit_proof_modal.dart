@@ -16,6 +16,8 @@ import 'package:image_picker/image_picker.dart';
 class SubmitProofModal extends StatefulWidget {
   final String token;
   final String keyword;
+  final String academicYearId;
+  final String? status;
   final CommunityActivityBloc bloc;
   final UserActivityModel userActivity;
   final bool fromCard;
@@ -24,6 +26,8 @@ class SubmitProofModal extends StatefulWidget {
       {super.key,
       required this.token,
       required this.keyword,
+      required this.academicYearId,
+      required this.status,
       required this.bloc,
       required this.userActivity,
       this.fromCard = true});
@@ -68,7 +72,7 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
             }
             context.read<CommunityActivityBloc>().add(
                 UpdateUserActivitiesAfterSubmit(
-                    activities: state.updatedActivities));
+                    activities: state.updatedActivities, academicYears: []));
           } else if (state is CommunityActivityError) {
             CustomSnackbar.showSnackBar(
               context,
@@ -96,9 +100,12 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
                     widget.bloc.add(SubmitProof(
                       token: widget.token,
                       keyword: widget.keyword,
+                      academicYearId: widget.academicYearId,
+                      status: widget.status,
                       idRegistration: widget.userActivity.id,
                       image: File(pickedImage!.path),
                       description: descriptionController.text.trim(),
+                      pageNumber: 1,
                     ));
                   },
                 );

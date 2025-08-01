@@ -21,9 +21,14 @@ class ScheduleService {
       : _url = url,
         _dio = Dio();
 
-  Future<List<SemesterModel>> getListSemester() async {
+  Future<List<SemesterModel>> getListSemester(String authToken) async {
     try {
-      final response = await _dio.get("$_url/api/Timetable/GetListSemesters");
+      final response = await _dio.get(
+        "$_url/api/Timetable/GetListSemesters",
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
 
@@ -43,17 +48,25 @@ class ScheduleService {
   }
 
   Future<List<UosItemModel>> getListUOSBySemester(
-      String idSemester, bool isTeacher) async {
+      String idSemester, bool isTeacher, String authToken) async {
     try {
       dynamic response;
       if (isTeacher) {
         response = await _dio.get(
-            "$_url/api/Timetable/GetListTeacherTimetablesBySemester",
-            queryParameters: {'idSemester': idSemester});
+          "$_url/api/Timetable/GetListTeacherTimetablesBySemester",
+          queryParameters: {'idSemester': idSemester},
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       } else {
         response = await _dio.get(
-            "$_url/api/Timetable/GetListStudentTimetablesBySemester",
-            queryParameters: {'idSemester': idSemester});
+          "$_url/api/Timetable/GetListStudentTimetablesBySemester",
+          queryParameters: {'idSemester': idSemester},
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       }
 
       if (response.data['statusCode'] == 200) {
@@ -71,21 +84,30 @@ class ScheduleService {
   }
 
   Future<List<ScheduleItemModel>> getSchedulesByDate(
-      DateTime inputDate, bool isTeacher) async {
+      DateTime inputDate, bool isTeacher, String authToken) async {
     try {
+      // logger.i('token: $authToken');
       dynamic response;
       if (isTeacher) {
         response = await _dio.get(
-            "$_url/api/Timetable/GetListTeacherTimetablesByDate",
-            queryParameters: {
-              'date': DateFormat('yyyy-MM-dd').format(inputDate),
-            });
+          "$_url/api/Timetable/GetListTeacherTimetablesByDate",
+          queryParameters: {
+            'date': DateFormat('yyyy-MM-dd').format(inputDate),
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       } else {
         response = await _dio.get(
-            "$_url/api/Timetable/GetListStudentTimetablesByDate",
-            queryParameters: {
-              'date': DateFormat('yyyy-MM-dd').format(inputDate),
-            });
+          "$_url/api/Timetable/GetListStudentTimetablesByDate",
+          queryParameters: {
+            'date': DateFormat('yyyy-MM-dd').format(inputDate),
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       }
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
@@ -105,23 +127,31 @@ class ScheduleService {
   }
 
   Future<List<CalendarEventModel>> getCalendarEvents(
-      int month, int year, bool isTeacher) async {
+      int month, int year, bool isTeacher, String authToken) async {
     try {
       dynamic response;
       if (isTeacher) {
         response = await _dio.get(
-            "$_url/api/Timetable/GetTeacherCalendarEvents",
-            queryParameters: {
-              'month': month,
-              'year': year,
-            });
+          "$_url/api/Timetable/GetTeacherCalendarEvents",
+          queryParameters: {
+            'month': month,
+            'year': year,
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       } else {
         response = await _dio.get(
-            "$_url/api/Timetable/GetStudentCalendarEvents",
-            queryParameters: {
-              'month': month,
-              'year': year,
-            });
+          "$_url/api/Timetable/GetStudentCalendarEvents",
+          queryParameters: {
+            'month': month,
+            'year': year,
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       }
 
       if (response.data['statusCode'] == 200) {
@@ -138,12 +168,17 @@ class ScheduleService {
     }
   }
 
-  Future<String> getSemesterByDate(DateTime inputDate) async {
+  Future<String> getSemesterByDate(DateTime inputDate, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Timetable/GetWeekSemester", queryParameters: {
-        'date': DateFormat('yyyy-MM-dd').format(inputDate),
-      });
+      final response = await _dio.get(
+        "$_url/api/Timetable/GetWeekSemester",
+        queryParameters: {
+          'date': DateFormat('yyyy-MM-dd').format(inputDate),
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final data = responseData['data'];
@@ -159,17 +194,22 @@ class ScheduleService {
             "Failed to load idSemester: ${response.data['message']}");
       }
     } catch (e) {
-      logger.e("Failed to load ScheduleItem: $e");
-      throw Exception("Failed to fetch ScheduleItem: $e");
+      logger.e("Failed to load semester: $e");
+      throw Exception("Failed to fetch semester: $e");
     }
   }
 
-  Future<String> getWeekByDate(DateTime inputDate) async {
+  Future<String> getWeekByDate(DateTime inputDate, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Timetable/GetWeekSemester", queryParameters: {
-        'date': DateFormat('yyyy-MM-dd').format(inputDate),
-      });
+      final response = await _dio.get(
+        "$_url/api/Timetable/GetWeekSemester",
+        queryParameters: {
+          'date': DateFormat('yyyy-MM-dd').format(inputDate),
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final data = responseData['data'];
@@ -186,15 +226,25 @@ class ScheduleService {
   }
 
   Future<FullInfoUosDetailModel> getFullInfoUosDetail(
-      String idUos, bool isTeacher) async {
+      String idUos, bool isTeacher, String authToken) async {
     try {
       dynamic response;
       if (isTeacher) {
-        response = await _dio.get("$_url/api/UOS/GetTeacherUosDetail",
-            queryParameters: {'idUos': idUos});
+        response = await _dio.get(
+          "$_url/api/UOS/GetTeacherUosDetail",
+          queryParameters: {'idUos': idUos},
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       } else {
-        response = await _dio.get("$_url/api/UOS/GetStudentUosDetail",
-            queryParameters: {'idUos': idUos});
+        response = await _dio.get(
+          "$_url/api/UOS/GetStudentUosDetail",
+          queryParameters: {'idUos': idUos},
+          options: Options(headers: {
+            "Authorization": "Bearer $authToken",
+          }),
+        );
       }
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
@@ -212,12 +262,17 @@ class ScheduleService {
   }
 
   Future<ExamShiftDetailModel> getTeacherExamShiftDetail(
-      String idExamShift) async {
+      String idExamShift, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/UOS/GetTeacherExamShiftDetail", queryParameters: {
-        'idExamShift': idExamShift,
-      });
+      final response = await _dio.get(
+        "$_url/api/UOS/GetTeacherExamShiftDetail",
+        queryParameters: {
+          'idExamShift': idExamShift,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final data = responseData['data'];
@@ -233,15 +288,20 @@ class ScheduleService {
     }
   }
 
-  Future<StudentsExamShiftModel> getListStudentsByExamShift(
-      String idExamShift, String keyword, int pageNumber) async {
+  Future<StudentsExamShiftModel> getListStudentsByExamShift(String idExamShift,
+      String keyword, int pageNumber, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/UOS/GetListStudentsByExamShift", queryParameters: {
-        'idExamShift': idExamShift,
-        'keyword': keyword,
-        'pageNumber': pageNumber,
-      });
+      final response = await _dio.get(
+        "$_url/api/UOS/GetListStudentsByExamShift",
+        queryParameters: {
+          'idExamShift': idExamShift,
+          'keyword': keyword,
+          'pageNumber': pageNumber,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data['statusCode'] == 200) {
         final responseData = response.data;
         final data = responseData['data'];

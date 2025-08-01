@@ -36,11 +36,14 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
 
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
     context.read<CalendarBloc>().add(
           LoadCalendarEvents(
               month: widget.initDate.month,
               year: widget.initDate.year,
-              isTeacher: userRole == RoleModel.roleTeacher),
+              isTeacher: userRole == RoleModel.roleTeacher,
+              authToken: authToken),
         );
   }
 
@@ -217,13 +220,17 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                   final String userRole = authState is AuthUserAuthenticated
                       ? authState.userData.role.name
                       : '';
+                  final String authToken = authState is AuthUserAuthenticated
+                      ? authState.accessToken
+                      : '';
                   if (_debounce?.isActive ?? false) _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 800), () {
                     context.read<CalendarBloc>().add(
                           LoadCalendarEvents(
                               month: focusDate.month,
                               year: focusDate.year,
-                              isTeacher: userRole == RoleModel.roleTeacher),
+                              isTeacher: userRole == RoleModel.roleTeacher,
+                              authToken: authToken),
                         );
                   });
                 },

@@ -22,8 +22,10 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
     try {
       final idUos = event.idUos;
       final isTeacher = event.isTeacher;
+      final authToken = event.authToken;
+
       final fullInfoUosDetail =
-          await _repository.getFullInfoUosDetail(idUos, isTeacher);
+          await _repository.getFullInfoUosDetail(idUos, isTeacher, authToken);
 
       emit(FullInfoUosLoaded(fullInfoUosDetail: fullInfoUosDetail));
     } catch (e) {
@@ -38,11 +40,13 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
       final idExamShift = event.idExamShift;
       final keyword = event.keyword;
       final pageNumber = event.pageNumber;
+      final authToken = event.authToken;
+
       final examShiftDetail =
-          await _repository.getTeacherExamShiftDetail(idExamShift);
+          await _repository.getTeacherExamShiftDetail(idExamShift, authToken);
 
       final listStudents = await _repository.getListStudentsByExamShift(
-          idExamShift, keyword, pageNumber);
+          idExamShift, keyword, pageNumber, authToken);
 
       emit(ExamShiftDetailLoaded(
           examShiftDetail: examShiftDetail, listStudents: listStudents));
