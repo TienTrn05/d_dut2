@@ -46,6 +46,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
 // key: studentId, value: true nếu vắng, false nếu có mặt
   Map<String, bool> _listStudentIsAbsent = {};
   Timer? _debounce;
+  bool _hasCheckedAttendanceStatus = false;
 
   void mergeStudentList(List<StudentAbsentModel> newPageStudents) {
     for (var student in newPageStudents) {
@@ -107,15 +108,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       _currentDate = widget.selectedDay;
       _currentWeek = "tuần ${widget.noWeek}";
       _listStudentIsAbsent = {};
+      _listIsSellectedAll = {};
     });
     context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
         idUos: widget.idUos, attendanceDate: widget.selectedDay));
-    context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-          idUos: widget.idUos,
-          pageNumber: 1,
-          absenceDate: _currentDate,
-          keyword: _searchController.text.trim(),
-        ));
   }
 
   @override
@@ -137,6 +133,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _isSellectedAll = false;
           _listIsSellectedAll = {};
           _listStudentIsAbsent = {};
+          _currentPage = 1;
+          _hasCheckedAttendanceStatus = false;
         });
         context.read<CalendarBloc>().add(
               LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
@@ -144,11 +142,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         Navigator.pop(context);
         context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
             idUos: widget.idUos, attendanceDate: newValue));
-        context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-              idUos: widget.idUos,
-              pageNumber: 1,
-              absenceDate: _currentDate,
-            ));
       }, textConfirm: "Tiếp tục");
     } else {
       setState(() {
@@ -157,6 +150,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         _isSellectedAll = false;
         _listIsSellectedAll = {};
         _listStudentIsAbsent = {};
+        _currentPage = 1;
+        _hasCheckedAttendanceStatus = false;
       });
       context.read<CalendarBloc>().add(
             LoadCalendarWeek(inputDate: getMondayOfWeek(newValue)),
@@ -164,11 +159,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       Navigator.pop(context);
       context.read<UosAbsentBloc>().add(
           LoadIsAttendanceDate(idUos: widget.idUos, attendanceDate: newValue));
-      context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-            idUos: widget.idUos,
-            pageNumber: 1,
-            absenceDate: _currentDate,
-          ));
     }
   }
 
@@ -325,20 +315,22 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       if (state is UosCheckIsAttendanceDateLoaded) {
         setState(() {
           _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
+          _hasCheckedAttendanceStatus = true;
         });
+        context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+              idUos: widget.idUos,
+              pageNumber: _currentPage,
+              absenceDate: _currentDate,
+              keyword: _searchController.text.trim(),
+            ));
       }
+
       if (state is UosTakeAttendanceLoaded) {
         final result = state.isSuccess;
         if (result) {
           _alertSuccess(type: "lưu");
           context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
               idUos: widget.idUos, attendanceDate: widget.selectedDay));
-          context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-                idUos: widget.idUos,
-                pageNumber: _currentPage,
-                absenceDate: _currentDate,
-                keyword: _searchController.text.trim(),
-              ));
         } else {
           _alertFailure(type: "lưu");
         }
@@ -361,6 +353,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       }
     }, child:
         BlocBuilder<UosAbsentBloc, UosAbsentState>(builder: (context, state) {
+      if (!_hasCheckedAttendanceStatus) {
+        return Center(
+          child: CircularProgressIndicator(
+            color: context.theme.primaryColor,
+          ),
+        );
+      }
       if (state is UosAbsentLoaded) {
         final listStudentAbsent = state.listStudentAbsent.studentsPaged;
         final totalItems = listStudentAbsent.totalItems;
@@ -657,7 +656,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 Expanded(
                   child: ListView.builder(
                     // Thêm 1 phần tử cho SizedBox
-                    itemCount: (listStudentAbsent.items.length) + 1,
+                    itemCount: listStudentAbsent.items.length,
                     itemBuilder: (context, index) {
                       if (index == (listStudentAbsent.items.length)) {
                         // Thêm khoảng trống cuối danh sách

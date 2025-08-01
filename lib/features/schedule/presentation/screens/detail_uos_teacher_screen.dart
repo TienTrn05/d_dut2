@@ -3,6 +3,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
@@ -38,9 +39,8 @@ class DetailUOSTeacherScreen extends StatefulWidget {
 
 class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
-  bool isCheckAbsent = false;
-  bool isOverlayVisible = false;
-  // bool _isAbsentDate = true;
+  bool _isCheckAbsent = false;
+  bool _isOverlayVisible = false;
   late TabController _tabController;
 
   String currentLink = "";
@@ -205,8 +205,21 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   controller: _tabController,
                                   tabs: ["Thông tin", "Điểm danh", "Thông báo"],
                                   onTap: (newindex) {
-                                    _tabController.index = newindex;
-                                    setState(() {});
+                                    if (newindex != 1 && _isCheckAbsent) {
+                                      CustomAlertDialog.showCustomDialog(
+                                          context,
+                                          'Lưu ý',
+                                          'Lịch sử điểm danh này sẽ không được lưu nếu rời trang, hãy chắc chắn bạn đã lưu nó trước khi tiếp tục hành động này.',
+                                          AlertType.confirm, onConfirm: () {
+                                        setState(() {
+                                          _tabController.index = newindex;
+                                          _isCheckAbsent = false;
+                                        });
+                                      }, textConfirm: "Tiếp tục");
+                                    } else {
+                                      _tabController.index = newindex;
+                                      setState(() {});
+                                    }
                                   },
                                 ),
                               ),
@@ -224,7 +237,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           studyShifts: uosFullInfo.studyShifts),
                                       UosAbsentTab(
                                         idUos: widget.idUos,
-                                        isCheckAbsent: isCheckAbsent,
+                                        isCheckAbsent: _isCheckAbsent,
                                         selectedDay: widget.selectedDay,
                                         noWeek: widget.noWeek,
                                       ),
@@ -241,7 +254,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         ),
 
                         // Overlay
-                        if (isOverlayVisible)
+                        if (_isOverlayVisible)
                           Positioned(
                             top: 0,
                             bottom: 0,
@@ -250,7 +263,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  isOverlayVisible = !isOverlayVisible;
+                                  _isOverlayVisible = !_isOverlayVisible;
                                 });
                               },
                               child: Container(
@@ -285,12 +298,12 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (isOverlayVisible) ...[
+                      if (_isOverlayVisible) ...[
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                              _isCheckAbsent ? "Tổng quan" : "Điểm danh",
                               style: TextStyle(
                                 fontSize: FontSizes.large,
                                 fontWeight: FontWeight.bold,
@@ -305,14 +318,14 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 child: FloatingActionButton.small(
                                   onPressed: () {
                                     setState(() {
-                                      isCheckAbsent = !isCheckAbsent;
-                                      isOverlayVisible = !isOverlayVisible;
+                                      _isCheckAbsent = !_isCheckAbsent;
+                                      _isOverlayVisible = !_isOverlayVisible;
                                     });
                                   },
                                   backgroundColor: context.theme.lightBlue,
                                   shape: CircleBorder(),
                                   child: SvgPicture.asset(
-                                    isCheckAbsent
+                                    _isCheckAbsent
                                         ? "assets/icons/svg/student_tracking_overview.svg"
                                         : "assets/icons/svg/student_tracking.svg",
                                     width: 18,
@@ -330,9 +343,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (isOverlayVisible) ...[
+                          if (_isOverlayVisible) ...[
                             Text(
-                              !isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                              !_isCheckAbsent ? "Tổng quan" : "Điểm danh",
                               style: TextStyle(
                                 fontSize: FontSizes.large,
                                 fontWeight: FontWeight.bold,
@@ -344,17 +357,17 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                           FloatingActionButton(
                             onPressed: () {
                               setState(() {
-                                isOverlayVisible = !isOverlayVisible;
+                                _isOverlayVisible = !_isOverlayVisible;
                               });
                             },
                             backgroundColor: context.theme.primaryColor,
                             shape: CircleBorder(),
                             child: SvgPicture.asset(
-                              isCheckAbsent
-                                  ? (!isOverlayVisible
+                              _isCheckAbsent
+                                  ? (!_isOverlayVisible
                                       ? "assets/icons/svg/student_tracking_overview.svg"
                                       : "assets/icons/svg/student_tracking.svg")
-                                  : (!isOverlayVisible
+                                  : (!_isOverlayVisible
                                       ? "assets/icons/svg/student_tracking.svg"
                                       : "assets/icons/svg/student_tracking_overview.svg"),
                               width: 24,
