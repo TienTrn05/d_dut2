@@ -8,6 +8,10 @@ class ScheduleEvent extends Equatable {
 class LoadSchedulesByDate extends ScheduleEvent {
   final DateTime inputDate;
   final bool isTeacher;
+  final String authToken;
 
-  LoadSchedulesByDate({required this.inputDate, required this.isTeacher});
+  LoadSchedulesByDate(
+      {required this.inputDate,
+      required this.isTeacher,
+      required this.authToken});
 }

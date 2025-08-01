@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
@@ -58,11 +60,16 @@ class _SemesterModeState extends State<SemesterMode> {
                       final String userRole = authState is AuthUserAuthenticated
                           ? authState.userData.role.name
                           : '';
+                      final String authToken =
+                          authState is AuthUserAuthenticated
+                              ? authState.accessToken
+                              : '';
                       context.read<TimetableBloc>().add(
                             LoadListUOSBySemester(
                                 idSemester: semesterList[index].idSemester,
                                 selectedIndex: index,
-                                isTeacher: userRole == RoleModel.roleTeacher),
+                                isTeacher: userRole == RoleModel.roleTeacher,
+                                authToken: authToken),
                           );
                     }
                   },
@@ -105,11 +112,15 @@ class _SemesterModeState extends State<SemesterMode> {
           ? authState.userData.role.name
           : '';
 
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
+
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
                 idSemester: semesterList[selectedIndex].idSemester,
                 selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher),
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken),
           );
     }
   }
@@ -124,12 +135,15 @@ class _SemesterModeState extends State<SemesterMode> {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
 
       context.read<TimetableBloc>().add(
             LoadListUOSBySemester(
                 idSemester: semesterList[selectedIndex].idSemester,
                 selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher),
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken),
           );
     }
   }
@@ -142,9 +156,11 @@ class _SemesterModeState extends State<SemesterMode> {
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
 
-    context
-        .read<TimetableBloc>()
-        .add(LoadListSemesters(isTeacher: userRole == RoleModel.roleTeacher));
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
+
+    context.read<TimetableBloc>().add(LoadListSemesters(
+        isTeacher: userRole == RoleModel.roleTeacher, authToken: authToken));
   }
 
   @override
@@ -155,6 +171,9 @@ class _SemesterModeState extends State<SemesterMode> {
           final String userRole = authState is AuthUserAuthenticated
               ? authState.userData.role.name
               : '';
+
+          final String authToken =
+              authState is AuthUserAuthenticated ? authState.accessToken : '';
 
           return BlocConsumer<TimetableBloc, TimetableState>(
             listener: (context, state) {
@@ -172,7 +191,39 @@ class _SemesterModeState extends State<SemesterMode> {
               if (state is TimetableLoading) {
                 return CustomLoadingIndicator.primary();
               } else if (state is TimetableDataLoaded) {
-                return _buildContent(state, userRole);
+                return RefreshIndicator(
+                    color: context.theme.primaryColor,
+                    backgroundColor: Colors.white,
+                    onRefresh: () async {
+                      final completer = Completer<void>();
+
+                      // Listen để biết khi nào refresh hoàn tất
+                      final subscription =
+                          context.read<TimetableBloc>().stream.listen((state) {
+                        if (state is TimetableDataLoaded ||
+                            state is TimetableError) {
+                          if (!completer.isCompleted) {
+                            completer.complete();
+                          }
+                        }
+                      });
+
+                      // Trigger refresh
+                      context.read<TimetableBloc>().add(LoadListSemesters(
+                          isTeacher: userRole == RoleModel.roleTeacher,
+                          authToken: authToken));
+
+                      // Đợi cho đến khi có kết quả
+                      await completer.future.timeout(
+                        Duration(seconds: 30),
+                        onTimeout: () {
+                          // Handle timeout nếu cần
+                        },
+                      );
+
+                      subscription.cancel();
+                    },
+                    child: _buildContent(state, userRole));
               } else {
                 return const Center(
                     child: Text('Không thể tải dữ liệu học kỳ.'));
@@ -203,25 +254,25 @@ class _SemesterModeState extends State<SemesterMode> {
             listUOS.isNotEmpty
                 ? _buildUOSContent(listUOS, userRole)
                 : Expanded(
-                    // padding: EdgeInsets.all(8.0),
                     child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          "assets/icons/svg/undraw_no-data.svg",
-                          width: 120,
-                          height: 120,
-                        ),
-                        const SizedBox(height: 16),
-                        Text("Hiện chưa có dữ liệu cho học kỳ này",
-                            style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontWeight: FontWeight.w600,
-                                color: context.theme.grey ?? Colors.grey)),
-                      ],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            "assets/icons/svg/undraw_no-data.svg",
+                            width: 120,
+                            height: 120,
+                          ),
+                          const SizedBox(height: 16),
+                          Text("Hiện chưa có dữ liệu cho học kỳ này",
+                              style: TextStyle(
+                                  fontSize: FontSizes.medium,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.theme.grey ?? Colors.grey)),
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
           ],
         ));
   }
@@ -283,7 +334,9 @@ class _SemesterModeState extends State<SemesterMode> {
                 nameSubject: listUOS[i].subjectName!,
                 credit: listUOS[i].credit,
                 timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
-                teacher: listUOS[i].teacherName,
+                teacher: userRole == RoleModel.roleStudent
+                    ? listUOS[i].teacherName
+                    : null,
               ),
               if (i < listUOS.length - 1 &&
                   // Check if there are more valid items after current index

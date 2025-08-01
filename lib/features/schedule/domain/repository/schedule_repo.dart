@@ -14,45 +14,48 @@ class ScheduleRepository {
 
   ScheduleRepository(this._scheduleService);
 
-  Future<List<SemesterModel>> getListSemester() {
-    return _scheduleService.getListSemester();
+  Future<List<SemesterModel>> getListSemester(String authToken) {
+    return _scheduleService.getListSemester(authToken);
   }
 
   Future<List<UosItemModel>> getListUOSBySemester(
-      String idSemester, bool isTeacher) {
-    return _scheduleService.getListUOSBySemester(idSemester, isTeacher);
+      String idSemester, bool isTeacher, String authToken) {
+    return _scheduleService.getListUOSBySemester(
+        idSemester, isTeacher, authToken);
   }
 
   Future<List<ScheduleItemModel>> getSchedulesByDate(
-      DateTime inputDate, bool isTeacher) {
-    return _scheduleService.getSchedulesByDate(inputDate, isTeacher);
+      DateTime inputDate, bool isTeacher, String authToken) {
+    return _scheduleService.getSchedulesByDate(inputDate, isTeacher, authToken);
   }
 
   Future<List<CalendarEventModel>> getCalendarEvents(
-      int month, int year, bool isTeacher) {
-    return _scheduleService.getCalendarEvents(month, year, isTeacher);
+      int month, int year, bool isTeacher, String authToken) {
+    return _scheduleService.getCalendarEvents(
+        month, year, isTeacher, authToken);
   }
 
-  Future<String> getSemesterByDate(DateTime inputDate) {
-    return _scheduleService.getSemesterByDate(inputDate);
+  Future<String> getSemesterByDate(DateTime inputDate, String authToken) {
+    return _scheduleService.getSemesterByDate(inputDate, authToken);
   }
 
-  Future<String> getWeekByDate(DateTime inputDate) {
-    return _scheduleService.getWeekByDate(inputDate);
+  Future<String> getWeekByDate(DateTime inputDate, String authToken) {
+    return _scheduleService.getWeekByDate(inputDate, authToken);
   }
 
   Future<FullInfoUosDetailModel> getFullInfoUosDetail(
-      String idUos, bool isTeacher) {
-    return _scheduleService.getFullInfoUosDetail(idUos, isTeacher);
+      String idUos, bool isTeacher, String authToken) {
+    return _scheduleService.getFullInfoUosDetail(idUos, isTeacher, authToken);
   }
 
-  Future<ExamShiftDetailModel> getTeacherExamShiftDetail(String idExamShift) {
-    return _scheduleService.getTeacherExamShiftDetail(idExamShift);
+  Future<ExamShiftDetailModel> getTeacherExamShiftDetail(
+      String idExamShift, String authToken) {
+    return _scheduleService.getTeacherExamShiftDetail(idExamShift, authToken);
   }
 
   Future<StudentsExamShiftModel> getListStudentsByExamShift(
-      String idExamShift, String keyword, int pageNumber) {
+      String idExamShift, String keyword, int pageNumber, String authToken) {
     return _scheduleService.getListStudentsByExamShift(
-        idExamShift, keyword, pageNumber);
+        idExamShift, keyword, pageNumber, authToken);
   }
 }

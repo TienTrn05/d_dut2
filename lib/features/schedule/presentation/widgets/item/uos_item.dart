@@ -51,6 +51,8 @@ class UnitOfStudyItem extends StatelessWidget {
       final String userRole = authState is AuthUserAuthenticated
           ? authState.userData.role.name
           : '';
+      final String authToken =
+          authState is AuthUserAuthenticated ? authState.accessToken : '';
       return GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(
@@ -67,7 +69,7 @@ class UnitOfStudyItem extends StatelessWidget {
                           examShiftName: userRole == RoleModel.roleTeacher
                               ? examShift!.examShiftName
                               : nameSubject,
-                        )
+                          authToken: authToken)
                       : idUos);
         },
         child: Container(

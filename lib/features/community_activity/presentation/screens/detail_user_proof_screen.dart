@@ -7,6 +7,7 @@ import 'package:e_dut/features/community_activity/presentation/widgets/items/com
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class DetailUserProofScreen extends StatelessWidget {
   final UserProofModel userProof;
@@ -82,51 +83,103 @@ class DetailUserProofScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: AspectRatio(
-                          aspectRatio: 3 / 2,
-                          child: (userProof.image != null)
-                              ? Image.network(
-                                  userProof.image!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      'assets/images/default_image.jpg',
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
-                              : Image.asset(
-                                  'assets/images/default_image.jpg',
-                                  fit: BoxFit.cover,
-                                ),
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => Dialog(
+                              insetPadding: const EdgeInsets.all(16),
+                              backgroundColor: Colors.transparent,
+                              child: Stack(
+                                children: [
+                                  PhotoView(
+                                      imageProvider:
+                                          NetworkImage(userProof.image!),
+                                      backgroundDecoration: const BoxDecoration(
+                                          color: Colors.transparent),
+                                      minScale:
+                                          PhotoViewComputedScale.contained *
+                                              0.4,
+                                      maxScale:
+                                          PhotoViewComputedScale.contained *
+                                              4.0),
+                                  Positioned(
+                                    top: 10,
+                                    right: 0,
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.of(context).pop(),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black54,
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: const Icon(
+                                          Icons.close_rounded,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: AspectRatio(
+                            aspectRatio: 3 / 2,
+                            child: (userProof.image != null)
+                                ? Image.network(
+                                    userProof.image!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/default_image.jpg',
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    'assets/images/default_image.jpg',
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
                       ),
                       if (userProof.description != null &&
                           userProof.description!.trim().isNotEmpty)
+                        // Column(
+                        //   children: [
+                        //     const SizedBox(height: 10),
+                        //     Text(
+                        //       'Mô tả:',
+                        //       style: TextStyle(
+                        //         fontSize: FontSizes.medium,
+                        //         color: Color(0xFF747474),
+                        //         height: 1.5,
+                        //       ),
+                        //     ),
+                        //     Text(
+                        //       userProof.description!,
+                        //       style: TextStyle(
+                        //         fontSize: FontSizes.medium,
+                        //         fontWeight: FontWeight.bold,
+                        //         color: Colors.black,
+                        //         height: 1.5,
+                        //       ),
+                        //       softWrap: true,
+                        //       overflow: TextOverflow.visible,
+                        //     ),
+                        //   ],
+                        // )
                         Column(
                           children: [
                             const SizedBox(height: 10),
-                            Text(
-                              'Mô tả:',
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                color: Color(0xFF747474),
-                                height: 1.5,
-                              ),
-                            ),
-                            Text(
-                              userProof.description!,
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                height: 1.5,
-                              ),
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                            ),
+                            InfoItem(
+                                field: "Mô tả", value: userProof.description!),
                           ],
                         )
                     ],

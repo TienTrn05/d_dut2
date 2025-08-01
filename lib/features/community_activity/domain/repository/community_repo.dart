@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:e_dut/features/community_activity/data/data_sources/remote_data_source/community_service.dart';
-import 'package:e_dut/features/community_activity/data/model/activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/academic_year_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/activities_paged_model.dart';
 import 'package:e_dut/features/community_activity/data/model/category_model.dart';
-import 'package:e_dut/features/community_activity/data/model/user_activity_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/proofs_paged_model.dart';
+import 'package:e_dut/features/community_activity/data/model/paged/user_activities_paged_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_info_model.dart';
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:injectable/injectable.dart';
@@ -14,13 +16,27 @@ class CommunityRepository {
 
   CommunityRepository(this._communityService);
 
-  Future<List<ActivityModel>> getActivities(
-      String token, String keyword) async {
-    return _communityService.getActivities(token, keyword);
+  Future<ActivitiesPagedModel> getActivities(
+    String token,
+    String keyword,
+    int pageNumber,
+    String? status,
+    String? categoryIds,
+    DateTime? startDate,
+    DateTime? endDate,
+    int minScrore,
+    int maxScore,
+  ) async {
+    return _communityService.getActivities(token, keyword, pageNumber, status,
+        categoryIds, startDate, endDate, minScrore, maxScore);
   }
 
   Future<List<CategoryModel>> getCategories(String token, String keyword) {
     return _communityService.getCategories(token, keyword);
+  }
+
+  Future<List<AcademicYearModel>> getAcademicYears(String token) {
+    return _communityService.getAcademicYears(token);
   }
 
   Future<UserInfoModel> getUserInfo(String token) {
@@ -31,9 +47,15 @@ class CommunityRepository {
     return _communityService.registActivity(token, idActivity);
   }
 
-  Future<List<UserActivityModel>> getUserActivities(
-      String token, String keyword) {
-    return _communityService.getUserActivities(token, keyword);
+  Future<UserActivitiesPagedModel> getUserActivities(
+    String token,
+    String keyword,
+    String academicYearId,
+    String? status,
+    int pageNumber,
+  ) {
+    return _communityService.getUserActivities(
+        token, keyword, academicYearId, status, pageNumber);
   }
 
   Future<bool> cancelRegistration(String token, String idActivity) {
@@ -50,7 +72,14 @@ class CommunityRepository {
         token, idRegistration, imageFile, description);
   }
 
-  Future<List<UserProofModel>> getUserProofs(String token, String keyword) {
-    return _communityService.getUserProofs(token, keyword);
+  Future<ProofsPagedModel> getUserProofs(String token, String keyword,
+      int pageNumber, String academicYearId, String? status) {
+    return _communityService.getUserProofs(
+        token, keyword, pageNumber, academicYearId, status);
+  }
+
+  Future<List<UserProofModel>> getUserScores(
+      String token, String keyword, String academicYearId) {
+    return _communityService.getUserScores(token, keyword, academicYearId);
   }
 }

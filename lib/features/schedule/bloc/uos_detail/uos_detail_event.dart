@@ -8,17 +8,21 @@ class UosDetailEvent extends Equatable {
 class LoadFullInfoUosDetail extends UosDetailEvent {
   final String idUos;
   final bool isTeacher;
+  final String authToken;
 
-  LoadFullInfoUosDetail({required this.idUos, this.isTeacher = true});
+  LoadFullInfoUosDetail(
+      {required this.idUos, this.isTeacher = true, required this.authToken});
 }
 
 class LoadExamShiftDetail extends UosDetailEvent {
   final String idExamShift;
   final String keyword;
   final int pageNumber;
+  final String authToken;
 
   LoadExamShiftDetail(
       {required this.idExamShift,
       required this.keyword,
-      required this.pageNumber});
+      required this.pageNumber,
+      required this.authToken});
 }

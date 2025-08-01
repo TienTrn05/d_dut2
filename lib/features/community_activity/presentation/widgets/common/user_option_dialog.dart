@@ -20,11 +20,17 @@ class UserOptionDialog extends StatefulWidget {
       {super.key,
       required this.userActivity,
       required this.keyword,
+      required this.academicYearId,
+      required this.status,
+      required this.pageNumber,
       required this.communityBloc,
       this.onRefresh});
 
   final CommunityActivityBloc communityBloc;
   final String keyword;
+  final String academicYearId;
+  final String? status;
+  final int pageNumber;
   final UserActivityModel userActivity;
   final VoidCallback? onRefresh;
 
@@ -55,6 +61,8 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
           return SubmitProofModal(
             token: token,
             keyword: widget.keyword,
+            academicYearId: widget.academicYearId,
+            status: widget.status,
             bloc: widget.communityBloc,
             userActivity: widget.userActivity,
           );
@@ -77,7 +85,10 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
           widget.communityBloc.add(CancelRegistration(
             token: token,
             keyword: widget.keyword,
+            academicYearId: widget.academicYearId,
             idActivity: widget.userActivity.activity.id,
+            status: widget.status,
+            pageNumber: widget.pageNumber,
           ));
           Navigator.pop(context);
         },
@@ -97,10 +108,12 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
         dialog.AlertType.confirm,
         onConfirm: () {
           widget.communityBloc.add(ReRegistActivity(
-            token: token,
-            keyword: widget.keyword,
-            idActivity: widget.userActivity.activity.id,
-          ));
+              token: token,
+              keyword: widget.keyword,
+              academicYearId: widget.academicYearId,
+              idActivity: widget.userActivity.activity.id,
+              status: widget.status,
+              pageNumber: widget.pageNumber));
           Navigator.pop(context);
         },
       );
@@ -120,6 +133,9 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
           UserActivityCard(
             userActivity: widget.userActivity,
             keyword: widget.keyword,
+            academicYearId: widget.academicYearId,
+            pageNumber: widget.pageNumber,
+            status: widget.status,
           ),
           const SizedBox(height: 10),
           Align(
@@ -147,7 +163,8 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                                       create: (_) => CommunityActivityBloc(
                                           getIt.get<CommunityRepository>()),
                                       child: DetailUserActivityScreen(
-                                          userActivity: widget.userActivity),
+                                          userActivity: widget.userActivity,
+                                          communityBloc: widget.communityBloc),
                                     )));
                         if (result == true) {
                           widget.onRefresh?.call();

@@ -123,70 +123,19 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        if (!_isAbsentDate) ...[
-          Center(
-            child: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () => {
-                    showDialog(
-                        context: context,
-                        builder: (context) => BlocProvider(
-                              create: (_) =>
-                                  CalendarBloc(getIt.get<ScheduleRepository>()),
-                              child: CalendarAbsent(
-                                initDate: currentDate,
-                                onValueChange: _updateCurrentDate,
-                              ),
-                            ))
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: BorderSide(
-                      color: context.theme.primaryColor ?? Colors.blue,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 8,
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    selectedDate,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      color: context.theme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  "Bạn không có tiết ngày này.",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-        if (_isAbsentDate) ...[
-          // SearchBarCustom(),
-          if (widget.isCheckAbsent) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  flex: 5,
-                  child: ElevatedButton(
+    return RefreshIndicator(
+      color: context.theme.primaryColor,
+      backgroundColor: Colors.white,
+      onRefresh: () async {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 4,
+        children: [
+          if (!_isAbsentDate) ...[
+            Center(
+              child: Column(
+                children: [
+                  ElevatedButton(
                     onPressed: () => {
                       showDialog(
                           context: context,
@@ -222,154 +171,212 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       ),
                     ),
                   ),
-                ),
-                Flexible(
-                  flex: 4,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(
-                        child: OutlinedButton(
-                          onPressed: _deleteAbsent,
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: BorderSide(
-                              color: context.theme.red ?? Colors.red,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 8,
-                            ),
-                          ),
-                          child: Text(
-                            'Xóa',
-                            style: TextStyle(
-                              fontSize: FontSizes.medium,
-                              color: context.theme.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Flexible(
-                        child: OutlinedButton(
-                          onPressed: _saveAbsent,
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor:
-                                context.theme.primaryColor ?? Colors.blue,
-                            side: BorderSide(
-                              color: context.theme.primaryColor ?? Colors.blue,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 8,
-                            ),
-                          ),
-                          child: Text(
-                            'Lưu',
-                            style: TextStyle(
-                              fontSize: FontSizes.medium,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                  Text(
+                    "Bạn không có tiết ngày này.",
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: context.theme.grey,
+                    ),
+                  )
+                ],
+              ),
+            )
           ],
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (!widget.isCheckAbsent) ...[
-                Text(
-                  "Sinh viên (10)",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
-                  ),
-                ),
-                Text(
-                  "Vắng",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.red,
-                  ),
-                )
-              ] else ...[
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: Checkbox(
-                        value: isSellectedAll,
-                        activeColor: context.theme.primaryColor,
-                        onChanged: (bool? newValue) {
-                          _toggleSelectAll();
-                        },
-                        visualDensity: VisualDensity.compact,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          if (_isAbsentDate) ...[
+            // SearchBarCustom(),
+            if (widget.isCheckAbsent) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: ElevatedButton(
+                      onPressed: () => {
+                        showDialog(
+                            context: context,
+                            builder: (context) => BlocProvider(
+                                  create: (_) => CalendarBloc(
+                                      getIt.get<ScheduleRepository>()),
+                                  child: CalendarAbsent(
+                                    initDate: currentDate,
+                                    onValueChange: _updateCurrentDate,
+                                  ),
+                                ))
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide(
+                          color: context.theme.primaryColor ?? Colors.blue,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        selectedDate,
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          color: context.theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      "Chọn tất cả (10)",
-                      style: TextStyle(
-                        fontSize: FontSizes.medium,
-                        color: context.theme.grey,
-                      ),
-                    )
-                  ],
-                ),
-                Text(
-                  "Điểm danh",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    color: context.theme.grey,
                   ),
-                ),
-              ]
+                  Flexible(
+                    flex: 4,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Flexible(
+                          child: OutlinedButton(
+                            onPressed: _deleteAbsent,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: BorderSide(
+                                color: context.theme.red ?? Colors.red,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 8,
+                              ),
+                            ),
+                            child: Text(
+                              'Xóa',
+                              style: TextStyle(
+                                fontSize: FontSizes.medium,
+                                color: context.theme.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: OutlinedButton(
+                            onPressed: _saveAbsent,
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor:
+                                  context.theme.primaryColor ?? Colors.blue,
+                              side: BorderSide(
+                                color:
+                                    context.theme.primaryColor ?? Colors.blue,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 8,
+                              ),
+                            ),
+                            child: Text(
+                              'Lưu',
+                              style: TextStyle(
+                                fontSize: FontSizes.medium,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              // Thêm 1 phần tử cho SizedBox
-              itemCount: students.length + 1,
-              itemBuilder: (context, index) {
-                if (index == students.length) {
-                  // Thêm khoảng trống cuối danh sách
-                  return SizedBox(height: 56);
-                }
-                return StudentItem(
-                  name: students[index]["name"],
-                  mail: students[index]["mail"],
-                  absentCount: students[index]["absentCount"],
-                  isCheckAbsent: widget.isCheckAbsent,
-                  isAbsentToday: students[index]["isAbsentToday"],
-                  onAbsentChanged: (isAbsent) {
-                    updateAbsentStatus(index, isAbsent);
-                    setState(() {
-                      isSellectedAll =
-                          students.every((s) => s["isAbsentToday"] == true);
-                    });
-                  },
-                );
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (!widget.isCheckAbsent) ...[
+                  Text(
+                    "Sinh viên (10)",
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: context.theme.grey,
+                    ),
+                  ),
+                  Text(
+                    "Vắng",
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: context.theme.red,
+                    ),
+                  )
+                ] else ...[
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Checkbox(
+                          value: isSellectedAll,
+                          activeColor: context.theme.primaryColor,
+                          onChanged: (bool? newValue) {
+                            _toggleSelectAll();
+                          },
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        "Chọn tất cả (10)",
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          color: context.theme.grey,
+                        ),
+                      )
+                    ],
+                  ),
+                  Text(
+                    "Điểm danh",
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                      color: context.theme.grey,
+                    ),
+                  ),
+                ]
+              ],
             ),
-          ),
+            Expanded(
+              child: ListView.builder(
+                // Thêm 1 phần tử cho SizedBox
+                itemCount: students.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == students.length) {
+                    // Thêm khoảng trống cuối danh sách
+                    return SizedBox(height: 56);
+                  }
+                  return StudentItem(
+                    name: students[index]["name"],
+                    mail: students[index]["mail"],
+                    absentCount: students[index]["absentCount"],
+                    isCheckAbsent: widget.isCheckAbsent,
+                    isAbsentToday: students[index]["isAbsentToday"],
+                    onAbsentChanged: (isAbsent) {
+                      updateAbsentStatus(index, isAbsent);
+                      setState(() {
+                        isSellectedAll =
+                            students.every((s) => s["isAbsentToday"] == true);
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

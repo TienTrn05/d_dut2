@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
@@ -9,7 +11,6 @@ import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/schedule_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_custom.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/schedule_toggle_button.dart';
-import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -54,10 +55,13 @@ class _DayModeState extends State<DayMode> {
 
     final String userRole =
         authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
     context.read<ScheduleBloc>().add(LoadSchedulesByDate(
-          inputDate: selectedDay,
-          isTeacher: userRole == RoleModel.roleTeacher,
-        ));
+        inputDate: selectedDay,
+        isTeacher: userRole == RoleModel.roleTeacher,
+        authToken: authToken));
   }
 
   @override
@@ -80,6 +84,8 @@ class _DayModeState extends State<DayMode> {
           final String userRole = authState is AuthUserAuthenticated
               ? authState.userData.role.name
               : '';
+          final String authToken =
+              authState is AuthUserAuthenticated ? authState.accessToken : '';
           return BlocBuilder<ScheduleBloc, ScheduleState>(
               builder: (builder, scheduleState) {
             return BlocBuilder<CalendarBloc, CalendarState>(
@@ -106,22 +112,57 @@ class _DayModeState extends State<DayMode> {
                         : SizedBox.shrink(),
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.all(24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          CalendarCustom(),
-                          SizedBox(height: 20),
-                          _buildHeaderSection(userRole),
-                          SizedBox(height: 10),
-                          _buildScheduleContent(
-                              scheduleState, filteredItems, userRole),
-                          SizedBox(height: 40),
-                        ],
+                    child: RefreshIndicator(
+                      color: context.theme.primaryColor,
+                      backgroundColor: Colors.white,
+                      onRefresh: () async {
+                        final completer = Completer<void>();
+
+                        // Listen để biết khi nào refresh hoàn tất
+                        final subscription =
+                            context.read<ScheduleBloc>().stream.listen((state) {
+                          if (state is SchedulesLoaded ||
+                              state is ScheduleError) {
+                            if (!completer.isCompleted) {
+                              completer.complete();
+                            }
+                          }
+                        });
+
+                        // Trigger refresh
+                        context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+                            inputDate: selectedDay,
+                            isTeacher: userRole == RoleModel.roleTeacher,
+                            authToken: authToken));
+
+                        // Đợi cho đến khi có kết quả
+                        await completer.future.timeout(
+                          Duration(seconds: 30),
+                          onTimeout: () {
+                            // Handle timeout nếu cần
+                          },
+                        );
+
+                        subscription.cancel();
+                      },
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.all(24),
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            CalendarCustom(),
+                            SizedBox(height: 20),
+                            _buildHeaderSection(userRole),
+                            SizedBox(height: 10),
+                            _buildScheduleContent(
+                                scheduleState, filteredItems, userRole),
+                            SizedBox(height: 40),
+                          ],
+                        ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               );
             });
