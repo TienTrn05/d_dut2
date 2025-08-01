@@ -317,16 +317,25 @@ class ScheduleService {
     }
   }
 
-  Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
-      int pageNumber, String? keyword, DateTime absenceDate) async {
+  Future<UosStudentsAbsentModel> getListStudentsByUos(
+      String idUos,
+      int pageNumber,
+      String? keyword,
+      DateTime absenceDate,
+      String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/UOS/GetListStudentsByUos", queryParameters: {
-        "idUos": idUos,
-        "pageNumber": pageNumber,
-        if (keyword != null) "keyword": keyword,
-        "absenceDate": absenceDate,
-      });
+      final response = await _dio.get(
+        "$_url/api/UOS/GetListStudentsByUos",
+        queryParameters: {
+          "idUos": idUos,
+          "pageNumber": pageNumber,
+          if (keyword != null) "keyword": keyword,
+          "absenceDate": absenceDate,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data["statusCode"] == 200) {
         final data = response.data["data"];
         final listStudentAbsent = UosStudentsAbsentModel.fromJson(data);
@@ -340,13 +349,19 @@ class ScheduleService {
     }
   }
 
-  Future<bool> isAttendanceDate(String idUos, DateTime? attendanceDate) async {
+  Future<bool> isAttendanceDate(
+      String idUos, DateTime? attendanceDate, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Absence/CheckAttendanceDate", queryParameters: {
-        "idUos": idUos,
-        "attendanceDate": attendanceDate,
-      });
+      final response = await _dio.get(
+        "$_url/api/Absence/CheckAttendanceDate",
+        queryParameters: {
+          "idUos": idUos,
+          "attendanceDate": attendanceDate,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data["statusCode"] == 200) {
         final data = response.data["data"];
         return data;
@@ -359,18 +374,23 @@ class ScheduleService {
     }
   }
 
-  Future<bool> takeAttendance({
-    required String idUnitOfStudy,
-    required DateTime absenceDate,
-    required List<String> idStudentsAbsent,
-  }) async {
+  Future<bool> takeAttendance(
+      {required String idUnitOfStudy,
+      required DateTime absenceDate,
+      required List<String> idStudentsAbsent,
+      required authToken}) async {
     try {
-      final response =
-          await _dio.post("$_url/api/Absence/TakeAttendance", data: {
-        "idUnitOfStudy": idUnitOfStudy,
-        "absenceDate": absenceDate.toIso8601String(),
-        "idStudentsAbsent": idStudentsAbsent,
-      });
+      final response = await _dio.post(
+        "$_url/api/Absence/TakeAttendance",
+        data: {
+          "idUnitOfStudy": idUnitOfStudy,
+          "absenceDate": absenceDate.toIso8601String(),
+          "idStudentsAbsent": idStudentsAbsent,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data["statusCode"] == 200) {
         final data = response.data["data"];
         return data == "Điểm danh thành công.";
@@ -384,14 +404,18 @@ class ScheduleService {
   }
 
   Future<bool> deleteAttendanceHistory(
-      String idUos, DateTime? attendanceDate) async {
+      String idUos, DateTime? attendanceDate, String authToken) async {
     try {
       final response = await _dio.delete(
-          "$_url/api/Absence/DeleteAttendanceHistory",
-          queryParameters: {
-            "idUos": idUos,
-            "attendanceDate": attendanceDate,
-          });
+        "$_url/api/Absence/DeleteAttendanceHistory",
+        queryParameters: {
+          "idUos": idUos,
+          "attendanceDate": attendanceDate,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data["statusCode"] == 200) {
         final data = response.data["data"];
         return data == "Xoá lịch sử điểm danh thành công.";
@@ -405,13 +429,18 @@ class ScheduleService {
   }
 
   Future<List<DateTime>> getListAbsentDate(
-      String idUos, String idStudent) async {
+      String idUos, String? idStudent, String authToken) async {
     try {
-      final response = await _dio
-          .get("$_url/api/Absence/GetListAbsentDate", queryParameters: {
-        "idUos": idUos,
-        "idStudent": idStudent,
-      });
+      final response = await _dio.get(
+        "$_url/api/Absence/GetListAbsentDate",
+        queryParameters: {
+          "idUos": idUos,
+          if (idStudent != null) "idStudent": idStudent,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
       if (response.data["statusCode"] == 200) {
         final List<dynamic> data = response.data["data"];
         return data.map((e) => DateTime.parse(e.toString())).toList();

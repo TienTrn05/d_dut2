@@ -7,10 +7,12 @@ class ListAbsentEvent extends Equatable {
 
 class LoadListAbsent extends ListAbsentEvent {
   final String idUos;
-  final String idStudent;
+  final String? idStudent;
+  final String authToken;
 
   LoadListAbsent({
     required this.idUos,
-    required this.idStudent,
+    this.idStudent,
+    required this.authToken,
   });
 }

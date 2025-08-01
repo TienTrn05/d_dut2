@@ -53,6 +53,32 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   Map<String, bool> _listStudentIsAbsent = {};
   Timer? _debounce;
   bool _hasCheckedAttendanceStatus = false;
+  String _authToken = "";
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthBloc>().state;
+    _authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
+
+    setState(() {
+      _currentDate = widget.selectedDay;
+      _currentWeek = "tuần ${widget.noWeek}";
+      _listStudentIsAbsent = {};
+      _listIsSellectedAll = {};
+    });
+    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+        idUos: widget.idUos,
+        attendanceDate: widget.selectedDay,
+        authToken: _authToken));
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   void mergeStudentList(List<StudentAbsentModel> newPageStudents) {
     for (var student in newPageStudents) {
@@ -98,7 +124,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           idUos: widget.idUos,
           pageNumber: 1,
           keyword: keyword,
-          absenceDate: _currentDate));
+          absenceDate: _currentDate,
+          authToken: _authToken));
     });
   }
 
@@ -107,30 +134,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     return focusedDay.subtract(Duration(days: difference));
   }
 
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      _currentDate = widget.selectedDay;
-      _currentWeek = "tuần ${widget.noWeek}";
-      _listStudentIsAbsent = {};
-      _listIsSellectedAll = {};
-    });
-    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-        idUos: widget.idUos, attendanceDate: widget.selectedDay));
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
   void _updateCurrentDate(DateTime newValue) {
-    final authState = context.read<AuthBloc>().state;
-    final String authToken =
-        authState is AuthUserAuthenticated ? authState.accessToken : '';
-
     if (_statusCheckedIn != 0) {
       CustomAlertDialog.showCustomDialog(
           context,
@@ -149,11 +153,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
 
         context.read<CalendarBloc>().add(
               LoadCalendarWeek(
-                  inputDate: getMondayOfWeek(newValue), authToken: authToken),
+                  inputDate: getMondayOfWeek(newValue), authToken: _authToken),
             );
         Navigator.pop(context);
         context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-            idUos: widget.idUos, attendanceDate: newValue));
+            idUos: widget.idUos,
+            attendanceDate: newValue,
+            authToken: _authToken));
       }, textConfirm: "Tiếp tục");
     } else {
       setState(() {
@@ -167,11 +173,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       });
       context.read<CalendarBloc>().add(
             LoadCalendarWeek(
-                inputDate: getMondayOfWeek(newValue), authToken: authToken),
+                inputDate: getMondayOfWeek(newValue), authToken: _authToken),
           );
       Navigator.pop(context);
-      context.read<UosAbsentBloc>().add(
-          LoadIsAttendanceDate(idUos: widget.idUos, attendanceDate: newValue));
+      context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+          idUos: widget.idUos,
+          attendanceDate: newValue,
+          authToken: _authToken));
     }
   }
 
@@ -182,7 +190,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
         AlertType.delete, onConfirm: () {
       context.read<UosAbsentBloc>().add(DeleteAttendanceHistory(
-          idUos: widget.idUos, attendanceDate: _currentDate));
+          idUos: widget.idUos,
+          attendanceDate: _currentDate,
+          authToken: _authToken));
     }, textConfirm: "Xóa");
   }
 
@@ -199,7 +209,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       context.read<UosAbsentBloc>().add(TakeAttendance(
           idUnitOfStudy: widget.idUos,
           absenceDate: _currentDate,
-          idStudentsAbsent: idStudentsAbsent));
+          idStudentsAbsent: idStudentsAbsent,
+          authToken: _authToken));
     }, textConfirm: "Lưu");
   }
 
@@ -235,11 +246,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _currentPage = i;
               });
               context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-                    idUos: widget.idUos,
-                    pageNumber: _currentPage,
-                    keyword: _searchController.text.trim(),
-                    absenceDate: _currentDate,
-                  ));
+                  idUos: widget.idUos,
+                  pageNumber: _currentPage,
+                  keyword: _searchController.text.trim(),
+                  absenceDate: _currentDate,
+                  authToken: _authToken));
             }
           },
           child: Container(
@@ -332,11 +343,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         });
         widget.setIsNotChecked(state.isAttendanceDate ? false : true);
         context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-              idUos: widget.idUos,
-              pageNumber: _currentPage,
-              absenceDate: _currentDate,
-              keyword: _searchController.text.trim(),
-            ));
+            idUos: widget.idUos,
+            pageNumber: _currentPage,
+            absenceDate: _currentDate,
+            keyword: _searchController.text.trim(),
+            authToken: _authToken));
       }
 
       if (state is UosTakeAttendanceLoaded) {
@@ -344,7 +355,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         if (result) {
           _alertSuccess(type: "lưu");
           context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
-              idUos: widget.idUos, attendanceDate: widget.selectedDay));
+              idUos: widget.idUos,
+              attendanceDate: widget.selectedDay,
+              authToken: _authToken));
         } else {
           _alertFailure(type: "lưu");
         }
@@ -357,11 +370,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _statusCheckedIn = 0;
           widget.setIsNotChecked(true);
           context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-                idUos: widget.idUos,
-                pageNumber: _currentPage,
-                absenceDate: _currentDate,
-                keyword: _searchController.text.trim(),
-              ));
+              idUos: widget.idUos,
+              pageNumber: _currentPage,
+              absenceDate: _currentDate,
+              keyword: _searchController.text.trim(),
+              authToken: _authToken));
         } else {
           _alertFailure(type: "xóa");
         }

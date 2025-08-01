@@ -61,28 +61,29 @@ class ScheduleRepository {
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(
-      String idUos, int pageNumber, String? keyword, DateTime absenceDate) {
+      String idUos, int pageNumber, String? keyword, DateTime absenceDate, String authToken) {
     return _scheduleService.getListStudentsByUos(
-        idUos, pageNumber, keyword, absenceDate);
+        idUos, pageNumber, keyword, absenceDate, authToken);
   }
 
-  Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate) {
-    return _scheduleService.isAttendanceDate(idUos, attendanceDate);
+  Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.isAttendanceDate(idUos, attendanceDate, authToken);
   }
 
   Future<bool> takeAttendance(String idUnitOfStudy, DateTime absenceDate,
-      List<String> idStudentsAbsent) {
+      List<String> idStudentsAbsent, String authToken) {
     return _scheduleService.takeAttendance(
         idUnitOfStudy: idUnitOfStudy,
         absenceDate: absenceDate,
-        idStudentsAbsent: idStudentsAbsent);
+        idStudentsAbsent: idStudentsAbsent,
+        authToken: authToken);
   }
 
-  Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate) {
-    return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate);
+  Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate, authToken);
   }
 
-  Future<List<DateTime>> getListAbsentDate(String idUos, String idStudent) {
-    return _scheduleService.getListAbsentDate(idUos, idStudent);
+  Future<List<DateTime>> getListAbsentDate(String idUos, String? idStudent, String authToken) {
+    return _scheduleService.getListAbsentDate(idUos, idStudent, authToken);
   }
 }

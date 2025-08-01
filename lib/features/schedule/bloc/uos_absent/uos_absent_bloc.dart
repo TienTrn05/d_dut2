@@ -20,8 +20,9 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
       final pageNumber = event.pageNumber;
       final keyword = event.keyword;
       final absenceDate = event.absenceDate;
+      final authToken = event.authToken;
       final listStudentAbsent = await _repository.getListStudentsByUos(
-          idUos, pageNumber, keyword, absenceDate);
+          idUos, pageNumber, keyword, absenceDate, authToken);
 
       emit(UosAbsentLoaded(listStudentAbsent: listStudentAbsent));
     } catch (e) {
@@ -35,8 +36,9 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
     try {
       final idUos = event.idUos;
       final attendanceDate = event.attendanceDate;
+      final authToken = event.authToken;
       final isAttendanceDate =
-          await _repository.getIsAttendanceDate(idUos, attendanceDate!);
+          await _repository.getIsAttendanceDate(idUos, attendanceDate!, authToken);
       emit(UosCheckIsAttendanceDateLoaded(isAttendanceDate: isAttendanceDate));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));
@@ -50,8 +52,9 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
       final idUnitOfStudy = event.idUnitOfStudy;
       final absenceDate = event.absenceDate;
       final idStudentsAbsent = event.idStudentsAbsent;
+      final authToken = event.authToken;
       final isSuccess = await _repository.takeAttendance(
-          idUnitOfStudy, absenceDate, idStudentsAbsent);
+          idUnitOfStudy, absenceDate, idStudentsAbsent, authToken);
       emit(UosTakeAttendanceLoaded(isSuccess: isSuccess));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));
@@ -64,8 +67,9 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
     try {
       final idUos = event.idUos;
       final attendanceDate = event.attendanceDate;
+      final authToken = event.authToken;
       final isSuccess =
-          await _repository.deleteAttendanceHistory(idUos, attendanceDate);
+          await _repository.deleteAttendanceHistory(idUos, attendanceDate, authToken);
       emit(UosDeleteAttendanceHistoryLoaded(isSuccess: isSuccess));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));

@@ -1,5 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_event.dart';
 import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_state.dart';
@@ -31,9 +33,16 @@ class _AbsentsCardState extends State<AbsentsCard> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<ListAbsentBloc>()
-        .add(LoadListAbsent(idUos: widget.idUos, idStudent: widget.idStudent));
+    final authState = context.read<AuthBloc>().state;
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
+
+    context.read<ListAbsentBloc>().add(LoadListAbsent(
+        idUos: widget.idUos,
+        idStudent: userRole == RoleModel.roleTeacher ? widget.idStudent : null,
+        authToken: authToken));
   }
 
   @override

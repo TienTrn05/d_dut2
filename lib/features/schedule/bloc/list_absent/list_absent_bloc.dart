@@ -15,8 +15,9 @@ class ListAbsentBloc extends Bloc<ListAbsentEvent, ListAbsentState> {
     try {
       final idUos = event.idUos;
       final idStudent = event.idStudent;
+      final authToken = event.authToken;
       final listAbsentDate =
-          await _repository.getListAbsentDate(idUos, idStudent);
+          await _repository.getListAbsentDate(idUos, idStudent, authToken);
 
       emit(ListAbsentLoaded(listAbsentDate: listAbsentDate));
     } catch (e) {
