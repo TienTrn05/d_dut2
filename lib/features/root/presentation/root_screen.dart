@@ -6,6 +6,7 @@ import '../bloc/root_bloc.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
+import '../../searching/presentation/searching_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 
 class RootScreen extends StatelessWidget {
@@ -31,7 +32,7 @@ class _MainViewState extends State<_MainView> {
   final PageStorageBucket bucket = PageStorageBucket();
   List<Widget> dashBoardScreens = [
     const DashboardScreen(),
-    const Placeholder(),
+    const SearchingScreen(),
     const ProfileScreen(),
   ];
 
