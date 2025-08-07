@@ -1,14 +1,13 @@
-import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../bloc/auth_bloc.dart';
 import '../bloc/login_bloc.dart';
 
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_button.dart';
+// import 'widgets/auth_text_field.dart';
+// import 'widgets/auth_button.dart';
 import 'widgets/auth_microsoft_button.dart';
 
 import '../../../common/extensions/custom_theme_extension.dart';
@@ -37,10 +36,16 @@ class LoginForm extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              AppEnvironment.logoPath,
-              width: 80,
-              height: 80,
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(8))),
+              child: Image.asset(
+                AppEnvironment.logoPath,
+                width: 76,
+                height: 76,
+              ),
             ),
             SizedBox(height: 24),
             Row(
@@ -61,78 +66,78 @@ class LoginForm extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 24),
-            AuthTextField(
-                hintText: "Tên đăng nhập ...",
-                prefixIcon: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: SvgPicture.asset(
-                    "assets/icons/svg/solar_user-bold.svg",
-                  ),
-                ),
-                iconColor: context.theme.primaryColor,
-                onChanged: (value) {
-                  context
-                      .read<LoginBloc>()
-                      .add(LoginUsernameChanged(username: value));
-                }),
-            SizedBox(height: 8),
-            AuthTextField(
-              hintText: "Mật khẩu ...",
-              prefixIcon: Padding(
-                padding: EdgeInsets.all(12),
-                child: SvgPicture.asset(
-                  "assets/icons/svg/solar_lock-bold.svg",
-                ),
-              ),
-              iconColor: context.theme.primaryColor,
-              obscureText: !context.read<LoginBloc>().state.isShowPassword,
-              enabledSuffixIcon: true,
-              onChanged: (value) {
-                context
-                    .read<LoginBloc>()
-                    .add(LoginPasswordChanged(password: value));
-              },
-              onShowPasswordChanged: () {
-                context.read<LoginBloc>().add(LoginShowPasswordChanged(
-                    isShowPassword: !state.isShowPassword));
-              },
-            ),
-            Row(
-              children: [
-                Checkbox(
-                  value: state.isRememberMe,
-                  onChanged: (value) {
-                    context.read<LoginBloc>().add(LoginRememberMeChanged(
-                        isRememberMe: !state.isRememberMe));
-                  },
-                  activeColor: context.theme.primaryColor,
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                Text(
-                  "Nhớ mật khẩu",
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
-                    fontFamily: GoogleFonts.notoSans().fontFamily,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-              return AuthButton(
-                text: "Đăng nhập",
-                fillColor: context.theme.primaryColor ?? Colors.blue,
-                onPressed: () {
-                  context.read<AuthBloc>().add(AuthLoginRequested(
-                      // read data from bloc
-                      context.read<LoginBloc>().state.username,
-                      context.read<LoginBloc>().state.password));
-                },
-              );
-            }),
-            SizedBox(height: 8),
+            SizedBox(height: 32),
+            // AuthTextField(
+            //     hintText: "Tên đăng nhập ...",
+            //     prefixIcon: Padding(
+            //       padding: EdgeInsets.all(12),
+            //       child: SvgPicture.asset(
+            //         "assets/icons/svg/solar_user-bold.svg",
+            //       ),
+            //     ),
+            //     iconColor: context.theme.primaryColor,
+            //     onChanged: (value) {
+            //       context
+            //           .read<LoginBloc>()
+            //           .add(LoginUsernameChanged(username: value));
+            //     }),
+            // SizedBox(height: 8),
+            // AuthTextField(
+            //   hintText: "Mật khẩu ...",
+            //   prefixIcon: Padding(
+            //     padding: EdgeInsets.all(12),
+            //     child: SvgPicture.asset(
+            //       "assets/icons/svg/solar_lock-bold.svg",
+            //     ),
+            //   ),
+            //   iconColor: context.theme.primaryColor,
+            //   obscureText: !context.read<LoginBloc>().state.isShowPassword,
+            //   enabledSuffixIcon: true,
+            //   onChanged: (value) {
+            //     context
+            //         .read<LoginBloc>()
+            //         .add(LoginPasswordChanged(password: value));
+            //   },
+            //   onShowPasswordChanged: () {
+            //     context.read<LoginBloc>().add(LoginShowPasswordChanged(
+            //         isShowPassword: !state.isShowPassword));
+            //   },
+            // ),
+            // Row(
+            //   children: [
+            //     Checkbox(
+            //       value: state.isRememberMe,
+            //       onChanged: (value) {
+            //         context.read<LoginBloc>().add(LoginRememberMeChanged(
+            //             isRememberMe: !state.isRememberMe));
+            //       },
+            //       activeColor: context.theme.primaryColor,
+            //       visualDensity: VisualDensity.compact,
+            //       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            //     ),
+            //     Text(
+            //       "Nhớ mật khẩu",
+            //       style: TextStyle(
+            //         fontSize: FontSizes.medium,
+            //         fontFamily: GoogleFonts.notoSans().fontFamily,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // SizedBox(height: 16),
+            // BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+            //   return AuthButton(
+            //     text: "Đăng nhập",
+            //     fillColor: context.theme.primaryColor ?? Colors.blue,
+            //     onPressed: () {
+            //       context.read<AuthBloc>().add(AuthLoginRequested(
+            //           // read data from bloc
+            //           context.read<LoginBloc>().state.username,
+            //           context.read<LoginBloc>().state.password));
+            //     },
+            //   );
+            // }),
+            // SizedBox(height: 8),
             BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
               return AuthMicrosoftButton(
                   text: "Đăng nhập bằng Microsoft",
@@ -142,26 +147,26 @@ class LoginForm extends StatelessWidget {
                   });
             }),
             const SizedBox(height: 24),
-            TextButton(
-              onPressed: () {},
-              style: ButtonStyle(
-                padding: WidgetStateProperty.all(
-                    EdgeInsets.symmetric(horizontal: 14)),
-                overlayColor: WidgetStateProperty.all(Colors.transparent),
-              ),
-              child: Text(
-                "Quên mật khẩu?",
-                style: TextStyle(
-                    color: context.theme.primaryColor,
-                    fontFamily: GoogleFonts.notoSans().fontFamily,
-                    fontSize: FontSizes.medium,
-                    decoration: TextDecoration.underline,
-                    decorationColor: context.theme
-                        .primaryColor, // Đảm bảo màu underline giống màu chữ
-                    fontStyle: FontStyle.italic,
-                    height: 1.25),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: () {},
+            //   style: ButtonStyle(
+            //     padding: WidgetStateProperty.all(
+            //         EdgeInsets.symmetric(horizontal: 14)),
+            //     overlayColor: WidgetStateProperty.all(Colors.transparent),
+            //   ),
+            //   child: Text(
+            //     "Quên mật khẩu?",
+            //     style: TextStyle(
+            //         color: context.theme.primaryColor,
+            //         fontFamily: GoogleFonts.notoSans().fontFamily,
+            //         fontSize: FontSizes.medium,
+            //         decoration: TextDecoration.underline,
+            //         decorationColor: context.theme
+            //             .primaryColor, // Đảm bảo màu underline giống màu chữ
+            //         fontStyle: FontStyle.italic,
+            //         height: 1.25),
+            //   ),
+            // ),
           ],
         ),
       ),
