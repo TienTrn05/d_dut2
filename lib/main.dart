@@ -11,6 +11,8 @@ import 'common/utils/app_environment.dart';
 import 'common/utils/getit_utils.dart';
 import 'common/utils/custom_http_overrides.dart';
 import 'core/data/local/storage.dart';
+import 'core/services/navigation_service.dart';
+
 import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
@@ -20,8 +22,6 @@ void main() async {
   await AppEnvironment.setup();
   await Storage.setup();
   await GetItUtils.setup();
-
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   final UserModel? userData = Storage.user;
 

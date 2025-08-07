@@ -12,14 +12,16 @@ import 'package:e_dut/features/community_activity/data/model/user_info_model.dar
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:injectable/injectable.dart';
 
+import '/core/services/api_client.dart';
+
 @injectable
 class CommunityService {
   CommunityService(@Named('communityAPIUrl') String url)
       : _url = url,
-        _dio = Dio();
+        _apiClient = ApiClient(url);
 
-  final Dio _dio;
   final String _url;
+  final ApiClient _apiClient;
 
   Future<ActivitiesPagedModel> getActivities(
     String token,
@@ -48,7 +50,7 @@ class CommunityService {
       queryParams["minScore"] = minScrore;
       queryParams["maxScore"] = maxScore;
 
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/activities",
         queryParameters: queryParams,
         options: Options(headers: {
@@ -73,7 +75,7 @@ class CommunityService {
   Future<List<CategoryModel>> getCategories(
       String token, String keyword) async {
     try {
-      final response = await _dio.get("$_url/api/categories",
+      final response = await _apiClient.dio.get("$_url/api/categories",
           queryParameters: {"keyword": keyword},
           options: Options(headers: {
             "Authorization": "Bearer $token",
@@ -98,7 +100,7 @@ class CommunityService {
 
   Future<List<AcademicYearModel>> getAcademicYears(String token) async {
     try {
-      final response = await _dio.get("$_url/api/academic-year-activities",
+      final response = await _apiClient.dio.get("$_url/api/academic-year-activities",
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
@@ -123,7 +125,7 @@ class CommunityService {
 
   Future<UserInfoModel> getUserInfo(String token) async {
     try {
-      final response = await _dio.get("$_url/api/users/me/info",
+      final response = await _apiClient.dio.get("$_url/api/users/me/info",
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
@@ -147,7 +149,7 @@ class CommunityService {
   Future<bool> registActivity(String token, String idActivity) async {
     try {
       final response =
-          await _dio.post("$_url/api/activities/$idActivity/register",
+          await _apiClient.dio.post("$_url/api/activities/$idActivity/register",
               options: Options(headers: {
                 "Authorization": "Bearer $token",
               }));
@@ -174,7 +176,7 @@ class CommunityService {
         "limit": PageLimit.activitiesLimit
       };
       if (status != null) queryParams["status"] = status;
-      final response = await _dio.get("$_url/api/my-activities",
+      final response = await _apiClient.dio.get("$_url/api/my-activities",
           queryParameters: queryParams,
           options: Options(headers: {
             "Authorization": "Bearer $token",
@@ -200,7 +202,7 @@ class CommunityService {
   Future<bool> cancelRegistration(String token, String idActivity) async {
     try {
       final response =
-          await _dio.post("$_url/api/activities/$idActivity/cancel",
+          await _apiClient.dio.post("$_url/api/activities/$idActivity/cancel",
               options: Options(headers: {
                 "Authorization": "Bearer $token",
                 "Content-Type": "application/json",
@@ -229,7 +231,7 @@ class CommunityService {
         )
       });
       final response =
-          await _dio.post("$_url/api/proofs/$idRegistration/submit",
+          await _apiClient.dio.post("$_url/api/proofs/$idRegistration/submit",
               data: formData,
               options: Options(headers: {
                 "Authorization": "Bearer $token",
@@ -251,7 +253,7 @@ class CommunityService {
         "limit": PageLimit.activitiesLimit
       };
       if (status != null) queryParams["status"] = status;
-      final response = await _dio.get("$_url/api/proofs/me",
+      final response = await _apiClient.dio.get("$_url/api/proofs/me",
           queryParameters: queryParams,
           options: Options(headers: {
             "Authorization": "Bearer $token",
@@ -276,7 +278,7 @@ class CommunityService {
   Future<List<UserProofModel>> getUserScores(
       String token, String keyword, String academicYearId) async {
     try {
-      final response = await _dio.get("$_url/api/proofs/me",
+      final response = await _apiClient.dio.get("$_url/api/proofs/me",
           queryParameters: {
             "keyword": keyword,
             "academicYearId": academicYearId,

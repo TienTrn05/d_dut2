@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
+import '/core/services/api_client.dart';
 import '/common/utils/logger.dart';
 
 import '../../models/registered_course_section.dart';
@@ -9,17 +10,17 @@ import '../../models/course_section_response.dart';
 @injectable
 class CourseSectionService {
   final String _url;
-  final Dio _dio;
+  final ApiClient _apiClient;
 
   CourseSectionService(@Named('courseRegistrationAPIUrl') String url)
       : _url = url,
-        _dio = Dio();
+        _apiClient = ApiClient(url);
 
   Future<CourseSectionResponse> getAvailableCourses(
     String token,
   ) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
           "$_url/api/CourseSections/available",
           options: Options(headers: {
             "Authorization": "Bearer $token",
@@ -44,7 +45,7 @@ class CourseSectionService {
     String token,
   ) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
           "$_url/api/CourseSections/me",
           options: Options(headers: {
             "Authorization": "Bearer $token",
@@ -70,7 +71,7 @@ class CourseSectionService {
     String courseSectionId,
   ) async {
     try {
-      final response = await _dio.post(
+      final response = await _apiClient.dio.post(
           "$_url/api/CourseSections/register",
           data: {
             "courseSectionId": courseSectionId,
@@ -94,7 +95,7 @@ class CourseSectionService {
     String courseSectionId,
   ) async {
     try {
-      final response = await _dio.post(
+      final response = await _apiClient.dio.post(
           "$_url/api/CourseSections/unregister",
           data: {
             "courseSectionId": courseSectionId,
