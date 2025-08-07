@@ -212,12 +212,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             CrossAxisAlignment.start,
                                         children: state.schedules.map((item) {
                                           return ScheduleItem(
-                                            idSubject: (item.idUnitOfStudy ??
-                                                item.idExamShift)!,
+                                            idSubject:
+                                                (item.idUnitOfStudy.isNotEmpty
+                                                    ? item.idUnitOfStudy
+                                                    : item.idExamShift),
                                             subject: item.subjectName,
                                             time: item.isExam
                                                 ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
-                                                : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
+                                                : "${item.startStudyTime.substring(0, 5)} - ${item.endStudyTime.substring(0, 5)}",
                                             room: item.room,
                                             isExam: item.isExam,
                                           );
