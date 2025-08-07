@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:e_dut/features/course_registration/features/grade/data/models/grade_color.dart';
 import 'package:flutter/material.dart';
 

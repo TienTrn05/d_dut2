@@ -357,11 +357,14 @@ class _SemesterModeState extends State<SemesterMode> {
     for (final uos in listUOS) {
       if (uos.examShifts.isNotEmpty) {
         for (final examShift in uos.examShifts) {
-          final id = examShift.idExamShift;
-          if (!seenExamShiftIds.contains(id)) {
-            seenExamShiftIds.add(id);
-            allExamShifts
-                .add(UosExamShiftPairModel(uos: uos, examShift: examShift));
+          final isValidExamShift = examShift.idExamShift.isNotEmpty;
+          if (isValidExamShift) {
+            final id = examShift.idExamShift;
+            if (!seenExamShiftIds.contains(id)) {
+              seenExamShiftIds.add(id);
+              allExamShifts
+                  .add(UosExamShiftPairModel(uos: uos, examShift: examShift));
+            }
           }
         }
       }
