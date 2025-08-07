@@ -3,9 +3,13 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
@@ -20,7 +24,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   final String idUos;
-  const DetailUOSTeacherScreen({super.key, required this.idUos});
+  final DateTime selectedDay;
+  final String noWeek;
+
+  const DetailUOSTeacherScreen(
+      {super.key,
+      required this.idUos,
+      required this.selectedDay,
+      required this.noWeek});
 
   @override
   State<DetailUOSTeacherScreen> createState() => _DetailUOSTeacherScreenState();
@@ -28,9 +39,9 @@ class DetailUOSTeacherScreen extends StatefulWidget {
 
 class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
-  bool isCheckAbsent = false;
-  bool isOverlayVisible = false;
-  bool _isAbsentDate = true;
+  bool _isCheckAbsent = false;
+  bool _isNotChecking = false;
+  bool _isOverlayVisible = false;
   late TabController _tabController;
 
   String currentLink = "";
@@ -38,6 +49,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   List<NotiModel> notifications = NotiModel.mockData;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
+  void setIsNotChecking(bool isNotChecked) {
+    _isNotChecking = isNotChecked;
+  }
 
   @override
   void initState() {
@@ -152,7 +167,13 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
             BlocProvider(
                 create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
                   ..add(LoadFullInfoUosDetail(
-                      idUos: widget.idUos, authToken: authToken)))
+                      idUos: widget.idUos, authToken: authToken))),
+            BlocProvider(
+                create: (_) => CalendarBloc(getIt.get<ScheduleRepository>())),
+            BlocProvider(
+                create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>())),
+            BlocProvider(
+                create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
           ],
           child: DefaultTabController(
             length: 3,
@@ -195,8 +216,23 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                         "Thông báo"
                                       ],
                                       onTap: (newindex) {
-                                        _tabController.index = newindex;
-                                        setState(() {});
+                                        if (newindex != 1 &&
+                                            _isCheckAbsent &&
+                                            !_isNotChecking) {
+                                          CustomAlertDialog.showCustomDialog(
+                                              context,
+                                              'Lưu ý',
+                                              'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Tiếp tục?',
+                                              AlertType.confirm, onConfirm: () {
+                                            setState(() {
+                                              _tabController.index = newindex;
+                                              _isCheckAbsent = false;
+                                            });
+                                          }, textConfirm: "Tiếp tục");
+                                        } else {
+                                          _tabController.index = newindex;
+                                          setState(() {});
+                                        }
                                       },
                                     ),
                                   ),
@@ -214,7 +250,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                               studyShifts:
                                                   uosFullInfo.studyShifts),
                                           UosAbsentTab(
-                                            isCheckAbsent: isCheckAbsent,
+                                            idUos: widget.idUos,
+                                            isCheckAbsent: _isCheckAbsent,
+                                            selectedDay: widget.selectedDay,
+                                            noWeek: widget.noWeek,
+                                            setIsNotChecked: setIsNotChecking,
                                           ),
                                           UosNotiTab(
                                             notifications: notifications,
@@ -229,7 +269,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                             ),
 
                             // Overlay
-                            if (isOverlayVisible)
+                            if (_isOverlayVisible)
                               Positioned(
                                 top: 0,
                                 bottom: 0,
@@ -238,7 +278,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      isOverlayVisible = !isOverlayVisible;
+                                      _isOverlayVisible = !_isOverlayVisible;
                                     });
                                   },
                                   child: Container(
@@ -266,16 +306,16 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         ),
                       ),
                     ),
-              floatingActionButton: _tabController.index == 1 && _isAbsentDate
+              floatingActionButton: _tabController.index == 1
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isOverlayVisible) ...[
+                        if (_isOverlayVisible) ...[
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                                _isCheckAbsent ? "Tổng quan" : "Điểm danh",
                                 style: TextStyle(
                                   fontSize: FontSizes.large,
                                   fontWeight: FontWeight.bold,
@@ -290,15 +330,15 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   child: FloatingActionButton.small(
                                     onPressed: () {
                                       setState(() {
-                                        isCheckAbsent = !isCheckAbsent;
-                                        isOverlayVisible = !isOverlayVisible;
+                                        _isCheckAbsent = !_isCheckAbsent;
+                                        _isOverlayVisible = !_isOverlayVisible;
                                       });
                                     },
                                     backgroundColor: context.theme.lightBlue,
                                     shape: CircleBorder(),
                                     foregroundColor: Colors.white,
                                     child: SvgPicture.asset(
-                                      isCheckAbsent
+                                      _isCheckAbsent
                                           ? "assets/icons/svg/student_tracking_overview.svg"
                                           : "assets/icons/svg/student_tracking.svg",
                                       width: 18,
@@ -314,9 +354,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (isOverlayVisible) ...[
+                            if (_isOverlayVisible) ...[
                               Text(
-                                !isCheckAbsent ? "Tổng quan" : "Điểm danh",
+                                !_isCheckAbsent ? "Tổng quan" : "Điểm danh",
                                 style: TextStyle(
                                   fontSize: FontSizes.large,
                                   fontWeight: FontWeight.bold,
@@ -328,13 +368,13 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                             FloatingActionButton(
                               onPressed: () {
                                 setState(() {
-                                  isOverlayVisible = !isOverlayVisible;
+                                  _isOverlayVisible = !_isOverlayVisible;
                                 });
                               },
                               backgroundColor: context.theme.primaryColor,
                               shape: CircleBorder(),
                               child: SvgPicture.asset(
-                                isCheckAbsent
+                                _isCheckAbsent
                                     ? "assets/icons/svg/student_tracking.svg"
                                     : "assets/icons/svg/student_tracking_overview.svg",
                                 width: 24,

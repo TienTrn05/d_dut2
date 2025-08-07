@@ -1,18 +1,49 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_event.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
-class AbsentsCard extends StatelessWidget {
+class AbsentsCard extends StatefulWidget {
   final bool isTeacher;
   final String? name;
   final String? mail;
-  final List<String> absentDates;
-  const AbsentsCard(
-      {super.key,
-      this.isTeacher = true,
-      this.name,
-      this.mail,
-      required this.absentDates});
+  final String idUos;
+  final String idStudent;
+
+  const AbsentsCard({
+    super.key,
+    this.isTeacher = true,
+    this.name,
+    this.mail,
+    required this.idUos,
+    required this.idStudent,
+  });
+
+  @override
+  State<AbsentsCard> createState() => _AbsentsCardState();
+}
+
+class _AbsentsCardState extends State<AbsentsCard> {
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthBloc>().state;
+    final String userRole =
+        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
+    final String authToken =
+        authState is AuthUserAuthenticated ? authState.accessToken : '';
+
+    context.read<ListAbsentBloc>().add(LoadListAbsent(
+        idUos: widget.idUos,
+        idStudent: userRole == RoleModel.roleTeacher ? widget.idStudent : null,
+        authToken: authToken));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +52,7 @@ class AbsentsCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 300),
+          constraints: BoxConstraints(maxHeight: 500),
           child: Container(
             padding: EdgeInsets.all(24),
             child: Column(
@@ -29,43 +60,19 @@ class AbsentsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (name?.isNotEmpty == true && mail?.isNotEmpty == true)
+                if (widget.name?.isNotEmpty == true &&
+                    widget.mail?.isNotEmpty == true)
                   Padding(
                     padding: EdgeInsets.only(bottom: 10),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1,
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.error,
-                                    size: 40,
-                                    color: Colors.red); // Hiển thị icon lỗi
-                              },
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                name!,
+                                widget.name!,
                                 style: TextStyle(
                                   fontSize: FontSizes.medium,
                                   fontWeight: FontWeight.bold,
@@ -74,7 +81,7 @@ class AbsentsCard extends StatelessWidget {
                                 overflow: TextOverflow.visible, // Không cắt chữ
                               ),
                               Text(
-                                mail!,
+                                widget.mail!,
                                 style: TextStyle(
                                   fontSize: FontSizes.small,
                                 ),
@@ -87,40 +94,52 @@ class AbsentsCard extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                // const SizedBox(height: 10),
-                if (absentDates.isNotEmpty)
-                  Flexible(
-                      child: ListView.builder(
-                    shrinkWrap: true,
-                    // physics: const BouncingScrollPhysics(),
-                    itemCount: absentDates.length,
-                    itemBuilder: (context, index) => Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ListTile(
-                        title: Center(
-                          child: Text(
-                            absentDates[index],
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: FontSizes.medium),
+                BlocBuilder<ListAbsentBloc, ListAbsentState>(
+                    builder: (context, state) {
+                  if (state is ListAbsentLoaded) {
+                    final absentDates = state.listAbsentDate;
+                    if (absentDates.isNotEmpty) {
+                      return Flexible(
+                          child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: absentDates.length,
+                        itemBuilder: (context, index) => Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                DateFormat('dd/MM/yyyy')
+                                    .format(absentDates[index])
+                                    .toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: FontSizes.medium),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ));
+                    } else {
+                      return Text(
+                        'Không có buổi vắng nào',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: FontSizes.medium,
+                            color: context.theme.grey ?? Colors.grey),
+                      );
+                    }
+                  }
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: context.theme.primaryColor,
                     ),
-                  ))
-                else
-                  Text(
-                    'Không có buổi vắng nào',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: FontSizes.medium,
-                        color: context.theme.grey ?? Colors.grey),
-                  ),
+                  );
+                }),
+                // const SizedBox(height: 10),
                 const SizedBox(
                   height: 10,
                 ),
