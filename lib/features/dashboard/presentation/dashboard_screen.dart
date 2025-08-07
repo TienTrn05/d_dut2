@@ -185,7 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ? Column(
                                       children: [
                                         Expanded(
-                                          child: Padding(
+                                          child: Container(
                                             padding: const EdgeInsets.all(12),
                                             child: SvgPicture.asset(
                                               "assets/images/free-schedule.svg",
@@ -281,6 +281,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               scopes, "/calendar"));
                                     },
                                   ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
+                                    title: "MS Team tool",
+                                    subtitle: "Học trực tuyến",
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, Routes.msteamtool));
+                                    },
+                                  ),
                                 ];
                               } else {
                                 gridItems = [
@@ -316,16 +326,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     },
                                   ),
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "MS Team tool",
-                                    subtitle: "Học trực tuyến",
-                                    onTap: () {
-                                      context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                              scopes, Routes.msteamtool));
-                                    },
-                                  ),
-                                  FeatureCard(
                                     iconUrl:
                                         "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
                                     title: "Hoạt động \ncộng đồng",
@@ -349,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 maxCrossAxisExtent: 200,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
-                                mainAxisExtent: 150,
+                                mainAxisExtent: 152,
                               ),
                               children: gridItems,
                             );
