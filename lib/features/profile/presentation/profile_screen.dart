@@ -129,12 +129,10 @@ class ProfileScreen extends StatelessWidget {
                                 InfoItem(
                                   field: "Số điện thoại",
                                   value: "0337237665",
-                                  enabledEdit: true,
                                 ),
                                 InfoItem(
                                   field: "Email cá nhân",
                                   value: "tranhuutuan26112003@gmail.com",
-                                  enabledEdit: true,
                                 ),
                               ],
                             ),
@@ -172,17 +170,14 @@ class ProfileScreen extends StatelessWidget {
                                 InfoItem(
                                   field: "Họ tên/Quan hệ",
                                   value: "Trần Tám/cha",
-                                  enabledEdit: true,
                                 ),
                                 InfoItem(
                                   field: "SĐT",
                                   value: "0377432969",
-                                  enabledEdit: true,
                                 ),
                                 InfoItem(
                                   field: "Số nhà đường",
                                   value: "Tổ dân phố Diên Trường",
-                                  enabledEdit: true,
                                 ),
                                 InfoItem(
                                   field: "Tỉnh/Thành phố",

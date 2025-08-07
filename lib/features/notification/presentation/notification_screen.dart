@@ -171,21 +171,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: context.theme.lightGrey ?? Color(0xffFAFAFA),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
+              TextField(
+                decoration: InputDecoration(
                     hintText: "Tìm kiếm...",
                     hintStyle: TextStyle(color: context.theme.grey),
-                    border: InputBorder.none,
-                    icon: Icon(Icons.search, color: context.theme.grey),
-                  ),
-                  style: TextStyle(fontSize: FontSizes.medium),
-                ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: SvgPicture.asset(
+                        "assets/icons/svg/flowbite_search-outline.svg",
+                        width: 24,
+                        height: 24,
+                        colorFilter:
+                            ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: context.theme.lightGrey ?? Color(0xffFAFAFA)),
+                style: TextStyle(fontSize: FontSizes.large),
               ),
               const SizedBox(height: 10),
               TabBar(
