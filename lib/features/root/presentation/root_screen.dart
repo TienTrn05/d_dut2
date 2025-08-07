@@ -41,89 +41,92 @@ class _MainViewState extends State<_MainView> {
     double bottomItemWidth = 72;
     double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 3) / 4;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          // Main Content
-          Center(
-            child: Container(
-              height: double.infinity,
-              decoration: BoxDecoration(
-                color: context.theme.lightBlue,
-              ),
-              child: BlocBuilder<MainBloc, MainState>(
-                builder: (context, state) {
-                  return PageStorage(
-                    bucket: bucket,
-                    child: dashBoardScreens[state.currentPage],
-                  );
-                },
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          children: [
+            // Main Content
+            Center(
+              child: Container(
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: context.theme.lightBlue,
+                ),
+                child: BlocBuilder<MainBloc, MainState>(
+                  builder: (context, state) {
+                    return PageStorage(
+                      bucket: bucket,
+                      child: dashBoardScreens[state.currentPage],
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-
-          // Bottom Navigation Bar
-          Positioned(
-            bottom: 24,
-            left: 24,
-            right: 24,
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(999)),
-              ),
-              child:
-                  BlocBuilder<MainBloc, MainState>(builder: (context, state) {
-                return Stack(
-                  children: [
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      top: 0,
-                      left: (offsetLeft + bottomItemWidth) * state.currentPage +
-                          offsetLeft,
-                      child: Container(
-                        height: 2,
-                        width: bottomItemWidth,
-                        decoration: BoxDecoration(
-                          color: context.theme.primaryColor,
-                          borderRadius: BorderRadius.circular(8),
+      
+            // Bottom Navigation Bar
+            Positioned(
+              bottom: 24,
+              left: 24,
+              right: 24,
+              child: Container(
+                width: double.infinity,
+                height: 50,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(999)),
+                ),
+                child:
+                    BlocBuilder<MainBloc, MainState>(builder: (context, state) {
+                  return Stack(
+                    children: [
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        top: 0,
+                        left: (offsetLeft + bottomItemWidth) * state.currentPage +
+                            offsetLeft,
+                        child: Container(
+                          height: 2,
+                          width: bottomItemWidth,
+                          decoration: BoxDecoration(
+                            color: context.theme.primaryColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
-                    ),
-
-                    // Các icon tab
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        bottomNavigationItem(
-                            context,
-                            0,
-                            "assets/icons/svg/iconoir_home-alt.svg",
-                            bottomItemWidth),
-                        bottomNavigationItem(
-                            context,
-                            1,
-                            "assets/icons/svg/flowbite_search-outline.svg",
-                            bottomItemWidth),
-                        bottomNavigationItem(
-                            context,
-                            2,
-                            "assets/icons/svg/solar_user-broken.svg",
-                            bottomItemWidth),
-                      ],
-                    ),
-                  ],
-                );
-              }),
+      
+                      // Các icon tab
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          bottomNavigationItem(
+                              context,
+                              0,
+                              "assets/icons/svg/iconoir_home-alt.svg",
+                              bottomItemWidth),
+                          bottomNavigationItem(
+                              context,
+                              1,
+                              "assets/icons/svg/flowbite_search-outline.svg",
+                              bottomItemWidth),
+                          bottomNavigationItem(
+                              context,
+                              2,
+                              "assets/icons/svg/solar_user-broken.svg",
+                              bottomItemWidth),
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
