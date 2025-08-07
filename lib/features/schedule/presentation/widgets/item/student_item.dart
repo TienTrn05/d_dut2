@@ -1,31 +1,25 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/absents_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StudentItem extends StatelessWidget {
   const StudentItem({
     super.key,
+    this.idUos = "",
+    this.idStudent = "",
     required this.name,
     required this.mail,
     this.absentCount = -1,
-    this.isCheckAbsent = false,
-    this.isAbsentToday = false,
-    this.onAbsentChanged,
   });
 
+  final String idUos;
+  final String idStudent;
   final String name;
   final String mail;
   final int absentCount;
-  final bool isCheckAbsent;
-  final bool isAbsentToday;
-  final ValueChanged<bool>? onAbsentChanged;
-
-  void _toggleAbsent() {
-    if (onAbsentChanged != null) {
-      onAbsentChanged!(!isAbsentToday);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,30 +41,6 @@ class StudentItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: Image.network(
-                      'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.error,
-                            size: 40, color: Colors.red); // Hiển thị icon lỗi
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,49 +69,40 @@ class StudentItem extends StatelessWidget {
             ),
           ),
           if (absentCount != -1)
-            if (!isCheckAbsent)
-              // ignore: dead_code
-              Container(
-                width: 39,
-                alignment: Alignment.center,
-                child: GestureDetector(
-                  onTap: () {
-                    showDialog(
+            // ignore: dead_code
+            Container(
+              width: 39,
+              alignment: Alignment.center,
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
                       context: context,
-                      builder: (context) => AbsentsCard(
-                          isTeacher: true,
-                          name: name.toString(),
-                          mail: mail.toString(),
-                          absentDates: ["10/09/2023", "11/09/2023"]),
-                    );
-                  },
-                  child: Text(
-                    "$absentCount",
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                      color: absentCount > 0
-                          ? context.theme.red
-                          : context.theme.grey,
-                      decoration: TextDecoration.underline,
-                      decorationColor: absentCount > 0
-                          ? context.theme.red
-                          : context.theme.grey,
-                    ),
+                      builder: (dialogContext) => BlocProvider.value(
+                            value: context.read<ListAbsentBloc>(),
+                            child: AbsentsCard(
+                              isTeacher: true,
+                              name: name,
+                              mail: mail,
+                              idUos: idUos,
+                              idStudent: idStudent,
+                            ),
+                          ));
+                },
+                child: Text(
+                  "$absentCount",
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                    color: absentCount > 0
+                        ? context.theme.red
+                        : context.theme.grey,
+                    decoration: TextDecoration.underline,
+                    decorationColor: absentCount > 0
+                        ? context.theme.red
+                        : context.theme.grey,
                   ),
                 ),
-              )
-            else
-              Container(
-                width: 83,
-                alignment: Alignment.center,
-                child: Checkbox(
-                  value: isAbsentToday,
-                  activeColor: context.theme.primaryColor,
-                  onChanged: (bool? newValue) {
-                    _toggleAbsent();
-                  },
-                ),
-              )
+              ),
+            )
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,6 +15,8 @@ class ScheduleItem extends StatelessWidget {
   final String? time;
   final String room;
   final bool isExam;
+  final DateTime? selectedDay;
+  final String noWeek;
 
   const ScheduleItem({
     super.key,
@@ -22,6 +25,8 @@ class ScheduleItem extends StatelessWidget {
     required this.time,
     required this.room,
     this.isExam = false,
+    this.selectedDay,
+    this.noWeek = "",
   });
 
   @override
@@ -46,7 +51,11 @@ class ScheduleItem extends StatelessWidget {
                           idExamShift: idUos,
                           examShiftName: subject,
                           authToken: authToken)
-                      : idUos
+                      : UosAbsentArgs(
+                          idUos: idUos,
+                          selectedDay: selectedDay ?? DateTime.now(),
+                          noWeek: noWeek,
+                        )
                   : idUos);
         },
         child: Container(

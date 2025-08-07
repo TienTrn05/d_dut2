@@ -6,6 +6,7 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_deta
 import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_students_absent_model.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton
@@ -57,5 +58,32 @@ class ScheduleRepository {
       String idExamShift, String keyword, int pageNumber, String authToken) {
     return _scheduleService.getListStudentsByExamShift(
         idExamShift, keyword, pageNumber, authToken);
+  }
+
+  Future<UosStudentsAbsentModel> getListStudentsByUos(
+      String idUos, int pageNumber, String? keyword, DateTime absenceDate, String authToken) {
+    return _scheduleService.getListStudentsByUos(
+        idUos, pageNumber, keyword, absenceDate, authToken);
+  }
+
+  Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.isAttendanceDate(idUos, attendanceDate, authToken);
+  }
+
+  Future<bool> takeAttendance(String idUnitOfStudy, DateTime absenceDate,
+      List<String> idStudentsAbsent, String authToken) {
+    return _scheduleService.takeAttendance(
+        idUnitOfStudy: idUnitOfStudy,
+        absenceDate: absenceDate,
+        idStudentsAbsent: idStudentsAbsent,
+        authToken: authToken);
+  }
+
+  Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate, authToken);
+  }
+
+  Future<List<DateTime>> getListAbsentDate(String idUos, String? idStudent, String authToken) {
+    return _scheduleService.getListAbsentDate(idUos, idStudent, authToken);
   }
 }

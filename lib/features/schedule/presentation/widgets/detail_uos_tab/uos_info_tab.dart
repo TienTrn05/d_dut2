@@ -271,9 +271,11 @@ class _UosInfoTabState extends State<UosInfoTab> {
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (context) => const AbsentsCard(
-                                    isTeacher: false,
-                                    absentDates: ["10/09/2023", "11/09/2023"]),
+                                builder: (context) => AbsentsCard(
+                                  isTeacher: false,
+                                  idUos: widget.uosDetail.idUnitOfStudy,
+                                  idStudent: '',
+                                ),
                               );
                             },
                             child: Text(

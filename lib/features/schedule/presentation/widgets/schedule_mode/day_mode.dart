@@ -235,6 +235,8 @@ class _DayModeState extends State<DayMode> {
               : "${item.startStudyTime.substring(0, 5)} - ${item.endStudyTime.substring(0, 5)}",
           room: item.room,
           isExam: item.isExam,
+          selectedDay: selectedDay,
+          noWeek: noWeek,
         );
       }).toList(),
     );
