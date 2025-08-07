@@ -4,6 +4,7 @@ import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/study_shift_model.dart';
@@ -270,13 +271,16 @@ class _UosInfoTabState extends State<UosInfoTab> {
                           value: GestureDetector(
                             onTap: () {
                               showDialog(
-                                context: context,
-                                builder: (context) => AbsentsCard(
-                                  isTeacher: false,
-                                  idUos: widget.uosDetail.idUnitOfStudy,
-                                  idStudent: '',
-                                ),
-                              );
+                                  context: context,
+                                  builder: (dialogContext) =>
+                                      BlocProvider.value(
+                                        value: context.read<ListAbsentBloc>(),
+                                        child: AbsentsCard(
+                                          isTeacher: false,
+                                          idUos: widget.uosDetail.idUnitOfStudy,
+                                          idStudent: '',
+                                        ),
+                                      ));
                             },
                             child: Text(
                               widget.absentTimes!.toString(),
