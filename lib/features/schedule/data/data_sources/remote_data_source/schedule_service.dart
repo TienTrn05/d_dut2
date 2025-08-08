@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
+import 'package:e_dut/core/services/api_client.dart';
 import 'package:e_dut/features/schedule/data/model/calendar_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
@@ -15,15 +16,15 @@ import 'package:intl/intl.dart';
 @injectable
 class ScheduleService {
   final String _url;
-  final Dio _dio;
+  final ApiClient _apiClient;
 
   ScheduleService(@Named('scheduleAPIUrl') String url)
       : _url = url,
-        _dio = Dio();
+        _apiClient = ApiClient(url);
 
   Future<List<SemesterModel>> getListSemester(String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Timetable/GetListSemesters",
         options: Options(headers: {
           "Authorization": "Bearer $authToken",
@@ -52,7 +53,7 @@ class ScheduleService {
     try {
       dynamic response;
       if (isTeacher) {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetListTeacherTimetablesBySemester",
           queryParameters: {'idSemester': idSemester},
           options: Options(headers: {
@@ -60,7 +61,7 @@ class ScheduleService {
           }),
         );
       } else {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetListStudentTimetablesBySemester",
           queryParameters: {'idSemester': idSemester},
           options: Options(headers: {
@@ -88,7 +89,7 @@ class ScheduleService {
     try {
       dynamic response;
       if (isTeacher) {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetListTeacherTimetablesByDate",
           queryParameters: {
             'date': DateFormat('yyyy-MM-dd').format(inputDate),
@@ -98,7 +99,7 @@ class ScheduleService {
           }),
         );
       } else {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetListStudentTimetablesByDate",
           queryParameters: {
             'date': DateFormat('yyyy-MM-dd').format(inputDate),
@@ -130,7 +131,7 @@ class ScheduleService {
     try {
       dynamic response;
       if (isTeacher) {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetTeacherCalendarEvents",
           queryParameters: {
             'month': month,
@@ -141,7 +142,7 @@ class ScheduleService {
           }),
         );
       } else {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/Timetable/GetStudentCalendarEvents",
           queryParameters: {
             'month': month,
@@ -170,7 +171,7 @@ class ScheduleService {
   Future<List<CalendarEventModel>> getCalendarAbsentEvents(
       int month, int year, String idUos, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Timetable/GetTeacherCalendarEventsByUOS",
         queryParameters: {
           'month': month,
@@ -198,7 +199,7 @@ class ScheduleService {
 
   Future<String> getSemesterByDate(DateTime inputDate, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Timetable/GetWeekSemester",
         queryParameters: {
           'date': DateFormat('yyyy-MM-dd').format(inputDate),
@@ -229,7 +230,7 @@ class ScheduleService {
 
   Future<String> getWeekByDate(DateTime inputDate, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Timetable/GetWeekSemester",
         queryParameters: {
           'date': DateFormat('yyyy-MM-dd').format(inputDate),
@@ -258,7 +259,7 @@ class ScheduleService {
     try {
       dynamic response;
       if (isTeacher) {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/UOS/GetTeacherUosDetail",
           queryParameters: {'idUos': idUos},
           options: Options(headers: {
@@ -266,7 +267,7 @@ class ScheduleService {
           }),
         );
       } else {
-        response = await _dio.get(
+        response = await _apiClient.dio.get(
           "$_url/api/UOS/GetStudentUosDetail",
           queryParameters: {'idUos': idUos},
           options: Options(headers: {
@@ -292,7 +293,7 @@ class ScheduleService {
   Future<ExamShiftDetailModel> getTeacherExamShiftDetail(
       String idExamShift, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/UOS/GetTeacherExamShiftDetail",
         queryParameters: {
           'idExamShift': idExamShift,
@@ -319,7 +320,7 @@ class ScheduleService {
   Future<StudentsExamShiftModel> getListStudentsByExamShift(String idExamShift,
       String keyword, int pageNumber, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/UOS/GetListStudentsByExamShift",
         queryParameters: {
           'idExamShift': idExamShift,
@@ -352,7 +353,7 @@ class ScheduleService {
       DateTime absenceDate,
       String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/UOS/GetListStudentsByUos",
         queryParameters: {
           "idUos": idUos,
@@ -380,7 +381,7 @@ class ScheduleService {
   Future<bool> isAttendanceDate(
       String idUos, DateTime? attendanceDate, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Absence/CheckAttendanceDate",
         queryParameters: {
           "idUos": idUos,
@@ -408,7 +409,7 @@ class ScheduleService {
       required List<String> idStudentsAbsent,
       required authToken}) async {
     try {
-      final response = await _dio.post(
+      final response = await _apiClient.dio.post(
         "$_url/api/Absence/TakeAttendance",
         data: {
           "idUnitOfStudy": idUnitOfStudy,
@@ -434,7 +435,7 @@ class ScheduleService {
   Future<bool> deleteAttendanceHistory(
       String idUos, DateTime? attendanceDate, String authToken) async {
     try {
-      final response = await _dio.delete(
+      final response = await _apiClient.dio.delete(
         "$_url/api/Absence/DeleteAttendanceHistory",
         queryParameters: {
           "idUos": idUos,
@@ -459,7 +460,7 @@ class ScheduleService {
   Future<List<DateTime>> getListAbsentDate(
       String idUos, String? idStudent, String authToken) async {
     try {
-      final response = await _dio.get(
+      final response = await _apiClient.dio.get(
         "$_url/api/Absence/GetListAbsentDate",
         queryParameters: {
           "idUos": idUos,
@@ -478,6 +479,26 @@ class ScheduleService {
       }
     } catch (e) {
       throw Exception("Failed to getListAbsentDate: $e");
+    }
+  }
+
+  Future<bool> updateMsTeamsInfo(
+      String token, String idUOS, String msTeamCode, String msTeamLink) async {
+    try {
+      final response = await _apiClient.dio.patch(
+        "$_url/api/UOS/UpdateMsTeamInfo/$idUOS",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        }),
+        data: {"msTeamCode": msTeamCode, "msTeamLink": msTeamLink},
+      );
+
+      return response.statusCode == 200 &&
+          response.data['message'] == 'Success';
+    } catch (e) {
+      logger.e("Error update Ms Teams info: $e");
+      rethrow;
     }
   }
 }

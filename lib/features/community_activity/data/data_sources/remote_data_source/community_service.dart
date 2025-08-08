@@ -100,10 +100,11 @@ class CommunityService {
 
   Future<List<AcademicYearModel>> getAcademicYears(String token) async {
     try {
-      final response = await _apiClient.dio.get("$_url/api/academic-year-activities",
-          options: Options(headers: {
-            "Authorization": "Bearer $token",
-          }));
+      final response =
+          await _apiClient.dio.get("$_url/api/academic-year-activities",
+              options: Options(headers: {
+                "Authorization": "Bearer $token",
+              }));
       if (response.statusCode == 200 && response.data['success'] == true) {
         final responseData = response.data;
 

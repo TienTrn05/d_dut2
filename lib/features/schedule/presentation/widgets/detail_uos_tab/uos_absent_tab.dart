@@ -389,7 +389,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           }),
           BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
             if (state is CalendarWeekLoaded) {
-              print("===>>> CalendarWeekLoaded ${state.noWeek}");
               setState(() {
                 if (state.noWeek.isNotEmpty) {
                   _currentWeek = "tuần ${state.noWeek}";

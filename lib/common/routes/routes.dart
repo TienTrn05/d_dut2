@@ -2,6 +2,7 @@ import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
+import 'package:e_dut/features/homeroom/presentation/screens/list_homeroom_screen.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
@@ -25,15 +26,23 @@ class Routes {
   static const String notification = "/notification";
   static const String schedule = "/schedule";
   static const String msteamtool = "/msteamtool";
+
+  //timetable
   static const String detailUnitOfStudy = "/detailUnitOfStudy";
   static const String detailUnitOfStudyTeacher = "/detailUOSTeacher";
   static const String detailExamShiftTeacher = "/detailExamShiftTeacher";
+
+  //course registration
   static const String courseRegistration = "/courseRegistration";
   static const String courseRegistrationGrade = "/courseRegistrationGrade";
+
+  //community activity
   static const String communityActivities = "/communityActivities";
-  // static const String detailCommunityActivity = "/detailCommunityActivity";
   static const String detailUserActivity = "/detailUserActivityScreen";
   static const String detailUserProof = "/detailUserProof";
+
+  //homeroom
+  static const String listHomeRoom = "/listHomeRoom";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -47,6 +56,14 @@ class Routes {
         return MaterialPageRoute(
             builder: (settings) => const NotificationScreen());
 
+      case msteamtool:
+        return MaterialPageRoute(
+          builder: (context) => const Scaffold(
+            body: Center(child: Text('MSTeamTool Screen')),
+          ),
+        );
+
+      //***** TIMETABLE *****//
       case schedule:
         return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
@@ -62,7 +79,6 @@ class Routes {
           builder: (context) => DetailUOSTeacherScreen(
             idUos: args.idUos,
             selectedDay: args.selectedDay,
-            // noWeek: args.noWeek,
           ),
         );
 
@@ -82,13 +98,7 @@ class Routes {
                   ),
                 ));
 
-      case msteamtool:
-        return MaterialPageRoute(
-          builder: (context) => const Scaffold(
-            body: Center(child: Text('MSTeamTool Screen')),
-          ),
-        );
-
+      //***** COURSE REGISTRATION *****//
       case courseRegistration:
         return MaterialPageRoute(
           builder: (context) => const CourseRegistrationScreen(),
@@ -99,6 +109,7 @@ class Routes {
           builder: (context) => const GradeScreen(),
         );
 
+      //***** COMMUNITY ACTIVITY *****//
       case communityActivities:
         return MaterialPageRoute(
             builder: (context) => const CommunityActivitiesScreen());
@@ -107,6 +118,11 @@ class Routes {
         final userProof = settings.arguments as UserProofModel;
         return MaterialPageRoute(
             builder: (context) => DetailUserProofScreen(userProof: userProof));
+
+      //***** HOMEROOM *****//
+      case listHomeRoom:
+        return MaterialPageRoute(builder: (context) => ListHomeroomScreen());
+
       default:
         return MaterialPageRoute(
           builder: (context) => const Scaffold(

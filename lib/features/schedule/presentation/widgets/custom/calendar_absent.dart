@@ -180,7 +180,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
             BlocListener<CalendarBloc, CalendarState>(
                 // Lắng nghe khi state thay đổi để thực hiện hành động phụ
                 listener: (context, state) {
-              if (state is CalendarEventLoaded) {
+              if (state is CalendarAbsentEventLoaded) {
                 final newEventMap = <DateTime, List<int>>{};
                 for (var event in state.calendarEvents) {
                   final date = DateTime(

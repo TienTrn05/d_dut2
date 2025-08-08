@@ -26,7 +26,6 @@ class UserScores extends StatefulWidget {
 class _UserScoresState extends State<UserScores> {
   List<UserProofModel> userScores = [];
   List<AcademicYearModel> _academicYears = [];
-  Map<String, int> _totalScoresByYear = {};
 
   bool _isAcademicYearsLoaded = false;
 
@@ -51,6 +50,7 @@ class _UserScoresState extends State<UserScores> {
     if (academicYearId.isEmpty) {
       return;
     }
+
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       final keyword = _searchController.text.trim();
@@ -237,19 +237,12 @@ class _UserScoresState extends State<UserScores> {
                                         proof.userActivity.status ==
                                         UserActivityStatus.approved)
                                     .toList();
-                                final yearId = _academicYears[selectedIndex].id;
+                                final totalScore = userScores.fold<int>(
+                                  0,
+                                  (sum, proof) =>
+                                      sum + proof.userActivity.activity.score,
+                                );
 
-                                if (!_totalScoresByYear.containsKey(yearId)) {
-                                  final totalScore = userScores.fold<int>(
-                                    0,
-                                    (sum, proof) =>
-                                        sum + proof.userActivity.activity.score,
-                                  );
-
-                                  _totalScoresByYear[yearId] = totalScore;
-                                }
-
-                                final totalScore = _totalScoresByYear[yearId]!;
                                 return Column(
                                   children: [
                                     Container(
