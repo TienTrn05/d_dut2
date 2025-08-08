@@ -28,11 +28,6 @@ class AuthMicrosoftButton extends StatelessWidget {
           minWidth: double.infinity,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(
-              color: color,
-              width: 2,
-              style: BorderStyle.solid,
-            ),
           ),
           clipBehavior: Clip.antiAlias,
           elevation: 0,

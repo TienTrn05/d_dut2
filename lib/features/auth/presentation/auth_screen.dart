@@ -15,37 +15,45 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthLoading) {
-              context.read<LoadingBloc>().add(LoadingShow());
-            } else if (state is AuthUserAuthenticated) {
-              context.read<LoadingBloc>().add(LoadingHide());
-              Navigator.pushNamedAndRemoveUntil(
-                  context, Routes.root, (route) => false);
-            } else if (state is AuthError) {
-              context.read<LoadingBloc>().add(LoadingHide());
-              CustomSnackbar.showSnackBar(
-                  context, "Lỗi đăng nhập", state.message, AlertType.error);
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Center(
-              child: BlocProvider(
-                create: (context) => LoginBloc(),
-                child: LoginForm(),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/background.jpg"),
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        ),
+          Container(
+            color: Colors.black.withAlpha(52),
+          ),
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthLoading) {
+                context.read<LoadingBloc>().add(LoadingShow());
+              } else if (state is AuthUserAuthenticated) {
+                context.read<LoadingBloc>().add(LoadingHide());
+                Navigator.pushNamedAndRemoveUntil(
+                    context, Routes.root, (route) => false);
+              } else if (state is AuthError) {
+                context.read<LoadingBloc>().add(LoadingHide());
+                CustomSnackbar.showSnackBar(
+                    context, "Lỗi đăng nhập", state.message, AlertType.error);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: BlocProvider(
+                  create: (context) => LoginBloc(),
+                  child: LoginForm(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
