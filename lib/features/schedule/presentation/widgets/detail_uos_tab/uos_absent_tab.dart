@@ -458,6 +458,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                                             child: CalendarAbsent(
                                               initDate: _currentDate,
                                               onValueChange: _updateCurrentDate,
+                                              idUos: widget.idUos,
                                             ),
                                           ))
                                 },

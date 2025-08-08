@@ -18,6 +18,19 @@ class LoadCalendarEvents extends CalendarEvent {
       required this.authToken});
 }
 
+class LoadCalendarAbsentEvents extends CalendarEvent {
+  final int month;
+  final int year;
+  final String idUos;
+  final String authToken;
+
+  LoadCalendarAbsentEvents(
+      {required this.month,
+      required this.year,
+      required this.idUos,
+      required this.authToken});
+}
+
 class LoadCalendarWeek extends CalendarEvent {
   final DateTime inputDate;
   final String authToken;

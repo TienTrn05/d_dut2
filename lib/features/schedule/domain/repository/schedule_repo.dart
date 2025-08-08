@@ -36,6 +36,12 @@ class ScheduleRepository {
         month, year, isTeacher, authToken);
   }
 
+  Future<List<CalendarEventModel>> getCalendarAbsentEvents(
+      int month, int year, String idUos, String authToken) {
+    return _scheduleService.getCalendarAbsentEvents(
+        month, year, idUos, authToken);
+  }
+
   Future<String> getSemesterByDate(DateTime inputDate, String authToken) {
     return _scheduleService.getSemesterByDate(inputDate, authToken);
   }
@@ -60,13 +66,14 @@ class ScheduleRepository {
         idExamShift, keyword, pageNumber, authToken);
   }
 
-  Future<UosStudentsAbsentModel> getListStudentsByUos(
-      String idUos, int pageNumber, String? keyword, DateTime absenceDate, String authToken) {
+  Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
+      int pageNumber, String? keyword, DateTime absenceDate, String authToken) {
     return _scheduleService.getListStudentsByUos(
         idUos, pageNumber, keyword, absenceDate, authToken);
   }
 
-  Future<bool> getIsAttendanceDate(String idUos, DateTime attendanceDate, String authToken) {
+  Future<bool> getIsAttendanceDate(
+      String idUos, DateTime attendanceDate, String authToken) {
     return _scheduleService.isAttendanceDate(idUos, attendanceDate, authToken);
   }
 
@@ -79,11 +86,14 @@ class ScheduleRepository {
         authToken: authToken);
   }
 
-  Future<bool> deleteAttendanceHistory(String idUos, DateTime attendanceDate, String authToken) {
-    return _scheduleService.deleteAttendanceHistory(idUos, attendanceDate, authToken);
+  Future<bool> deleteAttendanceHistory(
+      String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.deleteAttendanceHistory(
+        idUos, attendanceDate, authToken);
   }
 
-  Future<List<DateTime>> getListAbsentDate(String idUos, String? idStudent, String authToken) {
+  Future<List<DateTime>> getListAbsentDate(
+      String idUos, String? idStudent, String authToken) {
     return _scheduleService.getListAbsentDate(idUos, idStudent, authToken);
   }
 }

@@ -11,6 +11,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
 
   CalendarBloc(this._repository) : super(CalendarInitial()) {
     on<LoadCalendarEvents>(_onLoadCalendarEvents);
+    on<LoadCalendarAbsentEvents>(_onLoadCalendarAbsentEvents);
     on<LoadCalendarWeek>(_onLoadCalendarWeek);
   }
 
@@ -21,6 +22,18 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
       final events = await _repository.getCalendarEvents(
           event.month, event.year, event.isTeacher, event.authToken);
       emit(CalendarEventLoaded(calendarEvents: events));
+    } catch (e) {
+      emit(CalendarError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadCalendarAbsentEvents(
+      LoadCalendarAbsentEvents event, Emitter<CalendarState> emit) async {
+    emit(CalendarLoading());
+    try {
+      final events = await _repository.getCalendarAbsentEvents(
+          event.month, event.year, event.idUos, event.authToken);
+      emit(CalendarAbsentEventLoaded(calendarEvents: events));
     } catch (e) {
       emit(CalendarError(e.toString()));
     }
