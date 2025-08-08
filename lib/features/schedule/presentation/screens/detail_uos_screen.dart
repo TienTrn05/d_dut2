@@ -32,7 +32,7 @@ class DetailUnitOfStudy extends StatelessWidget {
                 ..add(LoadFullInfoUosDetail(
                     idUos: idUos, isTeacher: false, authToken: authToken))),
           BlocProvider(
-              create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>())),
+              create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
