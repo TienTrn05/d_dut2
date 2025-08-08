@@ -62,7 +62,7 @@ class UnitOfStudyItem extends StatelessWidget {
                       ? Routes.detailExamShiftTeacher
                       : Routes.detailUnitOfStudyTeacher,
               arguments: userRole == RoleModel.roleStudent
-                  ? idUos
+                  ? idUos //UosAbsentArgs
                   : isExam
                       ? ExamShiftArgs(
                           idExamShift: examShift!.idExamShift,

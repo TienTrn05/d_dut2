@@ -55,7 +55,7 @@ class ScheduleItem extends StatelessWidget {
             padding: EdgeInsets.only(left: 6, right: 8, top: 4, bottom: 4),
             decoration: BoxDecoration(
               color: context.theme.lightGrey,
-              // borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(4),
               border: Border(
                 left: BorderSide(
                   color: isExam
