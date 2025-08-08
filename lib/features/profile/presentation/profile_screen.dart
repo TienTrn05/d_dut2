@@ -58,8 +58,9 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             child: ClipRRect(
-                              child: Image.network(
-                                'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              child: Image.asset(
+                                'assets/images/default_avatar.jpg',
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,
@@ -92,13 +93,12 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: FontSizes.extraLarge,
                                         fontWeight: FontWeight.bold,
-                                        height: 1,
+                                        height: 1.2,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      // get string before @
-                                      userPrincipalName.split('@').first,
+                                      userPrincipalName,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontFamily:

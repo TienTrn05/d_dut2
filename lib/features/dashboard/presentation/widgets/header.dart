@@ -57,8 +57,8 @@ class Header extends StatelessWidget {
                       ),
                     ),
                     child: ClipOval(
-                      child: Image.network(
-                        'https://www.udn.vn/Portals/0/3doan%20bk.jpg',
+                      child: Image.asset(
+                        'assets/images/default_avatar.jpg',
                         width: 40,
                         height: 40,
                         fit: BoxFit.cover,
