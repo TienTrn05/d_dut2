@@ -10,7 +10,8 @@ class DashboardRepo {
   String _getPermission(routeName) {
     switch (routeName) {
       case Routes.msteamtool:
-        return "msteamtool-api-access";
+        // return "msteamtool-api-access";
+        return "no-permission";
       default:
         return "no-permission";
     }

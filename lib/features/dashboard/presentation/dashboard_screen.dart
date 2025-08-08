@@ -263,7 +263,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/solar_calendar-broken.svg",
                                     title: "Thời khóa biểu",
-                                    subtitle: "Tra cứu \nthời khóa biểu",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
@@ -274,7 +273,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/solar_calendar-broken.svg",
                                     title: "Lịch tuần",
-                                    subtitle: "Lên lịch họp",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
@@ -284,12 +282,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   FeatureCard(
                                     iconUrl: "assets/icons/svg/carbon_book.svg",
                                     title: "MS Team tool",
-                                    subtitle: "Học trực tuyến",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
                                               scopes, Routes.msteamtool));
                                     },
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
+                                    title: "Lớp chủ nhiệm",
+                                    onTap: () {},
                                   ),
                                 ];
                               } else {
@@ -298,7 +300,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/solar_calendar-broken.svg",
                                     title: "Thời khóa biểu",
-                                    subtitle: "Xem lịch học & thi",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
@@ -306,19 +307,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     },
                                   ),
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/mage_goals.svg",
-                                    title: "Kết quả học tập",
-                                    subtitle: "Tra cứu \nkết quả học tập",
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/tabler_coin.svg",
-                                    title: "Học phí",
-                                    subtitle: "Học phí",
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "Học phần",
-                                    subtitle: "Đăng ký học phần",
+                                    iconUrl: "assets/icons/svg/hugeicons_note-edit.svg",
+                                    title: "Đăng ký tín chỉ",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(scopes,
@@ -329,12 +319,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
                                     title: "Hoạt động \ncộng đồng",
-                                    subtitle:
-                                        "Theo dõi các \nhoạt động cộng đồng",
                                     onTap: () {
                                       Navigator.of(context).pushNamed(
                                           Routes.communityActivities);
                                     },
+                                  ),
+                                  
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
+                                    title: "Lớp sinh hoạt",
+                                    disabled: true,
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/mage_goals.svg",
+                                    title: "Kết quả học tập",
+                                    disabled: true,
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/tabler_coin.svg",
+                                    title: "Học phí",
+                                    disabled: true,
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/carbon_book.svg",
+                                    title: "Chương trình đào tạo",
+                                    disabled: true,
+                                  ),
+                                  FeatureCard(
+                                    iconUrl: "assets/icons/svg/uil_chart-line.svg",
+                                    title: "Thống kê",
+                                    disabled: true,
                                   ),
                                 ];
                               }
@@ -349,7 +363,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 maxCrossAxisExtent: 200,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
-                                mainAxisExtent: 152,
+                                mainAxisExtent: 150,
                               ),
                               children: gridItems,
                             );
