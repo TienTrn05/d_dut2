@@ -14,6 +14,7 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
   UosDetailBloc(this._repository) : super(UosDetailInitial()) {
     on<LoadFullInfoUosDetail>(_onLoadFullInfoUosDetail);
     on<LoadExamShiftDetail>(_onLoadExamShiftDetail);
+    on<UpdateMsTeamsInfo>(_onUpdateMsTeamsInfo);
   }
 
   Future<void> _onLoadFullInfoUosDetail(
@@ -50,6 +51,34 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
 
       emit(ExamShiftDetailLoaded(
           examShiftDetail: examShiftDetail, listStudents: listStudents));
+    } catch (e) {
+      emit(UosDetailError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onUpdateMsTeamsInfo(
+      UpdateMsTeamsInfo event, Emitter<UosDetailState> emit) async {
+    emit(UosDetailLoading());
+    try {
+      final idUos = event.idUos;
+      final isTeacher = event.isTeacher;
+      final authToken = event.authToken;
+      final msTeamCode = event.msTeamCode;
+      final msTeamLink = event.msTeamLink;
+
+      final isUpdateSuccess = await _repository.updateMsTeamsInfo(
+          authToken, idUos, msTeamCode, msTeamLink);
+
+      if (isUpdateSuccess) {
+        try {
+          final fullInfoUosDetail = await _repository.getFullInfoUosDetail(
+              idUos, isTeacher, authToken);
+
+          emit(FullInfoUosLoaded(fullInfoUosDetail: fullInfoUosDetail));
+        } catch (e) {
+          emit(UosDetailError(message: e.toString()));
+        }
+      }
     } catch (e) {
       emit(UosDetailError(message: e.toString()));
     }

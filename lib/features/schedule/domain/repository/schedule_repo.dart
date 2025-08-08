@@ -96,4 +96,10 @@ class ScheduleRepository {
       String idUos, String? idStudent, String authToken) {
     return _scheduleService.getListAbsentDate(idUos, idStudent, authToken);
   }
+
+  Future<bool> updateMsTeamsInfo(
+      String token, String idUOS, String msTeamCode, String msTeamLink) {
+    return _scheduleService.updateMsTeamsInfo(
+        token, idUOS, msTeamCode, msTeamLink);
+  }
 }

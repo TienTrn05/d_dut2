@@ -26,3 +26,18 @@ class LoadExamShiftDetail extends UosDetailEvent {
       required this.pageNumber,
       required this.authToken});
 }
+
+class UpdateMsTeamsInfo extends UosDetailEvent {
+  final String idUos;
+  final bool isTeacher;
+  final String authToken;
+  final String msTeamCode;
+  final String msTeamLink;
+
+  UpdateMsTeamsInfo(
+      {required this.idUos,
+      this.isTeacher = true,
+      required this.authToken,
+      required this.msTeamCode,
+      required this.msTeamLink});
+}

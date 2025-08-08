@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
@@ -56,7 +57,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
     super.dispose();
   }
 
-  void _showEditLinkModal(BuildContext context) {
+  void _showEditLinkModal(UosDetailBloc detailBloc, String authToken) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -65,27 +66,43 @@ class _UosInfoTabState extends State<UosInfoTab> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       backgroundColor: Colors.white,
-      builder: (BuildContext context) {
+      builder: (context) {
         return BottomModal(
-            title: "Giảng dạy",
-            mainAction: () {
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: Column(
-              children: [
-                EditFieldItem(
-                  field: "Mã truy cập",
-                  controller: _codeController,
-                ),
-                const SizedBox(height: 10),
-                EditFieldItem(
-                  field: "Đường link truy cập",
-                  controller: _linkController,
-                  minLine: 5,
-                )
-              ],
-            ));
+          title: "Giảng dạy",
+          mainAction: () {
+            dialog.CustomAlertDialog.showCustomDialog(
+              context,
+              "Xác nhận cập nhật thông tin",
+              "Bạn có chắc chắn muốn cập nhật thông tin giảng dạy không\"?",
+              textCancel: "Đóng",
+              dialog.AlertType.confirm,
+              textConfirm: "Xác nhận",
+              onConfirm: () {
+                detailBloc.add(UpdateMsTeamsInfo(
+                    idUos: widget.uosDetail.idUnitOfStudy,
+                    authToken: authToken,
+                    msTeamCode: _codeController.text.trim(),
+                    msTeamLink: _linkController.text.trim()));
+                setState(() {});
+                Navigator.pop(context);
+              },
+            );
+          },
+          child: Column(
+            children: [
+              EditFieldItem(
+                field: "Mã truy cập",
+                controller: _codeController,
+              ),
+              const SizedBox(height: 10),
+              EditFieldItem(
+                field: "Đường link truy cập",
+                controller: _linkController,
+                minLine: 5,
+              )
+            ],
+          ),
+        );
       },
     );
   }
@@ -139,7 +156,8 @@ class _UosInfoTabState extends State<UosInfoTab> {
               UosInfoCard(
                 title: 'Giảng dạy',
                 canEdit: userRole == RoleModel.roleTeacher,
-                action: () => _showEditLinkModal(context),
+                action: () => _showEditLinkModal(
+                    context.read<UosDetailBloc>(), authToken),
                 child: Column(
                   children: [
                     if (userRole == RoleModel.roleStudent)
