@@ -5,6 +5,7 @@ import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,7 +63,7 @@ class UnitOfStudyItem extends StatelessWidget {
                       ? Routes.detailExamShiftTeacher
                       : Routes.detailUnitOfStudyTeacher,
               arguments: userRole == RoleModel.roleStudent
-                  ? idUos
+                  ? idUos //UosAbsentArgs
                   : isExam
                       ? ExamShiftArgs(
                           idExamShift: examShift!.idExamShift,
@@ -70,7 +71,11 @@ class UnitOfStudyItem extends StatelessWidget {
                               ? examShift!.examShiftName
                               : nameSubject,
                           authToken: authToken)
-                      : idUos);
+                      : UosAbsentArgs(
+                          idUos: idUos!,
+                          selectedDay: DateTime.now(),
+                          // noWeek: noWeek,
+                        ));
         },
         child: Container(
           width: double.infinity,

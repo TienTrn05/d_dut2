@@ -1,8 +1,7 @@
 class UosAbsentArgs {
   final String idUos;
   final DateTime selectedDay;
-  final String noWeek;
+  // final String noWeek;
 
-  UosAbsentArgs(
-      {required this.idUos, required this.selectedDay, required this.noWeek});
+  UosAbsentArgs({required this.idUos, required this.selectedDay});
 }

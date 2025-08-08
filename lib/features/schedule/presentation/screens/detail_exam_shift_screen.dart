@@ -374,12 +374,15 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                         if (listStudents
                                             .studentsPaged.items.isEmpty) {
                                           return const Center(
-                                            child: Text(
-                                              'Không có dữ liệu danh sách sinh viên',
-                                              style: TextStyle(
-                                                fontSize: FontSizes.medium,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.black,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(24.0),
+                                              child: Text(
+                                                'Không có dữ liệu danh sách sinh viên',
+                                                style: TextStyle(
+                                                  fontSize: FontSizes.medium,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
                                               ),
                                             ),
                                           );
@@ -479,8 +482,17 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                       }
 
                                       return const Center(
-                                        child: Text(
-                                            "Không có dữ liệu danh sách sinh viên"),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(24.0),
+                                          child: Text(
+                                            'Không có dữ liệu danh sách sinh viên',
+                                            style: TextStyle(
+                                              fontSize: FontSizes.medium,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
                                       );
                                     },
                                   ),
