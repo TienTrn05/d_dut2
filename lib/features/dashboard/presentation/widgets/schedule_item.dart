@@ -3,6 +3,7 @@ import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -46,7 +47,10 @@ class ScheduleItem extends StatelessWidget {
                             idExamShift: idSubject,
                             examShiftName: subject,
                             authToken: authToken)
-                        : idSubject
+                        : UosAbsentArgs(
+                            idUos: idSubject,
+                            selectedDay: DateTime.now(),
+                          )
                     : idSubject);
           },
           child: Container(

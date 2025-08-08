@@ -54,7 +54,7 @@ class ScheduleItem extends StatelessWidget {
                       : UosAbsentArgs(
                           idUos: idUos,
                           selectedDay: selectedDay ?? DateTime.now(),
-                          noWeek: noWeek,
+                          // noWeek: noWeek,
                         )
                   : idUos);
         },

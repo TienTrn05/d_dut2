@@ -271,7 +271,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   FeatureCard(
                                     iconUrl:
-                                        "assets/icons/svg/solar_calendar-broken.svg",
+                                        "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                    title: "Lớp chủ nhiệm",
+                                    onTap: () {},
+                                    disabled: true,
+                                  ),
+                                  FeatureCard(
+                                    iconUrl:
+                                        "assets/icons/svg/fluent_calendar-work-week-32-regular.svg",
                                     title: "Lịch tuần",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
@@ -280,18 +287,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     },
                                   ),
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "MS Team tool",
+                                    iconUrl:
+                                        "assets/icons/svg/mdi_microsoft-teams.svg",
+                                    title: "Ms Teams tool",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
                                           DashboardNavigateRequested(
                                               scopes, Routes.msteamtool));
                                     },
-                                  ),
-                                  FeatureCard(
-                                    iconUrl: "assets/icons/svg/carbon_book.svg",
-                                    title: "Lớp chủ nhiệm",
-                                    onTap: () {},
                                   ),
                                 ];
                               } else {
@@ -307,7 +310,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     },
                                   ),
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/hugeicons_note-edit.svg",
+                                    iconUrl:
+                                        "assets/icons/svg/hugeicons_note-edit.svg",
                                     title: "Đăng ký tín chỉ",
                                     onTap: () {
                                       context.read<DashboardBloc>().add(
@@ -324,9 +328,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           Routes.communityActivities);
                                     },
                                   ),
-                                  
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
+                                    iconUrl:
+                                        "assets/icons/svg/solar_users-group-rounded-broken.svg",
                                     title: "Lớp sinh hoạt",
                                     disabled: true,
                                   ),
@@ -346,7 +350,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     disabled: true,
                                   ),
                                   FeatureCard(
-                                    iconUrl: "assets/icons/svg/uil_chart-line.svg",
+                                    iconUrl:
+                                        "assets/icons/svg/uil_chart-line.svg",
                                     title: "Thống kê",
                                     disabled: true,
                                   ),
