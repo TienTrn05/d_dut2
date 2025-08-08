@@ -167,6 +167,35 @@ class ScheduleService {
     }
   }
 
+  Future<List<CalendarEventModel>> getCalendarAbsentEvents(
+      int month, int year, String idUos, String authToken) async {
+    try {
+      final response = await _dio.get(
+        "$_url/api/Timetable/GetTeacherCalendarEventsByUOS",
+        queryParameters: {
+          'month': month,
+          'year': year,
+          'idUos': idUos,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
+
+      if (response.data['statusCode'] == 200) {
+        final responseData = response.data;
+        final List<dynamic> data = responseData['data'];
+        return data.map((item) => CalendarEventModel.fromJson(item)).toList();
+      } else {
+        throw Exception(
+            "Fail to load Calendar Absent Events: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Fail to load Calendar Absent Events: $e");
+      throw Exception("Failed to fetch CalendarAbsentEvents: $e");
+    }
+  }
+
   Future<String> getSemesterByDate(DateTime inputDate, String authToken) async {
     try {
       final response = await _dio.get(

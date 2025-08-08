@@ -343,6 +343,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           : "assets/icons/svg/student_tracking.svg",
                                       width: 18,
                                       height: 18,
+                                      colorFilter: ColorFilter.mode(
+                                          Colors.black, BlendMode.srcIn),
                                     ),
                                   ),
                                 ),

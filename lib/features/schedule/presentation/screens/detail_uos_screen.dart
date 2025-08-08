@@ -5,6 +5,7 @@ import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_info_tab.dart';
@@ -29,7 +30,9 @@ class DetailUnitOfStudy extends StatelessWidget {
           BlocProvider(
               create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
                 ..add(LoadFullInfoUosDetail(
-                    idUos: idUos, isTeacher: false, authToken: authToken)))
+                    idUos: idUos, isTeacher: false, authToken: authToken))),
+          BlocProvider(
+              create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>())),
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
