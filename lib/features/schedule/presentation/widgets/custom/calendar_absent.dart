@@ -4,7 +4,6 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,13 @@ import 'package:intl/date_symbol_data_local.dart';
 
 class CalendarAbsent extends StatefulWidget {
   const CalendarAbsent(
-      {super.key, required this.initDate, required this.onValueChange});
+      {super.key,
+      required this.initDate,
+      required this.onValueChange,
+      required this.idUos});
   final DateTime initDate;
   final Function(DateTime) onValueChange;
+  final String idUos;
 
   @override
   State<CalendarAbsent> createState() => _CalendarAbsentState();
@@ -33,16 +36,13 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
 
   void _loadCalendarEventsForMonth() {
     final authState = context.read<AuthBloc>().state;
-
-    final String userRole =
-        authState is AuthUserAuthenticated ? authState.userData.role.name : '';
     final String authToken =
         authState is AuthUserAuthenticated ? authState.accessToken : '';
     context.read<CalendarBloc>().add(
-          LoadCalendarEvents(
+          LoadCalendarAbsentEvents(
               month: widget.initDate.month,
               year: widget.initDate.year,
-              isTeacher: userRole == RoleModel.roleTeacher,
+              idUos: widget.idUos,
               authToken: authToken),
         );
   }
@@ -186,9 +186,8 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                   final date = DateTime(
                       event.date.year, event.date.month, event.date.day);
                   newEventMap.putIfAbsent(date, () => []);
-                  newEventMap[date]!.addAll(event.eventTypes
-                      .where((e) => e.eventType == 3)
-                      .map((e) => e.eventType));
+                  newEventMap[date]!
+                      .addAll(event.eventTypes.map((e) => e.eventType));
                 }
 
                 setState(() {
@@ -216,20 +215,16 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                     _focusedDay = focusDate;
                   });
                   final authState = context.read<AuthBloc>().state;
-
-                  final String userRole = authState is AuthUserAuthenticated
-                      ? authState.userData.role.name
-                      : '';
                   final String authToken = authState is AuthUserAuthenticated
                       ? authState.accessToken
                       : '';
                   if (_debounce?.isActive ?? false) _debounce?.cancel();
                   _debounce = Timer(const Duration(milliseconds: 800), () {
                     context.read<CalendarBloc>().add(
-                          LoadCalendarEvents(
+                          LoadCalendarAbsentEvents(
                               month: focusDate.month,
                               year: focusDate.year,
-                              isTeacher: userRole == RoleModel.roleTeacher,
+                              idUos: widget.idUos,
                               authToken: authToken),
                         );
                   });

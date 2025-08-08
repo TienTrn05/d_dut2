@@ -24,6 +24,14 @@ class CalendarEventLoaded extends CalendarState {
   List<Object> get props => [calendarEvents];
 }
 
+class CalendarAbsentEventLoaded extends CalendarState {
+  final List<CalendarEventModel> calendarEvents;
+  CalendarAbsentEventLoaded({required this.calendarEvents});
+
+  @override
+  List<Object> get props => [calendarEvents];
+}
+
 class CalendarWeekLoaded extends CalendarState {
   final String noWeek;
   CalendarWeekLoaded({required this.noWeek});
