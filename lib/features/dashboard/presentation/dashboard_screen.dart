@@ -273,7 +273,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/solar_users-group-rounded-broken.svg",
                                     title: "Lớp chủ nhiệm",
-                                    onTap: () {},
+                                    onTap: () {
+                                      context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                              scopes, Routes.listHomeRoom));
+                                    },
                                     disabled: true,
                                   ),
                                   FeatureCard(
@@ -332,7 +336,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     iconUrl:
                                         "assets/icons/svg/solar_users-group-rounded-broken.svg",
                                     title: "Lớp sinh hoạt",
-                                    disabled: true,
+                                    // disabled: true,
                                   ),
                                   FeatureCard(
                                     iconUrl: "assets/icons/svg/mage_goals.svg",
