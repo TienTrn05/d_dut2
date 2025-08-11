@@ -17,7 +17,7 @@ import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
-
+ 
 void main() async {
   await AppEnvironment.setup();
   await Storage.setup();
