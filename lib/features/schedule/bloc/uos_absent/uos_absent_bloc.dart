@@ -8,6 +8,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
   UosAbsentBloc(this._repository) : super(UosAbsentInitial()) {
     on<LoadStudentsAbsent>(_onLoadStudentAbsent);
     on<LoadIsAttendanceDate>(_onLoadIsAttendanceDate);
+    on<LoadIsAttendanceDateValid>(_onLoadIsAttendanceDateValid);
     on<TakeAttendance>(_onLoadTakeAttendance);
     on<DeleteAttendanceHistory>(_onLoadDeleteAttendanceHistory);
   }
@@ -54,7 +55,8 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
       final authToken = event.authToken;
       final isAttendanceDate = await _repository.getIsAttendanceDateValid(
           idUos, attendanceDate!, authToken);
-      emit(UosCheckIsAttendanceDateLoaded(isAttendanceDate: isAttendanceDate));
+      emit(UosCheckIsAttendanceDateValidLoaded(
+          isAttendanceDateValid: isAttendanceDate));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));
     }
