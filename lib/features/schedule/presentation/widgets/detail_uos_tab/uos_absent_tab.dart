@@ -157,6 +157,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _listStudentIsAbsent = {};
           _currentPage = 1;
           _hasCheckedAttendanceStatus = false;
+          _isTeachingDate = true;
         });
 
         context.read<CalendarBloc>().add(
@@ -178,6 +179,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         _listStudentIsAbsent = {};
         _currentPage = 1;
         _hasCheckedAttendanceStatus = false;
+        _isTeachingDate = true;
       });
       context.read<CalendarBloc>().add(
             LoadCalendarWeek(
@@ -587,13 +589,15 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   ],
                   if (!_isTeachingDate && widget.isCheckAbsent) ...[
                     Expanded(
-                      child: Text(
-                        "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh.",
-                        style: TextStyle(
-                          fontSize: FontSizes.medium,
-                          color: context.theme.grey,
+                      child: Center(
+                        child: Text(
+                          "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh.",
+                          style: TextStyle(
+                            fontSize: FontSizes.medium,
+                            color: context.theme.grey,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     )
                   ] else if (_statusCheckedIn == 0 && widget.isCheckAbsent) ...[
