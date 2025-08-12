@@ -42,4 +42,31 @@ class NotificationService {
       rethrow;
     }
   }
+
+  Future<List<Notification>> getGeneralNotifications(String token,
+      {int limit = 5, String? lastVisible}) async {
+    try {
+      final response = await _apiClient.dio.get(
+          !lastVisible.isNullOrEmpty
+              ? "$_url/api/notifications/general?limit=$limit&lastVisible=$lastVisible"
+              : "$_url/api/notifications/general?limit=$limit",
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200) {
+        final data = response.data['data']['notifications'];
+
+        final List<Notification> notifications = (data as List)
+            .map((notification) => Notification.fromJson(notification))
+            .toList();
+        return notifications;
+      } else {
+        throw Exception(
+            "Failed to load notifications: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching general notifications: $e");
+      rethrow;
+    }
+  }
 }
