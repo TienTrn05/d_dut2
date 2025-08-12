@@ -298,6 +298,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                               color: Color.fromRGBO(42, 116, 189, 1),
                               fontSize: FontSizes.medium,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),

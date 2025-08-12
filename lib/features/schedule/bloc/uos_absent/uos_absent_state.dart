@@ -8,10 +8,13 @@ class UosAbsentState extends Equatable {
 
 class UosAbsentInitial extends UosAbsentState {}
 
-class UosStudentsAbsentLoading extends UosAbsentState {}
-class UosCheckIsAttendanceDateLoading extends UosAbsentState {}
-class UosTakeAttendanceLoading extends UosAbsentState {}
-class UosDeleteAttendanceHistoryLoading extends UosAbsentState {}
+class UosAbsentLoading extends UosAbsentState {}
+
+// class UosCheckIsAttendanceDateLoading extends UosAbsentState {}
+
+// class UosTakeAttendanceLoading extends UosAbsentState {}
+
+// class UosDeleteAttendanceHistoryLoading extends UosAbsentState {}
 
 class UosAbsentError extends UosAbsentState {
   final String message;
@@ -28,6 +31,11 @@ class UosAbsentLoaded extends UosAbsentState {
 class UosCheckIsAttendanceDateLoaded extends UosAbsentState {
   final bool isAttendanceDate;
   UosCheckIsAttendanceDateLoaded({required this.isAttendanceDate});
+}
+
+class UosCheckIsAttendanceDateValidLoaded extends UosAbsentState {
+  final bool isAttendanceDateValid;
+  UosCheckIsAttendanceDateValidLoaded({required this.isAttendanceDateValid});
 }
 
 class UosTakeAttendanceLoaded extends UosAbsentState {
