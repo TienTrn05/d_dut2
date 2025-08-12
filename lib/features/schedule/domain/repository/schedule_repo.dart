@@ -77,6 +77,12 @@ class ScheduleRepository {
     return _scheduleService.isAttendanceDate(idUos, attendanceDate, authToken);
   }
 
+  Future<bool> getIsAttendanceDateValid(
+      String idUos, DateTime attendanceDate, String authToken) {
+    return _scheduleService.isAttendanceDateValid(
+        idUos, attendanceDate, authToken);
+  }
+
   Future<bool> takeAttendance(String idUnitOfStudy, DateTime absenceDate,
       List<String> idStudentsAbsent, String authToken) {
     return _scheduleService.takeAttendance(

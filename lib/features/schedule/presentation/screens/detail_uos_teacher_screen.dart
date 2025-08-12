@@ -254,7 +254,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                             idUos: widget.idUos,
                                             isCheckAbsent: _isCheckAbsent,
                                             selectedDay: widget.selectedDay,
-                                            // noWeek: widget.noWeek,
                                             setIsNotChecked: setIsNotChecking,
                                           ),
                                           UosNotiTab(
