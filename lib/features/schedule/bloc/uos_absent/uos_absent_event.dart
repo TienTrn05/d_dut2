@@ -33,6 +33,18 @@ class LoadIsAttendanceDate extends UosAbsentEvent {
   });
 }
 
+class LoadIsAttendanceDateValid extends UosAbsentEvent {
+  final String idUos;
+  final DateTime? attendanceDate;
+  final String authToken;
+
+  LoadIsAttendanceDateValid({
+    required this.idUos,
+    this.attendanceDate,
+    required this.authToken,
+  });
+}
+
 class TakeAttendance extends UosAbsentEvent {
   final String idUnitOfStudy;
   final DateTime absenceDate;
@@ -56,6 +68,5 @@ class DeleteAttendanceHistory extends UosAbsentEvent {
     required this.idUos,
     required this.attendanceDate,
     required this.authToken,
-
   });
 }

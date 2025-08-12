@@ -43,8 +43,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   Map<int, bool> _listIsSellectedAll = {};
   late DateTime _currentDate;
   late String _currentWeek = "";
-  int _statusCheckedIn =
-      0; // 0: Chưa điểm danh, 1: Đã điểm danh, 2: Đang điểm danh
+
+  // 0: Chưa điểm danh, 1: Đã điểm danh, 2: Đang điểm danh
+  int _statusCheckedIn = 0;
+  bool _isTeachingDate = false;
+
   final TextEditingController _searchController = TextEditingController();
   int _currentPage = 1;
   int _totalPages = 1;
@@ -64,7 +67,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
 
     setState(() {
       _currentDate = widget.selectedDay;
-      // _currentWeek = "tuần ${widget.noWeek}";
       _listStudentIsAbsent = {};
       _listIsSellectedAll = {};
     });
@@ -73,7 +75,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               inputDate: getMondayOfWeek(widget.selectedDay),
               authToken: _authToken),
         );
-    context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+    // Check có phải ngày dạy không trước
+    context.read<UosAbsentBloc>().add(LoadIsAttendanceDateValid(
         idUos: widget.idUos,
         attendanceDate: widget.selectedDay,
         authToken: _authToken));
@@ -343,6 +346,29 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         listeners: [
           BlocListener<UosAbsentBloc, UosAbsentState>(
               listener: (context, state) {
+            if (state is UosCheckIsAttendanceDateValidLoaded) {
+              setState(() {
+                _isTeachingDate = state.isAttendanceDateValid;
+              });
+              if (state.isAttendanceDateValid) {
+                context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
+                    idUos: widget.idUos,
+                    attendanceDate: widget.selectedDay,
+                    authToken: _authToken));
+              } else {
+                setState(() {
+                  _statusCheckedIn = 0;
+                  _hasCheckedAttendanceStatus = true;
+                });
+                widget.setIsNotChecked(true);
+                context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
+                    idUos: widget.idUos,
+                    pageNumber: _currentPage,
+                    absenceDate: _currentDate,
+                    keyword: _searchController.text.trim(),
+                    authToken: _authToken));
+              }
+            }
             if (state is UosCheckIsAttendanceDateLoaded) {
               setState(() {
                 _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
@@ -559,7 +585,18 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       ],
                     ),
                   ],
-                  if (_statusCheckedIn == 0 && widget.isCheckAbsent) ...[
+                  if (!_isTeachingDate && widget.isCheckAbsent) ...[
+                    Expanded(
+                      child: Text(
+                        "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh.",
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          color: context.theme.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  ] else if (_statusCheckedIn == 0 && widget.isCheckAbsent) ...[
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
