@@ -19,4 +19,15 @@ class NotificationRepository {
       throw Exception('Failed to load my notifications: $e');
     }
   }
+
+  Future<List<Notification>> fetchGeneralNotifications(String token,
+      {int limit = 5, String? lastVisible}) async {
+    try {
+      final notifications = await _notificationService.getGeneralNotifications(token,
+          limit: limit, lastVisible: lastVisible);
+      return notifications;
+    } catch (e) {
+      throw Exception('Failed to load general notifications: $e');
+    }
+  }
 }
