@@ -15,6 +15,8 @@ class NotificationsBloc
       : super(const NotificationsState()) {
     on<MyNotificationsSubscriptionRequested>(_onFetchMyNotifications);
     on<MyNotificationsLoadMoreRequested>(_onLoadMoreMyNotifications);
+    on<GeneralNotificationsSubscriptionRequested>(_onFetchGeneralNotifications);
+    on<GeneralNotificationsLoadMoreRequested>(_onLoadMoreGeneralNotifications);
   }
 
   Future<void> _onFetchMyNotifications(
@@ -49,6 +51,41 @@ class NotificationsBloc
       emit(state.copyWith(
           myNotificationsStatus: () => MyNotificationsStatus.failure,
           errorMyNotificationsMessage: () => "Đã có lỗi xảy ra!"));
+    }
+  }
+
+  Future<void> _onFetchGeneralNotifications(
+      GeneralNotificationsSubscriptionRequested event,
+      Emitter<NotificationsState> emit) async {
+    emit(state.copyWith(generalNotificationsStatus: () => GeneralNotificationsStatus.initial));
+    try {
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.loading));
+      final notifications = await notificationRepository.fetchGeneralNotifications(event.token);
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.success,
+          generalNotifications: () => notifications));
+    } catch (e) {
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.failure,
+          errorGeneralNotificationsMessage: () => "Đã có lỗi xảy ra!"));
+    }
+  }
+
+  Future<void> _onLoadMoreGeneralNotifications(
+      GeneralNotificationsLoadMoreRequested event,
+      Emitter<NotificationsState> emit) async {
+    try {
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.loading));
+      final notifications = await notificationRepository.fetchGeneralNotifications(event.token, lastVisible: state.generalNotifications.last.id);
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.success,
+          generalNotifications: () => [...state.generalNotifications, ...notifications]));
+    } catch (e) {
+      emit(state.copyWith(
+          generalNotificationsStatus: () => GeneralNotificationsStatus.failure,
+          errorGeneralNotificationsMessage: () => "Đã có lỗi xảy ra!"));
     }
   }
 }

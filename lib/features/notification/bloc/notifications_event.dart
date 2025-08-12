@@ -28,3 +28,25 @@ class MyNotificationsLoadMoreRequested extends NotificationsEvent {
   @override
   List<Object> get props => [token];
 }
+
+class GeneralNotificationsSubscriptionRequested extends NotificationsEvent {
+  final String token;
+
+  const GeneralNotificationsSubscriptionRequested({
+    required this.token,
+  });
+  
+  @override
+  List<Object> get props => [token];
+}
+
+class GeneralNotificationsLoadMoreRequested extends NotificationsEvent {
+  final String token;
+
+  const GeneralNotificationsLoadMoreRequested({
+    required this.token,
+  });
+  
+  @override
+  List<Object> get props => [token];
+}

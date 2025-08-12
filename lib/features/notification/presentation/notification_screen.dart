@@ -89,6 +89,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
         create: (context) => NotificationsBloc(
             notificationRepository: getIt.get<NotificationRepository>())
           ..add(MyNotificationsSubscriptionRequested(
+              token: stateAuth.accessToken))
+          ..add(GeneralNotificationsSubscriptionRequested(
               token: stateAuth.accessToken)),
         child: DefaultTabController(
           length: 2,
@@ -271,7 +273,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: TabBarView(
                           children: [
                             MyNotifications(token: stateAuth.accessToken,), // Nội dung tab 1
-                            GeneralNotifications(), // Nội dung tab 2
+                            GeneralNotifications(token: stateAuth.accessToken,), // Nội dung tab 2
                           ],
                         ),
                       ),

@@ -1,27 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/extensions/custom_theme_extension.dart';
+
+import '../bloc/notifications_bloc.dart';
 import './widgets/notification_card.dart';
 
 class GeneralNotifications extends StatelessWidget {
-  const GeneralNotifications({super.key});
+  const GeneralNotifications({super.key, required this.token});
+
+  final String token;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.all(0),
-      children: [
-        NotificationCard(
-          date: "14/02/2025",
-          title: "Thông báo thu học phí kỳ II năm học 2024-2025 (đợt 1)",
-          content: "Sinh viên xem thông báo tại đây",
-        ),
-        NotificationCard(
-          date: "14/02/2025",
-          title:
-              "Khảo sát lấy ý kiến đánh giá khóa học đối với sinh viên hoàn thành CTĐT",
-          content: "Thời gian: 07h00 ngày 17/01/2025 đến 17h00 ngày 15/02/2025",
-        ),
-      ],
-    );
+    return BlocBuilder<NotificationsBloc, NotificationsState>(
+        builder: (contextNoti, state) {
+      if (state.generalNotificationsStatus == GeneralNotificationsStatus.loading &&
+          state.generalNotifications.isEmpty) {
+        return Center(
+            child: CircularProgressIndicator(
+          color: context.theme.primaryColor,
+        ));
+      } else if (state.generalNotificationsStatus == GeneralNotificationsStatus.failure) {
+        return Center(
+          child: Text(
+            state.errorGeneralNotificationsMessage,
+            style: TextStyle(color: context.theme.red),
+          ),
+        );
+      } else if (state.generalNotificationsStatus == GeneralNotificationsStatus.success &&
+          state.generalNotifications.isEmpty) {
+        return const Center(child: Text("Hiện không có thông báo nào"));
+      }
+      return Column(
+        children: [
+          // 1. Wrap the ListView with Expanded
+          Expanded(
+            // 2. Use ListView.builder for better performance with long lists
+            child: ListView.builder(
+              padding: const EdgeInsets.all(0),
+              // The total number of items is notifications + 1 for the "Load more" button
+              itemCount: state.generalNotifications.length + 1,
+              itemBuilder: (context, index) {
+                // If it's the last item, show the "Load more" button
+                if (index == state.generalNotifications.length) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.read<NotificationsBloc>().add(
+                              GeneralNotificationsLoadMoreRequested(token: token));
+                        },
+                        child: (state.generalNotificationsStatus ==
+                                    GeneralNotificationsStatus.loading &&
+                                state.generalNotifications.isNotEmpty)
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                color: context.theme.primaryColor,
+                              ))
+                            : Text(
+                                "Load more",
+                                style: TextStyle(
+                                  color: context.theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: context.theme.primaryColor,
+                                ),
+                              ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Otherwise, build the notification card
+                final notification = state.generalNotifications[index];
+                return NotificationCard(
+                  date:
+                      "${notification.createdAt.day}/${notification.createdAt.month}/${notification.createdAt.year}",
+                  title: notification.title,
+                  content: notification.body,
+                  // Use the actual 'read' status from the notification object
+                  isRead: notification.read,
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
   }
 }
