@@ -141,6 +141,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       bottomLeft: Radius.circular(16),
                     ),
                   ),
+                  backgroundColor: Colors.white,
                   child: SafeArea(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -269,7 +270,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         padding: const EdgeInsets.only(top: 10),
                         child: TabBarView(
                           children: [
-                            MyNotifications(), // Nội dung tab 1
+                            MyNotifications(token: stateAuth.accessToken,), // Nội dung tab 1
                             GeneralNotifications(), // Nội dung tab 2
                           ],
                         ),

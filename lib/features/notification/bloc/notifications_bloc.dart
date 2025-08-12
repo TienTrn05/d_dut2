@@ -14,6 +14,7 @@ class NotificationsBloc
   NotificationsBloc({required this.notificationRepository})
       : super(const NotificationsState()) {
     on<MyNotificationsSubscriptionRequested>(_onFetchMyNotifications);
+    on<MyNotificationsLoadMoreRequested>(_onLoadMoreMyNotifications);
   }
 
   Future<void> _onFetchMyNotifications(
@@ -27,6 +28,23 @@ class NotificationsBloc
       emit(state.copyWith(
           myNotificationsStatus: () => MyNotificationsStatus.success,
           myNotifications: () => notifications));
+    } catch (e) {
+      emit(state.copyWith(
+          myNotificationsStatus: () => MyNotificationsStatus.failure,
+          errorMyNotificationsMessage: () => "Đã có lỗi xảy ra!"));
+    }
+  }
+
+  Future<void> _onLoadMoreMyNotifications(
+      MyNotificationsLoadMoreRequested event,
+      Emitter<NotificationsState> emit) async {
+    try {
+      emit(state.copyWith(
+          myNotificationsStatus: () => MyNotificationsStatus.loading));
+      final notifications = await notificationRepository.fetchMyNotifications(event.token, lastVisible: state.myNotifications.last.id);
+      emit(state.copyWith(
+          myNotificationsStatus: () => MyNotificationsStatus.success,
+          myNotifications: () => [...state.myNotifications, ...notifications]));
     } catch (e) {
       emit(state.copyWith(
           myNotificationsStatus: () => MyNotificationsStatus.failure,

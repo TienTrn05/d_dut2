@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:e_dut/common/extensions/optional_x.dart';
 import 'package:injectable/injectable.dart';
 
 import '/core/services/api_client.dart';
@@ -15,12 +16,13 @@ class NotificationService {
       : _url = url,
         _apiClient = ApiClient(url);
 
-  Future<List<Notification>> getMyNotifications(
-    String token,
-  ) async {
+  Future<List<Notification>> getMyNotifications(String token,
+      {int limit = 5, String? lastVisible}) async {
     try {
       final response = await _apiClient.dio.get(
-          "$_url/api/notifications",
+          !lastVisible.isNullOrEmpty
+              ? "$_url/api/notifications?limit=$limit&lastVisible=$lastVisible"
+              : "$_url/api/notifications?limit=$limit",
           options: Options(headers: {
             "Authorization": "Bearer $token",
           }));
@@ -32,7 +34,8 @@ class NotificationService {
             .toList();
         return notifications;
       } else {
-        throw Exception("Failed to load notifications: ${response.data['message']}");
+        throw Exception(
+            "Failed to load notifications: ${response.data['message']}");
       }
     } catch (e) {
       logger.e("Error fetching my notifications: $e");
