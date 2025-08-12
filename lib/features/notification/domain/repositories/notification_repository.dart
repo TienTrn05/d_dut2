@@ -9,6 +9,14 @@ class NotificationRepository {
 
   NotificationRepository(this._notificationService);
 
+  Future<void> registerFCMToken(String token, String FCMtoken) async {
+    try {
+      await _notificationService.registerFCMToken(token, FCMtoken);
+    } catch (e) {
+      throw Exception('Failed to register FCM token: $e');
+    }
+  }
+
   Future<List<Notification>> fetchMyNotifications(String token,
       {int limit = 5, String? lastVisible}) async {
     try {

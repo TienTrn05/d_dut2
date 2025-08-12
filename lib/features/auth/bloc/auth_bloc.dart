@@ -13,6 +13,7 @@ import '../../../common/widgets/loading/cube_grid_loading.dart';
 import '../../../core/data/local/storage.dart';
 import '../../../features/auth/data/model/user_model.dart';
 import '../../../features/auth/domain/repository/auth_repo.dart';
+import '../../../features/notification/domain/repositories/notification_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -20,8 +21,11 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
   final AuthRepository _authRepository;
+  final NotificationRepository _notificationRepository;
 
-  AuthBloc(this.navigatorKey, this._authRepository) : super(AuthInitial()) {
+  AuthBloc(
+      this.navigatorKey, this._authRepository, this._notificationRepository)
+      : super(AuthInitial()) {
     on<AuthInitRequested>(_onInitUser);
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
     on<AuthLoginRequested>(_onLogin);
@@ -36,7 +40,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       responseType: "code",
       scope: "User.Read",
       loginHint: savedEmail ?? "",
-      loader: const Center(child: CubeGridLoading(backgroundColor: Color(0xFF2A74BD),)),
+      loader: const Center(
+          child: CubeGridLoading(
+        backgroundColor: Color(0xFF2A74BD),
+      )),
       navigatorKey: navigatorKey, // Truyền navigatorKey
     ));
   }
@@ -60,7 +67,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onMicrosoftSignIn(
       MicrosoftSignInRequested event, Emitter<AuthState> emit) async {
-        String savedEmail = Storage.hintEmail ?? "";
+    String savedEmail = Storage.hintEmail ?? "";
     AadOAuth microsoftSignIn = _microsoftSignInSetup(savedEmail);
 
     var result = await microsoftSignIn.login();
@@ -83,6 +90,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           await Storage.setAccessToken(data["accessToken"]);
           await Storage.setUser(data["user"]);
+
+          if (event.FCMToken.isNotEmpty) {
+            try {
+              await _notificationRepository.registerFCMToken(data["accessToken"], event.FCMToken);
+            } catch (e) {
+              logger.e("Failed to register FCM token: $e");
+            }
+          }
 
           emit(AuthUserAuthenticated(
             data["accessToken"],
