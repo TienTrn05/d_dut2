@@ -121,7 +121,7 @@ class GradeScreen extends StatelessWidget {
                 } else if (state.status == GradeStatus.failure) {
                   return Center(
                     child: Text(
-                      'Đã xảy ra lỗi khi tải điểm.\n${state.errorMessage}',
+                      'Đã xảy ra lỗi khi tải điểm. Vui lòng thử lại sau.',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: FontSizes.medium),
                     ),

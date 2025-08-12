@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/services/notification_service.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/login_bloc.dart';
 
@@ -142,8 +143,9 @@ class LoginForm extends StatelessWidget {
               return AuthMicrosoftButton(
                   text: "Đăng nhập bằng Microsoft",
                   color: context.theme.primaryColor ?? Colors.blue,
-                  onPressed: () {
-                    context.read<AuthBloc>().add(MicrosoftSignInRequested());
+                  onPressed: () async {
+                    var FCMtoken = await context.read<FirebaseAPI>().init();
+                    context.read<AuthBloc>().add(MicrosoftSignInRequested(FCMtoken ?? ""));
                   });
             }),
             const SizedBox(height: 24),

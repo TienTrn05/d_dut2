@@ -7,7 +7,15 @@ sealed class AuthEvent extends Equatable {
 // Event để khởi tạo user từ Storage
 class AuthInitRequested extends AuthEvent {} 
 
-class MicrosoftSignInRequested extends AuthEvent {}
+class MicrosoftSignInRequested extends AuthEvent {
+  // ignore: non_constant_identifier_names
+  final String FCMToken;
+
+  MicrosoftSignInRequested(this.FCMToken);
+
+  @override
+  List<Object> get props => [FCMToken];
+}
 
 class AuthLoginRequested extends AuthEvent {
   final String username;

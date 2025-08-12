@@ -16,6 +16,23 @@ class NotificationService {
       : _url = url,
         _apiClient = ApiClient(url);
 
+  Future<void> registerFCMToken(String token, String FCMtoken) async {
+    try {
+      final response =
+          await _apiClient.dio.post("$_url/api/notifications/register-token",
+              data: {"token": FCMtoken},
+              options: Options(headers: {
+                "Authorization": "Bearer $token",
+              }));
+      if (response.statusCode != 200) {
+        throw Exception("Failed to register FCM token: ${response.data}");
+      }
+    } catch (e) {
+      logger.e("Error registering FCM token: $e");
+      rethrow;
+    }
+  }
+
   Future<List<Notification>> getMyNotifications(String token,
       {int limit = 5, String? lastVisible}) async {
     try {

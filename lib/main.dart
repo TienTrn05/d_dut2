@@ -21,6 +21,7 @@ import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
+import 'features/notification/domain/repositories/notification_repository.dart';
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) =>
-              AuthBloc(navigatorKey, getIt.get<AuthRepository>())
+              AuthBloc(navigatorKey, getIt.get<AuthRepository>(), getIt.get<NotificationRepository>())
                 ..add(AuthInitRequested()),
         ),
         BlocProvider(create: (context) => LoadingBloc()),

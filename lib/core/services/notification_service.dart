@@ -122,14 +122,15 @@ Future<void> _showNotification(RemoteMessage message) async {
 class FirebaseAPI with ChangeNotifier {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  Future<void> init() async {
+  Future<String?> init() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
     await _ensureNotificationSetup();
     await _firebaseMessaging.requestPermission(
         alert: true, badge: true, sound: true);
-    getToken();
+    String? token = await getToken();
     registerMessageHandlers();
+    return token;
   }
 
   void registerMessageHandlers() {
