@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/services/notification_service.dart';
 import '../bloc/root_bloc.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
@@ -35,6 +37,15 @@ class _MainViewState extends State<_MainView> {
     // const SearchingScreen(),
     const ProfileScreen(),
   ];
+
+  late FirebaseAPI firebaseAPI;
+
+  @override
+  void initState() {
+    super.initState();
+    firebaseAPI = Provider.of<FirebaseAPI>(context, listen: false);
+    firebaseAPI.init();
+  }
 
   @override
   Widget build(BuildContext context) {
