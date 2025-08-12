@@ -9,13 +9,11 @@ class NotificationRepository {
 
   NotificationRepository(this._notificationService);
 
-  Future<List<Notification>> fetchMyNotifications(
-    String token,
-  ) async {
+  Future<List<Notification>> fetchMyNotifications(String token,
+      {int limit = 5, String? lastVisible}) async {
     try {
-      final notifications = await _notificationService.getMyNotifications(
-        token
-      );
+      final notifications = await _notificationService.getMyNotifications(token,
+          limit: limit, lastVisible: lastVisible);
       return notifications;
     } catch (e) {
       throw Exception('Failed to load my notifications: $e');
