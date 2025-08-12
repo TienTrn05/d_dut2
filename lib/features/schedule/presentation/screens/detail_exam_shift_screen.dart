@@ -239,6 +239,7 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                         ),
                         Expanded(
                           child: TabBarView(
+                            physics: ClampingScrollPhysics(),
                             children: [
                               // Tab 1: Thông tin
                               BlocBuilder<UosDetailBloc, UosDetailState>(
@@ -373,15 +374,15 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
 
                                         if (listStudents
                                             .studentsPaged.items.isEmpty) {
-                                          return const Center(
+                                          return Center(
                                             child: Padding(
                                               padding: EdgeInsets.all(24.0),
                                               child: Text(
-                                                'Không có dữ liệu danh sách sinh viên',
+                                                'Không có dữ liệu sinh viên',
                                                 style: TextStyle(
                                                   fontSize: FontSizes.medium,
                                                   fontWeight: FontWeight.normal,
-                                                  color: Colors.black,
+                                                  color: context.theme.grey,
                                                 ),
                                               ),
                                             ),
@@ -464,17 +465,16 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                         ),
                                                         const SizedBox(
                                                             height: 8),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children:
-                                                              _buildPageButtons(),
-                                                        ),
                                                       ],
                                                     ),
                                                   ),
                                                 ),
+                                              ),
+                                              SizedBox(height: 8),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: _buildPageButtons(),
                                               ),
                                             ],
                                           ),
