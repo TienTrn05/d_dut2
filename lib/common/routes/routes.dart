@@ -2,6 +2,7 @@ import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/features/community_activity/data/model/user_proof_model.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/community_activities_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
+import 'package:e_dut/features/homeroom/presentation/screens/detail_homeroom_screen.dart';
 import 'package:e_dut/features/homeroom/presentation/screens/list_homeroom_screen.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
@@ -43,6 +44,7 @@ class Routes {
 
   //homeroom
   static const String listHomeRoom = "/listHomeRoom";
+  static const String detailHomeRoom = "/detailHomeRoom";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -122,6 +124,9 @@ class Routes {
       //***** HOMEROOM *****//
       case listHomeRoom:
         return MaterialPageRoute(builder: (context) => ListHomeroomScreen());
+
+      case detailHomeRoom:
+        return MaterialPageRoute(builder: (context) => DetailHomeroomScreen());
 
       default:
         return MaterialPageRoute(

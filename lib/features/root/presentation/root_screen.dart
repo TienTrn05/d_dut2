@@ -66,7 +66,7 @@ class _MainViewState extends State<_MainView> {
                 ),
               ),
             ),
-      
+
             // Bottom Navigation Bar
             Positioned(
               bottom: 24,
@@ -87,8 +87,9 @@ class _MainViewState extends State<_MainView> {
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         top: 0,
-                        left: (offsetLeft + bottomItemWidth) * state.currentPage +
-                            offsetLeft,
+                        left:
+                            (offsetLeft + bottomItemWidth) * state.currentPage +
+                                offsetLeft,
                         child: Container(
                           height: 2,
                           width: bottomItemWidth,
@@ -98,7 +99,7 @@ class _MainViewState extends State<_MainView> {
                           ),
                         ),
                       ),
-      
+
                       // Các icon tab
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
