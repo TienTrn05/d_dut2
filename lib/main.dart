@@ -1,8 +1,12 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import 'core/services/notification_service.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 
 import 'common/extensions/custom_theme_extension.dart';
@@ -17,11 +21,19 @@ import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
- 
+import 'firebase_options.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
+
 void main() async {
   await AppEnvironment.setup();
   await Storage.setup();
   await GetItUtils.setup();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final UserModel? userData = Storage.user;
 
@@ -48,28 +60,35 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(create: (context) => LoadingBloc()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        navigatorKey: navigatorKey,
-        theme: ThemeData(
-          fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
-          extensions: [CustomThemeExtension.lightMode],
-          textTheme: Theme.of(context).textTheme.apply(
-                fontSizeFactor: 1,
-                fontSizeDelta: -0.0,
-              ),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => FirebaseAPI(),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
+          theme: ThemeData(
+            fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
+            extensions: [CustomThemeExtension.lightMode],
+            textTheme: Theme.of(context).textTheme.apply(
+                  fontSizeFactor: 1,
+                  fontSizeDelta: -0.0,
+                ),
+          ),
+          darkTheme: ThemeData(
+            fontFamily: GoogleFonts.roboto().fontFamily,
+            extensions: [CustomThemeExtension.darkMode],
+          ),
+          onGenerateRoute: Routes.onGenerateRoute,
+          initialRoute: userData != null ? Routes.root : Routes.auth,
+          builder: (context, child) {
+            return LoadingOverlay(
+              child: child!,
+            );
+          },
         ),
-        darkTheme: ThemeData(
-          fontFamily: GoogleFonts.roboto().fontFamily,
-          extensions: [CustomThemeExtension.darkMode],
-        ),
-        onGenerateRoute: Routes.onGenerateRoute,
-        initialRoute: userData != null ? Routes.root : Routes.auth,
-        builder: (context, child) {
-          return LoadingOverlay(
-            child: child!,
-          );
-        },
       ),
     );
   }
