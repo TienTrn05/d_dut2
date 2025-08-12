@@ -69,7 +69,7 @@ class FeatureCard extends StatelessWidget {
                     ? SizedBox(
                         height: 20,
                         child: Text(
-                          "Upcoming...",
+                          "Sắp ra mắt...",
                           maxLines: 2,
                           style: TextStyle(
                             fontSize: FontSizes.small,

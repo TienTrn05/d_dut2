@@ -2,6 +2,7 @@ import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/homeroom/data/model/student_model.dart';
+import 'package:e_dut/features/homeroom/presentation/widgets/dialog/student_info_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,9 +21,20 @@ class StudentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
+    return BlocBuilder<AuthBloc, AuthState>(builder: (builder, authState) {
+      final userRole = authState is AuthUserAuthenticated
+          ? authState.userData.role.name
+          : '';
+      return GestureDetector(
+        onTap: () {
+          userRole == RoleModel.roleTeacher
+              ? showDialog(
+                  context: context,
+                  builder: (dialogContext) =>
+                      StudentInfoDialog(student: student))
+              : null;
+        },
+        child: Container(
           padding: EdgeInsets.symmetric(vertical: 8),
           width: double.infinity,
           decoration: BoxDecoration(
@@ -30,53 +42,56 @@ class StudentItem extends StatelessWidget {
               bottom: BorderSide(
                 color: Color.fromRGBO(116, 116, 116, 1),
                 width: 0.5,
-              ), // Chỉ border bottom
+              ),
             ),
           ),
-          child:
-              BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-            final userRole = authState is AuthUserAuthenticated
-                ? authState.userData.role.name
-                : '';
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              student.name,
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontWeight: FontWeight.bold,
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              final userRole = authState is AuthUserAuthenticated
+                  ? authState.userData.role.name
+                  : '';
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                student.name,
+                                style: TextStyle(
+                                  fontSize: FontSizes.medium,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                softWrap: true, // Cho phép xuống hàng
+                                overflow: TextOverflow.visible, // Không cắt chữ
                               ),
-                              softWrap: true, // Cho phép xuống hàng
-                              overflow: TextOverflow.visible, // Không cắt chữ
-                            ),
-                            Text(
-                              userRole == RoleModel.roleStudent
-                                  ? maskCode(student.studentCode)
-                                  : student.mail,
-                              style: TextStyle(
-                                fontSize: FontSizes.small,
+                              Text(
+                                userRole == RoleModel.roleStudent
+                                    ? maskCode(student.studentCode)
+                                    : student.mail,
+                                style: TextStyle(
+                                  fontSize: FontSizes.small,
+                                ),
+                                softWrap: true, // Cho phép xuống hàng
+                                overflow: TextOverflow.visible, // Không cắt chữ
                               ),
-                              softWrap: true, // Cho phép xuống hàng
-                              overflow: TextOverflow.visible, // Không cắt chữ
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          })),
-    );
+                ],
+              );
+            },
+          ),
+        ),
+      );
+    });
   }
 }

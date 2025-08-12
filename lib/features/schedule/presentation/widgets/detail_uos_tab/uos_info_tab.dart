@@ -137,10 +137,10 @@ class _UosInfoTabState extends State<UosInfoTab> {
                         value: widget.uosDetail.noUOS),
                     InfoItem(
                         field: "Mã môn", value: widget.uosDetail.noSubject),
-                    InfoItem(
-                      field: "Hệ",
-                      value: widget.uosDetail.clc == 1 ? "CLC" : "",
-                    ),
+                    // InfoItem(
+                    //   field: "Hệ",
+                    //   value: widget.uosDetail.clc == 1 ? "CLC" : "",
+                    // ),
                     InfoItem(
                       field: "Số tín chỉ",
                       value: widget.uosDetail.credit.toString(),

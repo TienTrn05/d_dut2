@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
@@ -307,20 +308,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       iconUrl:
                                           "assets/icons/svg/fluent_calendar-work-week-32-regular.svg",
                                       title: "Lịch tuần",
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, "/calendar"));
+                                      onTap: () async {
+                                        final url = Uri.parse(
+                                            'https://lichtuan.dut.udn.vn');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode:
+                                                  LaunchMode.inAppBrowserView);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                              context,
+                                              'Không thể mở liên kết',
+                                              'Vui lòng kiểm tra kết nối internet hoặc thử lại sau',
+                                              AlertType.error);
+                                        }
                                       },
                                     ),
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/mdi_microsoft-teams.svg",
                                       title: "Ms Teams tool",
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.msteamtool));
+                                      onTap: () async {
+                                        final url = Uri.parse(
+                                            'https://msteamtool.dut.udn.vn');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode:
+                                                  LaunchMode.inAppBrowserView);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                              context,
+                                              'Không thể mở liên kết',
+                                              'Vui lòng kiểm tra kết nối internet hoặc thử lại sau',
+                                              AlertType.error);
+                                        }
                                       },
                                     ),
                                   ];
@@ -361,8 +382,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       title: "Lớp sinh hoạt",
                                       // disabled: true,
                                       onTap: () {
-                                        Navigator.of(context)
-                                            .pushNamed(Routes.detailHomeRoom);
+                                        context.read<DashboardBloc>().add(
+                                            DashboardNavigateRequested(
+                                                scopes, Routes.detailHomeRoom));
                                       },
                                     ),
                                     FeatureCard(

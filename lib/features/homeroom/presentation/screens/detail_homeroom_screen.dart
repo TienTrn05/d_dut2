@@ -32,7 +32,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
       name: 'Nguyễn Văn A',
       studentCode: '21TCLC001',
       phoneNumber: '0901234567',
-      mail: 'nguyenvana@example.com',
+      mail: 'thaonguyenvy109@gmail.com',
       relativePhoneNumber: '0912345678',
     ),
     StudentModel(
