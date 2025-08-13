@@ -1,26 +1,20 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class InfoItem extends StatelessWidget {
   final String field;
   final String value;
-  final bool enabledEdit;
-  final Function()? onEdit;
 
   const InfoItem({
     super.key,
     required this.field,
     required this.value,
-    this.enabledEdit = false,
-    this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,28 +45,6 @@ class InfoItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (enabledEdit)
-                  GestureDetector(
-                    onTap: onEdit,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: onEdit,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: SvgPicture.asset(
-                            "assets/icons/svg/lucide_pen.svg",
-                            width: 16,
-                            height: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
