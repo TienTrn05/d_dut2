@@ -40,10 +40,14 @@ class EditFieldItem extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         TextField(
+          textInputAction: TextInputAction.done,
           controller: controller,
           cursorColor: context.theme.grey ?? Colors.grey,
           maxLines: maxLine,
           minLines: minLine,
+          onEditingComplete: () {
+            FocusScope.of(context).unfocus();
+          },
           style: TextStyle(
             fontSize: FontSizes.small,
             color: context.theme.grey ?? Colors.grey,

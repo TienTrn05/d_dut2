@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -23,6 +24,7 @@ class SearchTextField extends StatelessWidget {
         fontSize: 16,
         color: textColor,
       ),
+      cursorColor: context.theme.grey ?? Colors.grey,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
