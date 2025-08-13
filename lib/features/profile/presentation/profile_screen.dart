@@ -1,4 +1,9 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/profile/data/model/student_profile_model.dart';
+import 'package:e_dut/features/profile/data/model/teacher_profile_model.dart';
+import 'package:e_dut/features/profile/presentation/widgets/student_profile.dart';
+import 'package:e_dut/features/profile/presentation/widgets/teacher_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,8 +13,6 @@ import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../common/routes/routes.dart';
 
 import '../../auth/bloc/auth_bloc.dart';
-import './widgets/info_card.dart';
-import './widgets/info_item.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -58,7 +61,8 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
                               child: Image.asset(
                                 'assets/images/default_avatar.jpg',
                                 width: 80,
@@ -93,7 +97,7 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: FontSizes.extraLarge,
                                         fontWeight: FontWeight.bold,
-                                        height: 1.2,
+                                        height: 1,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -115,89 +119,22 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       )),
                   const SizedBox(height: 10),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          InfoCart(
-                            title: "Thông tin cơ bản",
-                            child: Column(
-                              children: [
-                                InfoItem(
-                                    field: "Ngày sinh", value: "21/11/2003"),
-                                InfoItem(field: "Giới tính", value: "Nam"),
-                                InfoItem(
-                                  field: "Số điện thoại",
-                                  value: "0337237665",
-                                ),
-                                InfoItem(
-                                  field: "Email cá nhân",
-                                  value: "tranhuutuan26112003@gmail.com",
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          InfoCart(
-                            title: "Thông tin học vấn",
-                            child: Column(
-                              children: [
-                                InfoItem(
-                                    field: "Ngành",
-                                    value: "Công nghệ thông tin"),
-                                InfoItem(field: "Lớp", value: "21TCLC_DT3"),
-                                InfoItem(
-                                    field: "CTĐT",
-                                    value:
-                                        "Công nghệ Thông tin K2021CLC Đặc thù_cử nhân_KTMT"),
-                                BlocBuilder<AuthBloc, AuthState>(
-                                    builder: (context, state) {
-                                  final String email =
-                                      (state is AuthUserAuthenticated)
-                                          ? state.userData.mail
-                                          : 'Unknown';
-                                  return InfoItem(
-                                      field: "TK Office365", value: email);
-                                })
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          InfoCart(
-                            title: "Thông tin liên hệ khẩn cấp",
-                            child: Column(
-                              children: [
-                                InfoItem(
-                                  field: "Họ tên/Quan hệ",
-                                  value: "Trần Tám/cha",
-                                ),
-                                InfoItem(
-                                  field: "SĐT",
-                                  value: "0377432969",
-                                ),
-                                InfoItem(
-                                  field: "Số nhà đường",
-                                  value: "Tổ dân phố Diên Trường",
-                                ),
-                                InfoItem(
-                                  field: "Tỉnh/Thành phố",
-                                  value: "Thừa Thiên Huế",
-                                ),
-                                InfoItem(
-                                  field: "Huyện/Quận",
-                                  value: "Phú Thuận",
-                                ),
-                                InfoItem(
-                                  field: "Xã/Phường",
-                                  value: "Thuận An",
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                  BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, authState) {
+                    final userRole = (authState is AuthUserAuthenticated)
+                        ? authState.userData.role.name
+                        : '';
+                    final student = StudentProfileModel.mockData;
+                    final teacher = TeacherProfileModel.mockTeacherProfile;
+                    return Expanded(
+                        child: userRole == RoleModel.roleStudent
+                            ? StudentProfile(
+                                profile: student,
+                              )
+                            : TeacherProfile(
+                                profile: teacher,
+                              ));
+                  })
                 ],
               ),
             ),

@@ -99,7 +99,7 @@ class Header extends StatelessWidget {
                                         GoogleFonts.notoSans().fontFamily,
                                     fontSize: FontSizes.large,
                                     fontWeight: FontWeight.bold,
-                                    height: 1,
+                                    height: 1.25,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -121,7 +121,7 @@ class Header extends StatelessWidget {
                                     fontFamily:
                                         GoogleFonts.notoSans().fontFamily,
                                     fontSize: FontSizes.small,
-                                    height: 1,
+                                    height: 1.5,
                                   ),
                                 ),
                         ],

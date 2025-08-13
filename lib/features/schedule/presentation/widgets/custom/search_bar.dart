@@ -28,6 +28,7 @@ class _SearchBarCustomState extends State<SearchBarCustom> {
       child: TextField(
         controller: widget.controller,
         onChanged: widget.onChanged,
+        cursorColor: context.theme.grey ?? Colors.grey,
         decoration: InputDecoration(
           icon: Icon(Icons.search, color: context.theme.grey),
           hintText: "Tìm kiếm...",

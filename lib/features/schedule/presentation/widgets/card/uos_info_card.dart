@@ -51,9 +51,9 @@ class _UosInfoCardState extends State<UosInfoCard> {
                   duration: const Duration(milliseconds: 300),
                   builder: (context, double value, child) {
                     return Transform.rotate(
-                      angle: value * (3.1415926535 / 2), // 90 độ = pi/2 radian
+                      angle: value * (3.1415926535 / 2),
                       child: Icon(
-                        Icons.keyboard_arrow_down_rounded, // Chỉ dùng 1 icon
+                        Icons.keyboard_arrow_down_rounded,
                         color: Colors.black,
                         size: 32,
                       ),

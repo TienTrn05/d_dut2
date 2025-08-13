@@ -102,6 +102,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     SizedBox(height: 10),
                     _buildMenuItem(
                       'Theo học kỳ',
+                      'assets/icons/svg/mdi_timeline-check-outline.svg',
                       isSelected: !_isDayView,
                       onPressed: () {
                         setState(() {
@@ -114,6 +115,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     SizedBox(height: 10),
                     _buildMenuItem(
                       'Theo ngày',
+                      "assets/icons/svg/system-uicons_calendar-date.svg",
                       isSelected: _isDayView,
                       onPressed: () {
                         setState(() {
@@ -129,7 +131,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ));
   }
 
-  Widget _buildMenuItem(String title,
+  Widget _buildMenuItem(String title, String iconUrl,
       {bool isSelected = false,
       VoidCallback? onPressed,
       required BuildContext context}) {
@@ -148,9 +150,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         child: Row(
           children: [
             SvgPicture.asset(
-              title == "Theo học kì"
-                  ? "assets/icons/svg/mdi_timeline-check-outline.svg"
-                  : "assets/icons/svg/system-uicons_calendar-date.svg",
+              iconUrl,
               colorFilter: ColorFilter.mode(
                   isSelected ? Colors.white : Colors.black, BlendMode.srcIn),
               width: 24,

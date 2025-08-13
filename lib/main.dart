@@ -55,9 +55,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              AuthBloc(navigatorKey, getIt.get<AuthRepository>(), getIt.get<NotificationRepository>())
-                ..add(AuthInitRequested()),
+          create: (context) => AuthBloc(navigatorKey,
+              getIt.get<AuthRepository>(), getIt.get<NotificationRepository>())
+            ..add(AuthInitRequested()),
         ),
         BlocProvider(create: (context) => LoadingBloc()),
       ],
@@ -77,6 +77,7 @@ class MyApp extends StatelessWidget {
                   fontSizeFactor: 1,
                   fontSizeDelta: -0.0,
                 ),
+            scaffoldBackgroundColor: Colors.white,
           ),
           darkTheme: ThemeData(
             fontFamily: GoogleFonts.roboto().fontFamily,
