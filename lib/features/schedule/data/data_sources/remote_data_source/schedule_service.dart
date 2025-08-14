@@ -317,15 +317,13 @@ class ScheduleService {
     }
   }
 
-  Future<StudentsExamShiftModel> getListStudentsByExamShift(String idExamShift,
-      String keyword, int pageNumber, String authToken) async {
+  Future<StudentsExamShiftModel> getListStudentsByExamShift(
+      String idExamShift, String authToken) async {
     try {
       final response = await _apiClient.dio.get(
         "$_url/api/UOS/GetListStudentsByExamShift",
         queryParameters: {
           'idExamShift': idExamShift,
-          'keyword': keyword,
-          'pageNumber': pageNumber,
         },
         options: Options(headers: {
           "Authorization": "Bearer $authToken",
