@@ -46,7 +46,7 @@ class ActivityCard extends StatelessWidget {
           "Xác nhận đăng ký",
           "Bạn có chắc chắn đăng ký tham gia hoạt động \"${activity.name}\"?",
           textConfirm: "Đăng ký",
-          dialog.AlertType.confirm, onConfirm: () {
+          dialog.AlertDialogType.confirm, onConfirm: () {
         context.read<CommunityActivityBloc>().add(RegistActivity(
             token: authToken,
             keyword: keyword,

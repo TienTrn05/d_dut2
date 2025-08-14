@@ -55,6 +55,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     _isNotChecking = isNotChecked;
   }
 
+  void setIsCheckAbsent(bool isCheckAbsent) {
+    _isCheckAbsent = isCheckAbsent;
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,7 +82,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
         context,
         'Xóa thông báo',
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
-        dialog.AlertType.delete,
+        dialog.AlertDialogType.delete,
         onConfirm: () => setState(() {
               notifications.removeAt(index);
             }),
@@ -112,7 +117,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                   context,
                   'Lưu thông báo',
                   'Bạn có chắc chắn muốn lưu thông báo: $truncatedTitle?',
-                  dialog.AlertType.confirm,
+                  dialog.AlertDialogType.confirm,
                   onConfirm: () => {
                         setState(() {
                           notifications.insert(0, newItem);
@@ -223,8 +228,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                           CustomAlertDialog.showCustomDialog(
                                               context,
                                               'Lưu ý',
-                                              'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Tiếp tục?',
-                                              AlertType.confirm, onConfirm: () {
+                                              'Dữ liệu chưa được lưu sẽ mất nếu rời trang. Bạn có muốn tiếp tục không?',
+                                              AlertDialogType.confirm,
+                                              onConfirm: () {
                                             setState(() {
                                               _tabController.index = newindex;
                                               _isCheckAbsent = false;
@@ -251,11 +257,12 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                               studyShifts:
                                                   uosFullInfo.studyShifts),
                                           UosAbsentTab(
-                                            idUos: widget.idUos,
-                                            isCheckAbsent: _isCheckAbsent,
-                                            selectedDay: widget.selectedDay,
-                                            setIsNotChecked: setIsNotChecking,
-                                          ),
+                                              idUos: widget.idUos,
+                                              isCheckAbsent: _isCheckAbsent,
+                                              selectedDay: widget.selectedDay,
+                                              setIsNotChecked: setIsNotChecking,
+                                              setIsCheckAbsent:
+                                                  setIsCheckAbsent),
                                           UosNotiTab(
                                             notifications: notifications,
                                             onDelete: _deleteNotification,

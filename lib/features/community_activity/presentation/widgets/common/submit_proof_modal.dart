@@ -94,7 +94,7 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
                   "Xác nhận nộp minh chứng",
                   "Bạn có chắc chắn muốn nộp minh chứng cho hoạt động \"${widget.userActivity.activity.name}\"?",
                   textCancel: "Đóng",
-                  dialog.AlertType.confirm,
+                  dialog.AlertDialogType.confirm,
                   textConfirm: "Nộp",
                   onConfirm: () {
                     widget.bloc.add(SubmitProof(

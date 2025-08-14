@@ -18,12 +18,10 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
     emit(UosAbsentLoading());
     try {
       final idUos = event.idUos;
-      final pageNumber = event.pageNumber;
-      final keyword = event.keyword;
       final absenceDate = event.absenceDate;
       final authToken = event.authToken;
-      final listStudentAbsent = await _repository.getListStudentsByUos(
-          idUos, pageNumber, keyword, absenceDate, authToken);
+      final listStudentAbsent =
+          await _repository.getListStudentsByUos(idUos, absenceDate, authToken);
 
       emit(UosAbsentLoaded(listStudentAbsent: listStudentAbsent));
     } catch (e) {

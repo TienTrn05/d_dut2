@@ -49,7 +49,7 @@ class _DetailUserActivityScreenState extends State<DetailUserActivityScreen> {
       "Hủy đăng ký",
       "Bạn có chắc chắn muốn hủy đăng ký hoạt động \"${_currentUserActivity.activity.name}\"?",
       textCancel: "Đóng",
-      dialog.AlertType.delete,
+      dialog.AlertDialogType.delete,
       onConfirm: () {
         widget.communityBloc.add(CancelRegistration(
           token: authState.accessToken,
@@ -72,7 +72,7 @@ class _DetailUserActivityScreenState extends State<DetailUserActivityScreen> {
       "Xác nhận đăng ký",
       "Bạn có chắc chắn đăng ký tham gia hoạt động \"${_currentUserActivity.activity.name}\"?",
       textCancel: "Đóng",
-      dialog.AlertType.confirm,
+      dialog.AlertDialogType.confirm,
       onConfirm: () {
         widget.communityBloc.add(ReRegistActivity(
           token: authState.accessToken,

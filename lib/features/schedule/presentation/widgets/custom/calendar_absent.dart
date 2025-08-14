@@ -52,7 +52,7 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
         context,
         'Bạn không có tiết ngày này.',
         'Vui lòng chọn ngày bạn có tiết dạy để thực hiện điểm danh.',
-        AlertType.warning,
+        AlertDialogType.warning,
         textCancel: "Đóng");
   }
 

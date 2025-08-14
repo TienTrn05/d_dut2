@@ -345,18 +345,12 @@ class ScheduleService {
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(
-      String idUos,
-      int pageNumber,
-      String? keyword,
-      DateTime absenceDate,
-      String authToken) async {
+      String idUos, DateTime absenceDate, String authToken) async {
     try {
       final response = await _apiClient.dio.get(
         "$_url/api/UOS/GetListStudentsByUos",
         queryParameters: {
           "idUos": idUos,
-          "pageNumber": pageNumber,
-          if (keyword != null) "keyword": keyword,
           "absenceDate": absenceDate,
         },
         options: Options(headers: {

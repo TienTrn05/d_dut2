@@ -66,9 +66,9 @@ class ScheduleRepository {
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
-      int pageNumber, String? keyword, DateTime absenceDate, String authToken) {
+       DateTime absenceDate, String authToken) {
     return _scheduleService.getListStudentsByUos(
-        idUos, pageNumber, keyword, absenceDate, authToken);
+        idUos, absenceDate, authToken);
   }
 
   Future<bool> getIsAttendanceDate(
