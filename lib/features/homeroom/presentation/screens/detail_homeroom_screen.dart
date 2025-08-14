@@ -32,7 +32,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
       name: 'Nguyễn Văn A',
       studentCode: '21TCLC001',
       phoneNumber: '0901234567',
-      mail: 'nguyenvana@example.com',
+      mail: 'thaonguyenvy109@gmail.com',
       relativePhoneNumber: '0912345678',
     ),
     StudentModel(
@@ -312,26 +312,28 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4.0),
-                            SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: students.length,
-                                    itemBuilder: (context, index) {
-                                      final student = students[index];
-                                      return StudentItem(
-                                        student: student,
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
+                            Expanded(
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Column(
+                                  children: [
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: students.length,
+                                      itemBuilder: (context, index) {
+                                        final student = students[index];
+                                        return StudentItem(
+                                          student: student,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(height: 8),
+                                  ],
+                                ),
                               ),
-                            ),
+                            )
                           ])
                     ],
                   ),

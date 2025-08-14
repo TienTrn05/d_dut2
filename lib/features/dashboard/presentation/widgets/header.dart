@@ -11,12 +11,14 @@ class Header extends StatelessWidget {
   final String displayName;
   final String userPrincipalName;
   final bool isLoading;
+  final Function()? onHeaderTap;
   final Function()? onTap;
 
   const Header({
     super.key,
     required this.displayName,
     required this.userPrincipalName,
+    this.onHeaderTap,
     this.onTap,
     this.isLoading = false,
   });
@@ -27,104 +29,114 @@ class Header extends StatelessWidget {
     final highlightColor = Colors.grey.shade100;
 
     return Container(
-      width: double.infinity,
-      height: 72,
       margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
+      child: MaterialButton(
+        onPressed: onHeaderTap,
+        minWidth: double.infinity,
+        height: 72,
+        padding: const EdgeInsets.all(0),
         color: context.theme.primaryColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 16, right: 10, top: 16, bottom: 16),
-              child: Row(
-                children: [
-                  // Avatar
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 0,
+        focusElevation: 0,
+        highlightElevation: 0,
+        hoverElevation: 0,
+        disabledElevation: 0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 16, right: 10, top: 16, bottom: 16),
+                child: Row(
+                  children: [
+                    // Avatar
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        width: 1,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/default_avatar.jpg',
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/default_avatar.jpg',
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
 
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        isLoading
-                            ? Shimmer.fromColors(
-                                baseColor: baseColor,
-                                highlightColor: highlightColor,
-                                child: Container(
-                                  height: 14,
-                                  width: 100,
-                                  color: baseColor,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          isLoading
+                              ? Shimmer.fromColors(
+                                  baseColor: baseColor,
+                                  highlightColor: highlightColor,
+                                  child: Container(
+                                    height: 14,
+                                    width: 100,
+                                    color: baseColor,
+                                  ),
+                                )
+                              : Text(
+                                  displayName,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily:
+                                        GoogleFonts.notoSans().fontFamily,
+                                    fontSize: FontSizes.large,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.25,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              )
-                            : Text(
-                                displayName,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: GoogleFonts.notoSans().fontFamily,
-                                  fontSize: FontSizes.large,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1,
+                          isLoading
+                              ? Shimmer.fromColors(
+                                  baseColor: baseColor,
+                                  highlightColor: highlightColor,
+                                  child: Container(
+                                    height: 12,
+                                    width: 140,
+                                    color: baseColor,
+                                  ),
+                                )
+                              : Text(
+                                  userPrincipalName,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily:
+                                        GoogleFonts.notoSans().fontFamily,
+                                    fontSize: FontSizes.small,
+                                    height: 1.5,
+                                  ),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                        isLoading
-                            ? Shimmer.fromColors(
-                                baseColor: baseColor,
-                                highlightColor: highlightColor,
-                                child: Container(
-                                  height: 12,
-                                  width: 140,
-                                  color: baseColor,
-                                ),
-                              )
-                            : Text(
-                                userPrincipalName,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: GoogleFonts.notoSans().fontFamily,
-                                  fontSize: FontSizes.small,
-                                  height: 1,
-                                ),
-                              ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          NotificationButton(
-            notificationCount: 2,
-            onTap: onTap,
-          ),
-        ],
+            NotificationButton(
+              notificationCount: 2,
+              onTap: onTap,
+            ),
+          ],
+        ),
       ),
     );
   }

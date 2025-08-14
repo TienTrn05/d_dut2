@@ -1,57 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/extensions/custom_theme_extension.dart';
+
+import '../bloc/notifications_bloc.dart';
 import './widgets/notification_card.dart';
 
 class MyNotifications extends StatelessWidget {
-  const MyNotifications({super.key});
+  const MyNotifications({super.key, required this.token});
+
+  final String token;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.all(0),
-      children: [
-        NotificationCard(
-          date: "15/02/2025",
-          title:
-              "Thầy Văn Công Vũ thông báo đến lớp: Kinh tế chính trị Mác - Lênin [24.Nh86]",
-          content: "Thầy nhắn: Lớp NGHỈ HỌC (Tiết:3-4) ngày: 17/02/2025",
-          isRead: false,
-        ),
-        NotificationCard(
-          date: "14/02/2025",
-          title:
-              "Thầy Nguyễn Lê Minh thông báo đến lớp: TH Kỹ thuật vi điều khiển",
-          content:
-              "Khi đi thực hành, các bạn nhớ chuẩn bị trước và mang theo: Sách lập trình vi điều khiển PIC, laptop cá nhân...",
-        ),
-        NotificationCard(
-          date: "15/02/2025",
-          title:
-              "Thầy Văn Công Vũ thông báo đến lớp: Kinh tế chính trị Mác - Lênin [24.Nh86]",
-          content: "Thầy nhắn: Lớp NGHỈ HỌC (Tiết:3-4) ngày: 17/02/2025",
-          isRead: false,
-        ),
-        NotificationCard(
-          date: "14/02/2025",
-          title:
-              "Thầy Nguyễn Lê Minh thông báo đến lớp: TH Kỹ thuật vi điều khiển",
-          content:
-              "Khi đi thực hành, các bạn nhớ chuẩn bị trước và mang theo: Sách lập trình vi điều khiển PIC, laptop cá nhân...",
-        ),
-        NotificationCard(
-          date: "15/02/2025",
-          title:
-              "Thầy Văn Công Vũ thông báo đến lớp: Kinh tế chính trị Mác - Lênin [24.Nh86]",
-          content: "Thầy nhắn: Lớp NGHỈ HỌC (Tiết:3-4) ngày: 17/02/2025",
-        ),
-        NotificationCard(
-          date: "14/02/2025",
-          title:
-              "Thầy Nguyễn Lê Minh thông báo đến lớp: TH Kỹ thuật vi điều khiển",
-          content:
-              "Khi đi thực hành, các bạn nhớ chuẩn bị trước và mang theo: Sách lập trình vi điều khiển PIC, laptop cá nhân...",
-        ),
-      ],
-    );
+    return BlocBuilder<NotificationsBloc, NotificationsState>(
+        builder: (contextNoti, state) {
+      if (state.myNotificationsStatus == MyNotificationsStatus.loading &&
+          state.myNotifications.isEmpty) {
+        return Center(
+            child: CircularProgressIndicator(
+          color: context.theme.primaryColor,
+        ));
+      } else if (state.myNotificationsStatus == MyNotificationsStatus.failure) {
+        return Center(
+          child: Text(
+            state.errorMyNotificationsMessage,
+            style: TextStyle(color: context.theme.red),
+          ),
+        );
+      } else if (state.myNotificationsStatus == MyNotificationsStatus.success &&
+          state.myNotifications.isEmpty) {
+        return const Center(child: Text("Hiện không có thông báo nào"));
+      }
+      return Column(
+        children: [
+          // 1. Wrap the ListView with Expanded
+          Expanded(
+            // 2. Use ListView.builder for better performance with long lists
+            child: ListView.builder(
+              padding: const EdgeInsets.all(0),
+              // The total number of items is notifications + 1 for the "Load more" button
+              itemCount: state.myNotifications.length + 1,
+              itemBuilder: (context, index) {
+                // If it's the last item, show the "Load more" button
+                if (index == state.myNotifications.length) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.read<NotificationsBloc>().add(
+                              MyNotificationsLoadMoreRequested(token: token));
+                        },
+                        child: (state.myNotificationsStatus ==
+                                    MyNotificationsStatus.loading &&
+                                state.myNotifications.isNotEmpty)
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                color: context.theme.primaryColor,
+                              ))
+                            : Text(
+                                "Load more",
+                                style: TextStyle(
+                                  color: context.theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: context.theme.primaryColor,
+                                ),
+                              ),
+                      ),
+                    ),
+                  );
+                }
+
+                // Otherwise, build the notification card
+                final notification = state.myNotifications[index];
+                return NotificationCard(
+                  date:
+                      "${notification.createdAt.day}/${notification.createdAt.month}/${notification.createdAt.year}",
+                  title: notification.title,
+                  content: notification.body,
+                  // Use the actual 'read' status from the notification object
+                  isRead: notification.read,
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
   }
 }

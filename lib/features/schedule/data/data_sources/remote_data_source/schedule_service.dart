@@ -403,6 +403,31 @@ class ScheduleService {
     }
   }
 
+  Future<bool> isAttendanceDateValid(
+      String idUos, DateTime? attendanceDate, String authToken) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/Absence/CheckAttendanceDateValid",
+        queryParameters: {
+          "idUos": idUos,
+          "attendanceDate": attendanceDate,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+        }),
+      );
+      if (response.data["statusCode"] == 200) {
+        final data = response.data["data"];
+        return data;
+      } else {
+        throw Exception(
+            "Failed to check isAttendanceDateValid: ${response.data['message']}");
+      }
+    } catch (e) {
+      throw Exception("Failed to check isAttendanceDateValid: $e");
+    }
+  }
+
   Future<bool> takeAttendance(
       {required String idUnitOfStudy,
       required DateTime absenceDate,

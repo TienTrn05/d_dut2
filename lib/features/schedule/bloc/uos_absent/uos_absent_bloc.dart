@@ -8,13 +8,14 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
   UosAbsentBloc(this._repository) : super(UosAbsentInitial()) {
     on<LoadStudentsAbsent>(_onLoadStudentAbsent);
     on<LoadIsAttendanceDate>(_onLoadIsAttendanceDate);
+    on<LoadIsAttendanceDateValid>(_onLoadIsAttendanceDateValid);
     on<TakeAttendance>(_onLoadTakeAttendance);
     on<DeleteAttendanceHistory>(_onLoadDeleteAttendanceHistory);
   }
 
   Future<void> _onLoadStudentAbsent(
       LoadStudentsAbsent event, Emitter<UosAbsentState> emit) async {
-    emit(UosStudentsAbsentLoading());
+    emit(UosAbsentLoading());
     try {
       final idUos = event.idUos;
       final pageNumber = event.pageNumber;
@@ -32,14 +33,30 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
 
   Future<void> _onLoadIsAttendanceDate(
       LoadIsAttendanceDate event, Emitter<UosAbsentState> emit) async {
-    emit(UosCheckIsAttendanceDateLoading());
+    emit(UosAbsentLoading());
     try {
       final idUos = event.idUos;
       final attendanceDate = event.attendanceDate;
       final authToken = event.authToken;
-      final isAttendanceDate =
-          await _repository.getIsAttendanceDate(idUos, attendanceDate!, authToken);
+      final isAttendanceDate = await _repository.getIsAttendanceDate(
+          idUos, attendanceDate!, authToken);
       emit(UosCheckIsAttendanceDateLoaded(isAttendanceDate: isAttendanceDate));
+    } catch (e) {
+      emit(UosAbsentError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onLoadIsAttendanceDateValid(
+      LoadIsAttendanceDateValid event, Emitter<UosAbsentState> emit) async {
+    emit(UosAbsentLoading());
+    try {
+      final idUos = event.idUos;
+      final attendanceDate = event.attendanceDate;
+      final authToken = event.authToken;
+      final isAttendanceDate = await _repository.getIsAttendanceDateValid(
+          idUos, attendanceDate!, authToken);
+      emit(UosCheckIsAttendanceDateValidLoaded(
+          isAttendanceDateValid: isAttendanceDate));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));
     }
@@ -47,7 +64,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
 
   Future<void> _onLoadTakeAttendance(
       TakeAttendance event, Emitter<UosAbsentState> emit) async {
-    emit(UosTakeAttendanceLoading());
+    emit(UosAbsentLoading());
     try {
       final idUnitOfStudy = event.idUnitOfStudy;
       final absenceDate = event.absenceDate;
@@ -63,13 +80,13 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
 
   Future<void> _onLoadDeleteAttendanceHistory(
       DeleteAttendanceHistory event, Emitter<UosAbsentState> emit) async {
-    emit(UosDeleteAttendanceHistoryLoading());
+    emit(UosAbsentLoading());
     try {
       final idUos = event.idUos;
       final attendanceDate = event.attendanceDate;
       final authToken = event.authToken;
-      final isSuccess =
-          await _repository.deleteAttendanceHistory(idUos, attendanceDate, authToken);
+      final isSuccess = await _repository.deleteAttendanceHistory(
+          idUos, attendanceDate, authToken);
       emit(UosDeleteAttendanceHistoryLoaded(isSuccess: isSuccess));
     } catch (e) {
       emit(UosAbsentError(message: e.toString()));

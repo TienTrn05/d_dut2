@@ -148,6 +148,7 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
                       hintText: "Mô tả ...",
                       controller: descriptionController,
                       minLine: 5,
+                      maxLine: 7,
                     ),
                   ],
                 ),
@@ -200,22 +201,31 @@ class _SubmitProofModalState extends State<SubmitProofModal> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: SizedBox(
-                  height: 36,
-                  child:
-                      Image.file(File(pickedImage.path), fit: BoxFit.fitHeight),
+          Expanded(
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: SizedBox(
+                    height: 36,
+                    child: Image.file(File(pickedImage.path),
+                        fit: BoxFit.fitHeight),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                pickedImage.name,
-                style: TextStyle(color: color, fontSize: FontSizes.small),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    pickedImage.name,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: FontSizes.small,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              ],
+            ),
           ),
           IconButton(
             icon: Icon(Icons.delete_outlined, color: color),

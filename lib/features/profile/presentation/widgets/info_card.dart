@@ -1,17 +1,17 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-class InfoCart extends StatefulWidget {
+class InfoCard extends StatefulWidget {
   final String title;
   final Widget? child;
 
-  const InfoCart({super.key, required this.title, this.child});
+  const InfoCard({super.key, required this.title, this.child});
 
   @override
-  State<InfoCart> createState() => _InfoCartState();
+  State<InfoCard> createState() => _InfoCardState();
 }
 
-class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
+class _InfoCardState extends State<InfoCard> with TickerProviderStateMixin {
   bool isShowing = true;
 
   @override
@@ -21,13 +21,6 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withAlpha(25),
-        //     blurRadius: 5,
-        //     spreadRadius: 2,
-        //   )
-        // ],
       ),
       child: Column(
         children: [
@@ -38,9 +31,10 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
               });
             },
             minWidth: double.infinity,
-            padding: EdgeInsets.all(16),
-            elevation: 0,
-            highlightElevation: 0,
+            padding: EdgeInsets.only(
+                top: 16, right: 16, left: 16, bottom: isShowing ? 10 : 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Row(
               children: [
                 TweenAnimationBuilder(
@@ -78,7 +72,7 @@ class _InfoCartState extends State<InfoCart> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(
                       left: 16,
                       right: 16,
-                      bottom: 8,
+                      bottom: 16,
                     ),
                     child: Container(
                         padding: EdgeInsets.only(top: 8),

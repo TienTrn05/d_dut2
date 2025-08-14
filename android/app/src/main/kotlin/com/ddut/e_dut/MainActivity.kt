@@ -1,4 +1,4 @@
-package com.example.e_dut
+package com.ddut.e_dut
 
 import io.flutter.embedding.android.FlutterActivity
 

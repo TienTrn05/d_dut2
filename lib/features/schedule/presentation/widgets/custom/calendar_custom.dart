@@ -201,9 +201,9 @@ class _CalendarCustomState extends State<CalendarCustom> {
                 final String userRole = authState is AuthUserAuthenticated
                     ? authState.userData.role.name
                     : '';
-                  final String authToken = authState is AuthUserAuthenticated
-                      ? authState.accessToken
-                      : '';
+                final String authToken = authState is AuthUserAuthenticated
+                    ? authState.accessToken
+                    : '';
                 if (_debounce?.isActive ?? false) _debounce?.cancel();
                 _debounce = Timer(const Duration(milliseconds: 800), () {
                   context.read<CalendarBloc>().add(
@@ -244,13 +244,13 @@ class _CalendarCustomState extends State<CalendarCustom> {
                     ? authState.userData.role.name
                     : '';
 
-                  final String authToken = authState is AuthUserAuthenticated
-                      ? authState.accessToken
-                      : '';
+                final String authToken = authState is AuthUserAuthenticated
+                    ? authState.accessToken
+                    : '';
                 context.read<ScheduleBloc>().add(LoadSchedulesByDate(
                     inputDate: _selectedDay,
                     isTeacher: userRole == RoleModel.roleTeacher,
-                      authToken: authToken));
+                    authToken: authToken));
               },
               daysOfWeekStyle: DaysOfWeekStyle(
                 weekdayStyle: TextStyle(fontSize: FontSizes.small),
@@ -300,6 +300,7 @@ class _CalendarCustomState extends State<CalendarCustom> {
                             color: Color.fromRGBO(42, 116, 189, 1),
                             fontSize: FontSizes.medium,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
