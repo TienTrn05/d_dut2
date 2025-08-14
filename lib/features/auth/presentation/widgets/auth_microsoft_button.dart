@@ -24,8 +24,7 @@ class AuthMicrosoftButton extends StatelessWidget {
         return MaterialButton(
           onPressed: onPressed,
           color: color,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          minWidth: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
