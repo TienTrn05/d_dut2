@@ -14,6 +14,7 @@ import 'package:e_dut/features/schedule/presentation/widgets/custom/calendar_abs
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_absent_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
+import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -113,10 +114,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       if (keyword.isEmpty) {
         _currentListStudentAbsent = List.from(_listStudentAbsent);
       } else {
+        final pattern = Functions.buildVietnamesePattern(keyword.toLowerCase());
+        final regex = RegExp(pattern, caseSensitive: false);
+
         _currentListStudentAbsent = _listStudentAbsent.where((student) {
           final name = student.studentName.toLowerCase();
-          final id = student.idStudent;
-          return name.contains(keyword) || id.contains(keyword);
+          final no = student.noStudent;
+          return regex.hasMatch(name) || regex.hasMatch(no);
         }).toList();
       }
       setState(() {});
