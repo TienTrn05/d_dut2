@@ -80,7 +80,7 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
         "Hủy đăng ký",
         "Bạn có chắc chắn muốn hủy đăng ký hoạt động \"${widget.userActivity.activity.name}\"?",
         textCancel: "Đóng",
-        dialog.AlertType.delete,
+        dialog.AlertDialogType.delete,
         onConfirm: () {
           widget.communityBloc.add(CancelRegistration(
             token: token,
@@ -105,7 +105,7 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
         "Xác nhận đăng ký",
         "Bạn có chắc chắn đăng ký tham gia hoạt động \"${widget.userActivity.activity.name}\"?",
         textCancel: "Đóng",
-        dialog.AlertType.confirm,
+        dialog.AlertDialogType.confirm,
         onConfirm: () {
           widget.communityBloc.add(ReRegistActivity(
               token: token,

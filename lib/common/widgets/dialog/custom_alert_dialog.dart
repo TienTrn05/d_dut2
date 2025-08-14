@@ -2,14 +2,14 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-enum AlertType { confirm, delete, warning, success, failure }
+enum AlertDialogType { confirm, delete, warning, success, failure }
 
 class CustomAlertDialog {
   static void showCustomDialog(
     BuildContext context,
     String title,
     String message,
-    AlertType alertType, {
+    AlertDialogType alertType, {
     String? textConfirm,
     VoidCallback? onConfirm,
     String? textCancel,
@@ -99,8 +99,8 @@ class CustomAlertDialog {
                         ),
                       ),
                     )),
-                    if (alertType != AlertType.warning &&
-                        alertType != AlertType.success) ...[
+                    if (alertType != AlertDialogType.warning &&
+                        alertType != AlertDialogType.success) ...[
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextButton(
@@ -143,30 +143,30 @@ class CustomAlertDialog {
     );
   }
 
-  static Icon _getIcon(AlertType type, BuildContext context,
+  static Icon _getIcon(AlertDialogType type, BuildContext context,
       {double size = 28}) {
     Color iconColor = _getColor(type, context);
     switch (type) {
-      case AlertType.confirm:
-      case AlertType.warning:
+      case AlertDialogType.confirm:
+      case AlertDialogType.warning:
         return Icon(Icons.info_outline_rounded, color: iconColor, size: size);
-      case AlertType.delete:
+      case AlertDialogType.delete:
         return Icon(Icons.delete_outline, color: iconColor, size: size);
-      case AlertType.success:
+      case AlertDialogType.success:
         return Icon(Icons.check_rounded, color: iconColor, size: size);
-      case AlertType.failure:
+      case AlertDialogType.failure:
         return Icon(Icons.close_rounded, color: iconColor, size: size);
     }
   }
 
-  static Color _getColor(AlertType type, BuildContext context) {
+  static Color _getColor(AlertDialogType type, BuildContext context) {
     switch (type) {
-      case AlertType.confirm:
-      case AlertType.warning:
-      case AlertType.success:
+      case AlertDialogType.confirm:
+      case AlertDialogType.warning:
+      case AlertDialogType.success:
         return context.theme.primaryColor ?? Colors.blue;
-      case AlertType.failure:
-      case AlertType.delete:
+      case AlertDialogType.failure:
+      case AlertDialogType.delete:
         return context.theme.red ?? Colors.red;
     }
   }

@@ -110,7 +110,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
         context,
         'Xóa thông báo',
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
-        dialog.AlertType.delete,
+        dialog.AlertDialogType.delete,
         onConfirm: () => setState(() {
               notifications.removeAt(index);
             }),
@@ -145,7 +145,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                   context,
                   'Lưu thông báo',
                   'Bạn có chắc chắn muốn lưu thông báo: $truncatedTitle?',
-                  dialog.AlertType.confirm,
+                  dialog.AlertDialogType.confirm,
                   onConfirm: () => {
                         setState(() {
                           notifications.insert(0, newItem);

@@ -34,7 +34,7 @@ class _DetailActivityScreenState extends State<DetailActivityScreen> {
         "Xác nhận đăng ký",
         "Bạn có chắc chắn đăng ký tham gia hoạt động \"${widget.activity.name}\"?",
         textCancel: "Đóng",
-        dialog.AlertType.confirm,
+        dialog.AlertDialogType.confirm,
         onConfirm: () {
           widget.communityBloc.add(RegistActivity(
               token: token,

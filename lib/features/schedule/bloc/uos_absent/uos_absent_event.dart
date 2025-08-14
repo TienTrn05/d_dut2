@@ -7,15 +7,11 @@ class UosAbsentEvent extends Equatable {
 
 class LoadStudentsAbsent extends UosAbsentEvent {
   final String idUos;
-  final int pageNumber;
-  final String? keyword;
   final DateTime absenceDate;
   final String authToken;
 
   LoadStudentsAbsent({
     required this.idUos,
-    required this.pageNumber,
-    this.keyword,
     required this.absenceDate,
     required this.authToken,
   });

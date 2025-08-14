@@ -75,7 +75,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
               "Xác nhận cập nhật thông tin",
               "Bạn có chắc chắn muốn cập nhật thông tin giảng dạy không\"?",
               textCancel: "Đóng",
-              dialog.AlertType.confirm,
+              dialog.AlertDialogType.confirm,
               textConfirm: "Xác nhận",
               onConfirm: () {
                 detailBloc.add(UpdateMsTeamsInfo(

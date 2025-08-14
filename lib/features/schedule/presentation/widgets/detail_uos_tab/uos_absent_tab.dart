@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
+import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
@@ -21,16 +22,16 @@ class UosAbsentTab extends StatefulWidget {
   final String idUos;
   final bool isCheckAbsent;
   final DateTime selectedDay;
-  // final String noWeek;
   final Function setIsNotChecked;
+  final Function setIsCheckAbsent;
 
   const UosAbsentTab({
     super.key,
     required this.idUos,
     required this.isCheckAbsent,
     required this.selectedDay,
-    // required this.noWeek,
     this.setIsNotChecked = defaultFunc,
+    this.setIsCheckAbsent = defaultFunc,
   });
 
   static void defaultFunc() {}
@@ -40,7 +41,6 @@ class UosAbsentTab extends StatefulWidget {
 
 class _UosAbsentTabState extends State<UosAbsentTab> {
   bool _isSellectedAll = false; // True: có mặt
-  Map<int, bool> _listIsSellectedAll = {};
   late DateTime _currentDate;
   late String _currentWeek = "";
 
@@ -49,11 +49,11 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   bool _isTeachingDate = false;
 
   final TextEditingController _searchController = TextEditingController();
-  int _currentPage = 1;
-  int _totalPages = 1;
 
 // key: studentId, value: true nếu vắng, false nếu có mặt
   Map<String, bool> _listStudentIsAbsent = {};
+  List<StudentAbsentModel> _listStudentAbsent = [];
+  List<StudentAbsentModel> _currentListStudentAbsent = [];
   Timer? _debounce;
   bool _hasCheckedAttendanceStatus = false;
   String _authToken = "";
@@ -68,7 +68,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _currentDate = widget.selectedDay;
       _listStudentIsAbsent = {};
-      _listIsSellectedAll = {};
     });
     context.read<CalendarBloc>().add(
           LoadCalendarWeek(
@@ -88,16 +87,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     super.dispose();
   }
 
-  void mergeStudentList(List<StudentAbsentModel> newPageStudents) {
-    for (var student in newPageStudents) {
-      _listStudentIsAbsent.putIfAbsent(
-          student.idStudent,
-          () => (_listIsSellectedAll[0] ?? false)
-              ? !(_listIsSellectedAll[_currentPage] ?? !student.isAbsent)
-              : (_statusCheckedIn == 1 ? student.isAbsent : true));
-    }
-  }
-
   // Cập nhập trang thái điểm danh
   void updateAbsentStatus(String idStudent, bool isAbsent) {
     setState(() {
@@ -105,7 +94,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       _isSellectedAll =
           _listStudentIsAbsent.values.every((status) => status == false);
       if (isAbsent == true && _isSellectedAll) {
-        _listIsSellectedAll[_currentPage] = false;
         _isSellectedAll = false;
       }
     });
@@ -115,9 +103,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _isSellectedAll = !_isSellectedAll;
       _listStudentIsAbsent.updateAll((key, value) => !_isSellectedAll);
-      _listIsSellectedAll.updateAll((key, value) => _isSellectedAll);
-      // 0; True => Đã từng sellectedAll
-      _listIsSellectedAll[0] = true;
     });
   }
 
@@ -125,15 +110,16 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 800), () {
       final keyword = _searchController.text.trim();
-      setState(() {
-        _currentPage = 1;
-      });
-      context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-          idUos: widget.idUos,
-          pageNumber: 1,
-          keyword: keyword,
-          absenceDate: _currentDate,
-          authToken: _authToken));
+      if (keyword.isEmpty) {
+        _currentListStudentAbsent = List.from(_listStudentAbsent);
+      } else {
+        _currentListStudentAbsent = _listStudentAbsent.where((student) {
+          final name = student.studentName.toLowerCase();
+          final id = student.idStudent;
+          return name.contains(keyword) || id.contains(keyword);
+        }).toList();
+      }
+      setState(() {});
     });
   }
 
@@ -148,14 +134,12 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           context,
           'Chuyển ngày điểm danh',
           'Dữ liệu sẽ mất nếu bạn chưa lưu trước đó, bạn có chắc chắn muốn tiếp tục thao tác này không?',
-          AlertType.confirm, onConfirm: () {
+          AlertDialogType.confirm, onConfirm: () {
         setState(() {
           _currentDate = newValue;
           _statusCheckedIn = 0;
           _isSellectedAll = false;
-          _listIsSellectedAll = {};
           _listStudentIsAbsent = {};
-          _currentPage = 1;
           _hasCheckedAttendanceStatus = false;
           _isTeachingDate = true;
         });
@@ -175,9 +159,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         _currentDate = newValue;
         _statusCheckedIn = 0;
         _isSellectedAll = false;
-        _listIsSellectedAll = {};
         _listStudentIsAbsent = {};
-        _currentPage = 1;
         _hasCheckedAttendanceStatus = false;
         _isTeachingDate = true;
       });
@@ -198,7 +180,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         context,
         'Xóa ngày điểm danh',
         'Bạn có chắc chắn muốn xóa nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
-        AlertType.delete, onConfirm: () {
+        AlertDialogType.delete, onConfirm: () {
       context.read<UosAbsentBloc>().add(DeleteAttendanceHistory(
           idUos: widget.idUos,
           attendanceDate: _currentDate,
@@ -211,7 +193,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         context,
         'Lưu ngày điểm danh',
         'Bạn có chắc chắn muốn lưu nhật ký điểm danh ngày ${DateFormat('dd/MM/yyyy').format(_currentDate)} không?',
-        AlertType.confirm, onConfirm: () {
+        AlertDialogType.confirm, onConfirm: () {
       List<String> idStudentsAbsent = _listStudentIsAbsent.entries
           .where((entry) => entry.value == true)
           .map((entry) => entry.key)
@@ -225,121 +207,22 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   }
 
   void _alertSuccess({String type = "lưu"}) {
-    CustomAlertDialog.showCustomDialog(
-        context,
-        'Thành công',
-        'Danh sách điểm danh của bạn đã được $type thành công.',
-        AlertType.success,
-        textCancel: "Đóng",
-        onCancel: () {});
+    widget.setIsCheckAbsent(false);
+    CustomSnackbar.showSnackBar(
+      context,
+      "Thành công",
+      'Danh sách điểm danh của bạn đã được $type thành công.',
+      AlertType.success,
+    );
   }
 
   void _alertFailure({String type = "lưu"}) {
-    CustomAlertDialog.showCustomDialog(
-        context,
-        'Thất bại',
-        'Đã có lỗi xảy ra trong quá trình $type, vui lòng thử lại sau.',
-        AlertType.failure,
-        textCancel: "Đóng",
-        onCancel: () {});
-  }
-
-  List<Widget> _buildPageButtons() {
-    List<Widget> buttons = [];
-
-    void addPageButton(int i) {
-      buttons.add(
-        InkWell(
-          onTap: () {
-            if (i != _currentPage) {
-              setState(() {
-                _currentPage = i;
-              });
-              context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
-                  idUos: widget.idUos,
-                  pageNumber: _currentPage,
-                  keyword: _searchController.text.trim(),
-                  absenceDate: _currentDate,
-                  authToken: _authToken));
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color:
-                  i == _currentPage ? context.theme.primaryColor : Colors.white,
-              border: Border.all(
-                color: i == _currentPage
-                    ? context.theme.primaryColor ?? Colors.blue
-                    : context.theme.grey ?? Colors.grey,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$i',
-              style: TextStyle(
-                color: i == _currentPage ? Colors.white : Colors.black,
-                fontWeight:
-                    i == _currentPage ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    void addEllipsis() {
-      buttons.add(
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 32,
-          alignment: Alignment.center,
-          child: const Text(
-            "...",
-            style: TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (_totalPages <= 5) {
-      for (int i = 1; i <= _totalPages; i++) {
-        addPageButton(i);
-      }
-      return buttons;
-    }
-
-    // Luôn hiển thị trang đầu tiên
-    addPageButton(1);
-
-    // Nếu cần dấu "..." giữa trang đầu và các trang tiếp theo
-    if (_currentPage > 3) {
-      addEllipsis();
-    }
-
-    // Hiển thị current -1, current, current +1 (nếu hợp lệ)
-    for (int i = _currentPage - 1; i <= _currentPage + 1; i++) {
-      if (i > 1 && i < _totalPages) {
-        addPageButton(i);
-      }
-    }
-
-    // Nếu cần dấu "..." trước trang cuối
-    if (_currentPage < _totalPages - 2) {
-      addEllipsis();
-    }
-
-    // Luôn hiển thị trang cuối
-    addPageButton(_totalPages);
-
-    return buttons;
+    CustomSnackbar.showSnackBar(
+      context,
+      'Thất bại',
+      'Đã có lỗi xảy ra trong quá trình $type, vui lòng thử lại sau.',
+      AlertType.error,
+    );
   }
 
   @override
@@ -365,9 +248,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
-                    pageNumber: _currentPage,
                     absenceDate: _currentDate,
-                    keyword: _searchController.text.trim(),
                     authToken: _authToken));
               }
             }
@@ -379,9 +260,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               widget.setIsNotChecked(state.isAttendanceDate ? false : true);
               context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                   idUos: widget.idUos,
-                  pageNumber: _currentPage,
                   absenceDate: _currentDate,
-                  keyword: _searchController.text.trim(),
                   authToken: _authToken));
             }
 
@@ -406,9 +285,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
-                    pageNumber: _currentPage,
                     absenceDate: _currentDate,
-                    keyword: _searchController.text.trim(),
                     authToken: _authToken));
               } else {
                 _alertFailure(type: "xóa");
@@ -437,18 +314,18 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
             );
           }
           if (state is UosAbsentLoaded) {
-            final listStudentAbsent = state.listStudentAbsent.studentsPaged;
-            final totalItems = listStudentAbsent.totalItems;
-            final pageSize = listStudentAbsent.pageSize;
-            _totalPages = (totalItems / pageSize).ceil();
-            _currentPage = listStudentAbsent.pageNumber;
-            if (_listIsSellectedAll.isEmpty) {
-              _listIsSellectedAll = {
-                // 0; True => Đã từng sellectedAll
-                for (int i = 0; i <= _totalPages; i++) i: _isSellectedAll
-              };
+            final listStudentAbsent = state.listStudentAbsent.students;
+            final totalItems = state.listStudentAbsent.studentsQuantity;
+            if (_listStudentIsAbsent.isEmpty) {
+              for (var student in listStudentAbsent) {
+                _listStudentIsAbsent[student.idStudent] =
+                    _statusCheckedIn == 1 ? student.isAbsent : true;
+              }
+              _isSellectedAll = _listStudentIsAbsent.values
+                  .every((status) => status == false);
+              _listStudentAbsent = listStudentAbsent;
+              _currentListStudentAbsent = listStudentAbsent;
             }
-            mergeStudentList(listStudentAbsent.items);
 
             return RefreshIndicator(
               color: context.theme.primaryColor,
@@ -716,6 +593,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               ],
                             ),
                           ),
+                          Text(
+                            "${_listStudentIsAbsent.values.where((v) => v == true).length} vắng",
+                            style: TextStyle(
+                              fontSize: FontSizes.medium,
+                              color: context.theme.red,
+                            ),
+                          )
                         ]
                       ],
                     ),
@@ -743,48 +627,44 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       Expanded(
                         child: ListView.builder(
                           // Thêm 1 phần tử cho SizedBox
-                          itemCount: listStudentAbsent.items.length,
+                          itemCount: _currentListStudentAbsent.length + 1,
                           itemBuilder: (context, index) {
-                            if (index == (listStudentAbsent.items.length)) {
+                            if (index == (_currentListStudentAbsent.length)) {
                               // Thêm khoảng trống cuối danh sách
                               return SizedBox(height: 56);
                             }
 
                             return widget.isCheckAbsent
                                 ? StudentAbsentItem(
-                                    name: listStudentAbsent
-                                        .items[index].studentName,
-                                    mail: listStudentAbsent
-                                        .items[index].noStudent,
+                                    name: _currentListStudentAbsent[index]
+                                        .studentName,
+                                    mail: _currentListStudentAbsent[index]
+                                        .noStudent,
                                     isAbsentToday: _listStudentIsAbsent[
-                                            listStudentAbsent
-                                                .items[index].idStudent] ??
+                                            _currentListStudentAbsent[index]
+                                                .idStudent] ??
                                         false,
                                     onAbsentChanged: (isAbsent) {
                                       updateAbsentStatus(
-                                          listStudentAbsent
-                                              .items[index].idStudent,
+                                          _currentListStudentAbsent[index]
+                                              .idStudent,
                                           isAbsent);
                                     },
                                   )
                                 : StudentItem(
                                     idUos: widget.idUos,
-                                    idStudent: listStudentAbsent
-                                        .items[index].idStudent,
-                                    name: listStudentAbsent
-                                        .items[index].studentName,
-                                    mail: listStudentAbsent
-                                        .items[index].noStudent,
-                                    absentCount: listStudentAbsent
-                                        .items[index].absentTimes,
+                                    idStudent: _currentListStudentAbsent[index]
+                                        .idStudent,
+                                    name: _currentListStudentAbsent[index]
+                                        .studentName,
+                                    mail: _currentListStudentAbsent[index]
+                                        .noStudent,
+                                    absentCount:
+                                        _currentListStudentAbsent[index]
+                                            .absentTimes,
                                   );
                           },
                         ),
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: _buildPageButtons(),
                       ),
                     ]
                   ]
