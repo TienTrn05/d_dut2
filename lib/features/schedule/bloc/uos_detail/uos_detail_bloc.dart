@@ -39,18 +39,17 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
     emit(UosDetailLoading());
     try {
       final idExamShift = event.idExamShift;
-      final keyword = event.keyword;
-      final pageNumber = event.pageNumber;
       final authToken = event.authToken;
 
       final examShiftDetail =
           await _repository.getTeacherExamShiftDetail(idExamShift, authToken);
 
-      final listStudents = await _repository.getListStudentsByExamShift(
-          idExamShift, keyword, pageNumber, authToken);
+      final listStudents =
+          await _repository.getListStudentsByExamShift(idExamShift, authToken);
 
       emit(ExamShiftDetailLoaded(
-          examShiftDetail: examShiftDetail, listStudents: listStudents));
+          examShiftDetail: examShiftDetail,
+          examShiftWithStudents: listStudents));
     } catch (e) {
       emit(UosDetailError(message: e.toString()));
     }

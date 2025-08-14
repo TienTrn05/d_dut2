@@ -61,9 +61,8 @@ class ScheduleRepository {
   }
 
   Future<StudentsExamShiftModel> getListStudentsByExamShift(
-      String idExamShift, String keyword, int pageNumber, String authToken) {
-    return _scheduleService.getListStudentsByExamShift(
-        idExamShift, keyword, pageNumber, authToken);
+      String idExamShift, String authToken) {
+    return _scheduleService.getListStudentsByExamShift(idExamShift, authToken);
   }
 
   Future<UosStudentsAbsentModel> getListStudentsByUos(String idUos,
