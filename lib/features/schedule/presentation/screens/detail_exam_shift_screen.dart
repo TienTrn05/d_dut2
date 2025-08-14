@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
@@ -7,6 +5,8 @@ import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
+import 'package:e_dut/features/schedule/data/model/role/student_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/student_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.dart';
@@ -25,136 +25,50 @@ class DetailExamShiftScreen extends StatefulWidget {
 }
 
 class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
+  StudentsExamShiftModel? examShiftWithStudents;
+  List<StudentModel> filteredStudents = [];
   final TextEditingController _searchController = TextEditingController();
-  Timer? _debounce;
-
-  int _currentPage = 1;
-  int _totalPages = 1;
+  String _currentSearchKeyword = '';
+  bool _isDataInitialized = false;
 
   void _onSearchChanged() {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 800), () {
-      final keyword = _searchController.text.trim();
+    final keyword = _searchController.text.trim();
+    _currentSearchKeyword = keyword; // Store current keyword
+    _performSearch();
+  }
 
-      setState(() {
-        _currentPage = 1;
-      });
-      final authState = context.read<AuthBloc>().state;
+  List<StudentModel> searchVietnamese(
+      List<StudentModel> students, String keyword) {
+    if (keyword.isEmpty) return List.from(students);
 
-      final String authToken =
-          authState is AuthUserAuthenticated ? authState.accessToken : '';
+    final pattern = Functions.buildVietnamesePattern(keyword.toLowerCase());
+    final regex = RegExp(pattern, caseSensitive: false);
 
-      context.read<UosDetailBloc>().add(
-            LoadExamShiftDetail(
-                idExamShift: widget.idExamShift,
-                keyword: keyword,
-                pageNumber: 1,
-                authToken: authToken),
-          );
+    return students.where((student) {
+      final name = student.studentName.toLowerCase();
+      final no = student.noStudent.toLowerCase();
+
+      return regex.hasMatch(name) || regex.hasMatch(no);
+    }).toList();
+  }
+
+  void _performSearch() {
+    if (examShiftWithStudents == null) return;
+
+    setState(() {
+      filteredStudents = searchVietnamese(
+        examShiftWithStudents!.students,
+        _currentSearchKeyword,
+      );
     });
   }
 
-  List<Widget> _buildPageButtons() {
-    List<Widget> buttons = [];
-
-    void addPageButton(int i) {
-      buttons.add(
-        InkWell(
-          onTap: () {
-            if (i != _currentPage) {
-              setState(() {
-                _currentPage = i;
-              });
-
-              final authState = context.read<AuthBloc>().state;
-
-              final String authToken = authState is AuthUserAuthenticated
-                  ? authState.accessToken
-                  : '';
-              context.read<UosDetailBloc>().add(LoadExamShiftDetail(
-                  idExamShift: widget.idExamShift,
-                  keyword: _searchController.text.trim(),
-                  pageNumber: _currentPage,
-                  authToken: authToken));
-            }
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color:
-                  i == _currentPage ? context.theme.primaryColor : Colors.white,
-              border: Border.all(
-                color: i == _currentPage
-                    ? context.theme.primaryColor ?? Colors.blue
-                    : context.theme.grey ?? Colors.grey,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$i',
-              style: TextStyle(
-                color: i == _currentPage ? Colors.white : Colors.black,
-                fontWeight:
-                    i == _currentPage ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    void addEllipsis() {
-      buttons.add(
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 32,
-          height: 32,
-          alignment: Alignment.center,
-          child: const Text(
-            "...",
-            style: TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (_totalPages <= 5) {
-      for (int i = 1; i <= _totalPages; i++) {
-        addPageButton(i);
-      }
-      return buttons;
-    }
-
-    // Luôn hiển thị trang đầu tiên
-    addPageButton(1);
-
-    // Nếu cần dấu "..." giữa trang đầu và các trang tiếp theo
-    if (_currentPage > 3) {
-      addEllipsis();
-    }
-
-    // Hiển thị current -1, current, current +1 (nếu hợp lệ)
-    for (int i = _currentPage - 1; i <= _currentPage + 1; i++) {
-      if (i > 1 && i < _totalPages) {
-        addPageButton(i);
-      }
-    }
-
-    // Nếu cần dấu "..." trước trang cuối
-    if (_currentPage < _totalPages - 2) {
-      addEllipsis();
-    }
-
-    // Luôn hiển thị trang cuối
-    addPageButton(_totalPages);
-
-    return buttons;
+  void _initializeStudentsList(StudentsExamShiftModel newData) {
+    examShiftWithStudents = newData;
+    filteredStudents = searchVietnamese(
+      newData.students,
+      _currentSearchKeyword,
+    );
   }
 
   @override
@@ -165,7 +79,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -209,7 +122,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                           ),
                         ),
                         Container(
-                          // height: 32,
                           color: Colors.white,
                           child: TabBar.secondary(
                             labelColor: Colors.white,
@@ -229,8 +141,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                               fontSize: 13.0,
                             ),
                             indicatorSize: TabBarIndicatorSize.tab,
-                            // labelPadding:
-                            //     EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                             tabs: [
                               Tab(text: "Thông tin"),
                               Tab(text: "Danh sách sinh viên"),
@@ -268,10 +178,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                               LoadExamShiftDetail(
                                                   idExamShift:
                                                       widget.idExamShift,
-                                                  keyword: _searchController
-                                                      .text
-                                                      .trim(),
-                                                  pageNumber: 1,
                                                   authToken: authToken),
                                             );
                                       },
@@ -364,29 +270,19 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                         curr is UosDetailError,
                                     builder: (context, state) {
                                       if (state is ExamShiftDetailLoaded) {
-                                        final listStudents = state.listStudents;
-                                        final totalItems = listStudents
-                                            .studentsPaged.totalItems;
-                                        final pageSize =
-                                            listStudents.studentsPaged.pageSize;
-                                        _totalPages =
-                                            (totalItems / pageSize).ceil();
+                                        final newData =
+                                            state.examShiftWithStudents;
 
-                                        if (listStudents
-                                            .studentsPaged.items.isEmpty) {
-                                          return Center(
-                                            child: Padding(
-                                              padding: EdgeInsets.all(24.0),
-                                              child: Text(
-                                                'Không có dữ liệu sinh viên',
-                                                style: TextStyle(
-                                                  fontSize: FontSizes.medium,
-                                                  fontWeight: FontWeight.normal,
-                                                  color: context.theme.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          );
+                                        // Only initialize if data changed or not initialized yet
+                                        if (!_isDataInitialized ||
+                                            examShiftWithStudents != newData) {
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            _initializeStudentsList(newData);
+                                            setState(() {
+                                              _isDataInitialized = true;
+                                            });
+                                          });
                                         }
 
                                         return Expanded(
@@ -398,7 +294,7 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                 margin: const EdgeInsets.only(
                                                     top: 10),
                                                 child: Text(
-                                                  "Sinh viên (${listStudents.studentQuantity})",
+                                                  "Sinh viên (${examShiftWithStudents?.studentQuantity ?? 0})",
                                                   style: TextStyle(
                                                     fontSize: FontSizes.medium,
                                                     color: context.theme.grey,
@@ -426,11 +322,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                           LoadExamShiftDetail(
                                                               idExamShift: widget
                                                                   .idExamShift,
-                                                              keyword:
-                                                                  _searchController
-                                                                      .text
-                                                                      .trim(),
-                                                              pageNumber: 1,
                                                               authToken:
                                                                   authToken),
                                                         );
@@ -445,16 +336,14 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                           physics:
                                                               const NeverScrollableScrollPhysics(),
                                                           itemCount:
-                                                              listStudents
-                                                                  .studentsPaged
-                                                                  .items
+                                                              filteredStudents
                                                                   .length,
                                                           itemBuilder:
                                                               (context, index) {
                                                             final student =
-                                                                listStudents
-                                                                    .studentsPaged
-                                                                    .items[index];
+                                                                filteredStudents[
+                                                                    index];
+
                                                             return StudentItem(
                                                               name: student
                                                                   .studentName,
@@ -471,11 +360,6 @@ class _DetailExamShiftScreenState extends State<DetailExamShiftScreen> {
                                                 ),
                                               ),
                                               SizedBox(height: 8),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: _buildPageButtons(),
-                                              ),
                                             ],
                                           ),
                                         );

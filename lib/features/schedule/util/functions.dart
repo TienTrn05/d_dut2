@@ -196,27 +196,29 @@ class Functions {
     }
     return noWeek;
   }
-  // static int getSemesterOrder(String noSemester) {
-  //   switch (noSemester.toLowerCase()) {
-  //     case "1":
-  //       return 1;
-  //     case "2":
-  //       return 2;
-  //     case "hè":
-  //       return 3;
-  //     default:
-  //       return 99; // fallback cho các trường hợp không xác định
-  //   }
-  // }
 
-  // static int compareSemesters(SemesterModel a, SemesterModel b) {
-  //   int startYearCompare = a.startYear.compareTo(b.startYear);
-  //   if (startYearCompare != 0) return startYearCompare;
+  static String buildVietnamesePattern(String keyword) {
+    const vnMap = {
+      'a': '[aàáạảãâầấậẩẫăằắặẳẵ]',
+      'A': '[AÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴ]',
+      'e': '[eèéẹẻẽêềếệểễ]',
+      'E': '[EÈÉẸẺẼÊỀẾỆỂỄ]',
+      'i': '[iìíịỉĩ]',
+      'I': '[IÌÍỊỈĨ]',
+      'o': '[oòóọỏõôồốộổỗơờớợởỡ]',
+      'O': '[OÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]',
+      'u': '[uùúụủũưừứựửữ]',
+      'U': '[UÙÚỤỦŨƯỪỨỰỬỮ]',
+      'y': '[yỳýỵỷỹ]',
+      'Y': '[YỲÝỴỶỸ]',
+      'd': '[dđ]',
+      'D': '[DĐ]',
+    };
 
-  //   int endYearCompare = a.endYear.compareTo(b.endYear);
-  //   if (endYearCompare != 0) return endYearCompare;
-
-  //   return getSemesterOrder(a.noSemester)
-  //       .compareTo(getSemesterOrder(b.noSemester));
-  // }
+    final buffer = StringBuffer();
+    for (var ch in keyword.characters) {
+      buffer.write(vnMap[ch] ?? ch);
+    }
+    return buffer.toString();
+  }
 }

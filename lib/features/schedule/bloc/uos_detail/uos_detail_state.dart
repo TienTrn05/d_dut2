@@ -26,8 +26,8 @@ class FullInfoUosLoaded extends UosDetailState {
 
 class ExamShiftDetailLoaded extends UosDetailState {
   final ExamShiftDetailModel examShiftDetail;
-  final StudentsExamShiftModel listStudents;
+  final StudentsExamShiftModel examShiftWithStudents;
 
   ExamShiftDetailLoaded(
-      {required this.examShiftDetail, required this.listStudents});
+      {required this.examShiftDetail, required this.examShiftWithStudents});
 }

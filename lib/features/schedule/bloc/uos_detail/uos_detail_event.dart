@@ -16,15 +16,9 @@ class LoadFullInfoUosDetail extends UosDetailEvent {
 
 class LoadExamShiftDetail extends UosDetailEvent {
   final String idExamShift;
-  final String keyword;
-  final int pageNumber;
   final String authToken;
 
-  LoadExamShiftDetail(
-      {required this.idExamShift,
-      required this.keyword,
-      required this.pageNumber,
-      required this.authToken});
+  LoadExamShiftDetail({required this.idExamShift, required this.authToken});
 }
 
 class UpdateMsTeamsInfo extends UosDetailEvent {
