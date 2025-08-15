@@ -60,13 +60,13 @@ class MyNotifications extends StatelessWidget {
                                 color: context.theme.primaryColor,
                               ))
                             : Text(
-                                "Load more",
+                                "Xem thêm",
                                 style: TextStyle(
-                                  color: context.theme.primaryColor,
+                                  color: context.theme.grey,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   decoration: TextDecoration.underline,
-                                  decorationColor: context.theme.primaryColor,
+                                  decorationColor: context.theme.grey,
                                 ),
                               ),
                       ),
