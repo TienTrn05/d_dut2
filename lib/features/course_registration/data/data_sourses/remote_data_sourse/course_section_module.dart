@@ -3,5 +3,5 @@ import 'package:injectable/injectable.dart';
 @module
 abstract class CourseSectionModule {
   @Named('courseRegistrationAPIUrl')
-  String get courseRegistrationAPIUrl => "http://10.10.52.52:5283";
+  String get courseRegistrationAPIUrl => "https://dangkytinchi.dut.udn.vn";
 }

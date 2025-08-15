@@ -2,16 +2,17 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
-enum AlertType { confirm, delete }
+enum AlertDialogType { confirm, delete, warning, success, failure }
 
 class CustomAlertDialog {
   static void showCustomDialog(
     BuildContext context,
     String title,
     String message,
-    AlertType alertType, {
+    AlertDialogType alertType, {
     String? textConfirm,
     VoidCallback? onConfirm,
+    String? textCancel,
     VoidCallback? onCancel,
   }) {
     showDialog(
@@ -29,18 +30,18 @@ class CustomAlertDialog {
                 Container(
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _getColor(alertType).withAlpha(30)),
+                      color: _getColor(alertType, context).withAlpha(10)),
                   child: Padding(
                     padding: EdgeInsets.all(8),
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _getColor(alertType).withAlpha(30),
+                        color: _getColor(alertType, context).withAlpha(10),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(8),
                         child: Center(
-                          child: _getIcon(alertType),
+                          child: _getIcon(alertType, context),
                         ),
                       ),
                     ),
@@ -72,8 +73,8 @@ class CustomAlertDialog {
                     Expanded(
                         child: OutlinedButton(
                       style: ButtonStyle(
-                        side: WidgetStateProperty.all(
-                            BorderSide(color: _getColor(alertType), width: 2)),
+                        side: WidgetStateProperty.all(BorderSide(
+                            color: _getColor(alertType, context), width: 2)),
                         padding: WidgetStateProperty.all(
                             EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
                         shape: WidgetStateProperty.all(
@@ -90,46 +91,50 @@ class CustomAlertDialog {
                       },
                       child: Center(
                         child: Text(
-                          "Hủy",
+                          textCancel ?? "Hủy",
                           style: TextStyle(
-                              color: _getColor(alertType),
+                              color: _getColor(alertType, context),
                               fontWeight: FontWeight.bold,
                               fontSize: FontSizes.medium),
                         ),
                       ),
                     )),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextButton(
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(
-                            _getColor(alertType),
+                    if (alertType != AlertDialogType.warning &&
+                        alertType != AlertDialogType.success) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                              _getColor(alertType, context),
+                            ),
+                            padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12)),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
-                          padding: WidgetStateProperty.all(EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12)),
-                          shape: WidgetStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          onPressed: () {
+                            if (onConfirm != null) {
+                              onConfirm();
+                            }
+                            Navigator.of(context).pop();
+                          },
+                          child: Center(
+                            child: Text(
+                              textConfirm ?? "Xác nhận",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: FontSizes.medium),
                             ),
                           ),
                         ),
-                        onPressed: () {
-                          if (onConfirm != null) {
-                            onConfirm();
-                          }
-                          Navigator.of(context).pop();
-                        },
-                        child: Center(
-                          child: Text(
-                            textConfirm ?? "Xác nhận",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: FontSizes.medium),
-                          ),
-                        ),
                       ),
-                    ),
+                    ]
                   ],
                 ),
               ],
@@ -138,22 +143,31 @@ class CustomAlertDialog {
     );
   }
 
-  static Icon _getIcon(AlertType type, {double size = 28}) {
-    Color iconColor = _getColor(type);
+  static Icon _getIcon(AlertDialogType type, BuildContext context,
+      {double size = 28}) {
+    Color iconColor = _getColor(type, context);
     switch (type) {
-      case AlertType.confirm:
+      case AlertDialogType.confirm:
+      case AlertDialogType.warning:
         return Icon(Icons.info_outline_rounded, color: iconColor, size: size);
-      case AlertType.delete:
+      case AlertDialogType.delete:
         return Icon(Icons.delete_outline, color: iconColor, size: size);
+      case AlertDialogType.success:
+        return Icon(Icons.check_rounded, color: iconColor, size: size);
+      case AlertDialogType.failure:
+        return Icon(Icons.close_rounded, color: iconColor, size: size);
     }
   }
 
-  static Color _getColor(AlertType type) {
+  static Color _getColor(AlertDialogType type, BuildContext context) {
     switch (type) {
-      case AlertType.confirm:
-        return Color(0xFF2A74BD);
-      case AlertType.delete:
-        return Color(0xFFCC0102);
+      case AlertDialogType.confirm:
+      case AlertDialogType.warning:
+      case AlertDialogType.success:
+        return context.theme.primaryColor ?? Colors.blue;
+      case AlertDialogType.failure:
+      case AlertDialogType.delete:
+        return context.theme.red ?? Colors.red;
     }
   }
 }

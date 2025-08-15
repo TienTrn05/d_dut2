@@ -1,9 +1,14 @@
-import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../common/extensions/custom_theme_extension.dart';
+import '/common/extensions/custom_theme_extension.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/utils/getit_utils.dart';
+import '/features/auth/bloc/auth_bloc.dart';
+import '../domain/repositories/notification_repository.dart';
 
+import '../bloc/notifications_bloc.dart';
 import 'general_notifications.dart';
 import 'my_notifications.dart';
 
@@ -70,179 +75,220 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: context.theme.primaryColor, // Màu nền xanh dương
-          elevation: 0, // Xóa bóng dưới AppBar
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context); // Quay lại màn hình trước
-              },
-            ),
+    return BlocBuilder<AuthBloc, AuthState>(builder: (contextAuth, stateAuth) {
+      if (stateAuth is! AuthUserAuthenticated) {
+        return Center(
+          child: Text(
+            'Bạn cần đăng nhập để sử dụng tính năng này.',
+            style: TextStyle(fontSize: FontSizes.large),
           ),
-          title: Text(
-            'Thông báo',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: FontSizes.medium,
-            ),
-          ),
-          centerTitle: true, // Căn giữa tiêu đề
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Builder(builder: (context) {
-                return IconButton(
-                  icon: SvgPicture.asset(
-                      "assets/icons/svg/solar_settings-broken.svg"),
+        );
+      }
+
+      return BlocProvider(
+        create: (context) => NotificationsBloc(
+            notificationRepository: getIt.get<NotificationRepository>())
+          ..add(MyNotificationsSubscriptionRequested(
+              token: stateAuth.accessToken))
+          ..add(GeneralNotificationsSubscriptionRequested(
+              token: stateAuth.accessToken)),
+        child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: context.theme.primaryColor, // Màu nền xanh dương
+              elevation: 0, // Xóa bóng dưới AppBar
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white),
                   onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
+                    Navigator.pop(context); // Quay lại màn hình trước
                   },
-                );
-              }),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        endDrawer: Drawer(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16),
-              bottomLeft: Radius.circular(16),
-            ),
-          ),
-            child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/svg/solar_bell-bold.svg",
-                      colorFilter: ColorFilter.mode(
-                        context.theme.primaryColor ?? Colors.blue,
-                        BlendMode.srcIn,
-                      ),
-                      width: 24,
-                      height: 24,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Thông báo",
-                      style: TextStyle(
-                        fontSize: FontSizes.large,
-                        fontWeight: FontWeight.bold,
-                        color: context.theme.primaryColor,
-                      ),
-                    ),
-                  ],
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  height: 1,
-                  color: context.theme.primaryColor,
+              ),
+              title: Text(
+                'Thông báo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: FontSizes.medium,
                 ),
-                _buildSwitchTile("Bật thông báo chung", isGeneralNotificationOn,
-                    (value) {
-                  setState(() {
-                    isGeneralNotificationOn = value;
-                  });
-                }),
-                _buildSwitchTile("Bật thông báo của tôi", isMyNotificationOn,
-                    (value) {
-                  setState(() {
-                    isMyNotificationOn = value;
-                  });
-                }),
-                _buildDropdownTile(),
+              ),
+              centerTitle: true, // Căn giữa tiêu đề
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Builder(builder: (context) {
+                    return IconButton(
+                      icon: SvgPicture.asset(
+                          "assets/icons/svg/solar_settings-broken.svg"),
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    );
+                  }),
+                ),
               ],
             ),
-          ),
-        )),
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Tìm kiếm...",
-                    hintStyle: TextStyle(color: context.theme.grey),
-                    border: InputBorder.none,
-                    icon: Icon(Icons.search, color: context.theme.grey),
+            backgroundColor: Colors.white,
+            endDrawer: Drawer(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
                   ),
-                  style: TextStyle(fontSize: FontSizes.medium),
                 ),
-              ),
-              const SizedBox(height: 10),
-              TabBar(
-                  labelPadding:
-                      EdgeInsets.all(0), // Khoảng cách giữa chữ và tab
-                  dividerColor:
-                      context.theme.primaryColor, // Màu đường chia tab
-                  indicator: BoxDecoration(
-                    color: context.theme.primaryColor, // Màu nền tab được chọn
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      topRight: Radius.circular(4),
+                backgroundColor: Colors.white,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              "assets/icons/svg/solar_bell-bold.svg",
+                              colorFilter: ColorFilter.mode(
+                                context.theme.primaryColor ?? Colors.blue,
+                                BlendMode.srcIn,
+                              ),
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Thông báo",
+                              style: TextStyle(
+                                fontSize: FontSizes.large,
+                                fontWeight: FontWeight.bold,
+                                color: context.theme.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          height: 1,
+                          color: context.theme.primaryColor,
+                        ),
+                        _buildSwitchTile(
+                            "Bật thông báo chung", isGeneralNotificationOn,
+                            (value) {
+                          setState(() {
+                            isGeneralNotificationOn = value;
+                          });
+                        }),
+                        _buildSwitchTile(
+                            "Bật thông báo của tôi", isMyNotificationOn,
+                            (value) {
+                          setState(() {
+                            isMyNotificationOn = value;
+                          });
+                        }),
+                        _buildDropdownTile(),
+                      ],
                     ),
                   ),
-                  labelColor: Colors.white, // Màu chữ của tab được chọn
-                  unselectedLabelColor:
-                      context.theme.grey, // Màu chữ của tab chưa chọn
-                  tabs: [
-                    Tab(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Center(
-                          child: Text("Thông báo của tôi",
-                              style: TextStyle(
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                              )),
+                )),
+            body: Padding(
+              padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 24,
+                  bottom: 24 + MediaQuery.of(context).padding.bottom),
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                        hintText: "Tìm kiếm...",
+                        hintStyle: TextStyle(color: context.theme.grey),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SvgPicture.asset(
+                            "assets/icons/svg/flowbite_search-outline.svg",
+                            width: 24,
+                            height: 24,
+                            colorFilter:
+                                ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                          ),
+                        ),
+                        filled: true,
+                        fillColor:
+                            context.theme.lightGrey ?? Color(0xffFAFAFA)),
+                    style: TextStyle(fontSize: FontSizes.large),
+                  ),
+                  const SizedBox(height: 10),
+                  TabBar(
+                      labelPadding:
+                          EdgeInsets.all(0), // Khoảng cách giữa chữ và tab
+                      dividerColor:
+                          context.theme.primaryColor, // Màu đường chia tab
+                      indicator: BoxDecoration(
+                        color:
+                            context.theme.primaryColor, // Màu nền tab được chọn
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          topRight: Radius.circular(8),
                         ),
                       ),
-                    ),
-                    Tab(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Center(
-                          child: Text("Chung",
-                              style: TextStyle(
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                              )),
+                      labelColor: Colors.white, // Màu chữ của tab được chọn
+                      unselectedLabelColor:
+                          context.theme.grey, // Màu chữ của tab chưa chọn
+                      tabs: [
+                        Tab(
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Center(
+                              child: Text("Thông báo của tôi",
+                                  style: TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                          ),
                         ),
+                        Tab(
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Center(
+                              child: Text("Chung",
+                                  style: TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ]),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: TabBarView(
+                        children: [
+                          MyNotifications(
+                            token: stateAuth.accessToken,
+                          ), // Nội dung tab 1
+                          GeneralNotifications(
+                            token: stateAuth.accessToken,
+                          ), // Nội dung tab 2
+                        ],
                       ),
                     ),
-                  ]),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: TabBarView(
-                    children: [
-                      MyNotifications(), // Nội dung tab 1
-                      GeneralNotifications(), // Nội dung tab 2
-                    ],
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

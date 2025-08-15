@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:e_dut/features/schedule/data/model/semester_model.dart';
-import 'package:e_dut/features/schedule/data/model/uos_item_model.dart';
+import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_item_model.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,14 +25,16 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
       LoadListSemesters event, Emitter<TimetableState> emit) async {
     emit(TimetableLoading());
     try {
-      final semesters = await _repository.getListSemester();
+      final authToken = event.authToken;
+      final semesters = await _repository.getListSemester(authToken);
 
       if (semesters.isEmpty) {
         emit(TimetableError("Không có học kỳ nào."));
         return;
       }
+
       final currentIdSemester =
-          await _repository.getSemesterByDate(DateTime.now());
+          await _repository.getSemesterByDate(DateTime.now(), authToken);
       final updatedSemesters = semesters.map((s) {
         return SemesterModel(
             idSemester: s.idSemester,
@@ -47,9 +49,9 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
               ? updatedSemesters.indexWhere((s) => s.isCurrentSemester)
               : 0;
       final selectedSemester = updatedSemesters[selectedIndex];
-
-      final listUOS =
-          await _repository.getListUOSBySemester(selectedSemester.idSemester);
+      final isTeacher = event.isTeacher;
+      final listUOS = await _repository.getListUOSBySemester(
+          selectedSemester.idSemester, isTeacher, authToken);
 
       emit(TimetableDataLoaded(semesters, listUOS, selectedIndex));
     } catch (e) {
@@ -67,6 +69,8 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
         final index = event.selectedIndex;
 
         final idSemester = event.idSemester;
+        final isTeacher = event.isTeacher;
+        final authToken = event.authToken;
 
         if (_uosCache.containsKey(idSemester)) {
           emit(TimetableDataLoaded(
@@ -75,7 +79,8 @@ class TimetableBloc extends Bloc<TimetableEvent, TimetableState> {
             index,
           ));
         } else {
-          final listUOS = await _repository.getListUOSBySemester(idSemester);
+          final listUOS = await _repository.getListUOSBySemester(
+              idSemester, isTeacher, authToken);
           if (_uosCache.length >= _cacheLimit) {
             _uosCache.remove(_uosCache.keys.first);
           }

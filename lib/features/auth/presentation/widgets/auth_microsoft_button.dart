@@ -23,16 +23,10 @@ class AuthMicrosoftButton extends StatelessWidget {
       builder: (context, constraints) {
         return MaterialButton(
           onPressed: onPressed,
-          color: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          minWidth: double.infinity,
+          color: color,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(
-              color: color,
-              width: 2,
-              style: BorderStyle.solid,
-            ),
           ),
           clipBehavior: Clip.antiAlias,
           elevation: 0,
@@ -45,7 +39,7 @@ class AuthMicrosoftButton extends StatelessWidget {
                 child: Text(
                   text,
                   style: TextStyle(
-                    color: color,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontFamily: GoogleFonts.notoSans().fontFamily,
                     fontSize: FontSizes.medium,
@@ -56,7 +50,10 @@ class AuthMicrosoftButton extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              SvgPicture.asset("assets/icons/svg/mdi_microsoft.svg"),
+              SvgPicture.asset(
+                "assets/icons/svg/mdi_microsoft.svg",
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              ),
             ],
           ),
         );

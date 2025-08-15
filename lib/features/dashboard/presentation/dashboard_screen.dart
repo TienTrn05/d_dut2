@@ -8,7 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../root/bloc/root_bloc.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
 
@@ -44,227 +46,249 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final DateTime today = DateTime.now();
     final String weekday = DateFormat.EEEE('vi').format(today);
     final String month = 'Tháng ${today.month}';
-    final String day = '${today.day}';
+    final String day = today.day.toString().padLeft(2, '0');
 
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
-        ),
-        BlocProvider(
-          create: (_) => ScheduleBloc(getIt.get<ScheduleRepository>())
-            ..add(LoadSchedulesByDate(inputDate: DateTime.now())),
-        ),
-      ],
-      child: BlocListener<DashboardBloc, DashboardState>(
-        listener: (context, state) {
-          if (state is DashboardPermissionRequested) {
-            CustomSnackbar.showSnackBar(context, "Thông báo",
-                "Không được phép truy cập", AlertType.warning);
-            context.read<DashboardBloc>().add(DashboardResetNavigation());
-          } else if (state is DashboardNavigateSuccess) {
-            Future.microtask(() async {
-              await Navigator.of(context).pushNamed(state.routeName);
-              if (context.mounted) {
-                context.read<DashboardBloc>().add(DashboardResetNavigation());
-              }
-            });
-          }
-        },
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 16,
-              bottom: 74,
+        providers: [
+          BlocProvider(
+            create: (context) => DashboardBloc(getIt.get<DashboardRepo>()),
+          ),
+          BlocProvider(
+            create: (context) => ScheduleBloc(getIt.get<ScheduleRepository>()),
+          ),
+        ],
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<DashboardBloc, DashboardState>(
+              listener: (context, state) {
+                if (state is DashboardPermissionRequested) {
+                  CustomSnackbar.showSnackBar(context, "Thông báo",
+                      "Không được phép truy cập", AlertType.warning);
+                  context.read<DashboardBloc>().add(DashboardResetNavigation());
+                } else if (state is DashboardNavigateSuccess) {
+                  Future.microtask(() async {
+                    await Navigator.of(context).pushNamed(state.routeName);
+                    if (context.mounted) {
+                      context
+                          .read<DashboardBloc>()
+                          .add(DashboardResetNavigation());
+                    }
+                  });
+                }
+              },
             ),
-            child: Column(
-              children: [
-                BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-                  if (state is! AuthUserAuthenticated) {
-                    return const Header(
-                      displayName: "title",
-                      userPrincipalName: "subtitle",
-                      isLoading: true,
-                    );
-                  }
+            BlocListener<AuthBloc, AuthState>(listener: (context, authState) {
+              if (authState is AuthUserAuthenticated) {
+                final String userRole = authState.userData.role.name;
+                final String authToken = authState.accessToken;
+                context.read<ScheduleBloc>().add(LoadSchedulesByDate(
+                    inputDate: DateTime.now(),
+                    isTeacher: userRole == RoleModel.roleTeacher,
+                    authToken: authToken));
+              }
+            })
+          ],
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 24,
+                bottom: 74,
+              ),
+              child: Column(
+                children: [
+                  BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+                    if (state is! AuthUserAuthenticated) {
+                      return const Header(
+                        displayName: "title",
+                        userPrincipalName: "subtitle",
+                        isLoading: true,
+                      );
+                    }
 
-                  return Header(
-                      displayName: state.userData.displayName,
-                      userPrincipalName: state.userData.userPrincipalName,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(Routes.notification);
-                      });
-                }),
-                const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  height: 150,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            weekday,
-                            style: TextStyle(
-                              fontSize: FontSizes.large,
-                              fontWeight: FontWeight.bold,
-                              height: 1.25,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            month,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: FontSizes.medium,
-                              height: 1.25,
-                            ),
-                          ),
-                          Flexible(
-                            // fit: BoxFit.scaleDown, //thu nhỏ nếu không đủ chỗ
-                            child: Text(
-                              day,
+                    return Header(
+                        displayName: state.userData.displayName,
+                        userPrincipalName: state.userData.userPrincipalName,
+                        onHeaderTap: () {
+                          context.read<MainBloc>().add(ChangePage(1));
+                        },
+                        onTap: () {
+                          Navigator.of(context).pushNamed(Routes.notification);
+                        });
+                  }),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    height: 150,
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              weekday,
                               style: TextStyle(
-                                color: context.theme.primaryColor,
-                                fontSize: 48,
+                                fontSize: FontSizes.large,
                                 fontWeight: FontWeight.bold,
-                                height: 1,
+                                height: 1.25,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 1,
-                        height: double.infinity,
-                        color: Colors.grey[300],
-                      ),
-                      const SizedBox(width: 10),
-                      BlocBuilder<ScheduleBloc, ScheduleState>(
-                        builder: (context, state) {
-                          if (state is ScheduleLoading) {
-                            return Expanded(
-                                child: Column(
-                              children: [
-                                CardLoading(
-                                  height: 56,
-                                  margin: EdgeInsets.only(bottom: 4),
+                            const SizedBox(height: 10),
+                            Text(
+                              month,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: FontSizes.medium,
+                                height: 1.25,
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                day,
+                                style: TextStyle(
+                                  color: context.theme.primaryColor,
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1,
                                 ),
-                              ],
-                            ));
-                          } else if (state is SchedulesLoaded) {
-                            return Expanded(
-                              child: state.schedules.isEmpty
-                                  ? Column(
-                                      children: [
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12),
-                                            child: SvgPicture.asset(
-                                              "assets/icons/svg/undraw_online-calendar_zaoc.svg",
-                                              fit: BoxFit.contain,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          width: 1,
+                          height: double.infinity,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(width: 10),
+                        BlocConsumer<ScheduleBloc, ScheduleState>(
+                          listener: (context, state) {},
+                          builder: (context, state) {
+                            if (state is ScheduleInitial) {
+                              final authState = context.read<AuthBloc>().state;
+                              if (authState is AuthUserAuthenticated) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (context.mounted) {
+                                    final String userRole =
+                                        authState.userData.role.name;
+                                    final String authToken =
+                                        authState.accessToken;
+                                    context.read<ScheduleBloc>().add(
+                                        LoadSchedulesByDate(
+                                            inputDate: DateTime.now(),
+                                            isTeacher: userRole ==
+                                                RoleModel.roleTeacher,
+                                            authToken: authToken));
+                                  }
+                                });
+                              }
+                            }
+                            if (state is ScheduleLoading) {
+                              return Expanded(
+                                  child: Column(
+                                children: [
+                                  CardLoading(
+                                    height: 56,
+                                    margin: EdgeInsets.only(bottom: 4),
+                                  ),
+                                ],
+                              ));
+                            } else if (state is SchedulesLoaded) {
+                              return Expanded(
+                                child: state.schedules.isEmpty
+                                    ? Column(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: const EdgeInsets.all(12),
+                                              child: SvgPicture.asset(
+                                                "assets/images/free-schedule.svg",
+                                                fit: BoxFit.contain,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        Text(
-                                          "Hôm nay không có lịch nào!",
-                                          style: TextStyle(
-                                            fontSize: FontSizes.medium,
-                                            fontWeight: FontWeight.w600,
-                                            color: context.theme.grey ??
-                                                Colors.grey,
+                                          Text(
+                                            "Hôm nay không có lịch nào!",
+                                            style: TextStyle(
+                                              fontSize: FontSizes.medium,
+                                              fontWeight: FontWeight.w600,
+                                              color: context.theme.grey ??
+                                                  Colors.grey,
+                                            ),
                                           ),
+                                        ],
+                                      )
+                                    : SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: state.schedules.map((item) {
+                                            return ScheduleItem(
+                                              idSubject:
+                                                  (item.idUnitOfStudy.isNotEmpty
+                                                      ? item.idUnitOfStudy
+                                                      : item.idExamShift),
+                                              subject: item.subjectName,
+                                              time: item.isExam
+                                                  ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
+                                                  : "${item.startStudyTime.substring(0, 5)} - ${item.endStudyTime.substring(0, 5)}",
+                                              room: item.room,
+                                              isExam: item.isExam,
+                                            );
+                                          }).toList(),
                                         ),
-                                      ],
-                                    )
-                                  : SingleChildScrollView(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: state.schedules.map((item) {
-                                          return ScheduleItem(
-                                            idSubject: item.idUnitOfStudy,
-                                            subject: item.subjectName,
-                                            time: item.isExam
-                                                ? "${DateFormat.Hm().format(item.examTime!)}, xuất ${item.noExamShift}, nhóm ${item.noExamGroup}"
-                                                : "${item.startStudyTime!.substring(0, 5)} - ${item.endStudyTime!.substring(0, 5)}",
-                                            room: item.room,
-                                            isExam: item.isExam,
-                                          );
-                                        }).toList(),
                                       ),
-                                    ),
-                            );
-                          } else {
-                            return Text("loading");
-                          }
-                        },
-                      )
-                    ],
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: BlocBuilder<AuthBloc, AuthState>(
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        children: [
+                          BlocBuilder<AuthBloc, AuthState>(
                             builder: (context, state) {
+                              List<Widget> gridItems = [];
+
                               if (state is! AuthUserAuthenticated) {
-                                return GridView(
-                                    shrinkWrap: true,
-                                    gridDelegate:
-                                        SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent:
-                                          200, // Chiều rộng tối đa của item
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      mainAxisExtent: 150,
-                                    ),
-                                    children: [
-                                      FeatureCardSkeleton(),
-                                      FeatureCardSkeleton(),
-                                    ]);
-                              }
+                                gridItems = [
+                                  FeatureCardSkeleton(),
+                                  FeatureCardSkeleton(),
+                                ];
+                              } else {
+                                final List<ScopeModel> scopes =
+                                    state.userData.scopes;
+                                final String userRole =
+                                    state.userData.role.name;
 
-                              final List<ScopeModel> scopes =
-                                  state.userData.scopes;
-
-                              final String userRole = state.userData.role.name;
-
-                              if (userRole == RoleModel.roleTeacher ||
-                                  userRole == RoleModel.roleAdmin) {
-                                return GridView(
-                                  shrinkWrap: true,
-                                  gridDelegate:
-                                      SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent:
-                                        200, // Chiều rộng tối đa của item
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    mainAxisExtent: 150,
-                                  ),
-                                  children: [
+                                if (userRole == RoleModel.roleTeacher ||
+                                    userRole == RoleModel.roleAdmin) {
+                                  gridItems = [
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/solar_calendar-broken.svg",
                                       title: "Thời khóa biểu",
-                                      subtitle: "Tra cứu thời khóa biểu",
                                       onTap: () {
                                         context.read<DashboardBloc>().add(
                                             DashboardNavigateRequested(
@@ -273,93 +297,150 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     FeatureCard(
                                       iconUrl:
-                                          "assets/icons/svg/solar_calendar-broken.svg",
-                                      title: "Lịch tuần",
-                                      subtitle: "Lên lịch họp",
+                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                      title: "Lớp chủ nhiệm",
                                       onTap: () {
                                         context.read<DashboardBloc>().add(
                                             DashboardNavigateRequested(
-                                                scopes, "/calendar"));
+                                                scopes, Routes.listHomeRoom));
+                                      },
+                                      // disabled: true,
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/fluent_calendar-work-week-32-regular.svg",
+                                      title: "Lịch tuần",
+                                      onTap: () async {
+                                        final url = Uri.parse(
+                                            'https://lichtuan.dut.udn.vn');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode:
+                                                  LaunchMode.inAppBrowserView);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                              context,
+                                              'Không thể mở liên kết',
+                                              'Vui lòng kiểm tra kết nối internet hoặc thử lại sau',
+                                              AlertType.error);
+                                        }
                                       },
                                     ),
-                                  ],
-                                );
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/mdi_microsoft-teams.svg",
+                                      title: "Ms Teams tool",
+                                      onTap: () async {
+                                        final url = Uri.parse(
+                                            'https://msteamtool.dut.udn.vn');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url,
+                                              mode:
+                                                  LaunchMode.inAppBrowserView);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                              context,
+                                              'Không thể mở liên kết',
+                                              'Vui lòng kiểm tra kết nối internet hoặc thử lại sau',
+                                              AlertType.error);
+                                        }
+                                      },
+                                    ),
+                                  ];
+                                } else {
+                                  gridItems = [
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/solar_calendar-broken.svg",
+                                      title: "Thời khóa biểu",
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                            DashboardNavigateRequested(
+                                                scopes, Routes.schedule));
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/hugeicons_note-edit.svg",
+                                      title: "Đăng ký tín chỉ",
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                            DashboardNavigateRequested(scopes,
+                                                Routes.courseRegistration));
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
+                                      title: "Hoạt động \ncộng đồng",
+                                      onTap: () {
+                                        Navigator.of(context).pushNamed(
+                                            Routes.communityActivities);
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                      title: "Lớp sinh hoạt",
+                                      // disabled: true,
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                            DashboardNavigateRequested(
+                                                scopes, Routes.detailHomeRoom));
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/mage_goals.svg",
+                                      title: "Kết quả học tập",
+                                      disabled: true,
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/tabler_coin.svg",
+                                      title: "Học phí",
+                                      disabled: true,
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/carbon_book.svg",
+                                      title: "Chương trình đào tạo",
+                                      disabled: true,
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/uil_chart-line.svg",
+                                      title: "Thống kê",
+                                      disabled: true,
+                                    ),
+                                  ];
+                                }
                               }
 
-                              return SizedBox(
-                                  height: 400,
-                                  child: GridView(
-                                    shrinkWrap: true,
-                                    gridDelegate:
-                                        SliverGridDelegateWithMaxCrossAxisExtent(
-                                      maxCrossAxisExtent:
-                                          200, // Chiều rộng tối đa của item
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      mainAxisExtent: 150,
-                                    ),
-                                    children: [
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/solar_calendar-broken.svg",
-                                        title: "Thời khóa biểu",
-                                        subtitle: "Xem lịch học & thi",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                              DashboardNavigateRequested(
-                                                  scopes, Routes.schedule));
-                                        },
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/mage_goals.svg",
-                                        title: "Kết quả học tập",
-                                        subtitle: "Tra cứu kết quả học tập",
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/tabler_coin.svg",
-                                        title: "Học phí",
-                                        subtitle: "Học phí",
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/carbon_book.svg",
-                                        title: "Học phần",
-                                        subtitle: "Đăng ký học phần",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                    scopes, Routes.courseRegistration),
-                                              );
-                                        },
-                                      ),
-                                      FeatureCard(
-                                        iconUrl:
-                                            "assets/icons/svg/carbon_book.svg",
-                                        title: "MS Team tool",
-                                        subtitle: "Học trực tuyến",
-                                        onTap: () {
-                                          context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                    scopes, Routes.msteamtool),
-                                              );
-                                        },
-                                      ),
-                                    ],
-                                  ));
+                              return GridView(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                clipBehavior: Clip.none,
+                                gridDelegate:
+                                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 200,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  mainAxisExtent: 150,
+                                ),
+                                children: gridItems,
+                              );
                             },
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12)
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                  )),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

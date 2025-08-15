@@ -24,14 +24,18 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     emit(ScheduleLoading());
     try {
       final inputDate = event.inputDate;
-      final noWeek = await _repository.getWeekByDate(inputDate);
+      final isTeacher = event.isTeacher;
+      final authToken = event.authToken;
+
+      final noWeek = await _repository.getWeekByDate(inputDate, authToken);
       if (_schedulesCache.containsKey(inputDate)) {
         emit(SchedulesLoaded(
             selectedDay: inputDate,
             noWeek: noWeek,
             schedules: _schedulesCache[inputDate]!));
       } else {
-        final schedules = await _repository.getSchedulesByDate(inputDate);
+        final schedules = await _repository.getSchedulesByDate(
+            inputDate, isTeacher, authToken);
         if (_schedulesCache.length > _cacheLimit) {
           _schedulesCache.remove(_schedulesCache.keys.first);
         }

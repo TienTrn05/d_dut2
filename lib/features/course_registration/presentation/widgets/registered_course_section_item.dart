@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+
+import '../../common/utils/course_date_utils.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/extensions/custom_theme_extension.dart';
+import '../../data/models/registered_course_section.dart';
+import '../../presentation/widgets/buttons/custom_button.dart';
+
+class RegisteredCourseSectionItem extends StatelessWidget {
+  final RegisteredCourseSection courseSection;
+  final Function()? onDetail;
+
+  const RegisteredCourseSectionItem({
+    super.key,
+    required this.courseSection,
+    this.onDetail,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+          color: Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '${courseSection.courseSectionIdSplited} ',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium - 1,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.fiber_manual_record,
+                    size: 6,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${courseSection.course.credits} tín chỉ',
+                    style: TextStyle(
+                      fontSize: FontSizes.medium - 1,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                'SL: ${courseSection.registeredCount}/${courseSection.capacity}',
+                style: TextStyle(fontSize: FontSizes.medium - 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    courseSection.courseName,
+                    style: TextStyle(
+                      fontSize: FontSizes.large,
+                      fontWeight: FontWeight.bold,
+                      color: context.theme.primaryColor,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    CourseDateUtils.formatStudyWeeks(courseSection.schedule),
+                    style: TextStyle(
+                      fontSize: FontSizes.medium - 1,
+                      color: Color(0xFF747474),
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              )),
+              const SizedBox(width: 4),
+              CustomButton(
+                text: "Chi tiết",
+                onPressed: onDetail,
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}

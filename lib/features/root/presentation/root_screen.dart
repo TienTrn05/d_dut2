@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/services/notification_service.dart';
 import '../bloc/root_bloc.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
+// import '../../searching/presentation/searching_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 
 class RootScreen extends StatelessWidget {
@@ -31,15 +34,24 @@ class _MainViewState extends State<_MainView> {
   final PageStorageBucket bucket = PageStorageBucket();
   List<Widget> dashBoardScreens = [
     const DashboardScreen(),
-    const Placeholder(),
+    // const SearchingScreen(),
     const ProfileScreen(),
   ];
+
+  late FirebaseAPI firebaseAPI;
+
+  @override
+  void initState() {
+    super.initState();
+    firebaseAPI = Provider.of<FirebaseAPI>(context, listen: false);
+    firebaseAPI.init();
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double bottomItemWidth = 72;
-    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 3) / 4;
+    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 2) / 3;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -63,10 +75,10 @@ class _MainViewState extends State<_MainView> {
               ),
             ),
           ),
-
+    
           // Bottom Navigation Bar
           Positioned(
-            bottom: 24,
+            bottom: 24 + MediaQuery.of(context).padding.bottom,
             left: 24,
             right: 24,
             child: Container(
@@ -74,7 +86,7 @@ class _MainViewState extends State<_MainView> {
               height: 50,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(16)),
+                borderRadius: BorderRadius.all(Radius.circular(999)),
               ),
               child:
                   BlocBuilder<MainBloc, MainState>(builder: (context, state) {
@@ -84,8 +96,9 @@ class _MainViewState extends State<_MainView> {
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       top: 0,
-                      left: (offsetLeft + bottomItemWidth) * state.currentPage +
-                          offsetLeft,
+                      left:
+                          (offsetLeft + bottomItemWidth) * state.currentPage +
+                              offsetLeft,
                       child: Container(
                         height: 2,
                         width: bottomItemWidth,
@@ -95,7 +108,7 @@ class _MainViewState extends State<_MainView> {
                         ),
                       ),
                     ),
-
+    
                     // Các icon tab
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,14 +119,14 @@ class _MainViewState extends State<_MainView> {
                             0,
                             "assets/icons/svg/iconoir_home-alt.svg",
                             bottomItemWidth),
+                        // bottomNavigationItem(
+                        //     context,
+                        //     1,
+                        //     "assets/icons/svg/flowbite_search-outline.svg",
+                        //     bottomItemWidth),
                         bottomNavigationItem(
                             context,
                             1,
-                            "assets/icons/svg/flowbite_search-outline.svg",
-                            bottomItemWidth),
-                        bottomNavigationItem(
-                            context,
-                            2,
                             "assets/icons/svg/solar_user-broken.svg",
                             bottomItemWidth),
                       ],

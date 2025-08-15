@@ -1,5 +1,5 @@
 class EventTypeModel {
-  // 1: Study, 2: Exam
+  // 1: Study, 2: Exam, Teaching: 3
   final int eventType;
   final String eventTypeDes;
 

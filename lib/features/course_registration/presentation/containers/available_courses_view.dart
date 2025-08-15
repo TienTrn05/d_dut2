@@ -1,9 +1,18 @@
-import 'package:e_dut/features/course_registration/bloc/available_courses/available_courses_bloc.dart';
-import 'package:e_dut/features/course_registration/data/models/course_section.dart';
-import 'package:e_dut/features/course_registration/presentation/widgets/course_card.dart';
-import 'package:e_dut/features/course_registration/presentation/widgets/course_section_item.dart';
+import 'package:e_dut/features/course_registration/bloc/registration_signalr/registration_signalr_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../data/models/course_section_response.dart';
+import '/common/extensions/custom_theme_extension.dart';
+import '/features/auth/bloc/auth_bloc.dart';
+
+import '../../bloc/course_sections/course_sections_bloc.dart';
+import '../../data/models/course_section.dart';
+import '../../presentation/widgets/course_card.dart';
+import '../../presentation/widgets/schedule_group_card.dart';
+import '../../presentation/widgets/course_section_item.dart';
+import '../widgets/dialogs/course_section_dialog.dart';
+import '../widgets/buttons/custom_button.dart';
 
 class AvailableCoursesView extends StatefulWidget {
   const AvailableCoursesView({super.key});
@@ -15,46 +24,182 @@ class AvailableCoursesView extends StatefulWidget {
 class _AvailableCoursesViewState extends State<AvailableCoursesView> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AvailableCoursesBloc, AvailableCoursesState>(
-        builder: (context, state) {
-      final groupedCourses = CourseSection.groupByCourse(state.courses);
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, stateAuth) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<CourseSectionsBloc>().add(
+                  AvailableCourseSectionsSubscriptionRequested(
+                    token: (stateAuth as AuthUserAuthenticated).accessToken,
+                  ),
+                );
+          },
+          color: context.theme.primaryColor,
+          backgroundColor: Colors.white,
+          child: BlocBuilder<CourseSectionsBloc, CourseSectionsState>(
+            builder: (context, state) {
+              if (state.availableCoursesStatus ==
+                  AvailableCoursesStatus.loading) {
+                return Center(
+                    child: CircularProgressIndicator(
+                  color: context.theme.primaryColor,
+                ));
+              }
 
-      if (state.status == AvailableCoursesStatus.loading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state.status == AvailableCoursesStatus.failure) {
-        return Center(
-          child: Text(
-            state.errorMessage,
-            style: const TextStyle(color: Colors.red),
+              final groupedCourses = CourseSection.groupByCourse(state.courses);
+              final groupedCoursesByScheduleGroup =
+                  CourseSection.groupByScheduleGroup(state.courses);
+
+              // Dùng ListView luôn, dù trạng thái nào
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  Text(
+                      "Học kỳ này bạn phải đăng ký các môn:", // Replace with actual logic to calculate registered credits
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: context.theme.primaryColor,
+                      )),
+                  Expanded(
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      children: [
+                        if (state.availableCoursesStatus ==
+                            AvailableCoursesStatus.failure)
+                          Center(
+                            child: Text(
+                              state.errorCourseSectionMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          )
+                        else if (groupedCourses.isEmpty)
+                          const Center(
+                              child: Text("Không có học phần nào khả dụng"))
+                        else if (state.registrationPhase ==
+                                RegistrationPhase.cohort ||
+                            state.registrationPhase == RegistrationPhase.global)
+                          ...groupedCourses.entries.map((entry) {
+                            final course = entry.key;
+                            final sections = entry.value;
+
+                            return Column(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CourseCard(
+                                      course: course,
+                                      child: Column(
+                                        children: sections
+                                            .map((section) => CourseSectionItem(
+                                                  courseSection: section,
+                                                  onDetail: () {
+                                                    CourseSectionDialog
+                                                        .showCustomDialog(
+                                                      context,
+                                                      section,
+                                                      () {
+                                                        context
+                                                            .read<
+                                                                CourseSectionsBloc>()
+                                                            .add(
+                                                              RegisterCourseRequested(
+                                                                token: (stateAuth
+                                                                        as AuthUserAuthenticated)
+                                                                    .accessToken,
+                                                                courseSectionId:
+                                                                    section.id,
+                                                              ),
+                                                            );
+                                                        Navigator.pop(context);
+                                                      },
+                                                    );
+                                                  },
+                                                ))
+                                            .toList(),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                        if (state.registrationPhase == RegistrationPhase.group)
+                          ...groupedCoursesByScheduleGroup.entries.map((entry) {
+                            final scheduleGroup = entry.key;
+                            final sections = entry.value;
+
+                            return Column(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ScheduleGroupCard(
+                                      scheduleGroup: scheduleGroup,
+                                      child: Column(
+                                        children: [
+                                          CustomButton(
+                                              text:
+                                                  "Đ.ký tất cả các học phần nhóm này",
+                                              onPressed: () {
+                                                context
+                                                    .read<
+                                                        RegistrationSignalRBloc>()
+                                                    .add(
+                                                        RegistrationSignalRStarted());
+                                              }),
+                                          Column(
+                                              children: sections
+                                                  .map(
+                                                      (section) =>
+                                                          CourseSectionItem(
+                                                            courseSection:
+                                                                section,
+                                                            onDetail: () {
+                                                              CourseSectionDialog
+                                                                  .showCustomDialog(
+                                                                context,
+                                                                section,
+                                                                () {
+                                                                  context
+                                                                      .read<
+                                                                          CourseSectionsBloc>()
+                                                                      .add(
+                                                                        RegisterCourseRequested(
+                                                                          token:
+                                                                              (stateAuth as AuthUserAuthenticated).accessToken,
+                                                                          courseSectionId:
+                                                                              section.id,
+                                                                        ),
+                                                                      );
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                              );
+                                                            },
+                                                          ))
+                                                  .toList()),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
-      } else if (groupedCourses.isEmpty) {
-        return const Center(child: Text('No available courses'));
-      }
-
-      return ListView(
-        children: groupedCourses.entries.map((entry) {
-          final course = entry.key;
-          final sections = entry.value;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CourseCard(
-                course: course,
-                child: Column(
-                  children: sections
-                      .map((section) => CourseSectionItem(
-                            courseSection: section,
-                          ))
-                      .toList(),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          );
-        }).toList(),
-      );
-    });
+      },
+    );
   }
 }
