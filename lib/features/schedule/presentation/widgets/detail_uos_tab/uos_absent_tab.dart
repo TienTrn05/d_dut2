@@ -323,7 +323,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
             if (_listStudentIsAbsent.isEmpty) {
               for (var student in listStudentAbsent) {
                 _listStudentIsAbsent[student.idStudent] =
-                    _statusCheckedIn == 1 ? student.isAbsent : true;
+                    _statusCheckedIn == 1 ? student.isAbsent : false;
               }
               _isSellectedAll = _listStudentIsAbsent.values
                   .every((status) => status == false);
