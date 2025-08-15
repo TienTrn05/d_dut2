@@ -14,11 +14,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DetailActivityScreen extends StatefulWidget {
   final ActivityModel activity;
-
   final CommunityActivityBloc communityBloc;
+  final int pageOfActivity;
 
   const DetailActivityScreen(
-      {super.key, required this.activity, required this.communityBloc});
+      {super.key,
+      required this.activity,
+      required this.communityBloc,
+      required this.pageOfActivity});
 
   @override
   State<DetailActivityScreen> createState() => _DetailActivityScreenState();
@@ -40,7 +43,7 @@ class _DetailActivityScreenState extends State<DetailActivityScreen> {
               token: token,
               keyword: '',
               idActivity: widget.activity.id,
-              pageNumber: 1,
+              pageNumber: widget.pageOfActivity,
               status: '',
               categoryIds: '',
               startDate: null,

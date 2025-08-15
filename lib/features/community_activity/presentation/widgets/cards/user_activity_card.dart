@@ -180,6 +180,7 @@ class _UserActivityCardState extends State<UserActivityCard>
                             child: DetailUserActivityScreen(
                               userActivity: widget.userActivity,
                               communityBloc: communityBloc,
+                              pageOfActivity: widget.pageNumber,
                             ),
                           )));
               if (result == true) {
