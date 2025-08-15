@@ -48,6 +48,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   // 0: Chưa điểm danh, 1: Đã điểm danh, 2: Đang điểm danh
   int _statusCheckedIn = 0;
   bool _isTeachingDate = false;
+  bool _isEditing = false;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -97,6 +98,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       if (isAbsent == true && _isSellectedAll) {
         _isSellectedAll = false;
       }
+      if (!_isEditing) {
+        _isEditing = true;
+        widget.setIsNotChecked(false);
+      }
     });
   }
 
@@ -104,6 +109,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _isSellectedAll = !_isSellectedAll;
       _listStudentIsAbsent.updateAll((key, value) => !_isSellectedAll);
+      if (!_isEditing) {
+        _isEditing = true;
+        widget.setIsNotChecked(false);
+      }
     });
   }
 
@@ -133,7 +142,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   }
 
   void _updateCurrentDate(DateTime newValue) {
-    if (_statusCheckedIn != 0) {
+    if (_statusCheckedIn != 0 && _isEditing) {
       CustomAlertDialog.showCustomDialog(
           context,
           'Chuyển ngày điểm danh',
@@ -146,7 +155,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _listStudentIsAbsent = {};
           _hasCheckedAttendanceStatus = false;
           _isTeachingDate = true;
+          _isEditing = false;
         });
+        widget.setIsNotChecked(true);
 
         context.read<CalendarBloc>().add(
               LoadCalendarWeek(
@@ -166,7 +177,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         _listStudentIsAbsent = {};
         _hasCheckedAttendanceStatus = false;
         _isTeachingDate = true;
+        _isEditing = false;
       });
+      widget.setIsNotChecked(true);
+
       context.read<CalendarBloc>().add(
             LoadCalendarWeek(
                 inputDate: getMondayOfWeek(newValue), authToken: _authToken),
@@ -249,7 +263,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   _statusCheckedIn = 0;
                   _hasCheckedAttendanceStatus = true;
                 });
-                widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
                     absenceDate: _currentDate,
@@ -261,7 +274,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
                 _hasCheckedAttendanceStatus = true;
               });
-              widget.setIsNotChecked(state.isAttendanceDate ? false : true);
               context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                   idUos: widget.idUos,
                   absenceDate: _currentDate,
@@ -286,6 +298,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _alertSuccess(type: "xóa");
                 _listStudentIsAbsent = {};
                 _statusCheckedIn = 0;
+                _isEditing = false;
                 widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
@@ -502,6 +515,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               onPressed: () {
                                 setState(() {
                                   _statusCheckedIn = 2;
+                                  _isEditing = true;
                                 });
                                 widget.setIsNotChecked(false);
                               },

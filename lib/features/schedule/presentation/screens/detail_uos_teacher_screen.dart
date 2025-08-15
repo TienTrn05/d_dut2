@@ -41,7 +41,7 @@ class DetailUOSTeacherScreen extends StatefulWidget {
 class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     with SingleTickerProviderStateMixin {
   bool _isCheckAbsent = false;
-  bool _isNotChecking = false;
+  bool _isNotChecking = true;
   bool _isOverlayVisible = false;
   late TabController _tabController;
 
