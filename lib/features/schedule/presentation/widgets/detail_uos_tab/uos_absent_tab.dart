@@ -48,6 +48,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   // 0: Chưa điểm danh, 1: Đã điểm danh, 2: Đang điểm danh
   int _statusCheckedIn = 0;
   bool _isTeachingDate = false;
+  bool _isEditing = false;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -97,6 +98,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
       if (isAbsent == true && _isSellectedAll) {
         _isSellectedAll = false;
       }
+      if (!_isEditing) {
+        _isEditing = true;
+        widget.setIsNotChecked(false);
+      }
     });
   }
 
@@ -104,6 +109,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     setState(() {
       _isSellectedAll = !_isSellectedAll;
       _listStudentIsAbsent.updateAll((key, value) => !_isSellectedAll);
+      if (!_isEditing) {
+        _isEditing = true;
+        widget.setIsNotChecked(false);
+      }
     });
   }
 
@@ -133,7 +142,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
   }
 
   void _updateCurrentDate(DateTime newValue) {
-    if (_statusCheckedIn != 0) {
+    if (_statusCheckedIn != 0 && _isEditing) {
       CustomAlertDialog.showCustomDialog(
           context,
           'Chuyển ngày điểm danh',
@@ -146,7 +155,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
           _listStudentIsAbsent = {};
           _hasCheckedAttendanceStatus = false;
           _isTeachingDate = true;
+          _isEditing = false;
         });
+        widget.setIsNotChecked(true);
 
         context.read<CalendarBloc>().add(
               LoadCalendarWeek(
@@ -166,7 +177,10 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         _listStudentIsAbsent = {};
         _hasCheckedAttendanceStatus = false;
         _isTeachingDate = true;
+        _isEditing = false;
       });
+      widget.setIsNotChecked(true);
+
       context.read<CalendarBloc>().add(
             LoadCalendarWeek(
                 inputDate: getMondayOfWeek(newValue), authToken: _authToken),
@@ -229,6 +243,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     );
   }
 
+  bool isToday(DateTime date) {
+    final now = DateTime.now();
+    return now.year == date.year &&
+        now.month == date.month &&
+        now.day == date.day;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -249,7 +270,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                   _statusCheckedIn = 0;
                   _hasCheckedAttendanceStatus = true;
                 });
-                widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
                     absenceDate: _currentDate,
@@ -261,7 +281,6 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _statusCheckedIn = state.isAttendanceDate ? 1 : 0;
                 _hasCheckedAttendanceStatus = true;
               });
-              widget.setIsNotChecked(state.isAttendanceDate ? false : true);
               context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                   idUos: widget.idUos,
                   absenceDate: _currentDate,
@@ -286,6 +305,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _alertSuccess(type: "xóa");
                 _listStudentIsAbsent = {};
                 _statusCheckedIn = 0;
+                _isEditing = false;
                 widget.setIsNotChecked(true);
                 context.read<UosAbsentBloc>().add(LoadStudentsAbsent(
                     idUos: widget.idUos,
@@ -323,7 +343,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
             if (_listStudentIsAbsent.isEmpty) {
               for (var student in listStudentAbsent) {
                 _listStudentIsAbsent[student.idStudent] =
-                    _statusCheckedIn == 1 ? student.isAbsent : true;
+                    _statusCheckedIn == 1 ? student.isAbsent : false;
               }
               _isSellectedAll = _listStudentIsAbsent.values
                   .every((status) => status == false);
@@ -472,7 +492,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     Expanded(
                       child: Center(
                         child: Text(
-                          "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh.",
+                          isToday(_currentDate)
+                          ? "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh."
+                          : "Bạn không có tiết dạy ngày này, vui lòng chọn ngày khác để điểm danh.",
                           style: TextStyle(
                             fontSize: FontSizes.medium,
                             color: context.theme.grey,
@@ -488,7 +510,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            "Bạn có muốn tạo danh sách điểm danh hôm nay không?",
+                            isToday(_currentDate)
+                            ? "Bạn có muốn tạo danh sách điểm danh hôm nay không?"
+                            : "Bạn có muốn tạo danh sách điểm danh ngày này không?",
                             style: TextStyle(
                               fontSize: FontSizes.medium,
                               color: context.theme.grey,
@@ -502,6 +526,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                               onPressed: () {
                                 setState(() {
                                   _statusCheckedIn = 2;
+                                  _isEditing = true;
                                 });
                                 widget.setIsNotChecked(false);
                               },
@@ -531,7 +556,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                                     width: 4,
                                   ),
                                   Text(
-                                    'Tạo điểm danh hôm nay',
+                                    isToday(_currentDate)
+                                        ? 'Tạo điểm danh hôm nay'
+                                        : 'Tạo điểm danh ngày này',
                                     style: TextStyle(
                                       fontSize: FontSizes.medium,
                                       color: Colors.white,
