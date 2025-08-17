@@ -1,6 +1,5 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
-import 'package:e_dut/features/profile/data/model/student_profile_model.dart';
 import 'package:e_dut/features/profile/data/model/teacher_profile_model.dart';
 import 'package:e_dut/features/profile/presentation/widgets/student_profile.dart';
 import 'package:e_dut/features/profile/presentation/widgets/teacher_profile.dart';
@@ -97,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
                                             GoogleFonts.notoSans().fontFamily,
                                         fontSize: FontSizes.extraLarge,
                                         fontWeight: FontWeight.bold,
-                                        height: 1,
+                                        height: 1.2,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -124,13 +123,10 @@ class ProfileScreen extends StatelessWidget {
                     final userRole = (authState is AuthUserAuthenticated)
                         ? authState.userData.role.name
                         : '';
-                    final student = StudentProfileModel.mockData;
                     final teacher = TeacherProfileModel.mockTeacherProfile;
                     return Expanded(
                         child: userRole == RoleModel.roleStudent
-                            ? StudentProfile(
-                                profile: student,
-                              )
+                            ? StudentProfile()
                             : TeacherProfile(
                                 profile: teacher,
                               ));
