@@ -99,35 +99,35 @@ class _CubeGridLoadingState extends State<CubeGridLoading>
               ),
 
               // Grid ở trên
-              SizedBox(
-                width: totalSize,
-                height: totalSize,
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: GridView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: gridCount,
-                      crossAxisSpacing: gridSpacing,
-                      mainAxisSpacing: gridSpacing,
-                    ),
-                    itemCount: gridCount * gridCount,
-                    itemBuilder: (context, index) {
-                      return AnimatedBuilder(
-                        animation: _animations[index],
-                        builder: (context, child) {
-                          return Opacity(
-                            opacity: _animations[index].value,
-                            child: Container(
-                              color: colors[index % colors.length],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
+              // SizedBox(
+              //   width: totalSize,
+              //   height: totalSize,
+              //   child: AspectRatio(
+              //     aspectRatio: 1,
+              //     child: GridView.builder(
+              //       physics: NeverScrollableScrollPhysics(),
+              //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //         crossAxisCount: gridCount,
+              //         crossAxisSpacing: gridSpacing,
+              //         mainAxisSpacing: gridSpacing,
+              //       ),
+              //       itemCount: gridCount * gridCount,
+              //       itemBuilder: (context, index) {
+              //         return AnimatedBuilder(
+              //           animation: _animations[index],
+              //           builder: (context, child) {
+              //             return Opacity(
+              //               opacity: _animations[index].value,
+              //               child: Container(
+              //                 color: colors[index % colors.length],
+              //               ),
+              //             );
+              //           },
+              //         );
+              //       },
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

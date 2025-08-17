@@ -1,7 +1,7 @@
 class StudentProfileModel {
   final String fullName;
   final String studentCode;
-  final DateTime dateOfBirth;
+  final DateTime? dateOfBirth;
   final String gender;
   final String phoneNumber;
   final String personalEmail;

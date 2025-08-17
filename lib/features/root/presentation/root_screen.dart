@@ -31,7 +31,6 @@ class _MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<_MainView> {
-  final PageStorageBucket bucket = PageStorageBucket();
   List<Widget> dashBoardScreens = [
     const DashboardScreen(),
     // const SearchingScreen(),
@@ -51,7 +50,9 @@ class _MainViewState extends State<_MainView> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double bottomItemWidth = 72;
-    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 2) / 3;
+
+    int itemCount = dashBoardScreens.length;
+    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * itemCount) / (itemCount + 1);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -67,9 +68,9 @@ class _MainViewState extends State<_MainView> {
               ),
               child: BlocBuilder<MainBloc, MainState>(
                 builder: (context, state) {
-                  return PageStorage(
-                    bucket: bucket,
-                    child: dashBoardScreens[state.currentPage],
+                  return IndexedStack(
+                    index: state.currentPage,
+                    children: dashBoardScreens,
                   );
                 },
               ),

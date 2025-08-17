@@ -69,7 +69,10 @@ class ActivityCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => DetailActivityScreen(
-                      activity: activity, communityBloc: communityBloc)));
+                        activity: activity,
+                        communityBloc: communityBloc,
+                        pageOfActivity: pageOfItem,
+                      )));
         },
         child: Container(
           width: double.infinity,
