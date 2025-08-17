@@ -28,9 +28,89 @@ class AuthScreen extends StatelessWidget {
   }
 }
 
-class BrandBackground extends StatelessWidget {
+class BrandBackground extends StatefulWidget {
   const BrandBackground({super.key, this.child});
   final Widget? child;
+
+  @override
+  State<BrandBackground> createState() => _BrandBackgroundState();
+}
+
+class _BrandBackgroundState extends State<BrandBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  late Animation<Offset> _offset1;
+  late Animation<double> _fade1;
+  late Animation<Offset> _offset2;
+  late Animation<double> _fade2;
+  late Animation<Offset> _offset3;
+  late Animation<double> _fade3;
+  late Animation<Offset> _offset4;
+  late Animation<double> _fade4;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    // 2 vòng trên (nhanh hơn)
+    _offset1 = Tween(begin: const Offset(0, 0.3), end: Offset(-0.1, 0)).animate(
+        CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.0, 0.5, curve: Curves.easeOut)));
+    _fade1 = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn)));
+
+    _offset2 = Tween(begin: const Offset(0, 0.3), end: Offset(0.1, 0)).animate(
+        CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.0, 0.5, curve: Curves.easeOut)));
+    _fade2 = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn)));
+
+    // 2 vòng dưới (delay hơn)
+    _offset3 = Tween(begin: const Offset(0, 0.3), end: Offset(-0.12, 0))
+        .animate(CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.2, 0.7, curve: Curves.easeOut)));
+    _fade3 = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.2, 0.7, curve: Curves.easeIn)));
+
+    _offset4 = Tween(begin: const Offset(0, 0.3), end: Offset(0.12, 0)).animate(
+        CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.2, 0.7, curve: Curves.easeOut)));
+    _fade4 = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.2, 0.7, curve: Curves.easeIn)));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _circle(double size, double opacity) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(opacity),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,40 +124,52 @@ class BrandBackground extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Decorative arcs (3 big partial circles)
+          Positioned(
+            left: -160,
+            bottom: -310,
+            child: FadeTransition(
+              opacity: _fade1,
+              child: SlideTransition(
+                position: _offset1,
+                child: _circle(450, 0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            right: -160,
+            bottom: -310,
+            child: FadeTransition(
+              opacity: _fade2,
+              child: SlideTransition(
+                position: _offset2,
+                child: _circle(450, 0.1),
+              ),
+            ),
+          ),
           Positioned(
             left: -180,
-            bottom: -310,
-            child: _circle(450, 0.1),
+            bottom: -360,
+            child: FadeTransition(
+              opacity: _fade3,
+              child: SlideTransition(
+                position: _offset3,
+                child: _circle(450, 0.1),
+              ),
+            ),
           ),
           Positioned(
             right: -180,
-            bottom: -310,
-            child: _circle(450, 0.1),
-          ),
-          Positioned(
-            left: -190,
             bottom: -360,
-            child: _circle(450, 0.1),
+            child: FadeTransition(
+              opacity: _fade4,
+              child: SlideTransition(
+                position: _offset4,
+                child: _circle(450, 0.1),
+              ),
+            ),
           ),
-          Positioned(
-            right: -190,
-            bottom: -360,
-            child: _circle(450, 0.1),
-          ),
-          if (child != null) child!,
+          if (widget.child != null) widget.child!,
         ],
-      ),
-    );
-  }
-
-  Widget _circle(double size, double opacity) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withOpacity(opacity),
       ),
     );
   }
@@ -125,8 +217,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navigate after short delay for a pleasant finish to the animation
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    // Navigate after delay
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -148,8 +240,16 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BrandBackground(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFFFFF), Color(0xFF2A74BD)],
+          ),
+        ),
         child: SafeArea(
+          bottom: false,
           child: Center(
             child: FadeTransition(
               opacity: _fade,
@@ -174,25 +274,53 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   static PageRoute<void> route() {
     return PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 1200),
-      reverseTransitionDuration: const Duration(milliseconds: 1000),
+      transitionDuration: const Duration(milliseconds: 2000),
       pageBuilder: (_, __, ___) => const LoginScreen(),
-      transitionsBuilder: (context, animation, secondary, child) {
-        final fade = animation.drive(
-          CurveTween(curve: Interval(0.0, 1.0, curve: Curves.easeInOutCubic)),
-        );
-
-        return FadeTransition(
-          opacity: fade,
-          child: child,
-        );
-      },
     );
+  }
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _logoFade;
+  late Animation<double> _textFade;
+  late Animation<double> _buttonFade;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    );
+
+    // Mỗi widget có một khoảng fade khác nhau
+    _logoFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.1, 0.4, curve: Curves.easeOut),
+    );
+
+    _textFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.3, 0.6, curve: Curves.easeOut),
+    );
+
+    _buttonFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.5, 0.8, curve: Curves.easeOut),
+    );
+
+    _controller.forward();
   }
 
   @override
@@ -214,34 +342,46 @@ class LoginScreen extends StatelessWidget {
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) => BrandBackground(
           child: SafeArea(
+            bottom: false,
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Hero(
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Hero(
                       tag: 'appLogo',
-                      child: _Logo(
-                        size: 120,
-                      )),
-                  Text("digital DUT",
+                      child: _Logo(size: 120),
+                    ),
+                  ),
+                  FadeTransition(
+                    opacity: _textFade,
+                    child: Text(
+                      "digital DUT",
                       style: GoogleFonts.baloo2(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
                         color: const Color(0xFF133D87),
                         decoration: TextDecoration.none,
-                      )),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 32),
                   BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-                    return AuthMicrosoftButton(
+                    return FadeTransition(
+                      opacity: _buttonFade,
+                      child: AuthMicrosoftButton(
                         text: "Đăng nhập bằng Microsoft",
                         color: context.theme.primaryColor ?? Colors.blue,
                         onPressed: () async {
-                          var FCMtoken =
+                          var fcmToken =
                               await context.read<FirebaseAPI>().init();
-                          context
-                              .read<AuthBloc>()
-                              .add(MicrosoftSignInRequested(FCMtoken ?? ""));
-                        });
+                          context.read<AuthBloc>().add(
+                                MicrosoftSignInRequested(fcmToken ?? ""),
+                              );
+                        },
+                      ),
+                    );
                   }),
                 ],
               ),

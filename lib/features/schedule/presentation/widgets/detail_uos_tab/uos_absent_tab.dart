@@ -243,6 +243,13 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
     );
   }
 
+  bool isToday(DateTime date) {
+    final now = DateTime.now();
+    return now.year == date.year &&
+        now.month == date.month &&
+        now.day == date.day;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -485,7 +492,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                     Expanded(
                       child: Center(
                         child: Text(
-                          "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh.",
+                          isToday(_currentDate)
+                          ? "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh."
+                          : "Bạn không có tiết dạy ngày này, vui lòng chọn ngày khác để điểm danh.",
                           style: TextStyle(
                             fontSize: FontSizes.medium,
                             color: context.theme.grey,
@@ -501,7 +510,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            "Bạn có muốn tạo danh sách điểm danh hôm nay không?",
+                            isToday(_currentDate)
+                            ? "Bạn có muốn tạo danh sách điểm danh hôm nay không?"
+                            : "Bạn có muốn tạo danh sách điểm danh ngày này không?",
                             style: TextStyle(
                               fontSize: FontSizes.medium,
                               color: context.theme.grey,
@@ -545,7 +556,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                                     width: 4,
                                   ),
                                   Text(
-                                    'Tạo điểm danh hôm nay',
+                                    isToday(_currentDate)
+                                        ? 'Tạo điểm danh hôm nay'
+                                        : 'Tạo điểm danh ngày này',
                                     style: TextStyle(
                                       fontSize: FontSizes.medium,
                                       color: Colors.white,

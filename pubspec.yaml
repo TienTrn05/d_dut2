@@ -57,6 +57,7 @@ dependencies:
   photo_view: ^0.15.0
   flutter_linkify: ^6.0.0
   linkify: ^5.0.0
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -83,3 +84,18 @@ flutter:
     - assets/icons/
     - assets/icons/svg/
     - assets/images/
+    - assets/icons/logo_full.png
+
+flutter_native_splash:
+  color: '#FFFFFF'
+  image: assets/icons/logo_full.png # Logo splash
+  android: true
+  ios: true
+  fullscreen: true
+
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+
+  android_12:
+    color: '#FFFFFF'
+    image: assets/icons/logo_full.png
