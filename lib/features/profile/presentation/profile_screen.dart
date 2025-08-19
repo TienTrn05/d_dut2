@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/core/services/notification_service.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/profile/data/model/teacher_profile_model.dart';
 import 'package:e_dut/features/profile/presentation/widgets/student_profile.dart';
@@ -138,9 +139,10 @@ class ProfileScreen extends StatelessWidget {
               bottom: 74 + 16,
               right: 16,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final state = context.read<AuthBloc>().state;
                   if (state is AuthUserAuthenticated) {
+                    await NotificationService().cancelAllNotifications();
                     context
                         .read<AuthBloc>()
                         .add(AuthLogoutRequested(state.userData.mail));

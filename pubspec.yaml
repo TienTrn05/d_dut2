@@ -59,6 +59,8 @@ dependencies:
   linkify: ^5.0.0
   flutter_native_splash: ^2.4.6
 
+  device_info_plus: ^11.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
