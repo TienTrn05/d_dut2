@@ -4,7 +4,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'core/services/notification_service.dart';
 import 'features/auth/bloc/auth_bloc.dart';
@@ -22,7 +21,6 @@ import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
 import 'features/notification/domain/repositories/notification_repository.dart';
-import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -34,7 +32,10 @@ void main() async {
   await Storage.setup();
   await GetItUtils.setup();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Khởi tạo NotificationService
+  await NotificationService().init();
+  // Đăng ký các handler cho FCM
+  NotificationService().registerMessageHandlers();
 
   final UserModel? userData = Storage.user;
 
@@ -61,36 +62,29 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(create: (context) => LoadingBloc()),
       ],
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => FirebaseAPI(),
-          ),
-        ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          navigatorKey: navigatorKey,
-          theme: ThemeData(
-            fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
-            extensions: [CustomThemeExtension.lightMode],
-            textTheme: Theme.of(context).textTheme.apply(
-                  fontSizeFactor: 1,
-                  fontSizeDelta: -0.0,
-                ),
-            scaffoldBackgroundColor: Colors.white,
-          ),
-          darkTheme: ThemeData(
-            fontFamily: GoogleFonts.roboto().fontFamily,
-            extensions: [CustomThemeExtension.darkMode],
-          ),
-          onGenerateRoute: Routes.onGenerateRoute,
-          initialRoute: userData != null ? Routes.root : Routes.auth,
-          builder: (context, child) {
-            return LoadingOverlay(
-              child: child!,
-            );
-          },
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          fontFamily: GoogleFonts.notoSansAnatolianHieroglyphs().fontFamily,
+          extensions: [CustomThemeExtension.lightMode],
+          textTheme: Theme.of(context).textTheme.apply(
+                fontSizeFactor: 1,
+                fontSizeDelta: -0.0,
+              ),
+          scaffoldBackgroundColor: Colors.white,
         ),
+        darkTheme: ThemeData(
+          fontFamily: GoogleFonts.roboto().fontFamily,
+          extensions: [CustomThemeExtension.darkMode],
+        ),
+        onGenerateRoute: Routes.onGenerateRoute,
+        initialRoute: userData != null ? Routes.root : Routes.auth,
+        builder: (context, child) {
+          return LoadingOverlay(
+            child: child!,
+          );
+        },
       ),
     );
   }
