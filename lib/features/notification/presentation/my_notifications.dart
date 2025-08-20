@@ -59,16 +59,19 @@ class MyNotifications extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                 color: context.theme.primaryColor,
                               ))
-                            : Text(
-                                "Xem thêm",
-                                style: TextStyle(
-                                  color: context.theme.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: context.theme.grey,
-                                ),
-                              ),
+                            : (state.myNotificationsStatus ==
+                                    MyNotificationsStatus.unchange
+                                ? const SizedBox.shrink()
+                                : Text(
+                                    "Xem thêm",
+                                    style: TextStyle(
+                                      color: context.theme.grey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: context.theme.grey,
+                                    ),
+                                  )),
                       ),
                     ),
                   );
