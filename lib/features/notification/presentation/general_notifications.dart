@@ -15,20 +15,23 @@ class GeneralNotifications extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<NotificationsBloc, NotificationsState>(
         builder: (contextNoti, state) {
-      if (state.generalNotificationsStatus == GeneralNotificationsStatus.loading &&
+      if (state.generalNotificationsStatus ==
+              GeneralNotificationsStatus.loading &&
           state.generalNotifications.isEmpty) {
         return Center(
             child: CircularProgressIndicator(
           color: context.theme.primaryColor,
         ));
-      } else if (state.generalNotificationsStatus == GeneralNotificationsStatus.failure) {
+      } else if (state.generalNotificationsStatus ==
+          GeneralNotificationsStatus.failure) {
         return Center(
           child: Text(
             state.errorGeneralNotificationsMessage,
             style: TextStyle(color: context.theme.red),
           ),
         );
-      } else if (state.generalNotificationsStatus == GeneralNotificationsStatus.success &&
+      } else if (state.generalNotificationsStatus ==
+              GeneralNotificationsStatus.success &&
           state.generalNotifications.isEmpty) {
         return const Center(child: Text("Hiện không có thông báo nào"));
       }
@@ -50,7 +53,8 @@ class GeneralNotifications extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () {
                           context.read<NotificationsBloc>().add(
-                              GeneralNotificationsLoadMoreRequested(token: token));
+                              GeneralNotificationsLoadMoreRequested(
+                                  token: token));
                         },
                         child: (state.generalNotificationsStatus ==
                                     GeneralNotificationsStatus.loading &&
@@ -59,16 +63,19 @@ class GeneralNotifications extends StatelessWidget {
                                 child: CircularProgressIndicator(
                                 color: context.theme.primaryColor,
                               ))
-                            : Text(
-                                "Xem thêm",
-                                style: TextStyle(
-                                  color: context.theme.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: context.theme.grey,
-                                ),
-                              ),
+                            : (state.generalNotificationsStatus ==
+                                    GeneralNotificationsStatus.unchange
+                                ? const SizedBox.shrink()
+                                : Text(
+                                    "Xem thêm",
+                                    style: TextStyle(
+                                      color: context.theme.grey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: context.theme.grey,
+                                    ),
+                                  )),
                       ),
                     ),
                   );

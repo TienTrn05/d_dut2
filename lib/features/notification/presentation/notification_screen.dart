@@ -11,6 +11,7 @@ import '../domain/repositories/notification_repository.dart';
 import '../bloc/notifications_bloc.dart';
 import 'general_notifications.dart';
 import 'my_notifications.dart';
+import 'widgets/custom_time_dropdown.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -23,6 +24,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   bool isGeneralNotificationOn = true;
 
   bool isMyNotificationOn = false;
+
+  bool isExamNotificationOn = false;
 
   String selectedTime = "30 phút";
 
@@ -41,34 +44,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: EdgeInsets.all(0),
         activeColor: Colors.white,
         activeTrackColor: context.theme.primaryColor,
+        inactiveThumbColor: context.theme.grey,
+        inactiveTrackColor: context.theme.lightGrey,
         value: value,
         onChanged: onChanged,
-      ),
-    );
-  }
-
-  Widget _buildDropdownTile() {
-    return ListTile(
-      contentPadding: EdgeInsets.all(0),
-      title: Text("Thông báo lịch học/thi trước",
-          style: TextStyle(
-              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
-      trailing: DropdownButton<String>(
-        value: selectedTime,
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedTime = newValue!;
-          });
-        },
-        items: ["15 phút", "30 phút", "1 giờ", "1 ngày"]
-            .map((time) => DropdownMenuItem(
-                  value: time,
-                  child: Text(time,
-                      style: TextStyle(
-                          fontSize: FontSizes.medium,
-                          fontWeight: FontWeight.bold)),
-                ))
-            .toList(),
       ),
     );
   }
@@ -187,7 +166,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             isMyNotificationOn = value;
                           });
                         }),
-                        _buildDropdownTile(),
+                        _buildSwitchTile(
+                            "Bật thông báo lịch học/thi", isExamNotificationOn,
+                            (value) {
+                          setState(() {
+                            isExamNotificationOn = value;
+                          });
+                        }),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            CustomTimeDropdown(),
+                          ],
+                        ),
                       ],
                     ),
                   ),

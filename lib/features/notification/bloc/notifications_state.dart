@@ -1,7 +1,7 @@
 part of 'notifications_bloc.dart';
 
-enum MyNotificationsStatus { initial, loading, success, failure }
-enum GeneralNotificationsStatus { initial, loading, success, failure }
+enum MyNotificationsStatus { initial, loading, success, unchange, failure }
+enum GeneralNotificationsStatus { initial, loading, success, unchange, failure }
 
 class NotificationsState extends Equatable {
   final MyNotificationsStatus myNotificationsStatus;
