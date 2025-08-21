@@ -1,14 +1,16 @@
-import 'package:e_dut/common/utils/getit_utils.dart';
-import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/profile/bloc/student_profile/student_profile_bloc.dart';
-import 'package:e_dut/features/profile/domain/repository/profile_repository.dart';
-import 'package:e_dut/features/profile/presentation/widgets/info_card.dart';
-import 'package:e_dut/features/profile/presentation/widgets/info_item.dart';
-import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../common/extensions/font_sizes.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/utils/getit_utils.dart';
+
+import '/features/auth/bloc/auth_bloc.dart';
+import '/features/schedule/util/functions.dart';
+
+import '../../bloc/student_profile/student_profile_bloc.dart';
+import '../../domain/repository/profile_repository.dart';
+import './info_card.dart';
+import './info_item.dart';
 
 class StudentProfile extends StatelessWidget {
   const StudentProfile({super.key});
@@ -43,7 +45,7 @@ class StudentProfile extends StatelessWidget {
                 StudentProfileStatus.failure) {
               return Center(
                 child: Text(
-                  'Lỗi khi tải thông tin: ${profileState.errorMessage}',
+                  'Lỗi khi tải thông tin',
                   style: TextStyle(fontSize: FontSizes.large),
                 ),
               );

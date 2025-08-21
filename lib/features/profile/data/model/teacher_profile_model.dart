@@ -2,7 +2,7 @@ class TeacherProfileModel {
   // Thông tin cơ bản
   final String fullName;
   final String email;
-  final DateTime dateOfBirth;
+  final DateTime? dateOfBirth;
   final String employeeId; // Mã CBVC
   final String address;
 
