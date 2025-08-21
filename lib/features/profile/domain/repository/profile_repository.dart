@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../data/data_sources/remote_data_source/profile_service.dart';
 import '../../data/model/student_profile_model.dart';
+import '../../data/model/teacher_profile_model.dart';
 
 @injectable
 class ProfileRepository {
@@ -14,6 +15,14 @@ class ProfileRepository {
       return await _profileService.getStudentProfile(token);
     } catch (e) {
       throw Exception('Failed to get student profile: $e');
+    }
+  }
+
+  Future<TeacherProfileModel> getTeacherProfile(String token) async {
+    try {
+      return await _profileService.getTeacherProfile(token);
+    } catch (e) {
+      throw Exception('Failed to get teacher profile: $e');
     }
   }
 }
