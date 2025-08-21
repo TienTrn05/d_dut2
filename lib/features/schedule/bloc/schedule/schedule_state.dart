@@ -26,3 +26,9 @@ class SchedulesLoaded extends ScheduleState {
       required this.noWeek,
       required this.schedules});
 }
+
+class ScheduleDashboardLoaded extends ScheduleState {
+  final List<ScheduleItemModel> schedules;
+
+  ScheduleDashboardLoaded({required this.schedules});
+}

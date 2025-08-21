@@ -21,7 +21,7 @@ dependencies:
   dartx: ^1.2.0
 
   # local storage
-  shared_preferences: ^2.5.2
+  shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.4
   rx_shared_preferences: ^4.0.0
 

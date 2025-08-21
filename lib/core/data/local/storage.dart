@@ -15,6 +15,7 @@ class _Keys {
   static const pushToken = 'push_token';
   static const user = 'user';
   static const hintEmail = 'hint_email';
+  static const scheduleNotifications = 'schedule_notifications';
 }
 
 class Storage {
@@ -108,7 +109,6 @@ class Storage {
   static Future setAccessToken(String? val) =>
       _setSecure(_Keys.accessToken, val);
 
-
   static Future<String?> get refreshToken => _getSecure(_Keys.accessToken);
 
   static Future setRefreshToken(String? val) =>
@@ -122,4 +122,16 @@ class Storage {
   // Save hint email for login with Microsoft
   static String? get hintEmail => _get(_Keys.hintEmail);
   static Future<void> setHintEmail(String? val) => _set(_Keys.hintEmail, val);
+
+  //Get stored schedule notifications
+  static String? getScheduleNotifications() {
+    final key = _Keys.scheduleNotifications;
+    return _get<String>(key);
+  }
+
+  // Set schedule notifications
+  static Future<void> setScheduleNotifications(String? val) {
+    final key = _Keys.scheduleNotifications;
+    return _set(key, val);
+  }
 }

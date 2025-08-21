@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:e_dut/features/schedule/data/model/schedule_item_model.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
+import 'package:e_dut/features/schedule/util/schedule_noti.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +18,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   ScheduleBloc(this._repository) : super(ScheduleInitial()) {
     on<LoadSchedulesByDate>(_onLoadSchedulesByDate);
+    on<LoadScheduleDashboard>(_onLoadSchedulesDashboard);
   }
 
   Future<void> _onLoadSchedulesByDate(
@@ -43,6 +45,26 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         emit(SchedulesLoaded(
             selectedDay: inputDate, noWeek: noWeek, schedules: schedules));
       }
+    } catch (e) {
+      emit(ScheduleError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadSchedulesDashboard(
+      LoadScheduleDashboard event, Emitter<ScheduleState> emit) async {
+    emit(ScheduleLoading());
+    try {
+      final currentDate = DateTime.now();
+      final isTeacher = event.isTeacher;
+      final authToken = event.authToken;
+
+      final schedules = await _repository.getSchedulesByDate(
+          currentDate, isTeacher, authToken);
+
+      emit(ScheduleDashboardLoaded(schedules: schedules));
+
+      ScheduleNoti.setupScheduleNotifications(
+          isTeacher, authToken, _repository);
     } catch (e) {
       emit(ScheduleError(e.toString()));
     }
