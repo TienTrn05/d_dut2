@@ -1,3 +1,4 @@
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,6 +48,9 @@ class NotificationScreen extends StatelessWidget {
           ),
         );
       }
+      final String userRole = stateAuth.userData.role.name;
+
+      final String authToken = stateAuth.accessToken;
 
       return BlocProvider(
         create: (context) => NotificationsBloc(
@@ -151,11 +155,16 @@ class NotificationScreen extends StatelessWidget {
                           }),
                           _buildSwitchTile(
                               context,
-                              "Bật thông báo lịch học/thi",
+                              userRole == RoleModel.roleTeacher
+                                  ? "Bật thông báo lịch dạy/coi thi"
+                                  : "Bật thông báo lịch học/thi",
                               state.examEnabled, (value) {
-                            context
-                                .read<NotificationSettingsBloc>()
-                                .add(ToggleExamNotification(isEnabled: value));
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleExamNotification(
+                                    isEnabled: value,
+                                    authToken: authToken,
+                                    isTeacher:
+                                        userRole == RoleModel.roleTeacher));
                           }),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,

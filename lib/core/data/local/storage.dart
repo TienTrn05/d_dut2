@@ -21,6 +21,7 @@ class _Keys {
   static const personalNotification = 'personal_notification';
   static const examNotification = 'exam_notification';
   static const remindBefore = 'remind_before';
+  static const scheduleNotifications = 'schedule_notifications';
 }
 
 class Storage {
@@ -114,7 +115,6 @@ class Storage {
   static Future setAccessToken(String? val) =>
       _setSecure(_Keys.accessToken, val);
 
-
   static Future<String?> get refreshToken => _getSecure(_Keys.accessToken);
 
   static Future setRefreshToken(String? val) =>
@@ -147,4 +147,16 @@ class Storage {
   static int get remindBefore => _get<int>(_Keys.remindBefore) ?? 15;
   static Future<void> setRemindBefore(int val) =>
       _set(_Keys.remindBefore, val, notify: true);
+
+  //Get stored schedule notifications
+  static String? getScheduleNotifications() {
+    final key = _Keys.scheduleNotifications;
+    return _get<String>(key);
+  }
+
+  // Set schedule notifications
+  static Future<void> setScheduleNotifications(String? val) {
+    final key = _Keys.scheduleNotifications;
+    return _set(key, val);
+  }
 }

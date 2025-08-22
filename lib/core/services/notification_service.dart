@@ -202,7 +202,8 @@ class NotificationService {
     var d = tz.TZDateTime.from(scheduledTime, tz.local);
     var n = tz.TZDateTime.now(tz.local);
     if (d.isBefore(n)) {
-      logger.w("Scheduled time is in the past, notification will not be scheduled.");
+      logger.w(
+          "Scheduled time is in the past, notification will not be scheduled.");
       return;
     }
     await _flutterLocalNotificationsPlugin.zonedSchedule(
@@ -232,6 +233,7 @@ class NotificationService {
 
   Future<void> cancelAllNotifications() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
+    logger.i('All notifications is canceled');
   }
 
   // --- CÁC HÀM TIỆN ÍCH và CALLBACK ---

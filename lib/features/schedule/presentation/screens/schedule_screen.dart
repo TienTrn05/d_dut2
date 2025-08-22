@@ -14,8 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../../core/services/notification_service.dart';
-
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
 
@@ -29,14 +27,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationService().scheduleClassNotification(
-      id: 12345, // ID phải là duy nhất cho mỗi thông báo
-      title: 'Sắp đến giờ học: ${"AV Chuyên ngành"}',
-      body: 'Tiết học sẽ bắt đầu lúc ${DateTime.now().add(const Duration(seconds: 10))} tại phòng ${"F101"}',
-      scheduledTime: DateTime.now().add(const Duration(seconds: 10)), // Thời gian lên lịch
-    );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(

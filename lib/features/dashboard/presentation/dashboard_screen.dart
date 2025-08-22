@@ -81,8 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (authState is AuthUserAuthenticated) {
                 final String userRole = authState.userData.role.name;
                 final String authToken = authState.accessToken;
-                context.read<ScheduleBloc>().add(LoadSchedulesByDate(
-                    inputDate: DateTime.now(),
+                context.read<ScheduleBloc>().add(LoadScheduleDashboard(
                     isTeacher: userRole == RoleModel.roleTeacher,
                     authToken: authToken));
               }
@@ -185,8 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     final String authToken =
                                         authState.accessToken;
                                     context.read<ScheduleBloc>().add(
-                                        LoadSchedulesByDate(
-                                            inputDate: DateTime.now(),
+                                        LoadScheduleDashboard(
                                             isTeacher: userRole ==
                                                 RoleModel.roleTeacher,
                                             authToken: authToken));
@@ -204,7 +202,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ],
                               ));
-                            } else if (state is SchedulesLoaded) {
+                            } else if (state is ScheduleDashboardLoaded) {
                               return Expanded(
                                 child: state.schedules.isEmpty
                                     ? Column(
