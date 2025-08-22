@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'core/bloc/notification_settings/notification_settings_bloc.dart';
 import 'core/services/notification_service.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 
@@ -61,6 +62,10 @@ class MyApp extends StatelessWidget {
             ..add(AuthInitRequested()),
         ),
         BlocProvider(create: (context) => LoadingBloc()),
+        BlocProvider(
+          create: (context) => NotificationSettingsBloc()
+            ..add(LoadNotificationSettings()),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

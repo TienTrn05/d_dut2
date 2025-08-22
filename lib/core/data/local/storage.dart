@@ -15,6 +15,12 @@ class _Keys {
   static const pushToken = 'push_token';
   static const user = 'user';
   static const hintEmail = 'hint_email';
+
+  // notification settings
+  static const generalNotification = 'general_notification';
+  static const personalNotification = 'personal_notification';
+  static const examNotification = 'exam_notification';
+  static const remindBefore = 'remind_before';
   static const scheduleNotifications = 'schedule_notifications';
 }
 
@@ -122,6 +128,25 @@ class Storage {
   // Save hint email for login with Microsoft
   static String? get hintEmail => _get(_Keys.hintEmail);
   static Future<void> setHintEmail(String? val) => _set(_Keys.hintEmail, val);
+
+  static bool get generalNotification =>
+      _get<bool>(_Keys.generalNotification) ?? true;
+  static Future<void> setGeneralNotification(bool val) =>
+      _set(_Keys.generalNotification, val, notify: true);
+
+  static bool get myNotification =>
+      _get<bool>(_Keys.personalNotification) ?? true;
+  static Future<void> setMyNotification(bool val) =>
+      _set(_Keys.personalNotification, val, notify: true);
+
+  static bool get examNotification =>
+      _get<bool>(_Keys.examNotification) ?? true;
+  static Future<void> setExamNotification(bool val) =>
+      _set(_Keys.examNotification, val, notify: true);
+
+  static int get remindBefore => _get<int>(_Keys.remindBefore) ?? 15;
+  static Future<void> setRemindBefore(int val) =>
+      _set(_Keys.remindBefore, val, notify: true);
 
   //Get stored schedule notifications
   static String? getScheduleNotifications() {

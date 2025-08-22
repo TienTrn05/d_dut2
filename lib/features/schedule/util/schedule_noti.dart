@@ -75,64 +75,66 @@ class ScheduleNoti {
     required StudyShiftModel studyShift,
     required int notificationId,
   }) async {
-    try {
-      final now = DateTime.now();
-      final studyStartDate =
-          studyShift.studyStartDate; // Ngày học thực tế của tuần startWeek
+    if (Storage.examNotification) {
+      try {
+        final now = DateTime.now();
+        final studyStartDate =
+            studyShift.studyStartDate; // Ngày học thực tế của tuần startWeek
 
-      // Parse study time (format: "HH:MM:SS")
-      final timeParts = studyShift.startStudyTime.split(':');
+        // Parse study time (format: "HH:MM:SS")
+        final timeParts = studyShift.startStudyTime.split(':');
 
-      // Tính số tuần cần tạo thông báo (từ startWeek đến endWeek)
-      final totalWeeks = studyShift.endWeek - studyShift.startWeek + 1;
+        // Tính số tuần cần tạo thông báo (từ startWeek đến endWeek)
+        final totalWeeks = studyShift.endWeek - studyShift.startWeek + 1;
 
-      // Tạo thông báo cho từng tuần
-      for (int weekOffset = 0; weekOffset < totalWeeks; weekOffset++) {
-        // Tính ngày học cho tuần hiện tại (cộng thêm 7 ngày cho mỗi tuần)
-        final classDate = studyStartDate.add(Duration(days: weekOffset * 7));
+        // Tạo thông báo cho từng tuần
+        for (int weekOffset = 0; weekOffset < totalWeeks; weekOffset++) {
+          // Tính ngày học cho tuần hiện tại (cộng thêm 7 ngày cho mỗi tuần)
+          final classDate = studyStartDate.add(Duration(days: weekOffset * 7));
 
-        // Tạo DateTime đầy đủ với thời gian học
-        final classDateTime = DateTime(
-          classDate.year,
-          classDate.month,
-          classDate.day,
-          int.parse(timeParts[0]), // hour
-          int.parse(timeParts[1]), // minute
-        );
+          // Tạo DateTime đầy đủ với thời gian học
+          final classDateTime = DateTime(
+            classDate.year,
+            classDate.month,
+            classDate.day,
+            int.parse(timeParts[0]), // hour
+            int.parse(timeParts[1]), // minute
+          );
 
-        // Chỉ tạo thông báo cho các tiết học trong tương lai
-        if (classDateTime.isAfter(now)) {
-          final notificationTime =
-              classDateTime.subtract(const Duration(hours: 2, minutes: 40));
+          // Chỉ tạo thông báo cho các tiết học trong tương lai
+          if (classDateTime.isAfter(now)) {
+            final notificationTime =
+                classDateTime.subtract(Duration(minutes: Storage.remindBefore));
 
-          final isPreviousDay = notificationTime.day != classDateTime.day ||
-              notificationTime.month != classDateTime.month ||
-              notificationTime.year != classDateTime.year;
+            final isPreviousDay = notificationTime.day != classDateTime.day ||
+                notificationTime.month != classDateTime.month ||
+                notificationTime.year != classDateTime.year;
 
-          final title =
-              'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
+            final title =
+                'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
 
-          final body = isPreviousDay
-              ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
-              : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
+            final body = isPreviousDay
+                ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
+                : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
 
-          if (notificationTime.isAfter(now)) {
-            await NotificationService().scheduleClassNotification(
-              id: notificationId +
-                  (weekOffset * 1000), // Unique ID cho mỗi notification
-              title: title,
-              body: body,
-              scheduledTime: notificationTime,
-            );
+            if (notificationTime.isAfter(now)) {
+              await NotificationService().scheduleClassNotification(
+                id: notificationId +
+                    (weekOffset * 1000), // Unique ID cho mỗi notification
+                title: title,
+                body: body,
+                scheduledTime: notificationTime,
+              );
+            }
           }
         }
-      }
 
-      logger.d(
-          "Scheduled $totalWeeks weeks of notifications for ${uos.subjectName}");
-    } catch (e) {
-      logger.e(
-          "Failed to schedule study shift notification for ${uos.subjectName}: $e");
+        logger.d(
+            "Scheduled $totalWeeks weeks of notifications for ${uos.subjectName}");
+      } catch (e) {
+        logger.e(
+            "Failed to schedule study shift notification for ${uos.subjectName}: $e");
+      }
     }
   }
 

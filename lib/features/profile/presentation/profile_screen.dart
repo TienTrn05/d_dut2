@@ -1,9 +1,10 @@
+import 'package:e_dut/core/bloc/notification_settings/notification_settings_bloc.dart';
+import 'package:e_dut/features/notification/bloc/notifications_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '/core/services/notification_service.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/routes/routes.dart';
@@ -138,10 +139,16 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () async {
                   final state = context.read<AuthBloc>().state;
                   if (state is AuthUserAuthenticated) {
-                    await NotificationService().cancelAllNotifications();
                     context
                         .read<AuthBloc>()
                         .add(AuthLogoutRequested(state.userData.mail));
+
+                    context.read<NotificationSettingsBloc>().add(
+                        RemindBeforeChanged(
+                            remindBefore: 15,
+                            authToken: state.accessToken,
+                            isTeacher: state.userData.role.name ==
+                                RoleModel.roleTeacher));
                   }
                 },
                 style: ElevatedButton.styleFrom(

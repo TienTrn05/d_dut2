@@ -140,8 +140,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
     await Storage.setHintEmail(event.email);
-    await Storage.setScheduleNotifications(null);
-    NotificationService().cancelAllNotifications();
+    await Storage.setExamNotification(true);
 
     emit(AuthLogoutSuccess());
     emit(AuthHandlerFinished());
