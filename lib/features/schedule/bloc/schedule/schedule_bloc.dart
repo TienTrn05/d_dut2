@@ -63,8 +63,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
       emit(ScheduleDashboardLoaded(schedules: schedules));
 
-      ScheduleNoti.setupScheduleNotifications(
-          isTeacher, authToken, _repository);
+      ScheduleNoti.setupScheduleNotifications(isTeacher, authToken);
     } catch (e) {
       emit(ScheduleError(e.toString()));
     }

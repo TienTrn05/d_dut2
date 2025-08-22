@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/core/data/local/storage.dart';
 import 'package:e_dut/core/services/notification_service.dart';
+import 'package:e_dut/features/schedule/data/data_sources/remote_data_source/schedule_service.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/study_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/uos_model.dart';
@@ -11,8 +13,9 @@ import 'package:e_dut/features/schedule/util/functions.dart';
 
 class ScheduleNoti {
   static Future<void> setupScheduleNotifications(
-      bool isTeacher, String authToken, ScheduleRepository repository) async {
+      bool isTeacher, String authToken) async {
     try {
+      final repository = ScheduleRepository(getIt.get<ScheduleService>());
       final scheduleNotis =
           await repository.getScheduleNotification(isTeacher, authToken);
 
@@ -99,18 +102,26 @@ class ScheduleNoti {
 
         // Chỉ tạo thông báo cho các tiết học trong tương lai
         if (classDateTime.isAfter(now)) {
-          // Thông báo 15 phút trước giờ học
           final notificationTime =
-              classDateTime.subtract(const Duration(minutes: 15));
+              classDateTime.subtract(const Duration(hours: 2, minutes: 40));
+
+          final isPreviousDay = notificationTime.day != classDateTime.day ||
+              notificationTime.month != classDateTime.month ||
+              notificationTime.year != classDateTime.year;
+
+          final title =
+              'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
+
+          final body = isPreviousDay
+              ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
+              : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
 
           if (notificationTime.isAfter(now)) {
             await NotificationService().scheduleClassNotification(
               id: notificationId +
                   (weekOffset * 1000), // Unique ID cho mỗi notification
-              title:
-                  'Sắp đến giờ  ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}',
-              body:
-                  'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}',
+              title: title,
+              body: body,
               scheduledTime: notificationTime,
             );
           }
@@ -137,17 +148,27 @@ class ScheduleNoti {
 
       // Only schedule notifications cho future exams
       if (examDateTime != null && examDateTime.isAfter(now)) {
-        // Schedule notification 1 day before exam
-        final oneDayBefore = examDateTime.subtract(const Duration(days: 1));
-        if (oneDayBefore.isAfter(now)) {
+        final notificationTime =
+            examDateTime.subtract(const Duration(hours: 11));
+
+        final isPreviousDay = notificationTime.day != examDateTime.day ||
+            notificationTime.month != examDateTime.month ||
+            notificationTime.year != examDateTime.year;
+
+        final title = isTeacher
+            ? 'Nhắc nhở lịch coi thi: ${examShift.examShiftName}'
+            : 'Nhắc nhở lịch thi: ${uos.subjectName}';
+
+        final body = isPreviousDay
+            ? 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào ngày mai (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}'
+            : 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào lúc (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}';
+
+        if (notificationTime.isAfter(now)) {
           await NotificationService().scheduleClassNotification(
             id: notificationId,
-            title: isTeacher
-                ? 'Nhắc nhở lịch coi thi: ${examShift.examShiftName}'
-                : 'Nhắc nhở lịch thi: ${uos.subjectName}',
-            body:
-                'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào ngày mai (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}',
-            scheduledTime: oneDayBefore,
+            title: title,
+            body: body,
+            scheduledTime: notificationTime,
           );
         }
       }
