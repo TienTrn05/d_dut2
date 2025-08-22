@@ -132,7 +132,7 @@ class Header extends StatelessWidget {
               ),
             ),
             NotificationButton(
-              notificationCount: 2,
+              notificationCount: 0,
               onTap: onTap,
             ),
           ],

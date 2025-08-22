@@ -1,3 +1,4 @@
+import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,10 +19,20 @@ class GeneralNotifications extends StatelessWidget {
       if (state.generalNotificationsStatus ==
               GeneralNotificationsStatus.loading &&
           state.generalNotifications.isEmpty) {
-        return Center(
-            child: CircularProgressIndicator(
-          color: context.theme.primaryColor,
-        ));
+        return Column(
+          children: [
+            CardLoading(
+              height: 100,
+              margin: EdgeInsets.only(bottom: 8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            CardLoading(
+              height: 100,
+              margin: EdgeInsets.only(bottom: 8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ],
+        );
       } else if (state.generalNotificationsStatus ==
           GeneralNotificationsStatus.failure) {
         return Center(
@@ -48,25 +59,35 @@ class GeneralNotifications extends StatelessWidget {
                 // If it's the last item, show the "Load more" button
                 if (index == state.generalNotifications.length) {
                   return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          context.read<NotificationsBloc>().add(
-                              GeneralNotificationsLoadMoreRequested(
-                                  token: token));
-                        },
-                        child: (state.generalNotificationsStatus ==
-                                    GeneralNotificationsStatus.loading &&
-                                state.generalNotifications.isNotEmpty)
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                color: context.theme.primaryColor,
-                              ))
-                            : (state.generalNotificationsStatus ==
-                                    GeneralNotificationsStatus.unchange
-                                ? const SizedBox.shrink()
-                                : Text(
+                    child: (state.generalNotificationsStatus ==
+                                GeneralNotificationsStatus.loading &&
+                            state.generalNotifications.isNotEmpty)
+                        ? Column(
+                            children: [
+                              CardLoading(
+                                height: 100,
+                                margin: EdgeInsets.only(bottom: 8),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              CardLoading(
+                                height: 100,
+                                margin: EdgeInsets.only(bottom: 8),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ],
+                          )
+                        : (state.generalNotificationsStatus ==
+                                GeneralNotificationsStatus.unchange
+                            ? const SizedBox.shrink()
+                            : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                  onTap: () {
+                                    context.read<NotificationsBloc>().add(
+                                        GeneralNotificationsLoadMoreRequested(
+                                            token: token));
+                                  },
+                                  child: Text(
                                     "Xem thêm",
                                     style: TextStyle(
                                       color: context.theme.grey,
@@ -75,9 +96,9 @@ class GeneralNotifications extends StatelessWidget {
                                       decoration: TextDecoration.underline,
                                       decorationColor: context.theme.grey,
                                     ),
-                                  )),
-                      ),
-                    ),
+                                  ),
+                                ),
+                            )),
                   );
                 }
 

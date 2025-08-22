@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/utils/getit_utils.dart';
+import '/core/bloc/notification_settings/notification_settings_bloc.dart';
 import '/features/auth/bloc/auth_bloc.dart';
 import '../domain/repositories/notification_repository.dart';
 
@@ -13,28 +14,11 @@ import 'general_notifications.dart';
 import 'my_notifications.dart';
 import 'widgets/custom_time_dropdown.dart';
 
-class NotificationScreen extends StatefulWidget {
+class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
-  @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
-}
-
-class _NotificationScreenState extends State<NotificationScreen> {
-  bool isGeneralNotificationOn = true;
-
-  bool isMyNotificationOn = false;
-
-  bool isExamNotificationOn = false;
-
-  String selectedTime = "30 phút";
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
+  Widget _buildSwitchTile(BuildContext context, String title, bool value,
+      Function(bool) onChanged) {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
       title: Text(title,
@@ -112,77 +96,78 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             ),
             backgroundColor: Colors.white,
-            endDrawer: Drawer(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                ),
-                backgroundColor: Colors.white,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/svg/solar_bell-bold.svg",
-                              colorFilter: ColorFilter.mode(
-                                context.theme.primaryColor ?? Colors.blue,
-                                BlendMode.srcIn,
-                              ),
-                              width: 24,
-                              height: 24,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Thông báo",
-                              style: TextStyle(
-                                fontSize: FontSizes.large,
-                                fontWeight: FontWeight.bold,
-                                color: context.theme.primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 8),
-                          height: 1,
-                          color: context.theme.primaryColor,
-                        ),
-                        _buildSwitchTile(
-                            "Bật thông báo chung", isGeneralNotificationOn,
-                            (value) {
-                          setState(() {
-                            isGeneralNotificationOn = value;
-                          });
-                        }),
-                        _buildSwitchTile(
-                            "Bật thông báo của tôi", isMyNotificationOn,
-                            (value) {
-                          setState(() {
-                            isMyNotificationOn = value;
-                          });
-                        }),
-                        _buildSwitchTile(
-                            "Bật thông báo lịch học/thi", isExamNotificationOn,
-                            (value) {
-                          setState(() {
-                            isExamNotificationOn = value;
-                          });
-                        }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            CustomTimeDropdown(),
-                          ],
-                        ),
-                      ],
+            endDrawer: BlocBuilder<NotificationSettingsBloc,
+                NotificationSettingsState>(builder: (context, state) {
+              return Drawer(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
                   ),
-                )),
+                  backgroundColor: Colors.white,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                "assets/icons/svg/solar_bell-bold.svg",
+                                colorFilter: ColorFilter.mode(
+                                  context.theme.primaryColor ?? Colors.blue,
+                                  BlendMode.srcIn,
+                                ),
+                                width: 24,
+                                height: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Thông báo",
+                                style: TextStyle(
+                                  fontSize: FontSizes.large,
+                                  fontWeight: FontWeight.bold,
+                                  color: context.theme.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            height: 1,
+                            color: context.theme.primaryColor,
+                          ),
+                          _buildSwitchTile(context, "Bật thông báo chung",
+                              state.generalEnabled, (value) {
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleGeneralNotification(isEnabled: value));
+                          }),
+                          _buildSwitchTile(context, "Bật thông báo của tôi",
+                              state.personalEnabled, (value) {
+                            context
+                                .read<NotificationSettingsBloc>()
+                                .add(ToggleMyNotification(isEnabled: value));
+                          }),
+                          _buildSwitchTile(
+                              context,
+                              "Bật thông báo lịch học/thi",
+                              state.examEnabled, (value) {
+                            context
+                                .read<NotificationSettingsBloc>()
+                                .add(ToggleExamNotification(isEnabled: value));
+                          }),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CustomTimeDropdown(),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ));
+            }),
             body: Padding(
               padding: EdgeInsets.only(
                   left: 24,
