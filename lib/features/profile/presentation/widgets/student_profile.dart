@@ -18,11 +18,13 @@ class StudentProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+      
       if (authState is! AuthUserAuthenticated) {
         return Center(
           child: Text(
             'Bạn cần đăng nhập để sử dụng tính năng này.',
             style: TextStyle(fontSize: FontSizes.large),
+            textAlign: TextAlign.center,
           ),
         );
       }
