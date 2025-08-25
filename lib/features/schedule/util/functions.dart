@@ -119,6 +119,10 @@ class Functions {
     return result;
   }
 
+  static String formatTime(DateTime dateTime) {
+    return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
   static formatDate(DateTime dt) {
     return DateFormat('dd/MM/yyyy').format(dt);
   }

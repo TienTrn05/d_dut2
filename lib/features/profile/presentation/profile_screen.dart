@@ -1,17 +1,18 @@
-import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/features/auth/data/model/role_model.dart';
-import 'package:e_dut/features/profile/data/model/teacher_profile_model.dart';
-import 'package:e_dut/features/profile/presentation/widgets/student_profile.dart';
-import 'package:e_dut/features/profile/presentation/widgets/teacher_profile.dart';
+import 'package:e_dut/core/bloc/notification_settings/notification_settings_bloc.dart';
+import 'package:e_dut/features/notification/bloc/notifications_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../common/extensions/custom_theme_extension.dart';
-import '../../../common/routes/routes.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/extensions/custom_theme_extension.dart';
+import '/common/routes/routes.dart';
 
 import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/data/model/role_model.dart';
+import './widgets/student_profile.dart';
+import './widgets/teacher_profile.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -123,13 +124,10 @@ class ProfileScreen extends StatelessWidget {
                     final userRole = (authState is AuthUserAuthenticated)
                         ? authState.userData.role.name
                         : '';
-                    final teacher = TeacherProfileModel.mockTeacherProfile;
                     return Expanded(
                         child: userRole == RoleModel.roleStudent
                             ? StudentProfile()
-                            : TeacherProfile(
-                                profile: teacher,
-                              ));
+                            : TeacherProfile());
                   })
                 ],
               ),
@@ -138,12 +136,19 @@ class ProfileScreen extends StatelessWidget {
               bottom: 74 + 16,
               right: 16,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final state = context.read<AuthBloc>().state;
                   if (state is AuthUserAuthenticated) {
                     context
                         .read<AuthBloc>()
                         .add(AuthLogoutRequested(state.userData.mail));
+
+                    context.read<NotificationSettingsBloc>().add(
+                        RemindBeforeChanged(
+                            remindBefore: 15,
+                            authToken: state.accessToken,
+                            isTeacher: state.userData.role.name ==
+                                RoleModel.roleTeacher));
                   }
                 },
                 style: ElevatedButton.styleFrom(

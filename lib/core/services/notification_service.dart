@@ -1,154 +1,265 @@
+// services/notification_service.dart
 
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:device_info_plus/device_info_plus.dart';
 
-import '../../firebase_options.dart';
+import '/common/utils/logger.dart';
+import '../../firebase_options.dart'; // Đảm bảo đường dẫn này đúng
 
-late AndroidNotificationChannel channel;
-late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-bool isFlutterLocalNotificationsInitialized = false;
-
-Future<void> _ensureNotificationSetup() async {
-  if (isFlutterLocalNotificationsInitialized) return;
-
-  channel = const AndroidNotificationChannel(
-    'high_importance_channel',
-    'High Importance Notifications',
-    description: 'This channel is used for important notifications.',
-    importance: Importance.max,
-  );
-
-  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  isFlutterLocalNotificationsInitialized = true;
+// Handler cho background messages phải là một top-level function
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  logger.i("Handling a background message: ${message.messageId}");
+  // Nếu bạn muốn hiển thị thông báo từ background, bạn cũng có thể gọi logic show ở đây
 }
 
-Future<Uint8List> getImageBytes(String? imageUrl) async {
-  var response = await http.get(Uri.parse(imageUrl!));
-  return response.bodyBytes;
-}
+class NotificationService {
+  // Singleton pattern để đảm bảo chỉ có một instance của service
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
 
-Future<void> _showNotification(RemoteMessage message) async {
-  if (!kIsWeb) {
-    print('showing notification');
+  late final FirebaseMessaging _firebaseMessaging;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  late AndroidNotificationChannel _channel;
+  late AndroidNotificationChannel _scheduleChannel;
+
+  bool _isInitialized = false;
+
+  Future<void> init() async {
+    if (_isInitialized) return;
+
+    // channel cho nhắc nhở lịch học
+    _scheduleChannel = AndroidNotificationChannel(
+      'class_reminder_channel', // ID phải khớp với ID trong AndroidNotificationDetails
+      'Nhắc nhở lịch học',
+      description: 'Thông báo nhắc nhở trước giờ học.',
+      importance: Importance.max, // Đặt mức độ quan trọng cao nhất
+    );
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_scheduleChannel);
+
+    // 1. Khởi tạo Firebase
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+
+    _firebaseMessaging = FirebaseMessaging.instance;
+
+    // 2. Khởi tạo Timezone cho việc lên lịch local
+    tz.initializeTimeZones();
+
+    // 3. Cài đặt cho Remote Notifications (từ code có sẵn của bạn)
+    _channel = const AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
+      description: 'This channel is used for important notifications.',
+      importance: Importance.max,
+    );
+
+    await _flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // 4. Cài đặt chung cho flutter_local_notifications
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: onNotificationTap,
+    );
+
+    await _requestPermissions();
+
+    _isInitialized = true;
+    logger.i("Notification Service Initialized");
+  }
+
+  Future<void> _requestPermissions() async {
+    // 1. Xin quyền post notification (cho Android 13+)
+    // Flutter_local_notifications đã làm điều này, nhưng gọi lại để chắc chắn
+    if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+      await androidImplementation?.requestNotificationsPermission();
+
+      // 2. Xin quyền đặt báo thức chính xác (cho Android 12+)
+      // Đây là phần quan trọng nhất để sửa lỗi của bạn
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      if (androidInfo.version.sdkInt >= 31) {
+        // Android 12 (S)
+        await androidImplementation?.requestExactAlarmsPermission();
+      }
+    } else if (Platform.isIOS) {
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
+  }
+
+  // --- PHẦN XỬ LÝ REMOTE NOTIFICATION (Push từ server) ---
+
+  Future<String?> getFCMToken() async {
+    String? token = await _firebaseMessaging.getToken();
+    logger.i('Firebase Messaging Token: $token');
+    return token;
+  }
+
+  void registerMessageHandlers() {
+    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
+
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    logger.i("Received a foreground message: ${message.notification?.title}");
+    await showRemoteNotification(message);
+  }
+
+  Future<void> showRemoteNotification(RemoteMessage message) async {
     String? imageUrl = message.notification?.android?.imageUrl;
     String? title = message.notification?.title ?? message.data['title'];
     String? body = message.notification?.body ?? message.data['body'];
 
-    // Kiểm tra dữ liệu thông báo
-    if ((title == null || title.isEmpty || title == '') &&
-        (body == null || body.isEmpty || title == '')) {
-      print('Thông báo rỗng, không hiển thị');
+    if (title == null && body == null) {
+      logger.i('Thông báo remote rỗng, không hiển thị');
       return;
     }
 
     AndroidNotificationDetails androidDetails;
-    DarwinNotificationDetails iOSDetails;
-
     if (imageUrl != null && imageUrl.isNotEmpty) {
-      var res = await getImageBytes(imageUrl);
-      AndroidBitmap<Object> androidBitmap =
-          ByteArrayAndroidBitmap.fromBase64String(base64Encode(res));
-      BigPictureStyleInformation bigPictureStyleInformation =
-          BigPictureStyleInformation(
+      final bigPicture =
+          await _getBigPictureStyleInformation(imageUrl, title, body);
+      androidDetails = AndroidNotificationDetails(
+        _channel.id,
+        _channel.name,
+        channelDescription: _channel.description,
+        icon: '@mipmap/launcher_icon',
+        importance: _channel.importance,
+        priority: Priority.high,
+        styleInformation: bigPicture,
+        largeIcon: bigPicture?.largeIcon,
+      );
+    } else {
+      androidDetails = AndroidNotificationDetails(
+        _channel.id,
+        _channel.name,
+        channelDescription: _channel.description,
+        icon: '@mipmap/launcher_icon',
+        importance: _channel.importance,
+        priority: Priority.high,
+      );
+    }
+
+    final notificationDetails = NotificationDetails(
+        android: androidDetails, iOS: const DarwinNotificationDetails());
+    _flutterLocalNotificationsPlugin.show(
+        message.hashCode, title, body, notificationDetails);
+  }
+
+  // --- PHẦN XỬ LÝ LOCAL NOTIFICATION (Lên lịch từ app) ---
+
+  Future<void> scheduleClassNotification({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime scheduledTime,
+    String? payload,
+  }) async {
+    logger.i("Scheduling notification ID $id for $scheduledTime");
+    var d = tz.TZDateTime.from(scheduledTime, tz.local);
+    var n = tz.TZDateTime.now(tz.local);
+    if (d.isBefore(n)) {
+      logger.w(
+          "Scheduled time is in the past, notification will not be scheduled.");
+      return;
+    }
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledTime, tz.local),
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _scheduleChannel.id, // Tạo channel riêng cho nhắc nhở
+          _scheduleChannel.name,
+          channelDescription: _scheduleChannel.description,
+          importance: Importance.max,
+          icon: '@mipmap/launcher_icon',
+          priority: Priority.high,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      payload: payload,
+    );
+  }
+
+  Future<void> cancelNotification(int id) async {
+    await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  Future<void> cancelAllNotifications() async {
+    await _flutterLocalNotificationsPlugin.cancelAll();
+    logger.i('All notifications is canceled');
+  }
+
+  // --- CÁC HÀM TIỆN ÍCH và CALLBACK ---
+
+  Future<BigPictureStyleInformation?> _getBigPictureStyleInformation(
+      String imageUrl, String? title, String? body) async {
+    try {
+      var response = await http.get(Uri.parse(imageUrl));
+      final imageBytes = response.bodyBytes;
+      AndroidBitmap<Object> androidBitmap = ByteArrayAndroidBitmap(imageBytes);
+      return BigPictureStyleInformation(
         androidBitmap,
         contentTitle: title,
         summaryText: body,
         htmlFormatContent: true,
         htmlFormatContentTitle: true,
-        hideExpandedLargeIcon: true,
       );
-
-      androidDetails = AndroidNotificationDetails(
-        channel.id,
-        channel.name,
-        channelDescription: channel.description,
-        icon: '@mipmap/launcher_icon',
-        onlyAlertOnce: true,
-        importance: channel.importance,
-        priority: Priority.high,
-        showWhen: true,
-        largeIcon: androidBitmap,
-        styleInformation: bigPictureStyleInformation,
-      );
-    } else {
-      androidDetails = AndroidNotificationDetails(
-        channel.id,
-        channel.name,
-        channelDescription: channel.description,
-        icon: '@mipmap/launcher_icon',
-        onlyAlertOnce: true,
-        importance: channel.importance,
-        priority: Priority.high,
-        showWhen: true,
-      );
+    } catch (e) {
+      logger.e("Error fetching image for notification: $e");
+      return null;
     }
-
-    iOSDetails = const DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-      badgeNumber: null,
-      sound: 'default',
-    );
-
-    var notificationDetails =
-        NotificationDetails(android: androidDetails, iOS: iOSDetails);
-    flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      title,
-      body,
-      notificationDetails,
-    );
-  }
-}
-
-class FirebaseAPI with ChangeNotifier {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-
-  Future<String?> init() async {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    await _ensureNotificationSetup();
-    await _firebaseMessaging.requestPermission(
-        alert: true, badge: true, sound: true);
-    String? token = await getToken();
-    registerMessageHandlers();
-    return token;
   }
 
-  void registerMessageHandlers() {
-    FirebaseMessaging.onMessage.listen(_foregroundMessageHandler);
-  }
-
-  Future<void> _foregroundMessageHandler(RemoteMessage message) async {
-    await _ensureNotificationSetup();
-    _showNotification(message);
-  }
-
-  Future<String?> getToken() async {
-    String? token = await _firebaseMessaging.getToken();
-    if (token != null) {
-      print('Firebase Messaging Token: $token');
-    } else {
-      print('Failed to get Firebase Messaging Token');
-    }
-    return token;
+  void onNotificationTap(NotificationResponse response) {
+    logger.i("Notification tapped with payload: ${response.payload}");
+    // Tại đây, bạn có thể điều hướng người dùng dựa vào payload
+    // Ví dụ: if (response.payload.startsWith('class_id=')) { ... }
   }
 }

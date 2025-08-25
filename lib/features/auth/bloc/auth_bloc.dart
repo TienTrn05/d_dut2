@@ -1,3 +1,4 @@
+import 'package:e_dut/core/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -93,7 +94,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           if (event.FCMToken.isNotEmpty) {
             try {
-              await _notificationRepository.registerFCMToken(data["accessToken"], event.FCMToken);
+              await _notificationRepository.registerFCMToken(
+                  data["accessToken"], event.FCMToken);
             } catch (e) {
               logger.e("Failed to register FCM token: $e");
             }
@@ -138,6 +140,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
     await Storage.setHintEmail(event.email);
+    await Storage.setExamNotification(true);
+
     emit(AuthLogoutSuccess());
     emit(AuthHandlerFinished());
   }

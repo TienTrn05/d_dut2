@@ -81,8 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (authState is AuthUserAuthenticated) {
                 final String userRole = authState.userData.role.name;
                 final String authToken = authState.accessToken;
-                context.read<ScheduleBloc>().add(LoadSchedulesByDate(
-                    inputDate: DateTime.now(),
+                context.read<ScheduleBloc>().add(LoadScheduleDashboard(
                     isTeacher: userRole == RoleModel.roleTeacher,
                     authToken: authToken));
               }
@@ -185,8 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     final String authToken =
                                         authState.accessToken;
                                     context.read<ScheduleBloc>().add(
-                                        LoadSchedulesByDate(
-                                            inputDate: DateTime.now(),
+                                        LoadScheduleDashboard(
                                             isTeacher: userRole ==
                                                 RoleModel.roleTeacher,
                                             authToken: authToken));
@@ -204,7 +202,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ],
                               ));
-                            } else if (state is SchedulesLoaded) {
+                            } else if (state is ScheduleDashboardLoaded) {
                               return Expanded(
                                 child: state.schedules.isEmpty
                                     ? Column(
@@ -378,41 +376,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             Routes.communityActivities);
                                       },
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
-                                      title: "Lớp sinh hoạt",
-                                      // disabled: true,
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.detailHomeRoom));
-                                      },
-                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                    //   title: "Lớp sinh hoạt",
+                                    //   // disabled: true,
+                                    //   onTap: () {
+                                    //     context.read<DashboardBloc>().add(
+                                    //         DashboardNavigateRequested(
+                                    //             scopes, Routes.detailHomeRoom));
+                                    //   },
+                                    // ),
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/mage_goals.svg",
                                       title: "Kết quả học tập",
                                       disabled: true,
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/tabler_coin.svg",
-                                      title: "Học phí",
-                                      disabled: true,
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/carbon_book.svg",
-                                      title: "Chương trình đào tạo",
-                                      disabled: true,
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/uil_chart-line.svg",
-                                      title: "Thống kê",
-                                      disabled: true,
-                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/tabler_coin.svg",
+                                    //   title: "Học phí",
+                                    //   disabled: true,
+                                    // ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/carbon_book.svg",
+                                    //   title: "Chương trình đào tạo",
+                                    //   disabled: true,
+                                    // ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/uil_chart-line.svg",
+                                    //   title: "Thống kê",
+                                    //   disabled: true,
+                                    // ),
                                   ];
                                 }
                               }

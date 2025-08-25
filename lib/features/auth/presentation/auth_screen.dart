@@ -374,8 +374,7 @@ class _LoginScreenState extends State<LoginScreen>
                         text: "Đăng nhập bằng Microsoft",
                         color: context.theme.primaryColor ?? Colors.blue,
                         onPressed: () async {
-                          var fcmToken =
-                              await context.read<FirebaseAPI>().init();
+                          var fcmToken = await NotificationService().getFCMToken();
                           context.read<AuthBloc>().add(
                                 MicrosoftSignInRequested(fcmToken ?? ""),
                               );

@@ -21,7 +21,7 @@ dependencies:
   dartx: ^1.2.0
 
   # local storage
-  shared_preferences: ^2.5.2
+  shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.4
   rx_shared_preferences: ^4.0.0
 
@@ -58,6 +58,8 @@ dependencies:
   flutter_linkify: ^6.0.0
   linkify: ^5.0.0
   flutter_native_splash: ^2.4.6
+
+  device_info_plus: ^11.5.0
 
 dev_dependencies:
   flutter_test:

@@ -44,6 +44,13 @@ class NotificationsBloc
       emit(state.copyWith(
           myNotificationsStatus: () => MyNotificationsStatus.loading));
       final notifications = await notificationRepository.fetchMyNotifications(event.token, lastVisible: state.myNotifications.last.id);
+
+      if (notifications.isEmpty) {
+        emit(state.copyWith(
+            myNotificationsStatus: () => MyNotificationsStatus.unchange));
+        return;
+      }
+
       emit(state.copyWith(
           myNotificationsStatus: () => MyNotificationsStatus.success,
           myNotifications: () => [...state.myNotifications, ...notifications]));
@@ -79,6 +86,13 @@ class NotificationsBloc
       emit(state.copyWith(
           generalNotificationsStatus: () => GeneralNotificationsStatus.loading));
       final notifications = await notificationRepository.fetchGeneralNotifications(event.token, lastVisible: state.generalNotifications.last.id);
+
+      if (notifications.isEmpty) {
+        emit(state.copyWith(
+            generalNotificationsStatus: () => GeneralNotificationsStatus.unchange));
+        return;
+      }
+
       emit(state.copyWith(
           generalNotificationsStatus: () => GeneralNotificationsStatus.success,
           generalNotifications: () => [...state.generalNotifications, ...notifications]));
