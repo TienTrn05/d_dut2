@@ -46,12 +46,42 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
       if (authState is! AuthUserAuthenticated) {
-        return Center(
-          child: Text(
-            'Bạn cần đăng nhập để sử dụng tính năng này.',
-            style: TextStyle(fontSize: FontSizes.large),
-          ),
-        );
+        return Scaffold(
+            appBar: AppBar(
+              backgroundColor: context.theme.primaryColor ?? Colors.blue,
+              elevation: 0, // Xóa bóng dưới AppBar
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context); // Quay lại màn hình trước
+                  },
+                ),
+              ),
+              title: Text(
+                'Hoạt động cộng đồng',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: FontSizes.medium,
+                ),
+              ),
+              centerTitle: true,
+            ),
+            backgroundColor: Colors.white,
+            body: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: Text(
+                  'Bạn cần đăng nhập để sử dụng tính năng này.',
+                  style: TextStyle(
+                      color: context.theme.grey!, fontSize: FontSizes.large),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ));
       }
       return MultiBlocProvider(
           providers: [

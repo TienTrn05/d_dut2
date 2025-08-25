@@ -24,6 +24,7 @@ class TeacherProfile extends StatelessWidget {
           child: Text(
             'Bạn cần đăng nhập để sử dụng tính năng này.',
             style: TextStyle(fontSize: FontSizes.large),
+            textAlign: TextAlign.center,
           ),
         );
       }
