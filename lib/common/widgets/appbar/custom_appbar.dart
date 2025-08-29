@@ -33,7 +33,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       actions: [
         NotificationButton(
-          notificationCount: 2,
+          notificationCount: 0,
           onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
         ),
       ],

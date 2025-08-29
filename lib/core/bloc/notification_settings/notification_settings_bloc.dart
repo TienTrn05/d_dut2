@@ -1,3 +1,4 @@
+import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/core/data/local/storage.dart';
 import 'package:e_dut/core/services/notification_service.dart';
 import 'package:e_dut/features/schedule/util/schedule_noti.dart';
@@ -18,6 +19,9 @@ class NotificationSettingsBloc
     on<ToggleMyNotification>(_onToggleMyNotification);
     on<ToggleExamNotification>(_onToggleExamNotification);
     on<RemindBeforeChanged>(_onRemindBeforeChanged);
+    on<ClearErrorMessage>((event, emit) {
+      emit(state.copyWith(errorMessage: () => null));
+    });
   }
 
   void _onLoadNotificationSettings(
@@ -43,30 +47,69 @@ class NotificationSettingsBloc
 
   Future<void> _onToggleExamNotification(ToggleExamNotification event,
       Emitter<NotificationSettingsState> emit) async {
-    await Storage.setExamNotification(event.isEnabled);
-    await Storage.setScheduleNotifications(null);
-    await NotificationService().cancelAllNotifications();
+    try {
+      await Storage.setExamNotification(event.isEnabled);
+      await Storage.setScheduleNotifications(null);
+      await NotificationService().cancelAllNotifications();
 
-    emit(state.copyWith(examEnabled: () => event.isEnabled));
+      bool setupSuccess = true;
 
-    if (event.isEnabled) {
-      final isTeacher = event.isTeacher;
-      final authToken = event.authToken;
-      NotificationService().cancelAllNotifications();
-      ScheduleNoti.setupScheduleNotifications(isTeacher, authToken);
+      if (event.isEnabled) {
+        final isTeacher = event.isTeacher;
+        final authToken = event.authToken;
+
+        // Kiểm tra kết quả setup
+        setupSuccess =
+            await ScheduleNoti.setupScheduleNotifications(isTeacher, authToken);
+
+        if (!setupSuccess) {
+          // Nếu setup thất bại, rollback setting về false
+          await Storage.setExamNotification(false);
+          emit(state.copyWith(errorMessage: () => "Đã có lỗi xảy ra"));
+        }
+      }
+
+      // Chỉ emit state với giá trị thực tế sau khi setup
+      final finalValue = event.isEnabled && setupSuccess;
+      emit(state.copyWith(examEnabled: () => finalValue));
+    } catch (e) {
+      await Storage.setExamNotification(false);
+      emit(state.copyWith(examEnabled: () => false));
     }
   }
 
   Future<void> _onRemindBeforeChanged(RemindBeforeChanged event,
       Emitter<NotificationSettingsState> emit) async {
-    emit(state.copyWith(remindBefore: () => event.remindBefore));
+    // Lưu giá trị cũ để rollback nếu cần
+    final oldRemindBefore = state.remindBefore;
 
-    await Storage.setRemindBefore(event.remindBefore);
-    await Storage.setScheduleNotifications(null);
-    await NotificationService().cancelAllNotifications();
+    try {
+      await Storage.setRemindBefore(event.remindBefore);
+      await Storage.setScheduleNotifications(null);
+      await NotificationService().cancelAllNotifications();
 
-    final isTeacher = event.isTeacher;
-    final authToken = event.authToken;
-    ScheduleNoti.setupScheduleNotifications(isTeacher, authToken);
+      final isTeacher = event.isTeacher;
+      final authToken = event.authToken;
+
+      // Kiểm tra kết quả setup notifications
+      final setupSuccess =
+          await ScheduleNoti.setupScheduleNotifications(isTeacher, authToken);
+
+      if (setupSuccess) {
+        emit(state.copyWith(remindBefore: () => event.remindBefore));
+      } else {
+        await Storage.setRemindBefore(oldRemindBefore);
+        emit(state.copyWith(errorMessage: () => "Đã có lỗi xảy ra"));
+      }
+    } catch (e) {
+      // Rollback về giá trị cũ
+      await Storage.setRemindBefore(oldRemindBefore);
+      try {
+        await ScheduleNoti.setupScheduleNotifications(
+            event.isTeacher, event.authToken);
+      } catch (setupError) {
+        logger.e("Failed to rollback setup notifications: $setupError");
+      }
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/widgets/snackbar/container_snackbar.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -172,6 +173,18 @@ class NotificationScreen extends StatelessWidget {
                               CustomTimeDropdown(),
                             ],
                           ),
+                          Expanded(child: SizedBox.shrink()),
+                          if (state.errorMessage != null)
+                            ContainerSnackbar(
+                              title: "Cập nhật thất bại",
+                              message: state.errorMessage ?? "Có lỗi xảy ra",
+                              alertType: AlertType.error,
+                              onClose: () {
+                                context
+                                    .read<NotificationSettingsBloc>()
+                                    .add(ClearErrorMessage());
+                              },
+                            )
                         ],
                       ),
                     ),
