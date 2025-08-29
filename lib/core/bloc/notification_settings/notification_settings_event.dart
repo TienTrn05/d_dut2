@@ -55,3 +55,5 @@ class RemindBeforeChanged extends NotificationSettingsEvent {
   @override
   List<Object?> get props => [remindBefore];
 }
+
+class ClearErrorMessage extends NotificationSettingsEvent {}

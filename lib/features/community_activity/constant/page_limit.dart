@@ -1,3 +1,3 @@
 class PageLimit {
-  static const int activitiesLimit = 5;
+  static const int activitiesLimit = 10;
 }

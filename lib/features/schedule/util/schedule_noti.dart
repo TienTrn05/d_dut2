@@ -12,7 +12,7 @@ import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 
 class ScheduleNoti {
-  static Future<void> setupScheduleNotifications(
+  static Future<bool> setupScheduleNotifications(
       bool isTeacher, String authToken) async {
     try {
       final repository = ScheduleRepository(getIt.get<ScheduleService>());
@@ -29,7 +29,7 @@ class ScheduleNoti {
       // Compare to old data
       if (storedScheduleJson != null && storedScheduleJson == newScheduleJson) {
         logger.i("Schedule notifications unchanged, skipping update");
-        return;
+        return true; // Trả về true vì không cần update
       }
 
       logger.i("Schedule notifications changed, updating...");
@@ -64,8 +64,10 @@ class ScheduleNoti {
 
       logger.i(
           "Successfully setup ${scheduleNotis.length} schedule notifications");
+      return true; // Trả về true khi setup thành công
     } catch (e) {
       logger.e("Failed to setup schedule notifications: $e");
+      return false; // Trả về false khi có lỗi
     }
   }
 

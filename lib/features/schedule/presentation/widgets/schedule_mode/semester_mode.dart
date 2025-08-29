@@ -281,20 +281,29 @@ class _SemesterModeState extends State<SemesterMode> {
       List<SemesterModel> semesterList, SemesterModel currentSemester) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 24.0,
       children: [
         GestureDetector(
           onTap: () => _previousSemester(semesterList),
           child: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
-        GestureDetector(
-          onTap: () => _showPicker(context, semesterList),
-          child: Text(
-            'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
-            style: const TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        Expanded(
+          child: InkWell(
+              onTap: () => _showPicker(context, semesterList),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(4.0),
+                child: Center(
+                  child: Text(
+                    'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
+                    style: const TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )),
         ),
         GestureDetector(
           onTap: () => _nextSemester(semesterList),

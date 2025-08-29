@@ -127,6 +127,61 @@ class _UserScoresState extends State<UserScores> {
               }
               return const SizedBox.shrink();
             }),
+        Padding(
+          padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
+          child: BlocListener<CommunityActivityBloc, CommunityActivityState>(
+            listener: (context, state) {
+              if (state is AcademicYearsLoaded) {
+                // Cập nhật danh sách academic years
+                _academicYears = state.academicYears;
+                final now = DateTime.now();
+                final index = _academicYears.indexWhere((year) =>
+                    now.isAfter(year.startDate) && now.isBefore(year.endDate));
+
+                setState(() {
+                  // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
+                  selectedIndex =
+                      index != -1 ? index : _academicYears.length - 1;
+                });
+
+                // Load activities với academic year đầu tiên
+                if (_academicYears.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _loadScores(_academicYears[selectedIndex].id.toString());
+                  });
+                }
+              }
+            },
+            child: BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+              buildWhen: (previous, current) =>
+                  current is AcademicYearsLoaded ||
+                  current is UserScoresLoaded ||
+                  current is CommunityActivityError,
+              builder: (context, state) {
+                if (_academicYears.isNotEmpty) {
+                  return _buildAcademicYearSelector(_academicYears);
+                } else {
+                  return LoadingAcademicYearSelector();
+                }
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding:
+              const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 14.0),
+          child: SearchTextField(
+              controller: _searchController,
+              onFilterPressed: () {
+                setState(() {
+                  sortAscending = !sortAscending;
+                });
+              },
+              iconUrl: sortAscending
+                  ? 'assets/icons/svg/lucide_sort-asc.svg'
+                  : 'assets/icons/svg/lucide_sort-desc.svg',
+              textColor: context.theme.grey ?? Colors.grey),
+        ),
         Expanded(
           child: RefreshIndicator(
             color: context.theme.primaryColor,
@@ -155,189 +210,130 @@ class _UserScoresState extends State<UserScores> {
               subscription.cancel();
             },
             child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(24),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height -
-                        kToolbarHeight - // nếu có AppBar
-                        100,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        BlocListener<CommunityActivityBloc,
-                            CommunityActivityState>(
-                          listener: (context, state) {
-                            if (state is AcademicYearsLoaded) {
-                              // Cập nhật danh sách academic years
-                              _academicYears = state.academicYears;
-                              final now = DateTime.now();
-                              final index = _academicYears.indexWhere((year) =>
-                                  now.isAfter(year.startDate) &&
-                                  now.isBefore(year.endDate));
-
-                              setState(() {
-                                // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
-                                selectedIndex = index != -1
-                                    ? index
-                                    : _academicYears.length - 1;
-                              });
-
-                              // Load activities với academic year đầu tiên
-                              if (_academicYears.isNotEmpty) {
-                                WidgetsBinding.instance
-                                    .addPostFrameCallback((_) {
-                                  _loadScores(_academicYears[selectedIndex]
-                                      .id
-                                      .toString());
-                                });
-                              }
-                            }
-                          },
-                          child: BlocBuilder<CommunityActivityBloc,
+              physics: AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(
+                  left: 24.0, right: 24.0, top: 7.0, bottom: 16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height -
+                      kToolbarHeight - // nếu có AppBar
+                      100,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BlocBuilder<CommunityActivityBloc,
                               CommunityActivityState>(
-                            buildWhen: (previous, current) =>
-                                current is AcademicYearsLoaded ||
-                                current is UserScoresLoaded ||
-                                current is CommunityActivityError,
-                            builder: (context, state) {
-                              if (_academicYears.isNotEmpty) {
-                                return _buildAcademicYearSelector(
-                                    _academicYears);
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SearchTextField(
-                            controller: _searchController,
-                            onFilterPressed: () {
-                              setState(() {
-                                sortAscending = !sortAscending;
-                              });
-                            },
-                            iconUrl: sortAscending
-                                ? 'assets/icons/svg/lucide_sort-asc.svg'
-                                : 'assets/icons/svg/lucide_sort-desc.svg',
-                            textColor: context.theme.grey ?? Colors.grey),
-                        const SizedBox(height: 20),
-                        BlocBuilder<CommunityActivityBloc,
-                                CommunityActivityState>(
-                            buildWhen: (previous, current) =>
-                                current is UserScoresLoaded ||
-                                current is CommunityActivityError,
-                            builder: (context, state) {
-                              if (state is UserScoresLoaded) {
-                                userScores = state.userScores
-                                    .where((proof) =>
-                                        proof.userActivity.status ==
-                                        UserActivityStatus.approved)
-                                    .toList();
-                                final totalScore = userScores.fold<int>(
-                                  0,
-                                  (sum, proof) =>
-                                      sum + proof.userActivity.activity.score,
-                                );
+                          buildWhen: (previous, current) =>
+                              current is UserScoresLoaded ||
+                              current is CommunityActivityError,
+                          builder: (context, state) {
+                            if (state is UserScoresLoaded) {
+                              userScores = state.userScores
+                                  .where((proof) =>
+                                      proof.userActivity.status ==
+                                      UserActivityStatus.approved)
+                                  .toList();
+                              final totalScore = userScores.fold<int>(
+                                0,
+                                (sum, proof) =>
+                                    sum + proof.userActivity.activity.score,
+                              );
 
-                                return Column(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 10),
-                                      padding: const EdgeInsets.only(
-                                          bottom: 4, right: 16),
-                                      decoration: BoxDecoration(
-                                          border: Border(
-                                              bottom: BorderSide(
-                                                  color: context.theme.grey ??
-                                                      Colors.grey))),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Tổng điểm',
-                                            style: TextStyle(
-                                                fontSize: FontSizes.medium,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SvgPicture.asset(
-                                                ActivityIconPath.score,
-                                                colorFilter:
-                                                    const ColorFilter.mode(
-                                                  Color(0XFFFFFF01),
-                                                  BlendMode.srcIn,
-                                                ),
-                                                width: 13,
-                                                height: 13,
+                              return Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.only(
+                                        bottom: 4, right: 16),
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                                color: context.theme.grey ??
+                                                    Colors.grey))),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Tổng điểm',
+                                          style: TextStyle(
+                                              fontSize: FontSizes.medium,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              ActivityIconPath.score,
+                                              colorFilter:
+                                                  const ColorFilter.mode(
+                                                Color(0XFFFFFF01),
+                                                BlendMode.srcIn,
                                               ),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                totalScore.toString(),
-                                                style: TextStyle(
-                                                    fontSize: FontSizes.medium,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
+                                              width: 13,
+                                              height: 13,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              totalScore.toString(),
+                                              style: TextStyle(
+                                                  fontSize: FontSizes.medium,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        )
+                                      ],
                                     ),
-                                    Column(
-                                      children: userScores.isNotEmpty
-                                          ? filteredScores
-                                              .map((proof) => Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 10),
-                                                    child: UserProofCard(
-                                                      nameActivity: proof
-                                                          .userActivity
-                                                          .activity
-                                                          .name,
-                                                      score: proof.userActivity
-                                                          .activity.score,
-                                                    ),
-                                                  ))
-                                              .toList()
-                                          : [
-                                              Center(
-                                                  child: Text(
-                                                      'Không có dữ liệu',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: context
-                                                                  .theme.grey ??
-                                                              Colors.grey)))
-                                            ],
-                                    )
-                                  ],
-                                );
-                              } else if (state is CommunityActivityError) {
-                                return Center(
-                                    child: Text(
-                                        'Không thể tải dữ liệu điểm của tôi',
-                                        style: TextStyle(
-                                            color: context.theme.grey ??
-                                                Colors.grey)));
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            })
-                      ],
-                    ),
+                                  ),
+                                  Column(
+                                    children: userScores.isNotEmpty
+                                        ? filteredScores
+                                            .map((proof) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 10),
+                                                  child: UserProofCard(
+                                                    nameActivity: proof
+                                                        .userActivity
+                                                        .activity
+                                                        .name,
+                                                    score: proof.userActivity
+                                                        .activity.score,
+                                                  ),
+                                                ))
+                                            .toList()
+                                        : [
+                                            Center(
+                                                child: Text('Không có dữ liệu',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: context
+                                                                .theme.grey ??
+                                                            Colors.grey)))
+                                          ],
+                                  )
+                                ],
+                              );
+                            } else if (state is CommunityActivityError) {
+                              return Center(
+                                  child: Text(
+                                      'Không thể tải dữ liệu điểm của tôi',
+                                      style: TextStyle(
+                                          color: context.theme.grey ??
+                                              Colors.grey)));
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          })
+                    ],
                   ),
-                )),
+                ),
+              ),
+            ),
           ),
         )
       ],

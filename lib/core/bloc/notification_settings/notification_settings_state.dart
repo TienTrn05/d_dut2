@@ -7,12 +7,14 @@ class NotificationSettingsState extends Equatable {
   final bool personalEnabled;
   final bool examEnabled;
   final int remindBefore;
+  final String? errorMessage;
 
   const NotificationSettingsState({
     this.generalEnabled = false,
     this.personalEnabled = false,
     this.examEnabled = false,
     this.remindBefore = 15,
+    this.errorMessage,
   });
 
   NotificationSettingsState copyWith({
@@ -20,6 +22,7 @@ class NotificationSettingsState extends Equatable {
     bool Function()? personalEnabled,
     bool Function()? examEnabled,
     int Function()? remindBefore,
+    String? Function()? errorMessage,
   }) {
     return NotificationSettingsState(
       generalEnabled:
@@ -28,14 +31,16 @@ class NotificationSettingsState extends Equatable {
           personalEnabled != null ? personalEnabled() : this.personalEnabled,
       examEnabled: examEnabled != null ? examEnabled() : this.examEnabled,
       remindBefore: remindBefore != null ? remindBefore() : this.remindBefore,
+      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
     );
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         generalEnabled,
         personalEnabled,
         examEnabled,
         remindBefore,
+        errorMessage,
       ];
 }

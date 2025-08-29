@@ -1,3 +1,4 @@
+import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/features/community_activity/data/model/academic_year_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,19 +23,30 @@ class AcademicYearSelector extends StatelessWidget {
     final selectedIndex = yearList.indexWhere((y) => y.id == currentYear.id);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 24.0,
       children: [
         GestureDetector(
           onTap: onPrevious,
           child: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
-        GestureDetector(
-          onTap: () => _showPicker(context, selectedIndex),
-          child: Text(
-            currentYear.name,
-            style: const TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: FontWeight.bold,
-            ),
+        Expanded(
+          child: InkWell(
+            onTap: () => _showPicker(context, selectedIndex),
+            borderRadius:
+                BorderRadius.circular(4), // bo góc hiệu ứng ripple (nếu cần)
+            child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(
+                    4.0), // tạo vùng chạm lớn hơn, tránh chỉ dính vào text
+                child: Center(
+                  child: Text(
+                    currentYear.name,
+                    style: const TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )),
           ),
         ),
         GestureDetector(
@@ -87,6 +99,30 @@ class AcademicYearSelector extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class LoadingAcademicYearSelector extends StatelessWidget {
+  const LoadingAcademicYearSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 24.0,
+      children: [
+        Icon(Icons.arrow_back_ios_new_rounded),
+        Expanded(
+            child: SizedBox(
+          width: double.infinity,
+          child: CardLoading(
+              height: 20,
+              margin: EdgeInsets.only(bottom: 4),
+              borderRadius: BorderRadius.circular(4)),
+        )),
+        Icon(Icons.arrow_forward_ios_rounded),
+      ],
     );
   }
 }
