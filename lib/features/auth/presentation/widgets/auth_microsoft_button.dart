@@ -33,7 +33,7 @@ class AuthMicrosoftButton extends StatelessWidget {
           highlightElevation: 0,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, // Giữ nội dung vừa đủ
+            mainAxisSize: MainAxisSize.max, // Giữ nội dung vừa đủ
             children: [
               Flexible(
                 child: Text(
@@ -49,11 +49,11 @@ class AuthMicrosoftButton extends StatelessWidget {
                   softWrap: false,
                 ),
               ),
-              const SizedBox(width: 8),
-              SvgPicture.asset(
-                "assets/icons/svg/mdi_microsoft.svg",
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-              ),
+              // const SizedBox(width: 8),
+              // SvgPicture.asset(
+              //   "assets/icons/svg/mdi_microsoft.svg",
+              //   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              // ),
             ],
           ),
         );
