@@ -376,41 +376,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             Routes.communityActivities);
                                       },
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
-                                      title: "Lớp sinh hoạt",
-                                      // disabled: true,
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.detailHomeRoom));
-                                      },
-                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                    //   title: "Lớp sinh hoạt",
+                                    //   // disabled: true,
+                                    //   onTap: () {
+                                    //     context.read<DashboardBloc>().add(
+                                    //         DashboardNavigateRequested(
+                                    //             scopes, Routes.detailHomeRoom));
+                                    //   },
+                                    // ),
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/mage_goals.svg",
                                       title: "Kết quả học tập",
                                       disabled: true,
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/tabler_coin.svg",
-                                      title: "Học phí",
-                                      disabled: true,
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/carbon_book.svg",
-                                      title: "Chương trình đào tạo",
-                                      disabled: true,
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/uil_chart-line.svg",
-                                      title: "Thống kê",
-                                      disabled: true,
-                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/tabler_coin.svg",
+                                    //   title: "Học phí",
+                                    //   disabled: true,
+                                    // ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/carbon_book.svg",
+                                    //   title: "Chương trình đào tạo",
+                                    //   disabled: true,
+                                    // ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/uil_chart-line.svg",
+                                    //   title: "Thống kê",
+                                    //   disabled: true,
+                                    // ),
                                   ];
                                 }
                               }

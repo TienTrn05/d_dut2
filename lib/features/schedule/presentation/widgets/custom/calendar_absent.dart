@@ -281,6 +281,14 @@ class _CalendarAbsentState extends State<CalendarAbsent> {
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
+                  leftChevronIcon: Icon(
+                    Icons.chevron_left,
+                    color: context.theme.grey, // đổi màu nút trái
+                  ),
+                  rightChevronIcon: Icon(
+                    Icons.chevron_right,
+                    color: context.theme.grey, // đổi màu nút phải
+                  ),
                 ),
                 calendarBuilders: CalendarBuilders(
                   headerTitleBuilder: (context, date) {
