@@ -77,6 +77,7 @@ class ActivityCard extends StatelessWidget {
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(boxShadow: [
             BoxShadow(
                 color: Colors.black.withAlpha(64),

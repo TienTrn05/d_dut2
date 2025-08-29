@@ -156,236 +156,202 @@ class _UserActivitiesState extends State<UserActivities> {
             return const SizedBox.shrink();
           },
         ),
-        Expanded(
-            child: RefreshIndicator(
-                color: context.theme.primaryColor,
-                backgroundColor: Colors.white,
-                onRefresh: () async {
-                  final completer = Completer<void>();
+        Padding(
+          padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
+          child: BlocListener<CommunityActivityBloc, CommunityActivityState>(
+            listener: (context, state) {
+              if (state is AcademicYearsLoaded) {
+                // Cập nhật danh sách academic years
+                _academicYears = state.academicYears;
+                final now = DateTime.now();
+                final index = _academicYears.indexWhere((year) =>
+                    now.isAfter(year.startDate) && now.isBefore(year.endDate));
 
-                  final subscription = context
-                      .read<CommunityActivityBloc>()
-                      .stream
-                      .listen((state) {
-                    if (state is UserActivitiesLoaded ||
-                        state is CommunityActivityError) {
-                      if (!completer.isCompleted) {
-                        completer.complete();
-                      }
-                    }
+                setState(() {
+                  // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
+                  selectedIndex =
+                      index != -1 ? index : _academicYears.length - 1;
+                });
+
+                // Load activities với academic year đầu tiên
+                if (_academicYears.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _loadActivities(
+                        1, _academicYears[selectedIndex].id.toString());
                   });
+                }
+              } else if (state is UserActivitiesLoaded) {
+                // Cập nhật academic years nếu có trong response
+                if (state.academicYears.isNotEmpty) {
+                  _academicYears = state.academicYears;
+                }
 
-                  // Refresh với academic year hiện tại
-                  _loadActivitiesWithCurrentYear(_currentPage);
+                // Cập nhật pagination info
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final totalItems = state.pagedActivities.total;
+                  final pageSize = int.parse(state.pagedActivities.limit);
+                  final total = (totalItems / pageSize).ceil();
+                  if (_totalPages != total) {
+                    setState(() {
+                      _totalPages = total;
+                    });
+                  }
+                });
+              }
+            },
+            child: BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+              buildWhen: (previous, current) =>
+                  current is AcademicYearsLoaded ||
+                  current is UserActivitiesLoaded ||
+                  current is CommunityActivityError,
+              builder: (context, state) {
+                if (_academicYears.isNotEmpty) {
+                  return _buildAcademicYearSelector(_academicYears);
+                } else {
+                  return LoadingAcademicYearSelector();
+                }
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding:
+              const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 14.0),
+          child: SearchTextField(
+            controller: _searchController,
+            onFilterPressed: () => _showFilterModal(context),
+            iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
+            textColor:
+                context.theme.grey ?? const Color.fromARGB(255, 75, 62, 62),
+          ),
+        ),
+        BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+            buildWhen: (previous, current) =>
+                current is UserActivitiesLoaded ||
+                current is CommunityActivityError,
+            builder: (context, state) {
+              if (state is UserActivitiesLoaded) {
+                userActivites = state.pagedActivities.activities;
+                final Set<String> statusSet =
+                    selectedStateFilters.map((e) => e).toSet();
+                final String? selectedStatus =
+                    statusSet.isNotEmpty ? statusSet.join(',') : null;
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: context.theme.primaryColor,
+                          backgroundColor: Colors.white,
+                          onRefresh: () async {
+                            final completer = Completer<void>();
 
-                  await completer.future.timeout(
-                    const Duration(seconds: 30),
-                    onTimeout: () {},
-                  );
-
-                  subscription.cancel();
-                },
-                child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(24),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height -
-                            kToolbarHeight -
-                            100,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Academic Year Selector - hiển thị khi đã load được academic years
-                            BlocListener<CommunityActivityBloc,
-                                CommunityActivityState>(
-                              listener: (context, state) {
-                                if (state is AcademicYearsLoaded) {
-                                  // Cập nhật danh sách academic years
-                                  _academicYears = state.academicYears;
-                                  final now = DateTime.now();
-                                  final index = _academicYears.indexWhere(
-                                      (year) =>
-                                          now.isAfter(year.startDate) &&
-                                          now.isBefore(year.endDate));
-
-                                  setState(() {
-                                    // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
-                                    selectedIndex = index != -1
-                                        ? index
-                                        : _academicYears.length - 1;
-                                  });
-
-                                  // Load activities với academic year đầu tiên
-                                  if (_academicYears.isNotEmpty) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
-                                      _loadActivities(
-                                          1,
-                                          _academicYears[selectedIndex]
-                                              .id
-                                              .toString());
-                                    });
-                                  }
-                                } else if (state is UserActivitiesLoaded) {
-                                  // Cập nhật academic years nếu có trong response
-                                  if (state.academicYears.isNotEmpty) {
-                                    _academicYears = state.academicYears;
-                                  }
-
-                                  // Cập nhật pagination info
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    final totalItems =
-                                        state.pagedActivities.total;
-                                    final pageSize =
-                                        int.parse(state.pagedActivities.limit);
-                                    final total =
-                                        (totalItems / pageSize).ceil();
-                                    if (_totalPages != total) {
-                                      setState(() {
-                                        _totalPages = total;
-                                      });
-                                    }
-                                  });
+                            final subscription = context
+                                .read<CommunityActivityBloc>()
+                                .stream
+                                .listen((state) {
+                              if (state is UserActivitiesLoaded ||
+                                  state is CommunityActivityError) {
+                                if (!completer.isCompleted) {
+                                  completer.complete();
                                 }
-                              },
-                              child: BlocBuilder<CommunityActivityBloc,
-                                  CommunityActivityState>(
-                                buildWhen: (previous, current) =>
-                                    current is AcademicYearsLoaded ||
-                                    current is UserActivitiesLoaded ||
-                                    current is CommunityActivityError,
-                                builder: (context, state) {
-                                  if (_academicYears.isNotEmpty) {
-                                    return _buildAcademicYearSelector(
-                                        _academicYears);
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                },
+                              }
+                            });
+
+                            // Refresh với academic year hiện tại
+                            _loadActivitiesWithCurrentYear(_currentPage);
+
+                            await completer.future.timeout(
+                              const Duration(seconds: 30),
+                              onTimeout: () {},
+                            );
+
+                            subscription.cancel();
+                          },
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(
+                                left: 24.0,
+                                right: 24.0,
+                                top: 7.0,
+                                bottom: 16.0),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: MediaQuery.of(context).size.height -
+                                    kToolbarHeight -
+                                    100,
                               ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            // Search Field - chỉ hoạt động khi đã có academic years
-                            SearchTextField(
-                              controller: _searchController,
-                              onFilterPressed: () => _showFilterModal(context),
-                              iconUrl:
-                                  'assets/icons/svg/tabler_filter-search.svg',
-                              textColor: context.theme.grey ??
-                                  const Color.fromARGB(255, 75, 62, 62),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            // Activities List
-                            BlocBuilder<CommunityActivityBloc,
-                                CommunityActivityState>(
-                              buildWhen: (previous, current) =>
-                                  current is UserActivitiesLoaded ||
-                                  current is CommunityActivityError,
-                              builder: (context, state) {
-                                if (state is UserActivitiesLoaded) {
-                                  userActivites =
-                                      state.pagedActivities.activities;
-                                  final Set<String> statusSet =
-                                      selectedStateFilters
-                                          .map((e) => e)
-                                          .toSet();
-                                  final String? selectedStatus =
-                                      statusSet.isNotEmpty
-                                          ? statusSet.join(',')
-                                          : null;
-                                  return Column(children: [
-                                    Column(
-                                      children: userActivites.isNotEmpty
-                                          ? filteredActivities.isNotEmpty
-                                              ? filteredActivities
-                                                  .map((activity) => Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                bottom: 10),
-                                                        child: UserActivityCard(
-                                                          userActivity:
-                                                              activity,
-                                                          keyword:
-                                                              _searchController
-                                                                  .text
-                                                                  .trim(),
-                                                          academicYearId:
-                                                              _academicYears[
-                                                                      selectedIndex]
-                                                                  .id,
-                                                          status:
-                                                              selectedStatus,
-                                                          pageNumber:
-                                                              _currentPage,
-                                                          onRefresh: () {
-                                                            _loadActivitiesWithCurrentYear(
-                                                                _currentPage);
-                                                          },
-                                                        ),
-                                                      ))
-                                                  .toList()
-                                              : [
-                                                  Center(
-                                                      child: Text(
-                                                          'Không tìm thấy hoạt động nào phù hợp với tiêu chí tìm kiếm.',
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              color: context
-                                                                      .theme
-                                                                      .grey ??
-                                                                  Colors.grey)))
-                                                ]
+                              child: IntrinsicHeight(
+                                child: Column(
+                                  spacing: 10,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: userActivites.isNotEmpty
+                                      ? filteredActivities.isNotEmpty
+                                          ? filteredActivities
+                                              .map(
+                                                (activity) => UserActivityCard(
+                                                  userActivity: activity,
+                                                  keyword: _searchController
+                                                      .text
+                                                      .trim(),
+                                                  academicYearId:
+                                                      _academicYears[
+                                                              selectedIndex]
+                                                          .id,
+                                                  status: selectedStatus,
+                                                  pageNumber: _currentPage,
+                                                  onRefresh: () {
+                                                    _loadActivitiesWithCurrentYear(
+                                                        _currentPage);
+                                                  },
+                                                ),
+                                              )
+                                              .toList()
                                           : [
                                               Center(
                                                   child: Text(
-                                                'Không có dữ liệu',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    color: context.theme.grey ??
-                                                        Colors.grey),
-                                              ))
-                                            ],
-                                    ),
-                                    if (userActivites.isNotEmpty)
-                                      _buildPageButtons()
-                                  ]);
-                                } else if (state is CommunityActivityError) {
-                                  return const Center(
-                                    child: Text(
-                                      'Không thể tải dữ liệu hoạt động cộng đồng',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: FontSizes.medium,
-                                      ),
-                                    ),
-                                  );
-                                } else if (_academicYears.isEmpty) {
-                                  return Center(
-                                    child: Text('Đang tải danh sách năm học...',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: context.theme.grey ??
-                                                Colors.grey)),
-                                  );
-                                } else {
-                                  return const SizedBox.shrink();
-                                }
-                              },
-                            )
-                          ],
+                                                      'Không tìm thấy hoạt động nào phù hợp với tiêu chí tìm kiếm.',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color: context
+                                                                  .theme.grey ??
+                                                              Colors.grey)))
+                                            ]
+                                      : [
+                                          Center(
+                                              child: Text(
+                                            'Không có dữ liệu',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: context.theme.grey ??
+                                                    Colors.grey),
+                                          ))
+                                        ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ))))
+                      if (userActivites.isNotEmpty) _buildPageButtons()
+                    ],
+                  ),
+                );
+              } else if (state is CommunityActivityError) {
+                return const Center(
+                  child: Text(
+                    'Không thể tải dữ liệu hoạt động cộng đồng',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                    ),
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
       ],
     ));
   }
@@ -401,15 +367,18 @@ class _UserActivitiesState extends State<UserActivities> {
   }
 
   Widget _buildPageButtons() {
-    return Pagination(
-      currentPage: _currentPage,
-      totalPages: _totalPages,
-      onPageChanged: (int page) {
-        setState(() {
-          _currentPage = page;
-        });
-        _loadActivitiesWithCurrentYear(_currentPage);
-      },
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
+      child: Pagination(
+        currentPage: _currentPage,
+        totalPages: _totalPages,
+        onPageChanged: (int page) {
+          setState(() {
+            _currentPage = page;
+          });
+          _loadActivitiesWithCurrentYear(_currentPage);
+        },
+      ),
     );
   }
 

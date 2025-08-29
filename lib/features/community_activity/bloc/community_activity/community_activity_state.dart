@@ -46,9 +46,9 @@ class ProofSubmitted extends CommunityActivityState {
 }
 
 class UserProofsLoaded extends CommunityActivityState {
-  final ProofsPagedModel userProofs;
+  final ProofsPagedModel pagedUserProofs;
 
-  UserProofsLoaded(this.userProofs);
+  UserProofsLoaded(this.pagedUserProofs);
 }
 
 class UserScoresLoaded extends CommunityActivityState {

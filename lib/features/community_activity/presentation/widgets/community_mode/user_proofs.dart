@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
-import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart'
-    show CustomLoadingIndicator;
+import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
@@ -140,177 +139,172 @@ class _UserProofsState extends State<UserProofs> {
               }
               return const SizedBox.shrink();
             }),
-        Expanded(
-          child: RefreshIndicator(
-            color: context.theme.primaryColor,
-            backgroundColor: Colors.white,
-            onRefresh: () async {
-              final completer = Completer<void>();
+        Padding(
+          padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
+          child: BlocListener<CommunityActivityBloc, CommunityActivityState>(
+            listener: (context, state) {
+              if (state is AcademicYearsLoaded) {
+                // Cập nhật danh sách academic years
+                _academicYears = state.academicYears;
 
-              // Listen để biết khi nào refresh hoàn tất
-              final subscription =
-                  context.read<CommunityActivityBloc>().stream.listen((state) {
-                if (state is UserProofsLoaded ||
-                    state is CommunityActivityError) {
-                  if (!completer.isCompleted) {
-                    completer.complete();
-                  }
+                final now = DateTime.now();
+                final index = _academicYears.indexWhere((year) =>
+                    now.isAfter(year.startDate) && now.isBefore(year.endDate));
+
+                setState(() {
+                  // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
+                  selectedIndex =
+                      index != -1 ? index : _academicYears.length - 1;
+                });
+
+                // Load activities với academic year đầu tiên
+                if (_academicYears.isNotEmpty) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _loadProofs(1, _academicYears[selectedIndex].id.toString());
+                  });
                 }
-              });
-
-              _loadProofsWithCurrentYear(_currentPage);
-
-              // Đợi cho đến khi có kết quả
-              await completer.future.timeout(
-                Duration(seconds: 30),
-              );
-
-              subscription.cancel();
+              } else if (state is UserProofsLoaded) {
+                // Cập nhật pagination info
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final totalItems = state.pagedUserProofs.total;
+                  final pageSize = int.parse(state.pagedUserProofs.limit);
+                  final total = (totalItems / pageSize).ceil();
+                  if (_totalPages != total) {
+                    setState(() {
+                      _totalPages = total;
+                    });
+                  }
+                });
+              }
             },
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height -
-                      kToolbarHeight - // nếu có AppBar
-                      100,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BlocListener<CommunityActivityBloc,
-                          CommunityActivityState>(
-                        listener: (context, state) {
-                          if (state is AcademicYearsLoaded) {
-                            // Cập nhật danh sách academic years
-                            _academicYears = state.academicYears;
-                            final now = DateTime.now();
-                            final index = _academicYears.indexWhere((year) =>
-                                now.isAfter(year.startDate) &&
-                                now.isBefore(year.endDate));
-
-                            setState(() {
-                              // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
-                              selectedIndex = index != -1
-                                  ? index
-                                  : _academicYears.length - 1;
-                            });
-
-                            // Load activities với academic year đầu tiên
-                            if (_academicYears.isNotEmpty) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                _loadProofs(
-                                    1,
-                                    _academicYears[selectedIndex]
-                                        .id
-                                        .toString());
-                              });
-                            }
-                          }
-                        },
-                        child: BlocBuilder<CommunityActivityBloc,
-                            CommunityActivityState>(
-                          buildWhen: (previous, current) =>
-                              current is AcademicYearsLoaded ||
-                              current is UserProofsLoaded ||
-                              current is CommunityActivityError,
-                          builder: (context, state) {
-                            if (_academicYears.isNotEmpty) {
-                              return _buildAcademicYearSelector(_academicYears);
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SearchTextField(
-                          controller: _searchController,
-                          onFilterPressed: () => _showFilterModal(context),
-                          iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
-                          textColor: context.theme.grey ?? Colors.grey),
-                      const SizedBox(height: 20),
-                      BlocBuilder<CommunityActivityBloc,
-                              CommunityActivityState>(
-                          buildWhen: (previous, current) =>
-                              current is UserProofsLoaded ||
-                              current is CommunityActivityError,
-                          builder: (context, state) {
-                            if (state is UserProofsLoaded) {
-                              userProofs = state.userProofs.proofs;
-                              return Column(children: [
-                                Column(
-                                  children: userProofs.isNotEmpty
-                                      ? filteredProofs.isNotEmpty
-                                          ? filteredProofs
-                                              .map((proof) => Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 10),
-                                                    child: UserProofCard(
-                                                      nameActivity: proof
-                                                          .userActivity
-                                                          .activity
-                                                          .name,
-                                                      score: proof.userActivity
-                                                          .activity.score,
-                                                      status: proof
-                                                          .userActivity.status,
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pushNamed(
-                                                                Routes
-                                                                    .detailUserProof,
-                                                                arguments:
-                                                                    proof);
-                                                      },
-                                                    ),
-                                                  ))
-                                              .toList()
-                                          : [
-                                              Center(
-                                                  child: Text(
-                                                      'Không tìm thấy minh chứng nào phù hợp với tiêu chí tìm kiếm.',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: context
-                                                                  .theme.grey ??
-                                                              Colors.grey)))
-                                            ]
-                                      : [
-                                          Center(
-                                              child: Text(
-                                            'Không có dữ liệu',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: context.theme.grey ??
-                                                    Colors.grey),
-                                          ))
-                                        ],
-                                ),
-                                if (userProofs.isNotEmpty) _buildPageButtons()
-                              ]);
-                            } else if (state is CommunityActivityError) {
-                              return Center(
-                                  child: Text(
-                                      'Không thể tải dữ liệu minh chứng của tôi',
-                                      style: TextStyle(
-                                          color: context.theme.grey ??
-                                              Colors.grey)));
-                            } else {
-                              return const SizedBox.shrink();
-                            }
-                          })
-                    ],
-                  ),
-                ),
-              ),
+            child: BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+              buildWhen: (previous, current) =>
+                  current is AcademicYearsLoaded ||
+                  current is UserProofsLoaded ||
+                  current is CommunityActivityError,
+              builder: (context, state) {
+                if (_academicYears.isNotEmpty) {
+                  return _buildAcademicYearSelector(_academicYears);
+                } else {
+                  return LoadingAcademicYearSelector();
+                }
+              },
             ),
           ),
-        )
+        ),
+        Padding(
+          padding:
+              const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 14.0),
+          child: SearchTextField(
+              controller: _searchController,
+              onFilterPressed: () => _showFilterModal(context),
+              iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
+              textColor: context.theme.grey ?? Colors.grey),
+        ),
+        BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+          buildWhen: (previous, current) =>
+              current is UserProofsLoaded || current is CommunityActivityError,
+          builder: (context, state) {
+            if (state is UserProofsLoaded) {
+              userProofs = state.pagedUserProofs.proofs;
+              return Expanded(
+                  child: Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      color: context.theme.primaryColor,
+                      backgroundColor: Colors.white,
+                      onRefresh: () async {
+                        final completer = Completer<void>();
+
+                        // Listen để biết khi nào refresh hoàn tất
+                        final subscription = context
+                            .read<CommunityActivityBloc>()
+                            .stream
+                            .listen((state) {
+                          if (state is UserProofsLoaded ||
+                              state is CommunityActivityError) {
+                            if (!completer.isCompleted) {
+                              completer.complete();
+                            }
+                          }
+                        });
+
+                        _loadProofsWithCurrentYear(_currentPage);
+
+                        // Đợi cho đến khi có kết quả
+                        await completer.future.timeout(
+                          Duration(seconds: 30),
+                        );
+
+                        subscription.cancel();
+                      },
+                      child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(
+                            left: 24.0, right: 24.0, top: 7.0, bottom: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 10,
+                          children: userProofs.isNotEmpty
+                              ? filteredProofs.isNotEmpty
+                                  ? filteredProofs
+                                      .map(
+                                        (proof) => UserProofCard(
+                                          nameActivity:
+                                              proof.userActivity.activity.name,
+                                          score:
+                                              proof.userActivity.activity.score,
+                                          status: proof.userActivity.status,
+                                          onPressed: () {
+                                            Navigator.of(context).pushNamed(
+                                                Routes.detailUserProof,
+                                                arguments: proof);
+                                          },
+                                        ),
+                                      )
+                                      .toList()
+                                  : [
+                                      Center(
+                                          child: Text(
+                                              'Không tìm thấy minh chứng nào phù hợp với tiêu chí tìm kiếm.',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: context.theme.grey ??
+                                                      Colors.grey)))
+                                    ]
+                              : [
+                                  Center(
+                                      child: Text(
+                                    'Không có dữ liệu',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color:
+                                            context.theme.grey ?? Colors.grey),
+                                  ))
+                                ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (userProofs.isNotEmpty) _buildPageButtons()
+                ],
+              ));
+            } else if (state is CommunityActivityError) {
+              return const Center(
+                child: Text(
+                  'Không thể tải dữ liệu minh chứng của tôi',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: FontSizes.medium,
+                  ),
+                ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
       ],
     ));
   }
@@ -556,15 +550,18 @@ class _UserProofsState extends State<UserProofs> {
   }
 
   Widget _buildPageButtons() {
-    return Pagination(
-      currentPage: _currentPage,
-      totalPages: _totalPages,
-      onPageChanged: (int page) {
-        setState(() {
-          _currentPage = page;
-        });
-        _loadProofsWithCurrentYear(_currentPage);
-      },
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
+      child: Pagination(
+        currentPage: _currentPage,
+        totalPages: _totalPages,
+        onPageChanged: (int page) {
+          setState(() {
+            _currentPage = page;
+          });
+          _loadProofsWithCurrentYear(_currentPage);
+        },
+      ),
     );
   }
 }

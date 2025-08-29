@@ -129,148 +129,143 @@ class _AllActivitiesState extends State<AllActivities> {
               return const SizedBox.shrink();
             },
           ),
-          Expanded(
-              child: RefreshIndicator(
-            color: context.theme.primaryColor,
-            backgroundColor: Colors.white,
-            onRefresh: () async {
-              final completer = Completer<void>();
+          BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+            buildWhen: (previous, current) =>
+                current is AllActivitiesLoaded ||
+                current is CommunityActivityError,
+            builder: (context, state) {
+              if (state is AllActivitiesLoaded) {
+                activities = state.pagedActivities.activities;
 
-              // Listen để biết khi nào refresh hoàn tất
-              final subscription =
-                  context.read<CommunityActivityBloc>().stream.listen((state) {
-                if (state is AllActivitiesLoaded ||
-                    state is CommunityActivityError) {
-                  if (!completer.isCompleted) {
-                    completer.complete();
-                  }
-                }
-              });
+                final totalItems = state.pagedActivities.total;
+                final pageSize = int.parse(state.pagedActivities.limit);
+                _totalPages = (totalItems / pageSize).ceil();
+                categoryFilters = state.categories;
 
-              _loadActivities(_currentPage);
+                final Set<String> categoryIdSet =
+                    selectedCategoryFilters.map((e) => e.id).toSet();
+                final String? categoryIds =
+                    categoryIdSet.isNotEmpty ? categoryIdSet.join(',') : null;
 
-              // Đợi cho đến khi có kết quả
-              await completer.future.timeout(
-                Duration(seconds: 30),
-                onTimeout: () {
-                  // Handle timeout nếu cần
-                },
-              );
-
-              subscription.cancel();
-            },
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height -
-                      kToolbarHeight - // nếu có AppBar
-                      100, // hoặc một giá trị ước lượng cho phần header đã chiếm chỗ
-                ),
-                child: IntrinsicHeight(
+                final String? selectedStatus =
+                    selectedCategoryFilters.isNotEmpty
+                        ? selectedCategoryFilters.join(',')
+                        : null;
+                return Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SearchTextField(
-                        controller: _searchController,
-                        onFilterPressed: () => _showFilterModal(context),
-                        iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
-                        textColor: context.theme.grey ?? Colors.grey,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 24, left: 24, right: 24, bottom: 7.0),
+                        child: SearchTextField(
+                          controller: _searchController,
+                          onFilterPressed: () => _showFilterModal(context),
+                          iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
+                          textColor: context.theme.grey ?? Colors.grey,
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      BlocBuilder<CommunityActivityBloc,
-                          CommunityActivityState>(
-                        buildWhen: (previous, current) =>
-                            current is AllActivitiesLoaded ||
-                            current is CommunityActivityError,
-                        builder: (context, state) {
-                          if (state is AllActivitiesLoaded) {
-                            activities = state.pagedActivities.activities;
+                      Expanded(
+                          child: RefreshIndicator(
+                        color: context.theme.primaryColor,
+                        backgroundColor: Colors.white,
+                        onRefresh: () async {
+                          final completer = Completer<void>();
 
-                            final totalItems = state.pagedActivities.total;
-                            final pageSize =
-                                int.parse(state.pagedActivities.limit);
-                            _totalPages = (totalItems / pageSize).ceil();
-                            categoryFilters = state.categories;
+                          // Listen để biết khi nào refresh hoàn tất
+                          final subscription = context
+                              .read<CommunityActivityBloc>()
+                              .stream
+                              .listen((state) {
+                            if (state is AllActivitiesLoaded ||
+                                state is CommunityActivityError) {
+                              if (!completer.isCompleted) {
+                                completer.complete();
+                              }
+                            }
+                          });
 
-                            final Set<String> categoryIdSet =
-                                selectedCategoryFilters
-                                    .map((e) => e.id)
-                                    .toSet();
-                            final String? categoryIds = categoryIdSet.isNotEmpty
-                                ? categoryIdSet.join(',')
-                                : null;
+                          _loadActivities(_currentPage);
 
-                            final String? selectedStatus =
-                                selectedCategoryFilters.isNotEmpty
-                                    ? selectedCategoryFilters.join(',')
-                                    : null;
-                            return Column(
-                              children: [
-                                Column(
-                                  children: activities.isNotEmpty
-                                      ? activities
-                                          .map((activity) => Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 10),
-                                                child: ActivityCard(
-                                                  activity: activity,
-                                                  authToken: widget.authToken,
-                                                  keyword: _searchController
-                                                      .text
-                                                      .trim(),
-                                                  pageOfItem: _currentPage,
-                                                  status: selectedStatus,
-                                                  categoryIds: categoryIds,
-                                                  startDate: startDateFilter,
-                                                  endDate: endDateFilter,
-                                                  minScrore: _currentRange.start
-                                                      .toInt(),
-                                                  maxScore:
-                                                      _currentRange.end.toInt(),
-                                                ),
-                                              ))
-                                          .toList()
-                                      : [
-                                          Center(
-                                              child: Text(
-                                                  'Hiện chưa có hoạt động nào được tổ chức.',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color:
-                                                          context.theme.grey ??
-                                                              Colors.grey)))
-                                        ],
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: activities.isNotEmpty
-                                      ? [_buildPageButtons()]
-                                      : [const SizedBox.shrink()],
-                                ),
-                                const SizedBox(height: 8),
-                              ],
-                            );
-                          } else if (state is CommunityActivityError) {
-                            return Center(
-                                child: Text(
-                                    'Không thể tải dữ liệu hoạt động cộng đồng',
-                                    style: TextStyle(
-                                        color: context.theme.grey ??
-                                            Colors.grey)));
-                          } else {
-                            return const SizedBox.shrink();
-                          }
+                          // Đợi cho đến khi có kết quả
+                          await completer.future.timeout(
+                            Duration(seconds: 30),
+                            onTimeout: () {
+                              // Handle timeout nếu cần
+                            },
+                          );
+
+                          subscription.cancel();
                         },
+                        child: SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: MediaQuery.of(context).size.height -
+                                  kToolbarHeight - // nếu có AppBar
+                                  100, // hoặc một giá trị ước lượng cho phần header đã chiếm chỗ
+                            ),
+                            child: IntrinsicHeight(
+                                child: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 7.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: activities.isNotEmpty
+                                    ? activities
+                                        .map(
+                                          (activity) => ActivityCard(
+                                            activity: activity,
+                                            authToken: widget.authToken,
+                                            keyword:
+                                                _searchController.text.trim(),
+                                            pageOfItem: _currentPage,
+                                            status: selectedStatus,
+                                            categoryIds: categoryIds,
+                                            startDate: startDateFilter,
+                                            endDate: endDateFilter,
+                                            minScrore:
+                                                _currentRange.start.toInt(),
+                                            maxScore: _currentRange.end.toInt(),
+                                          ),
+                                        )
+                                        .toList()
+                                    : [
+                                        Center(
+                                            child: Text(
+                                                'Hiện chưa có hoạt động nào được tổ chức.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: context.theme.grey ??
+                                                        Colors.grey)))
+                                      ],
+                              ),
+                            )),
+                          ),
+                        ),
+                      )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 16.0, bottom: 24, left: 24, right: 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: activities.isNotEmpty
+                              ? [_buildPageButtons()]
+                              : [const SizedBox.shrink()],
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-          )),
+                );
+              } else if (state is CommunityActivityError) {
+                return Center(
+                    child: Text('Không thể tải dữ liệu hoạt động cộng đồng',
+                        style: TextStyle(
+                            color: context.theme.grey ?? Colors.grey)));
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
         ],
       ),
     );
