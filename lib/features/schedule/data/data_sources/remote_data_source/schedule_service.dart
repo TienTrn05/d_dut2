@@ -551,4 +551,35 @@ class ScheduleService {
       rethrow;
     }
   }
+
+  Future<List<String>> getListStudentForNotiByUos(
+    String token,
+    String idUOS,
+  ) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/UOS/GetListStudentsForNotiByUos",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        queryParameters: {"idUos": idUOS},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['data'];
+
+        // map sang list email
+        return data
+            .map((e) => (e as Map<String, dynamic>)['studentMail'] as String)
+            .toList();
+      } else {
+        throw Exception(
+          "Failed to load list students for notification: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Error fetching list students for notification: $e");
+      throw Exception("Failed to fetch list students for notification: $e");
+    }
+  }
 }

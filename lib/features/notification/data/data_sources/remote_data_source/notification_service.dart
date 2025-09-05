@@ -86,4 +86,34 @@ class NotificationService {
       rethrow;
     }
   }
+
+  Future<void> sendNotificationToMultiUsers(
+    String token, {
+    required List<String> userIds,
+    required String title,
+    required String body,
+    String? link,
+  }) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/notifications/send-multi-notifications",
+        data: {
+          "userIds": userIds,
+          "title": title,
+          "body": body,
+          if (link != null) "link": link,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception("Failed to send notifications: ${response.data}");
+      }
+    } catch (e) {
+      logger.e("Error sending notifications: $e");
+      rethrow;
+    }
+  }
 }

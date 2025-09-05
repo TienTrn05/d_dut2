@@ -8,6 +8,7 @@ import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/list_absent/list_absent_bloc.dart';
+import 'package:e_dut/features/schedule/bloc/notification/noti_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_absent/uos_absent_bloc.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
@@ -21,6 +22,8 @@ import 'package:e_dut/features/schedule/presentation/widgets/item/edit_field_ite
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../notification/domain/repositories/notification_repository.dart';
 
 class DetailUOSTeacherScreen extends StatefulWidget {
   final String idUos;
@@ -47,7 +50,6 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
 
   String currentLink = "";
 
-  List<NotiModel> notifications = NotiModel.mockData;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
@@ -84,14 +86,14 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
         dialog.AlertDialogType.delete,
         onConfirm: () => setState(() {
-              notifications.removeAt(index);
+              // notifications.removeAt(index);
             }),
         textConfirm: "Xóa");
   }
 
-  void _showCreatNewNoti(BuildContext context) {
+  void _showCreatNewNoti(BuildContext contextOuter, String idUos, String authToken) {
     showModalBottomSheet(
-      context: context,
+      context: contextOuter,
       isScrollControlled: true,
       showDragHandle: true,
       shape: RoundedRectangleBorder(
@@ -119,39 +121,45 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                   'Bạn có chắc chắn muốn lưu thông báo: $truncatedTitle?',
                   dialog.AlertDialogType.confirm,
                   onConfirm: () => {
-                        setState(() {
-                          notifications.insert(0, newItem);
-                        }),
+                        // setState(() {
+                        //   notifications.insert(0, newItem);
+                        // }),
+                        contextOuter
+                            .read<NotiBloc>()
+                            .add(AddNotiEvent(newItem, idUos, authToken)),
                         Navigator.pop(context)
                       },
                   textConfirm: "Lưu");
             }
           }
 
-          return BottomModal(
-              title: "Thêm thông báo mới",
-              enabledMainAction: title.isNotEmpty && content.isNotEmpty,
-              mainAction: addNotification,
-              onClose: () {
-                _titleController.clear();
-                _contentController.clear();
-              },
-              child: Column(
-                children: [
-                  EditFieldItem(
-                    field: "Tiêu đề",
-                    controller: _titleController,
-                    minLine: 1,
-                    maxLine: 2,
-                  ),
-                  const SizedBox(height: 10),
-                  EditFieldItem(
-                    field: "Nội dung",
-                    controller: _contentController,
-                    minLine: 3,
-                  )
-                ],
-              ));
+          return SafeArea(
+            top: false,
+            child: BottomModal(
+                title: "Thêm thông báo mới",
+                enabledMainAction: title.isNotEmpty && content.isNotEmpty,
+                mainAction: addNotification,
+                onClose: () {
+                  _titleController.clear();
+                  _contentController.clear();
+                },
+                child: Column(
+                  children: [
+                    EditFieldItem(
+                      field: "Tiêu đề",
+                      controller: _titleController,
+                      minLine: 1,
+                      maxLine: 2,
+                    ),
+                    const SizedBox(height: 10),
+                    EditFieldItem(
+                      field: "Nội dung",
+                      controller: _contentController,
+                      minLine: 3,
+                    )
+                  ],
+                )),
+          );
         });
       },
     ).whenComplete(() {
@@ -179,7 +187,12 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
             BlocProvider(
                 create: (_) => UosAbsentBloc(getIt.get<ScheduleRepository>())),
             BlocProvider(
-                create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()))
+                create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>())),
+            BlocProvider(
+                create: (_) => NotiBloc(
+                      getIt.get<NotificationRepository>(),
+                      getIt.get<ScheduleRepository>(),
+                    )..add(LoadNotiEvent())),
           ],
           child: DefaultTabController(
             length: 3,
@@ -263,10 +276,15 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                               setIsNotChecked: setIsNotChecking,
                                               setIsCheckAbsent:
                                                   setIsCheckAbsent),
-                                          UosNotiTab(
-                                            notifications: notifications,
-                                            onDelete: _deleteNotification,
-                                          )
+                                          BlocBuilder<NotiBloc, NotiState>(
+                                              builder: (context, state) {
+                                            return UosNotiTab(
+                                              notifications:
+                                                  state.notifications,
+                                              uosDetail: uosFullInfo.uosDetail,
+                                              onDelete: _deleteNotification,
+                                            );
+                                          })
                                         ],
                                       ),
                                     ),
@@ -397,25 +415,38 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                       ],
                     )
                   : _tabController.index == 2
-                      ? Container(
-                          decoration:
-                              BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 4,
-                              spreadRadius: 0,
-                              offset: const Offset(2, 5),
-                            )
-                          ]),
-                          child: FloatingActionButton(
-                            elevation: 0,
-                            onPressed: () => _showCreatNewNoti(context),
-                            backgroundColor: context.theme.primaryColor,
-                            shape: const CircleBorder(),
-                            child: const Icon(Icons.add_rounded,
-                                size: 28, color: Colors.white),
-                          ),
-                        )
+                      ? BlocBuilder<UosDetailBloc, UosDetailState>(
+                          builder: (infoContext, infoState) {
+                          if (infoState is UosDetailLoading) {
+                            return SizedBox.shrink();
+                          } else if (infoState is FullInfoUosLoaded) {
+                            final uosFullInfo = infoState.fullInfoUosDetail;
+                            return Container(
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.25),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                      offset: const Offset(2, 5),
+                                    )
+                                  ]),
+                              child: FloatingActionButton(
+                                elevation: 0,
+                                onPressed: () => _showCreatNewNoti(infoContext,
+                                    uosFullInfo.uosDetail.idUnitOfStudy, authToken),
+                                backgroundColor: context.theme.primaryColor,
+                                shape: const CircleBorder(),
+                                child: const Icon(Icons.add_rounded,
+                                    size: 28, color: Colors.white),
+                              ),
+                            );
+                          } else {
+                            return SizedBox.shrink();
+                          }
+                        })
                       : null,
             ),
           ));
