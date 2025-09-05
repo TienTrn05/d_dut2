@@ -4,11 +4,14 @@ import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 
+import '../../../data/model/unit_of_study/uos_detail_model.dart';
+
 class UosNotiTab extends StatelessWidget {
+  final UosDetailModel uosDetail;
   final List<NotiModel> notifications;
   final Function(int, String) onDelete;
   const UosNotiTab(
-      {super.key, required this.notifications, required this.onDelete});
+      {super.key, required this.uosDetail, required this.notifications, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {

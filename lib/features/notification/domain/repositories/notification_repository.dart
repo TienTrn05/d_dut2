@@ -38,4 +38,24 @@ class NotificationRepository {
       throw Exception('Failed to load general notifications: $e');
     }
   }
+
+  Future<void> sendNotificationToMultiUsers(
+    String token, {
+    required List<String> userIds,
+    required String title,
+    required String body,
+    String? link,
+  }) async {
+    try {
+      await _notificationService.sendNotificationToMultiUsers(
+        "token",
+        userIds: userIds,
+        title: title,
+        body: body,
+        link: link,
+      );
+    } catch (e) {
+      throw Exception('Failed to send notification: $e');
+    }
+  }
 }

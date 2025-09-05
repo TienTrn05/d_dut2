@@ -112,4 +112,8 @@ class ScheduleRepository {
     return _scheduleService.updateMsTeamsInfo(
         token, idUOS, msTeamCode, msTeamLink);
   }
+
+  Future<List<String>> getListStudentForNotiByUos(String idUos, String authToken) {
+    return _scheduleService.getListStudentForNotiByUos(authToken, idUos);
+  }
 }
