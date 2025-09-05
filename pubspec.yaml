@@ -88,6 +88,8 @@ flutter:
     - assets/images/
     - assets/icons/logo_full.png
     - assets/icons/svg/logo_dut.svg
+    - assets/icons/svg/dDUT.svg
+    - assets/icons/svg/bg_pattern.svg
 
 flutter_native_splash:
   color: '#FFFFFF'
