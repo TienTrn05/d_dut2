@@ -74,11 +74,31 @@ class _AuthScreenState extends State<AuthScreen> {
                   curve: Curves.easeOut,
                   child: Padding(
                     padding: EdgeInsets.only(top: 92),
-                    child: SvgPicture.asset(
-                      "assets/icons/svg/dDUT.svg",
-                      width: 92,
-                      height: 92,
-                      color: Colors.white,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/svg/dDUT_d.svg",
+                          width: 92,
+                          height: 92,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 8,),
+                        SvgPicture.asset(
+                          "assets/icons/svg/dDUT_u.svg",
+                          width: 52,
+                          height: 52,
+                          color: Color(0xFFFFFF01),
+                        ),
+                        SizedBox(width: 8,),
+                        SvgPicture.asset(
+                          "assets/icons/svg/dDUT_t.svg",
+                          width: 52,
+                          height: 52,
+                          color: Color(0xFFCC0102),
+                        ),
+                      ],
                     ),
                   ),
                 ),
