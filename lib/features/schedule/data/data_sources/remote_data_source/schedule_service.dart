@@ -87,6 +87,7 @@ class ScheduleService {
 
   Future<List<ScheduleItemModel>> getSchedulesByDate(
       DateTime inputDate, bool isTeacher, String authToken) async {
+    logger.d(authToken);
     try {
       dynamic response;
       if (isTeacher) {

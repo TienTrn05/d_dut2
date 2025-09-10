@@ -1,5 +1,4 @@
 import 'package:e_dut/core/bloc/notification_settings/notification_settings_bloc.dart';
-import 'package:e_dut/features/notification/bloc/notifications_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';

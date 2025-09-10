@@ -4,6 +4,7 @@ import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/homeroom/data/model/homeroom_model.dart';
+import 'package:e_dut/features/homeroom/presentation/widgets/custom/cohort_selector.dart';
 import 'package:e_dut/features/homeroom/presentation/widgets/items/homeroom_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +34,7 @@ class ListHomeroomScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 20.0,
               children: [
+                // CohortSelector(cohortList: cohortList, currentCohort: currentCohort, onPrevious: onPrevious, onNext: onNext, onPickerSelected: onPickerSelected),
                 Text(
                   "${homerooms.length} lớp chủ nhiệm",
                   style: TextStyle(
