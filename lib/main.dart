@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'common/extensions/custom_theme_extension.dart';
 import 'common/routes/routes.dart';
 import 'common/utils/app_environment.dart';
 import 'common/utils/getit_utils.dart';
-import 'common/utils/custom_http_overrides.dart';
 import 'core/data/local/storage.dart';
 import 'core/services/navigation_service.dart';
 
@@ -28,23 +26,28 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
 
-void main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   await AppEnvironment.setup();
   await Storage.setup();
   await GetItUtils.setup();
 
-  // Khởi tạo NotificationService
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   await NotificationService().init();
-  // Đăng ký các handler cho FCM
   NotificationService().registerMessageHandlers();
 
   final UserModel? userData = Storage.user;
 
-  HttpOverrides.global = CustomHttpOverrides();
-  runApp(MyApp(
-    navigatorKey,
-    userData: userData,
-  ));
+  runApp(
+    MyApp(
+      navigatorKey,
+      userData: userData,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -52,19 +55,22 @@ class MyApp extends StatelessWidget {
   final UserModel? userData;
 
   const MyApp(this.navigatorKey, {super.key, this.userData});
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthBloc(navigatorKey,
-              getIt.get<AuthRepository>(), getIt.get<NotificationRepository>())
-            ..add(AuthInitRequested()),
+          create: (context) => AuthBloc(
+            navigatorKey,
+            getIt.get<AuthRepository>(),
+            getIt.get<NotificationRepository>(),
+          )..add(AuthInitRequested()),
         ),
         BlocProvider(create: (context) => LoadingBloc()),
         BlocProvider(
-          create: (context) => NotificationSettingsBloc()
-            ..add(LoadNotificationSettings()),
+          create: (context) =>
+              NotificationSettingsBloc()..add(LoadNotificationSettings()),
         ),
       ],
       child: MaterialApp(
@@ -75,7 +81,7 @@ class MyApp extends StatelessWidget {
           extensions: [CustomThemeExtension.lightMode],
           textTheme: Theme.of(context).textTheme.apply(
                 fontSizeFactor: 1,
-                fontSizeDelta: -0.0,
+                fontSizeDelta: 0.0,
               ),
           scaffoldBackgroundColor: Colors.white,
         ),

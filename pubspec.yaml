@@ -16,6 +16,11 @@ dependencies:
   equatable: ^2.0.7
   dio: ^5.8.0+1
 
+  # new dependencies
+  fl_chart: 1.0.0
+  fluentui_system_icons: ^1.1.219
+  file_picker: ^10.3.1
+
   #state management
   flutter_bloc: ^9.0.0
   dartx: ^1.2.0
@@ -60,6 +65,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
 
   device_info_plus: ^11.5.0
+  bloc: ^9.0.0
 
 dev_dependencies:
   flutter_test:
@@ -95,7 +101,7 @@ flutter:
     - assets/icons/svg/dDUT_t.svg
 
 flutter_native_splash:
-  color: '#FFFFFF'
+  color: "#FFFFFF"
   image: assets/icons/logo_full.png # Logo splash
   android: true
   ios: true
@@ -105,5 +111,5 @@ flutter_native_splash:
   ios_content_mode: scaleAspectFit
 
   android_12:
-    color: '#FFFFFF'
+    color: "#FFFFFF"
     image: assets/icons/logo_full.png
