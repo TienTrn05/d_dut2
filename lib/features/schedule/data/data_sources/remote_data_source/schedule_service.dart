@@ -14,6 +14,8 @@ import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
+import '../../model/noti_model.dart' show NotiModel;
+
 @injectable
 class ScheduleService {
   final String _url;
@@ -581,6 +583,94 @@ class ScheduleService {
     } catch (e) {
       logger.e("Error fetching list students for notification: $e");
       throw Exception("Failed to fetch list students for notification: $e");
+    }
+  }
+
+  Future<String> createNotificationByIdUOS(
+      String token, String idUos, String title, String content) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/Notification/CreateNotificationByIdUOS",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        data: {"IdUnitOfStudy": idUos, "Title": title, "Content": content},
+      );
+
+      if (response.statusCode == 200) {
+        final String data = response.data['data'];
+
+        // notificationId
+        return data;
+      } else {
+        throw Exception(
+          "Failed to create notification by IdUOS: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Failed to create notification by IdUOS: $e");
+      throw Exception("Failed to create notification by IdUOS: $e");
+    }
+  }
+
+  Future<List<NotiModel>> getNotificationByIdUOS(
+    String token,
+    String idUOS,
+  ) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/Notification/GetNotificationByIdUOS",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        queryParameters: {"idUos": idUOS},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['data'];
+
+        // map sang list
+        return data
+            .map((e) => NotiModel(
+                id: e['idNotification'],
+                title: e['title'],
+                content: e['content'],
+                date: DateTime.parse(e['createdDate'])))
+            .toList();
+      } else {
+        throw Exception(
+          "Failed to get notification by IdUOS: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Error fetching notification by IdUOS: $e");
+      throw Exception("Failed to fetch notification by IdUOS: $e");
+    }
+  }
+
+  Future<String> deleteNotification(String token, String idNotification) async {
+    try {
+      final response = await _apiClient.dio.put(
+        "$_url/api/Notification/DeleteNotification",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        queryParameters: {"idNotification": idNotification},
+      );
+
+      if (response.statusCode == 200) {
+        final String data = response.data['data'];
+
+        // notificationId
+        return data;
+      } else {
+        throw Exception(
+          "Failed to delete notification by IdUOS: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Failed to delete notification by IdUOS: $e");
+      throw Exception("Failed to delete notification by IdUOS: $e");
     }
   }
 }
