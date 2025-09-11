@@ -9,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../root/bloc/root_bloc.dart';
 import '../bloc/dashboard_bloc.dart';
@@ -24,12 +23,8 @@ import './widgets/feature_card_skeleton.dart';
 import './widgets/header.dart';
 
 import '../../auth/data/model/scope_model.dart';
-
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
-
-import '../../academic/presentation/results.dart';
-import '../../academic/presentation/statistics.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -45,34 +40,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
     initializeDateFormatting();
   }
 
-  String _resolveApiBase() {
-    const apiEnv = String.fromEnvironment('API_BASE', defaultValue: '');
-    if (apiEnv.isNotEmpty) return apiEnv;
+  String _extractStudentId(dynamic userData) {
+    String? v;
     try {
-      return dotenv.env['API_BASE'] ?? '';
-    } catch (_) {
-      return '';
-    }
+      v = userData.studentId as String?;
+    } catch (_) {}
+    v ??= (() {
+      try {
+        return userData.studentCode as String?;
+      } catch (_) {}
+      return null;
+    })();
+    v ??= (() {
+      try {
+        return userData.code as String?;
+      } catch (_) {}
+      return null;
+    })();
+    v ??= (() {
+      try {
+        return userData.userPrincipalName as String?;
+      } catch (_) {}
+      return null;
+    })();
+
+    if (v == null || v.trim().isEmpty) return '';
+    final local = v.contains('@') ? v.split('@').first : v;
+    final digits =
+        RegExp(r'\d+').allMatches(local).map((m) => m.group(0)!).join();
+    return digits;
   }
 
-  String _extractStudentId(dynamic userData) {
-    try {
-      final v = userData.studentId as String?;
-      if (v != null && v.isNotEmpty) return v;
-    } catch (_) {}
-    try {
-      final v = userData.studentCode as String?;
-      if (v != null && v.isNotEmpty) return v;
-    } catch (_) {}
-    try {
-      final v = userData.code as String?;
-      if (v != null && v.isNotEmpty) return v;
-    } catch (_) {}
-    try {
-      final v = userData.userPrincipalName as String?;
-      if (v != null && v.isNotEmpty) return v;
-    } catch (_) {}
-    return '';
+  void _openAcademicResults(BuildContext context, AuthUserAuthenticated state) {
+    final studentId = _extractStudentId(state.userData);
+    if (studentId.isEmpty) {
+      CustomSnackbar.showSnackBar(
+        context,
+        'Thiếu thông tin',
+        'Không tìm thấy mã số sinh viên để tải kết quả học tập',
+        AlertType.error,
+      );
+      return;
+    }
+    Navigator.of(context).pushNamed(
+      Routes.academicResults,
+      arguments: studentId,
+    );
+  }
+
+  void _openAcademicStats(BuildContext context, AuthUserAuthenticated state) {
+    final studentId = _extractStudentId(state.userData);
+    if (studentId.isEmpty) {
+      CustomSnackbar.showSnackBar(
+        context,
+        'Thiếu thông tin',
+        'Không tìm thấy mã số sinh viên để tải học vụ',
+        AlertType.error,
+      );
+      return;
+    }
+    Navigator.of(context).pushNamed(
+      Routes.academicStatistics,
+      arguments: studentId,
+    );
   }
 
   @override
@@ -441,17 +471,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/mage_goals.svg",
                                       title: "Kết quả học tập",
                                       onTap: () {
-                                        final studentId =
-                                            _extractStudentId(state.userData);
-                                        final apiBase = _resolveApiBase();
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (_) => ResultsPage(
-                                              studentId: studentId,
-                                              apiBase: apiBase,
-                                            ),
-                                          ),
-                                        );
+                                        final auth =
+                                            context.read<AuthBloc>().state;
+                                        if (auth is AuthUserAuthenticated) {
+                                          _openAcademicResults(context, auth);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                            context,
+                                            'Chưa đăng nhập',
+                                            'Vui lòng đăng nhập để xem kết quả học tập',
+                                            AlertType.warning,
+                                          );
+                                        }
                                       },
                                     ),
                                     FeatureCard(
@@ -459,17 +490,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/uil_chart-line.svg",
                                       title: "Học vụ",
                                       onTap: () {
-                                        final studentId =
-                                            _extractStudentId(state.userData);
-                                        final apiBase = _resolveApiBase();
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (_) => StatisticsPage(
-                                              studentId: studentId,
-                                              apiBase: apiBase,
-                                            ),
-                                          ),
-                                        );
+                                        final auth =
+                                            context.read<AuthBloc>().state;
+                                        if (auth is AuthUserAuthenticated) {
+                                          _openAcademicStats(context, auth);
+                                        } else {
+                                          CustomSnackbar.showSnackBar(
+                                            context,
+                                            'Chưa đăng nhập',
+                                            'Vui lòng đăng nhập để xem học vụ',
+                                            AlertType.warning,
+                                          );
+                                        }
                                       },
                                     ),
                                   ];

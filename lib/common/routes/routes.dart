@@ -12,6 +12,11 @@ import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.d
 import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+// Academic (kết quả học tập/học vụ)
+import 'package:e_dut/features/academic/presentation/results.dart';
+import 'package:e_dut/features/academic/presentation/statistics.dart';
 
 import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
@@ -21,6 +26,16 @@ import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.d
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
 
+String _resolveApiBase() {
+  const fromDefine = String.fromEnvironment('API_BASE', defaultValue: '');
+  if (fromDefine.isNotEmpty) return fromDefine;
+  try {
+    return dotenv.env['API_BASE'] ?? '';
+  } catch (_) {
+    return '';
+  }
+}
+
 class Routes {
   static const String root = "/";
   static const String auth = "/auth";
@@ -28,23 +43,27 @@ class Routes {
   static const String schedule = "/schedule";
   static const String msteamtool = "/msteamtool";
 
-  //timetable
+  // timetable
   static const String detailUnitOfStudy = "/detailUnitOfStudy";
   static const String detailUnitOfStudyTeacher = "/detailUOSTeacher";
   static const String detailExamShiftTeacher = "/detailExamShiftTeacher";
 
-  //course registration
+  // course registration
   static const String courseRegistration = "/courseRegistration";
   static const String courseRegistrationGrade = "/courseRegistrationGrade";
 
-  //community activity
+  // community activity
   static const String communityActivities = "/communityActivities";
   static const String detailUserActivity = "/detailUserActivityScreen";
   static const String detailUserProof = "/detailUserProof";
 
-  //homeroom
+  // homeroom
   static const String listHomeRoom = "/listHomeRoom";
   static const String detailHomeRoom = "/detailHomeRoom";
+
+  // academic
+  static const String academicResults = "/academic/results";
+  static const String academicStatistics = "/academic/statistics";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -65,7 +84,7 @@ class Routes {
           ),
         );
 
-      //***** TIMETABLE *****//
+      // ***** TIMETABLE ***** //
       case schedule:
         return MaterialPageRoute(builder: (context) => const ScheduleScreen());
 
@@ -87,18 +106,20 @@ class Routes {
       case detailExamShiftTeacher:
         final args = settings.arguments as ExamShiftArgs;
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                  create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
-                    ..add(LoadExamShiftDetail(
-                        idExamShift: args.idExamShift,
-                        authToken: args.authToken)),
-                  child: DetailExamShiftScreen(
-                    idExamShift: args.idExamShift,
-                    examShiftName: args.examShiftName,
-                  ),
-                ));
+          builder: (_) => BlocProvider(
+            create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
+              ..add(LoadExamShiftDetail(
+                idExamShift: args.idExamShift,
+                authToken: args.authToken,
+              )),
+            child: DetailExamShiftScreen(
+              idExamShift: args.idExamShift,
+              examShiftName: args.examShiftName,
+            ),
+          ),
+        );
 
-      //***** COURSE REGISTRATION *****//
+      // ***** COURSE REGISTRATION ***** //
       case courseRegistration:
         return MaterialPageRoute(
           builder: (context) => const CourseRegistrationScreen(),
@@ -109,29 +130,55 @@ class Routes {
           builder: (context) => const GradeScreen(),
         );
 
-      //***** COMMUNITY ACTIVITY *****//
+      // ***** COMMUNITY ACTIVITY ***** //
       case communityActivities:
         return MaterialPageRoute(
-            builder: (context) => const CommunityActivitiesScreen());
+          builder: (context) => const CommunityActivitiesScreen(),
+        );
 
       case detailUserProof:
         final userProof = settings.arguments as UserProofModel;
         return MaterialPageRoute(
-            builder: (context) => DetailUserProofScreen(userProof: userProof));
+          builder: (context) => DetailUserProofScreen(userProof: userProof),
+        );
 
-      //***** HOMEROOM *****//
+      // ***** HOMEROOM ***** //
       case listHomeRoom:
         return MaterialPageRoute(builder: (context) => ListHomeroomScreen());
 
       case detailHomeRoom:
         return MaterialPageRoute(builder: (context) => DetailHomeroomScreen());
 
+      // ***** ACADEMIC ***** //
+      case academicResults:
+        {
+          final studentId = settings.arguments as String;
+          final apiBase = _resolveApiBase();
+          return MaterialPageRoute(
+            builder: (context) => ResultsPage(
+              studentId: studentId,
+              apiBase: apiBase,
+            ),
+          );
+        }
+
+      case academicStatistics:
+        {
+          final studentId = settings.arguments as String;
+          final apiBase = _resolveApiBase();
+          return MaterialPageRoute(
+            builder: (context) => StatisticsPage(
+              studentId: studentId,
+              apiBase: apiBase,
+            ),
+          );
+        }
+
+      // ===== default ===== //
       default:
         return MaterialPageRoute(
           builder: (context) => const Scaffold(
-            body: Center(
-              child: Text('No page route provided'),
-            ),
+            body: Center(child: Text('No page route provided')),
           ),
         );
     }

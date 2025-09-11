@@ -7,7 +7,7 @@ import '../bloc/results_event.dart';
 import '../bloc/results_state.dart';
 
 import '../data/results_repository.dart';
-import '../../../core/services/api_client.dart';
+import '../data/academic_api_client.dart';
 import 'detail_result.dart';
 
 class ResultsPage extends StatefulWidget {
@@ -25,13 +25,30 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  int _semesterIndex = 0; // index của kỳ đang chọn (mặc định mới nhất)
+  int _semesterIndex = 0;
+
+  late final AcademicApiClient _client;
+  late final ResultsBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _client = AcademicApiClient(baseUrl: widget.apiBase);
+    _bloc = ResultsBloc(ResultsRepository(_client));
+    _bloc.add(LoadResults(widget.studentId));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    _client.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ResultsBloc>(
-      create: (_) => ResultsBloc(ResultsRepository(ApiClient(widget.apiBase)))
-        ..add(LoadResults(widget.studentId)),
+    return BlocProvider.value(
+      value: _bloc,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -51,7 +68,7 @@ class _ResultsPageState extends State<ResultsPage> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: SvgPicture.asset(
-                'assets/icons/solar_bell-bold.svg',
+                'assets/icons/svg/solar_bell-bold.svg',
                 color: Colors.white,
               ),
             ),
@@ -66,9 +83,7 @@ class _ResultsPageState extends State<ResultsPage> {
             if (state is ResultsError) {
               return _ErrorView(
                 message: state.message,
-                onRetry: () => context.read<ResultsBloc>().add(
-                      LoadResults(widget.studentId),
-                    ),
+                onRetry: () => _bloc.add(LoadResults(widget.studentId)),
               );
             }
 
@@ -77,9 +92,8 @@ class _ResultsPageState extends State<ResultsPage> {
 
               if (all.isEmpty) {
                 return RefreshIndicator(
-                  onRefresh: () async => context.read<ResultsBloc>().add(
-                        LoadResults(widget.studentId),
-                      ),
+                  onRefresh: () async =>
+                      _bloc.add(LoadResults(widget.studentId)),
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: const [
@@ -90,18 +104,12 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // Lấy danh sách kỳ , sort giảm dần (theo mã kỳ)
-              final semesters = all.map((e) => e.semesterCode).toSet().toList();
-              semesters.sort((a, b) {
-                final ai = int.tryParse(a) ?? 0;
-                final bi = int.tryParse(b) ?? 0;
-                return bi.compareTo(ai);
-              });
+              // danh sách kỳ, sort giảm dần theo mã kỳ
+              final semesters = all.map((e) => e.semesterCode).toSet().toList()
+                ..sort((a, b) =>
+                    (int.tryParse(b) ?? 0).compareTo(int.tryParse(a) ?? 0));
 
-              if (_semesterIndex >= semesters.length) {
-                _semesterIndex = 0;
-              }
-
+              if (_semesterIndex >= semesters.length) _semesterIndex = 0;
               if (semesters.isEmpty) {
                 return const Center(child: Text('Không có dữ liệu học kỳ'));
               }
@@ -111,9 +119,7 @@ class _ResultsPageState extends State<ResultsPage> {
                   all.where((e) => e.semesterCode == currentCode).toList();
 
               return RefreshIndicator(
-                onRefresh: () async => context.read<ResultsBloc>().add(
-                      LoadResults(widget.studentId),
-                    ),
+                onRefresh: () async => _bloc.add(LoadResults(widget.studentId)),
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: items.length + 1,
@@ -125,10 +131,8 @@ class _ResultsPageState extends State<ResultsPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
-                              icon: const Icon(
-                                Icons.chevron_left,
-                                color: Colors.black54,
-                              ),
+                              icon: const Icon(Icons.chevron_left,
+                                  color: Colors.black54),
                               onPressed: _semesterIndex < semesters.length - 1
                                   ? () => setState(() => _semesterIndex++)
                                   : null,
@@ -142,10 +146,8 @@ class _ResultsPageState extends State<ResultsPage> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.chevron_right,
-                                color: Colors.black54,
-                              ),
+                              icon: const Icon(Icons.chevron_right,
+                                  color: Colors.black54),
                               onPressed: _semesterIndex > 0
                                   ? () => setState(() => _semesterIndex--)
                                   : null,
@@ -162,23 +164,18 @@ class _ResultsPageState extends State<ResultsPage> {
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 6.0,
-                      ),
+                          horizontal: 16.0, vertical: 6.0),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (_) => DetailResults(
-                              subjectCode: s.classCode, // Mã lớp học phần
-                              subjectTitle: subjectTitleText, // Tên học phần
-                              credits: '${s.credits ?? '-'}', // Số tín chỉ
-                              // Chi tiết điểm
+                              subjectCode: s.classCode,
+                              subjectTitle: subjectTitleText,
+                              credits: '${s.credits ?? '-'}',
                               detailsList: s.detailLines,
                               congThucDiem: s.formula,
-
-                              // Tổng kết điểm
                               tongKet: s.scoreChar,
                               thang10: s.score10?.toStringAsFixed(1),
                               thang4: s.score4?.toStringAsFixed(1),
@@ -191,9 +188,7 @@ class _ResultsPageState extends State<ResultsPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 12.0,
-                          ),
+                              horizontal: 16.0, vertical: 12.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -204,9 +199,7 @@ class _ResultsPageState extends State<ResultsPage> {
                                     Text(
                                       s.classCode,
                                       style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black45,
-                                      ),
+                                          fontSize: 12, color: Colors.black45),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -221,9 +214,7 @@ class _ResultsPageState extends State<ResultsPage> {
                                     Text(
                                       'Số TC: ${s.credits ?? '-'}',
                                       style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black54,
-                                      ),
+                                          fontSize: 12, color: Colors.black54),
                                     ),
                                   ],
                                 ),
@@ -248,9 +239,7 @@ class _ResultsPageState extends State<ResultsPage> {
 
             return _ErrorView(
               message: 'Lỗi tải dữ liệu',
-              onRetry: () => context.read<ResultsBloc>().add(
-                    LoadResults(widget.studentId),
-                  ),
+              onRetry: () => _bloc.add(LoadResults(widget.studentId)),
             );
           },
         ),
@@ -258,38 +247,24 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
-  /// Quy tắc: XXYY, với YY là học kì
-  /// 10 -> HỌC KÌ 1 ; 20 -> HỌC KÌ 2 ; 21 -> HỌC KÌ HÈ
+  /// Quy tắc: XXYY, với YY là học kì (10: HK1, 20: HK2, 21: Hè)
   String _formatSemesterTitle(String code) {
-    // đảm bảo đủ 4 ký tự để tránh lỗi cắt chuỗi
     final safe = code.padLeft(4, '0');
-
     final yy = safe.substring(0, 2);
-    final hk = safe.substring(2); // "10" | "20" | "21"
-
+    final hk = safe.substring(2);
     final startYear = 2000 + (int.tryParse(yy) ?? 0);
     final endYear = startYear + 1;
 
-    late final String hkText;
-    switch (hk) {
-      case '10':
-        hkText = 'HỌC KÌ 1';
-        break;
-      case '20':
-        hkText = 'HỌC KÌ 2';
-        break;
-      case '21':
-        hkText = 'HỌC KÌ HÈ';
-        break;
-      default:
-        hkText = 'HỌC KÌ 2';
-        break;
-    }
+    final hkText = switch (hk) {
+      '10' => 'HỌC KÌ 1',
+      '20' => 'HỌC KÌ 2',
+      '21' => 'HỌC KÌ HÈ',
+      _ => 'HỌC KÌ 2',
+    };
     return '$hkText, $startYear-$endYear';
   }
 }
 
-// Widget lỗi
 class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;

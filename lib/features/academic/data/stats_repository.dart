@@ -1,28 +1,30 @@
 import 'dart:io';
-import '../../../core/services/api_client.dart';
+
+import 'academic_api_client.dart' as acad;
 import '../models/stats_model.dart';
 
 class StatsRepository {
   StatsRepository(this._api);
-  final ApiClient _api;
 
-  /// Lấy thống kê GPA & tín chỉ.
+  final acad.AcademicApiClient _api;
+
+  // Lấy thống kê GPA, ĐRL, tín chỉ theo kỳ + tổng quan.
   Future<StatsModel> fetchStats({required String studentId}) async {
-    if (studentId.trim().isEmpty) {
+    final id = studentId.trim();
+    if (id.isEmpty) {
       throw ArgumentError('studentId is required and must not be empty');
     }
 
     try {
       final obj = await _api.getObject(
         '/stats',
-        query: {'studentId': studentId},
+        query: {'studentId': id},
       );
-      // { semesters: [...], gpaPerSemester: [...], creditsPerSemester: [...], overall: {...} }
       return StatsModel.fromJson(obj);
     } on HttpException {
       rethrow;
     } catch (e) {
-      throw HttpException('Failed to fetch stats for $studentId: $e');
+      throw HttpException('Failed to fetch stats for $id: $e');
     }
   }
 }

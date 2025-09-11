@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:label="dDUT" android:name="${applicationName}" android:icon="@mipmap/launcher_icon">
+    <application 
+        android:label="dDUT" 
+        android:name="${applicationName}" 
+        android:icon="@mipmap/launcher_icon" 
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config">
     <!-- Handles showing scheduled notifications -->
         <receiver 
             android:exported="false" 

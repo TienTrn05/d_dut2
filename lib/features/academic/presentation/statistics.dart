@@ -6,10 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../bloc/stats_bloc.dart';
 import '../data/stats_repository.dart';
-import '../../../core/services/api_client.dart';
+import '../data/academic_api_client.dart';
 import '../models/stats_model.dart';
 
-class StatisticsPage extends StatelessWidget {
+class StatisticsPage extends StatefulWidget {
   const StatisticsPage({
     super.key,
     required this.studentId,
@@ -20,210 +20,216 @@ class StatisticsPage extends StatelessWidget {
   final String apiBase;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider<StatsBloc>(
-      create: (_) => StatsBloc(StatsRepository(ApiClient(apiBase)))
-        ..add(StatsRequested(studentId: studentId)),
-      child: _StatisticsView(studentId: studentId),
-    );
-  }
+  State<StatisticsPage> createState() => _StatisticsPageState();
 }
 
-class _StatisticsView extends StatelessWidget {
-  const _StatisticsView({required this.studentId});
-  final String studentId;
+class _StatisticsPageState extends State<StatisticsPage> {
+  late final AcademicApiClient _client;
+  late final StatsBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _client = AcademicApiClient(baseUrl: widget.apiBase);
+    _bloc = StatsBloc(StatsRepository(_client));
+    _bloc.add(StatsRequested(studentId: widget.studentId));
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    _client.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Học vụ'),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF2A74BD),
-        foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 22),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.white,
-          tooltip: null,
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: SvgPicture.asset(
-              'assets/icons/solar_bell-bold.svg',
-              width: 26,
-              height: 26,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
+    return BlocProvider.value(
+      value: _bloc,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text('Học vụ'),
+          centerTitle: true,
+          backgroundColor: const Color(0xFF2A74BD),
+          foregroundColor: Colors.white,
+          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 22),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            color: Colors.white,
+            tooltip: null,
+            onPressed: () => Navigator.of(context).maybePop(),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: SvgPicture.asset(
+                'assets/icons/svg/solar_bell-bold.svg',
+                width: 26,
+                height: 26,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: BlocBuilder<StatsBloc, StatsState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state.error != null) {
-            return _ErrorView(
-              message: state.error!,
-              onRetry: () => context.read<StatsBloc>().add(
-                    StatsRequested(studentId: studentId),
-                  ),
-            );
-          }
-
-          final StatsModel data = state.data!;
-
-          final semesters = data.semesters;
-          final gpaPerSem = data.gpaPerSemester; // thang 4
-          final conductScores = data.conductPerSemester; // ĐRL 0-100
-          final credits =
-              data.creditsPerSemester.map((e) => e.toDouble()).toList();
-
-          final double? overallGpa4 = data.gpa4 ?? data.gpa10;
-          final double totalCredits = data.totalCredits.toDouble();
-          final String? warningLevel = data.warningLevel;
-          final String? studyStage = data.stage;
-
-          final double creditsYMax = () {
-            if (credits.isEmpty) return 10.0;
-            final maxVal = credits.reduce(math.max);
-            return (((maxVal ~/ 10) + 1) * 10).toDouble();
-          }();
-
-          return RefreshIndicator(
-            onRefresh: () async => context.read<StatsBloc>().add(
-                  StatsRefreshed(studentId: studentId),
+          ],
+        ),
+        body: BlocBuilder<StatsBloc, StatsState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state.error != null) {
+              return _ErrorView(
+                message: state.error!,
+                onRetry: () => _bloc.add(
+                  StatsRequested(studentId: widget.studentId),
                 ),
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 24),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A74BD),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 8,
-                              ),
-                              child: _BigMetricCard(
-                                value: overallGpa4 == null
-                                    ? '--'
-                                    : overallGpa4.toStringAsFixed(2),
-                                label: 'GPA (thang 4)',
+              );
+            }
+
+            final StatsModel data = state.data!;
+
+            final semesters = data.semesters;
+            final gpaPerSem = data.gpaPerSemester; // thang 4
+            final conductScores = data.conductPerSemester; // ĐRL 0-100
+            final credits =
+                data.creditsPerSemester.map((e) => e.toDouble()).toList();
+
+            final double? overallGpa4 = data.gpa4 ?? data.gpa10;
+            final double totalCredits = data.totalCredits.toDouble();
+            final String? warningLevel = data.warningLevel;
+            final String? studyStage = data.stage;
+
+            final double creditsYMax = () {
+              if (credits.isEmpty) return 10.0;
+              final maxVal = credits.reduce(math.max);
+              return (((maxVal ~/ 10) + 1) * 10).toDouble();
+            }();
+
+            return RefreshIndicator(
+              onRefresh: () async => _bloc.add(
+                StatsRefreshed(studentId: widget.studentId),
+              ),
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A74BD),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                                child: _BigMetricCard(
+                                  value: overallGpa4 == null
+                                      ? '--'
+                                      : overallGpa4.toStringAsFixed(2),
+                                  label: 'GPA (thang 4)',
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            width: 2,
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            color: const Color(0xFFFFFFFF),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 10,
-                              ),
-                              child: _InfoSummaryInline(
-                                totalCredits: totalCredits,
-                                warningLevel: warningLevel?.toString(),
-                                studyStage: studyStage,
+                            Container(
+                              width: 2,
+                              margin: const EdgeInsets.symmetric(horizontal: 6),
+                              color: const Color(0xFFFFFFFF),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 10,
+                                ),
+                                child: _InfoSummaryInline(
+                                  totalCredits: totalCredits,
+                                  warningLevel: warningLevel?.toString(),
+                                  studyStage: studyStage,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                // GPA từng kỳ
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  child: _ChartCard(
-                    title: 'GPA từng kỳ',
-                    child: _LineChart(
-                      xLabels: semesters,
-                      values: gpaPerSem,
-                      minY: 0,
-                      maxY: 4,
-                      yInterval: 0.5,
+                  // GPA từng kỳ
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: _ChartCard(
+                      title: 'GPA từng kỳ',
+                      child: _LineChart(
+                        xLabels: semesters,
+                        values: gpaPerSem,
+                        minY: 0,
+                        maxY: 4,
+                        yInterval: 0.5,
+                      ),
                     ),
                   ),
-                ),
 
-                // Điểm rèn luyện
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  child: _ChartCard(
-                    title: 'Điểm rèn luyện từng kỳ',
-                    child: (conductScores.isNotEmpty)
-                        ? _LineChart(
-                            xLabels: semesters,
-                            values: conductScores,
-                            minY: 0,
-                            maxY: 100,
-                            yInterval: 10,
-                          )
-                        : const _EmptyChart(),
-                  ),
-                ),
-
-                // Số TC đăng ký
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  child: _ChartCard(
-                    title: 'Số TC đăng ký từng kỳ',
-                    child: _LineChart(
-                      xLabels: semesters,
-                      values: credits,
-                      minY: 0,
-                      maxY: creditsYMax,
-                      yInterval: 5,
+                  // Điểm rèn luyện
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: _ChartCard(
+                      title: 'Điểm rèn luyện từng kỳ',
+                      child: (conductScores.isNotEmpty)
+                          ? _LineChart(
+                              xLabels: semesters,
+                              values: conductScores,
+                              minY: 0,
+                              maxY: 100,
+                              yInterval: 10,
+                            )
+                          : const _EmptyChart(),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+
+                  // Số TC đăng ký
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: _ChartCard(
+                      title: 'Số TC đăng ký từng kỳ',
+                      child: _LineChart(
+                        xLabels: semesters,
+                        values: credits,
+                        minY: 0,
+                        maxY: creditsYMax,
+                        yInterval: 5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -248,10 +254,9 @@ class _ChartCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(height: 220, child: child),
           ],
@@ -290,20 +295,16 @@ class _LineChart extends StatelessWidget {
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
               getTooltipColor: (_) => Colors.white,
-              tooltipBorder: const BorderSide(
-                color: Color(0xFF133D87),
-                width: 1.5,
-              ),
+              tooltipBorder:
+                  const BorderSide(color: Color(0xFF133D87), width: 1.5),
               getTooltipItems: (touchedSpots) => touchedSpots
-                  .map(
-                    (spot) => LineTooltipItem(
-                      spot.y.toString(),
-                      const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF133D87),
-                      ),
-                    ),
-                  )
+                  .map((spot) => LineTooltipItem(
+                        spot.y.toString(),
+                        const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF133D87),
+                        ),
+                      ))
                   .toList(),
             ),
           ),
@@ -316,10 +317,13 @@ class _LineChart extends StatelessWidget {
                 reservedSize: 36,
                 interval: yInterval,
                 getTitlesWidget: (v, meta) {
-                  final isInt = (v - v.roundToDouble()).abs() < 1e-6;
-                  if (!isInt) return const SizedBox.shrink();
+                  // hiển thị tick nếu là số tròn hoặc .5
+                  final d = (v * 2).roundToDouble() / 2.0;
+                  final isTick = (v - d).abs() < 1e-6;
+                  if (!isTick) return const SizedBox.shrink();
+                  // Với thang 0–4, cho hiển thị 0, 0.5, 1, ...
                   return Text(
-                    v.toInt().toString(),
+                    (v % 1 == 0) ? v.toInt().toString() : v.toStringAsFixed(1),
                     style: const TextStyle(fontSize: 11),
                   );
                 },
@@ -331,25 +335,20 @@ class _LineChart extends StatelessWidget {
                 interval: 1,
                 getTitlesWidget: (value, meta) {
                   final i = value.toInt();
-                  if (i < 0 || i >= xLabels.length) {
+                  if (i < 0 || i >= xLabels.length)
                     return const SizedBox.shrink();
-                  }
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      xLabels[i],
-                      style: const TextStyle(fontSize: 10),
-                    ),
+                    child:
+                        Text(xLabels[i], style: const TextStyle(fontSize: 10)),
                   );
                 },
               ),
             ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           lineBarsData: [
             LineChartBarData(
