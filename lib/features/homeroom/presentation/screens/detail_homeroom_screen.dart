@@ -80,7 +80,10 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
               String truncatedTitle =
                   title.length > 50 ? '${title.substring(0, 47)}...' : title;
               final newItem = NotiModel(
-                  date: DateTime.now(), title: title, content: content);
+                  id: "0",
+                  date: DateTime.now(),
+                  title: title,
+                  content: content);
 
               dialog.CustomAlertDialog.showCustomDialog(
                   context,

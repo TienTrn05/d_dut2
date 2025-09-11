@@ -77,7 +77,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
     super.dispose();
   }
 
-  void _deleteNotification(int index, String title) {
+  void _deleteNotification(Function()? onConfirm, String title) {
     String truncatedTitle =
         title.length > 50 ? '${title.substring(0, 47)}...' : title;
     dialog.CustomAlertDialog.showCustomDialog(
@@ -85,13 +85,12 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
         'Xóa thông báo',
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
         dialog.AlertDialogType.delete,
-        onConfirm: () => setState(() {
-              // notifications.removeAt(index);
-            }),
+        onConfirm: onConfirm,
         textConfirm: "Xóa");
   }
 
-  void _showCreatNewNoti(BuildContext contextOuter, String idUos, String authToken) {
+  void _showCreatNewNoti(
+      BuildContext contextOuter, String idUos, String authToken) {
     showModalBottomSheet(
       context: contextOuter,
       isScrollControlled: true,
@@ -113,7 +112,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               String truncatedTitle =
                   title.length > 50 ? '${title.substring(0, 47)}...' : title;
               final newItem = NotiModel(
-                  date: DateTime.now(), title: title, content: content);
+                  id: "0",
+                  date: DateTime.now(),
+                  title: title,
+                  content: content);
 
               dialog.CustomAlertDialog.showCustomDialog(
                   context,
@@ -192,7 +194,8 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                 create: (_) => NotiBloc(
                       getIt.get<NotificationRepository>(),
                       getIt.get<ScheduleRepository>(),
-                    )..add(LoadNotiEvent())),
+                    )..add(LoadNotiEvent(
+                        authToken: authToken, idUos: widget.idUos))),
           ],
           child: DefaultTabController(
             length: 3,
@@ -278,11 +281,49 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                                   setIsCheckAbsent),
                                           BlocBuilder<NotiBloc, NotiState>(
                                               builder: (context, state) {
-                                            return UosNotiTab(
-                                              notifications:
-                                                  state.notifications,
-                                              uosDetail: uosFullInfo.uosDetail,
-                                              onDelete: _deleteNotification,
+                                            return Stack(
+                                              children: [
+                                                UosNotiTab(
+                                                  notifications:
+                                                      state.notifications,
+                                                  uosDetail:
+                                                      uosFullInfo.uosDetail,
+                                                  onRefresh: () async {
+                                                    context
+                                                        .read<NotiBloc>()
+                                                        .add(LoadNotiEvent(
+                                                            authToken:
+                                                                authToken,
+                                                            idUos:
+                                                                widget.idUos));
+                                                  },
+                                                  onDelete: (noti) {
+                                                    _deleteNotification(() {
+                                                      context
+                                                          .read<NotiBloc>()
+                                                          .add(DeleteNotiEvent(
+                                                              noti.id,
+                                                              widget.idUos,
+                                                              authToken));
+                                                    }, noti.title);
+                                                  },
+                                                ),
+                                                if (state.status ==
+                                                    NotiStatus.loading)
+                                                  Positioned.fill(
+                                                    child: Container(
+                                                      color: Colors.black
+                                                          .withOpacity(0),
+                                                      child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color: context.theme
+                                                              .primaryColor,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
                                             );
                                           })
                                         ],
@@ -435,8 +476,10 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                   ]),
                               child: FloatingActionButton(
                                 elevation: 0,
-                                onPressed: () => _showCreatNewNoti(infoContext,
-                                    uosFullInfo.uosDetail.idUnitOfStudy, authToken),
+                                onPressed: () => _showCreatNewNoti(
+                                    infoContext,
+                                    uosFullInfo.uosDetail.idUnitOfStudy,
+                                    authToken),
                                 backgroundColor: context.theme.primaryColor,
                                 shape: const CircleBorder(),
                                 child: const Icon(Icons.add_rounded,
