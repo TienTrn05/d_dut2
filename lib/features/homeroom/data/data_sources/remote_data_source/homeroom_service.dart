@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/core/services/api_client.dart';
+import 'package:e_dut/features/homeroom/data/model/homeroom_model.dart';
 import 'package:e_dut/features/homeroom/data/model/student_model.dart';
 import 'package:injectable/injectable.dart';
 
@@ -34,6 +35,34 @@ class HomeroomService {
       }
     } catch (e) {
       logger.e("Error fetching students of homeroom: $e");
+      rethrow;
+    }
+  }
+
+  Future<List<HomeroomModel>> getHomerooms(String token) async {
+    try {
+      final response = await _apiClient.dio.get("$_url/api/classActivities",
+          options: Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['isSuccess'] == true) {
+        final responseData = response.data;
+
+        final List<dynamic> data = responseData['data'];
+
+        final homerooms = data.map((e) => HomeroomModel(
+            id: e['id'] ?? 'Unknown',
+            name: e['name'] ?? 'Unknown',
+            numStudent: e['numOfStudents'] ?? 0
+        )).toList();
+
+        return homerooms;
+      } else {
+        throw Exception(
+            "Failed to load homerooms: ${response.data['message']}");
+      }
+    } catch (e) {
+      logger.e("Error fetching homerooms: $e");
       rethrow;
     }
   }
