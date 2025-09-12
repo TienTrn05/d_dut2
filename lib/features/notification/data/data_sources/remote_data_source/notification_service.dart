@@ -92,6 +92,7 @@ class NotificationService {
     required List<String> userIds,
     required String title,
     required String body,
+    String? notiTimeTableId,
     String? link,
   }) async {
     try {
@@ -101,6 +102,7 @@ class NotificationService {
           "userIds": userIds,
           "title": title,
           "body": body,
+          if (notiTimeTableId != null) "notiTimeTableId": notiTimeTableId,
           if (link != null) "link": link,
         },
         options: Options(headers: {
@@ -113,6 +115,29 @@ class NotificationService {
       }
     } catch (e) {
       logger.e("Error sending notifications: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> deleteNotificationsByUsersAndTimeTable(
+    {
+    required List<String> userIds,
+    required String notiTimeTableId,
+  }) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/notifications/time-table/delete",
+        data: {
+          "userIds": userIds,
+          "notiTimeTableId": notiTimeTableId,
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception("Failed to delete notifications: ${response.data}");
+      }
+    } catch (e) {
+      logger.e("Error deleting notifications: $e");
       rethrow;
     }
   }

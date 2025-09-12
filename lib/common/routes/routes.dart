@@ -147,7 +147,9 @@ class Routes {
         return MaterialPageRoute(builder: (context) => ListHomeroomScreen());
 
       case detailHomeRoom:
-        return MaterialPageRoute(builder: (context) => DetailHomeroomScreen());
+        return MaterialPageRoute(builder: (context) => DetailHomeroomScreen(
+            classId: settings.arguments as String
+        ));
 
       // ***** ACADEMIC ***** //
       case academicResults:

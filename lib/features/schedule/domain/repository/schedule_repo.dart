@@ -10,6 +10,8 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_d
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_students_absent_model.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../data/model/noti_model.dart';
+
 @singleton
 class ScheduleRepository {
   final ScheduleService _scheduleService;
@@ -115,5 +117,17 @@ class ScheduleRepository {
 
   Future<List<String>> getListStudentForNotiByUos(String idUos, String authToken) {
     return _scheduleService.getListStudentForNotiByUos(authToken, idUos);
+  }
+
+  Future<String> createNotificationByIdUOS(String token, String idUos, String title, String content) {
+    return _scheduleService.createNotificationByIdUOS(token, idUos, title, content);
+  }
+
+  Future<List<NotiModel>> getNotificationByIdUOS(String token, String idUos) {
+    return _scheduleService.getNotificationByIdUOS(token, idUos);
+  }
+
+  Future<String> deleteNotification(String token, String idNotification) {
+    return _scheduleService.deleteNotification(token, idNotification);
   }
 }

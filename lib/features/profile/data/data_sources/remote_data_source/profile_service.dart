@@ -36,6 +36,7 @@ class ProfileService {
         dateOfBirth:
             data['birthday'] != null ? DateTime.parse(data['birthday']) : null,
         gender: (data['gender'] as num) == 1 ? "Nam" : "Nữ",
+        homeroomId: data['class']['id'],
         homeroom: data['class']['name'] ?? '',
         major: data['program']['major']['majorName'] ?? '',
         personalEmail: "Không có",
@@ -68,7 +69,8 @@ class ProfileService {
         // Thông tin cơ bản
         fullName: data['fullName'],
         email: "dtb@dut.udn.vn",
-        dateOfBirth: data['birthday'] != null ? DateTime.parse(data['birthday']) : null,
+        dateOfBirth:
+            data['birthday'] != null ? DateTime.parse(data['birthday']) : null,
         employeeId: "CBVC001",
         address: data['address'] ?? '',
 

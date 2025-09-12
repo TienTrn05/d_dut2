@@ -55,7 +55,7 @@ class InfoItem extends StatelessWidget {
                     linkifiers: [
                       UrlLinkifier(),
                       EmailLinkifier(),
-                      PhoneNumberLinkifier()
+                      // PhoneNumberLinkifier()
                     ],
                     onOpen: (link) async {
                       if (link.url.startsWith('tel:')) {

@@ -44,6 +44,7 @@ class NotificationRepository {
     required List<String> userIds,
     required String title,
     required String body,
+    String? notiTimeTableId,
     String? link,
   }) async {
     try {
@@ -52,10 +53,26 @@ class NotificationRepository {
         userIds: userIds,
         title: title,
         body: body,
+        notiTimeTableId: notiTimeTableId,
         link: link,
       );
     } catch (e) {
       throw Exception('Failed to send notification: $e');
+    }
+  }
+
+  Future<void> deleteNotificationsByUsersAndTimeTable(
+    {
+    required List<String> userIds,
+    required String notiTimeTableId,
+  }) async {
+    try {
+      await _notificationService.deleteNotificationsByUsersAndTimeTable(
+        userIds: userIds,
+        notiTimeTableId: notiTimeTableId,
+      );
+    } catch (e) {
+      throw Exception('Failed to delete notification: $e');
     }
   }
 }
