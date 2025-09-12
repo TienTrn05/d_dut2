@@ -22,7 +22,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DetailHomeroomScreen extends StatefulWidget {
-  const DetailHomeroomScreen({super.key});
+  const DetailHomeroomScreen({super.key, required this.classId});
+
+  final String classId; // Thay thế bằng classId thực tế
 
   @override
   State<DetailHomeroomScreen> createState() => _DetailHomeroomScreenState();
@@ -295,7 +297,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
           return BlocProvider(
             create: (_) => HomeroomBloc(getIt.get<HomeroomRepository>())
               ..add(
-                  LoadStudentsOfHomeroom(token: authToken, classId: "1022108")),
+                  LoadStudentsOfHomeroom(token: authToken, classId: widget.classId)),
             child: BlocBuilder<HomeroomBloc, HomeroomState>(
               builder: (context, homeroomState) {
                 // Gán students từ state
