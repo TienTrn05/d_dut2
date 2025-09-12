@@ -11,7 +11,13 @@ class HomeroomItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(Routes.detailHomeRoom, arguments: homeroom.id);
+        Navigator.of(context).pushNamed(
+          Routes.detailHomeRoom,
+          arguments: {
+            "id": homeroom.id,
+            "name": homeroom.name,
+          },
+        );
       },
       child: Container(
         width: double.infinity,
@@ -34,7 +40,7 @@ class HomeroomItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              "${homeroom.numStudent} sinh viên",
+              "${homeroom.numOfStudents} sinh viên",
               style: TextStyle(
                 fontSize: FontSizes.small,
                 fontWeight: FontWeight.normal,

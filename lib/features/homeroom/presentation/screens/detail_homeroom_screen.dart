@@ -22,9 +22,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DetailHomeroomScreen extends StatefulWidget {
-  const DetailHomeroomScreen({super.key, required this.classId});
+  const DetailHomeroomScreen({super.key, this.classId, this.homeroomName});
 
-  final String classId; // Thay thế bằng classId thực tế
+  final String? classId;
+  final String? homeroomName;
 
   @override
   State<DetailHomeroomScreen> createState() => _DetailHomeroomScreenState();
@@ -32,7 +33,7 @@ class DetailHomeroomScreen extends StatefulWidget {
 
 class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
     with SingleTickerProviderStateMixin {
-  List<NotiModel> notifications = NotiModel.mockData;
+  List<NotiModel> notifications = [];
 
   List<StudentModel> students = [];
   List<StudentModel> filteredStudents = [];
@@ -190,7 +191,6 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
@@ -296,8 +296,8 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
         } else {
           return BlocProvider(
             create: (_) => HomeroomBloc(getIt.get<HomeroomRepository>())
-              ..add(
-                  LoadStudentsOfHomeroom(token: authToken, classId: widget.classId)),
+              ..add(LoadStudentsOfHomeroom(
+                  token: authToken, classId: widget.classId!)),
             child: BlocBuilder<HomeroomBloc, HomeroomState>(
               builder: (context, homeroomState) {
                 // Gán students từ state
@@ -342,7 +342,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
               Container(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '21TCLC_DT2',
+                  widget.homeroomName ?? '',
                   style: TextStyle(
                     fontSize: FontSizes.extraLarge,
                     fontWeight: FontWeight.bold,

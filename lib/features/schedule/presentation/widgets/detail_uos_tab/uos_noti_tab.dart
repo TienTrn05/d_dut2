@@ -12,7 +12,11 @@ class UosNotiTab extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final Function(NotiModel) onDelete;
   const UosNotiTab(
-      {super.key, required this.uosDetail, required this.notifications, required this.onRefresh, required this.onDelete});
+      {super.key,
+      required this.uosDetail,
+      required this.notifications,
+      required this.onRefresh,
+      required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +24,28 @@ class UosNotiTab extends StatelessWidget {
       color: context.theme.primaryColor,
       backgroundColor: Colors.white,
       onRefresh: onRefresh,
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final item = notifications[index];
-          return NotificationCard(
-            date: Functions.formatDate(item.date),
-            title: item.title,
-            content: item.content,
-            canDel: true,
-            onDelete: () => onDelete(item),
-          );
-        },
-      ),
+      child: notifications.isNotEmpty
+          ? ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                final item = notifications[index];
+                return NotificationCard(
+                  date: Functions.formatDate(item.date),
+                  title: item.title,
+                  content: item.content,
+                  canDel: true,
+                  onDelete: () => onDelete(item),
+                );
+              },
+            )
+          : Center(
+              child: Text(
+                'Hiện không có thông báo nào',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: context.theme.grey ?? Colors.grey),
+              ),
+            ),
     );
   }
 }

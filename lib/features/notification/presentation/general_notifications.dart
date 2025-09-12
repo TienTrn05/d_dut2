@@ -44,7 +44,9 @@ class GeneralNotifications extends StatelessWidget {
       } else if (state.generalNotificationsStatus ==
               GeneralNotificationsStatus.success &&
           state.generalNotifications.isEmpty) {
-        return const Center(child: Text("Hiện không có thông báo nào"));
+        return Center(
+            child: Text("Hiện không có thông báo nào",
+                style: TextStyle(color: context.theme.grey ?? Colors.grey)));
       }
       return Column(
         children: [
@@ -80,8 +82,8 @@ class GeneralNotifications extends StatelessWidget {
                                 GeneralNotificationsStatus.unchange
                             ? const SizedBox.shrink()
                             : Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
                                   onTap: () {
                                     context.read<NotificationsBloc>().add(
                                         GeneralNotificationsLoadMoreRequested(
@@ -98,7 +100,7 @@ class GeneralNotifications extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                            )),
+                              )),
                   );
                 }
 
