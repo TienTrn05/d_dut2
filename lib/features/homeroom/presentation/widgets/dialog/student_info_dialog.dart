@@ -14,7 +14,7 @@ class StudentInfoDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16.0)),
+          borderRadius: BorderRadius.circular(16.0)),
       child: Container(
         padding: const EdgeInsetsDirectional.all(24.0),
         child: Column(
