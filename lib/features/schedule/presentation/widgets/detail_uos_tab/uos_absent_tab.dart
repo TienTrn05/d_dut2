@@ -493,8 +493,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                       child: Center(
                         child: Text(
                           isToday(_currentDate)
-                          ? "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh."
-                          : "Bạn không có tiết dạy ngày này, vui lòng chọn ngày khác để điểm danh.",
+                              ? "Bạn không có tiết dạy hôm nay, vui lòng chọn ngày khác để điểm danh."
+                              : "Bạn không có tiết dạy ngày này, vui lòng chọn ngày khác để điểm danh.",
                           style: TextStyle(
                             fontSize: FontSizes.medium,
                             color: context.theme.grey,
@@ -511,8 +511,8 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                         children: [
                           Text(
                             isToday(_currentDate)
-                            ? "Bạn có muốn tạo danh sách điểm danh hôm nay không?"
-                            : "Bạn có muốn tạo danh sách điểm danh ngày này không?",
+                                ? "Bạn có muốn tạo danh sách điểm danh hôm nay không?"
+                                : "Bạn có muốn tạo danh sách điểm danh ngày này không?",
                             style: TextStyle(
                               fontSize: FontSizes.medium,
                               color: context.theme.grey,

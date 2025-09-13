@@ -23,21 +23,30 @@ class NotificationsTab extends StatelessWidget {
         color: context.theme.primaryColor,
         backgroundColor: Colors.white,
         onRefresh: () async {},
-        child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: notifications.length,
-          itemBuilder: (context, index) {
-            final item = notifications[index];
-            return NotificationCard(
-              date: Functions.formatDate(item.date),
-              title: item.title,
-              content: item.content,
-              isRead: userRole == RoleModel.roleStudent ? item.isRead : false,
-              canDel: userRole == RoleModel.roleTeacher ? true : false,
-              onDelete: () => onDelete(index, item.title),
-            );
-          },
-        ),
+        child: notifications.isNotEmpty
+            ? ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final item = notifications[index];
+                  return NotificationCard(
+                    date: Functions.formatDate(item.date),
+                    title: item.title,
+                    content: item.content,
+                    isRead:
+                        userRole == RoleModel.roleStudent ? item.isRead : false,
+                    canDel: userRole == RoleModel.roleTeacher ? true : false,
+                    onDelete: () => onDelete(index, item.title),
+                  );
+                },
+              )
+            : Center(
+                child: Text(
+                  'Hiện không có thông báo nào',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: context.theme.grey ?? Colors.grey),
+                ),
+              ),
       );
     });
   }
