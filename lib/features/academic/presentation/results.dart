@@ -54,10 +54,7 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
-  // --------------------------
   // Chọn học kỳ
-  // --------------------------
-
   void _previousSemester(List<String> semesters) {
     if (_semesterIndex > 0) {
       setState(() => _semesterIndex--);
@@ -260,7 +257,6 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               }
 
-              // Bảo vệ index hợp lệ khi dữ liệu thay đổi
               if (semesters.isEmpty) {
                 return const Center(child: Text('Không có dữ liệu học kỳ'));
               }
@@ -394,10 +390,10 @@ class _ResultsPageState extends State<ResultsPage> {
     final endYear = startYear + 1;
 
     final hkText = switch (hk) {
-      '10' => 'HỌC KỲ 1',
-      '20' => 'HỌC KỲ 2',
-      '21' => 'HỌC KỲ HÈ',
-      _ => 'HỌC KỲ 2',
+      '10' => 'Học kỳ 1',
+      '20' => 'Học kỳ 2',
+      '21' => 'Học kỳ hè',
+      _ => 'Học kỳ 2',
     };
     return '$hkText, $startYear-$endYear';
   }
