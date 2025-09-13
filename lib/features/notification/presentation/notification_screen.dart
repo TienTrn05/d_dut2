@@ -152,7 +152,7 @@ class NotificationScreen extends StatelessWidget {
                               state.personalEnabled, (value) {
                             context
                                 .read<NotificationSettingsBloc>()
-                                .add(ToggleMyNotification(isEnabled: value));
+                                .add(ToggleMyNotification(isEnabled: value, userId: stateAuth.userData.userPrincipalName));
                           }),
                           _buildSwitchTile(
                               context,

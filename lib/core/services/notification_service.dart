@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -261,5 +262,59 @@ class NotificationService {
     logger.i("Notification tapped with payload: ${response.payload}");
     // Tại đây, bạn có thể điều hướng người dùng dựa vào payload
     // Ví dụ: if (response.payload.startsWith('class_id=')) { ... }
+  }
+
+  // Đăng ký topic
+  Future<void> subscribeToTopic(String topic) async {
+    final safeTopic = sanitizeTopic(topic);
+    try {
+      await _firebaseMessaging.subscribeToTopic(safeTopic);
+      logger.i("Subscribed to topic: $safeTopic");
+    } catch (e) {
+      logger.e("Error when subscribing to topic: $safeTopic — $e");
+    }
+  }
+
+  // Hủy đăng ký topic
+  Future<void> unsubscribeFromTopic(String topic) async {
+    final safeTopic = sanitizeTopic(topic);
+    try {
+      await _firebaseMessaging.unsubscribeFromTopic(safeTopic);
+      logger.i("Unsubscribed from topic: $safeTopic");
+    } catch (e) {
+      logger.e("Error when unsubscribing to topic: $safeTopic — $e");
+    }
+  }
+
+  /// Chuẩn hóa tên topic trước khi đăng ký/hủy đăng ký
+  String sanitizeTopic(String topic) {
+    // Thay mọi ký tự @ thành dấu gạch dưới
+    return topic.replaceAll('@', '_');
+  }
+
+  Future<bool> areNotificationsAllowed() async {
+    if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+      final granted = await androidImplementation?.areNotificationsEnabled();
+      return granted ?? false;
+    } else if (Platform.isIOS) {
+      final iosImplementation = _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>();
+      final settings = await iosImplementation?.checkPermissions();
+      return settings?.isEnabled ?? false;
+    }
+    return false;
+  }
+
+  Future<void> openAppSettings() async {
+    if (Platform.isAndroid) {
+      await AppSettings.openAppSettings();
+    } else if (Platform.isIOS) {
+      await AppSettings.openAppSettings();
+    }
   }
 }
