@@ -54,7 +54,7 @@ class DetailResults extends StatelessWidget {
     final t4 = _firstNonEmpty([thang4]);
 
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -75,10 +75,10 @@ class DetailResults extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Center(
+                Align(
+                  alignment: Alignment.centerLeft,
                   child: Text(
                     subjectTitle,
-                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16.0,
@@ -90,17 +90,10 @@ class DetailResults extends StatelessWidget {
                   right: 0,
                   child: InkWell(
                     onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(76),
-                      ),
-                      padding: const EdgeInsets.all(2.0),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 16.0,
-                      ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24.0,
                     ),
                   ),
                 ),
@@ -126,14 +119,10 @@ class DetailResults extends StatelessWidget {
               children: [
                 _kv('Mã lớp học phần', subjectCode),
                 const SizedBox(height: 8.0),
-
                 _kv('Số tín chỉ', credits),
                 const SizedBox(height: 8.0),
-
                 _kv('Công thức điểm', _displayOrPlaceholder(parsed.formula)),
                 const SizedBox(height: 8.0),
-
-                // Các thành phần động theo công thức
                 ...parsed.components.map(
                   (e) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3.0),
@@ -143,15 +132,11 @@ class DetailResults extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const Divider(height: 24),
-
                 _kv('Tổng kết', _displayOrPlaceholder(tk)),
                 const SizedBox(height: 6.0),
-
                 _kv('Thang 4', _displayOrPlaceholder(t4)),
                 const SizedBox(height: 6.0),
-
                 _kv('Thang 10', _displayOrPlaceholder(t10)),
               ],
             ),
@@ -163,7 +148,7 @@ class DetailResults extends StatelessWidget {
 
   // Kết quả phân tích `detailsList`
   //[formula]: chuỗi công thức (nếu có)
-  // [components]: danh sách (giữ nguyên thứ tự xuất hiện) các cặp "mã" -> "điểm"
+  // [components]: danh sách (giữ nguyên thứ tự xuất hiện) các cặp thành phần - điểm
   _ParsedDetails _parseDetails(List<String>? list) {
     final comps = <MapEntry<String, String>>[];
     String formula = '';
@@ -181,7 +166,7 @@ class DetailResults extends StatelessWidget {
           continue;
         }
 
-        // Các dòng "mã: value" bất kỳ (GK, BT, CK, QT, CC, DA, TH, LT, ...).
+        // Các dòng điểm thành phần GK, BT, CK, QT, CC, DA, TH, LT
         final idx = s.indexOf(':');
         if (idx > 0) {
           final code = s.substring(0, idx).trim();
@@ -194,12 +179,10 @@ class DetailResults extends StatelessWidget {
     return _ParsedDetails(formula: formula, components: comps);
   }
 
-  /// Ghép các giá trị lẻ kiểu cũ (BT/GK/CK/QT) vào list động nếu detailsList thiếu.
   void _mergeLegacyFallback(
     _ParsedDetails parsed,
     Map<String, String?> legacy,
   ) {
-    // set hiện có để tránh thêm trùng
     final existingKeys =
         parsed.components.map((e) => e.key.toUpperCase()).toSet();
     legacy.forEach((k, v) {
@@ -228,7 +211,11 @@ class DetailResults extends StatelessWidget {
           width: 140.0,
           child: Text(
             '$label:',
-            style: const TextStyle(fontSize: 14.0, color: Colors.black87),
+            style: TextStyle(
+              fontSize: 14.0,
+              color: Colors.grey[800],
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         Expanded(
@@ -237,7 +224,7 @@ class DetailResults extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14.0,
               fontWeight: FontWeight.w500,
-              color: Colors.black,
+              color: Colors.black, 
             ),
           ),
         ),
