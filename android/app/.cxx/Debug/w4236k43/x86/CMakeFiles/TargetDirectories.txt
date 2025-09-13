@@ -1,2 +1,0 @@
-C:/Users/Dell/d_dut/android/app/.cxx/Debug/w4236k43/x86/CMakeFiles/edit_cache.dir
-C:/Users/Dell/d_dut/android/app/.cxx/Debug/w4236k43/x86/CMakeFiles/rebuild_cache.dir
