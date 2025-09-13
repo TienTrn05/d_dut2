@@ -1,4 +1,3 @@
-import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
