@@ -57,6 +57,8 @@ lib/firebase_options.dart
 android/app/.cxx/
 
 # Build outputs
+android/app/.cxx
+*.cmake
 build/
 .gradle/
 
