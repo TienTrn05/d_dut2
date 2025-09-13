@@ -1,17 +1,18 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AuthMicrosoftButton extends StatelessWidget {
   final String text;
   final bool enabled;
+  final Color color;
   final Function()? onPressed;
 
   const AuthMicrosoftButton({
     super.key,
     required this.text,
     this.enabled = true,
+    this.color = Colors.blue,
     this.onPressed,
   });
 
@@ -21,8 +22,8 @@ class AuthMicrosoftButton extends StatelessWidget {
       builder: (context, constraints) {
         return MaterialButton(
           onPressed: onPressed,
-          color: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+          color: color,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -36,22 +37,22 @@ class AuthMicrosoftButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   text,
-                  style: GoogleFonts.notoSans(
-                    color: Color(0xFF0048FF),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: GoogleFonts.notoSans().fontFamily,
+                    fontSize: FontSizes.medium,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   softWrap: false,
                 ),
               ),
-              const SizedBox(width: 8),
-              SvgPicture.asset(
-                "assets/icons/svg/logo_dut.svg",
-                width: 28,
-                height: 28,
-              ),
+              // const SizedBox(width: 8),
+              // SvgPicture.asset(
+              //   "assets/icons/svg/mdi_microsoft.svg",
+              //   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              // ),
             ],
           ),
         );
