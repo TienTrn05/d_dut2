@@ -466,17 +466,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         );
                                       },
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
-                                      title: "Lớp sinh hoạt",
-                                      // disabled: true,
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                            DashboardNavigateRequested(
-                                                scopes, Routes.detailHomeRoom));
-                                      },
-                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                    //   title: "Lớp sinh hoạt",
+                                    //   // disabled: true,
+                                    //   onTap: () {
+                                    //     context.read<DashboardBloc>().add(
+                                    //         DashboardNavigateRequested(
+                                    //             scopes, Routes.detailHomeRoom));
+                                    //   },
+                                    // ),
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/mage_goals.svg",
