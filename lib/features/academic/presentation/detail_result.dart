@@ -5,8 +5,8 @@ class DetailResults extends StatelessWidget {
   final String subjectTitle; // Tên học phần
   final String credits; // Số tín chỉ
 
-  /// Danh sách chi tiết dạng chuỗi từ API:
-  /// ["Công thức điểm: [GK]*0.20+[BT]*0.20+[CK]*0.60", "GK: 7.5", "BT: 8.0", "CK: 6.0"]
+  // Danh sách chi tiết dạng chuỗi từ API:
+  // ["Công thức điểm: [GK]*0.20+[BT]*0.20+[CK]*0.60", "GK: 7.5", "BT: 8.0", "CK: 6.0"]
   final List<String>? detailsList;
 
   final String? congThucDiem;
@@ -16,8 +16,8 @@ class DetailResults extends StatelessWidget {
   final String? diemQT;
 
   final String? tongKet; // điểm chữ
-  final String? thang10; // "8.0"
-  final String? thang4; // "3.0"
+  final String? thang10; // thang 10
+  final String? thang4; // thang 4
 
   const DetailResults({
     super.key,
@@ -55,7 +55,7 @@ class DetailResults extends StatelessWidget {
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -68,8 +68,8 @@ class DetailResults extends StatelessWidget {
             decoration: const BoxDecoration(
               color: Color(0xFF1976D2),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8.0),
-                topRight: Radius.circular(8.0),
+                topLeft: Radius.circular(16.0),
+                topRight: Radius.circular(16.0),
               ),
             ),
             child: Stack(
@@ -115,10 +115,10 @@ class DetailResults extends StatelessWidget {
               vertical: 12.0,
             ),
             decoration: const BoxDecoration(
-              color: Color(0xFFECEFF1),
+              color: Colors.white,
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(8.0),
-                bottomRight: Radius.circular(8.0),
+                bottomLeft: Radius.circular(16.0),
+                bottomRight: Radius.circular(16.0),
               ),
             ),
             child: Column(
@@ -161,9 +161,9 @@ class DetailResults extends StatelessWidget {
     );
   }
 
-  /// Kết quả phân tích `detailsList`
-  /// - [formula]: chuỗi công thức (nếu có)
-  /// - [components]: danh sách (giữ nguyên thứ tự xuất hiện) các cặp "mã" -> "điểm"
+  // Kết quả phân tích `detailsList`
+  //[formula]: chuỗi công thức (nếu có)
+  // [components]: danh sách (giữ nguyên thứ tự xuất hiện) các cặp "mã" -> "điểm"
   _ParsedDetails _parseDetails(List<String>? list) {
     final comps = <MapEntry<String, String>>[];
     String formula = '';
