@@ -55,3 +55,19 @@ lib/firebase_options.dart
 
 # Android NDK build artifacts
 android/app/.cxx/
+
+# Build outputs
+build/
+.gradle/
+
+# Platform generated
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/Generated.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+android/local.properties
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugin_registrant.h
