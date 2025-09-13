@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../common/extensions/font_sizes.dart';
+import '../../../common/widgets/appbar/custom_appbar.dart';
+import '../../../common/widgets/loading/loading_progress_bar.dart';
 
 import '../bloc/results_bloc.dart';
 import '../bloc/results_event.dart';
@@ -9,6 +13,8 @@ import '../bloc/results_state.dart';
 import '../data/results_repository.dart';
 import '../data/academic_api_client.dart';
 import 'detail_result.dart';
+
+import '../../../features/auth/bloc/auth_bloc.dart';
 
 class ResultsPage extends StatefulWidget {
   final String studentId;
@@ -26,6 +32,9 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
   int _semesterIndex = 0;
+
+  /// Đánh dấu đã auto-chọn kỳ mới nhất lần đầu hay chưa
+  bool _autoPickedLatestOnce = false;
 
   late final AcademicApiClient _client;
   late final ResultsBloc _bloc;
@@ -45,39 +54,163 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
+  // --------------------------
+  // Chọn học kỳ
+  // --------------------------
+
+  void _previousSemester(List<String> semesters) {
+    if (_semesterIndex > 0) {
+      setState(() => _semesterIndex--);
+    }
+  }
+
+  void _nextSemester(List<String> semesters) {
+    if (_semesterIndex < semesters.length - 1) {
+      setState(() => _semesterIndex++);
+    }
+  }
+
+  void _showSemesterPicker(BuildContext context, List<String> semesters) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 200,
+                child: CupertinoPicker(
+                  backgroundColor: Colors.transparent,
+                  itemExtent: 52,
+                  scrollController:
+                      FixedExtentScrollController(initialItem: _semesterIndex),
+                  onSelectedItemChanged: (int index) {
+                    if (_semesterIndex != index) {
+                      setState(() => _semesterIndex = index);
+                    }
+                  },
+                  selectionOverlay: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue.withAlpha(30),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  children: [
+                    for (int i = 0; i < semesters.length; i++)
+                      Center(
+                        child: Text(
+                          _formatSemesterTitle(semesters[i]),
+                          style: const TextStyle(
+                            fontSize: FontSizes.large,
+                            fontWeight: FontWeight.bold,
+                            height: 1.25,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget selector: mũi tên trái – nhãn – mũi tên phải + mở picker
+  Widget _buildSemesterSelector(List<String> semesters) {
+    final currentCode = semesters[_semesterIndex];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => _previousSemester(semesters),
+            child: const Icon(Icons.arrow_back_ios_new_rounded),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () => _showSemesterPicker(context, semesters),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(4.0),
+                child: Center(
+                  child: Text(
+                    _formatSemesterTitle(currentCode),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _nextSemester(semesters),
+            child: const Icon(Icons.arrow_forward_ios_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --------------------------
+  // UI
+  // --------------------------
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _bloc,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('Kết quả học tập'),
-          centerTitle: true,
-          backgroundColor: const Color(0xFF2A74BD),
-          iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 22),
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            color: Colors.white,
-            tooltip: null,
-            onPressed: () => Navigator.of(context).maybePop(),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: SvgPicture.asset(
-                'assets/icons/svg/solar_bell-bold.svg',
-                color: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CustomAppbar(label: 'Kết quả học tập'),
+              BlocBuilder<ResultsBloc, ResultsState>(
+                buildWhen: (prev, curr) => prev.runtimeType != curr.runtimeType,
+                builder: (context, state) {
+                  final isLoading =
+                      state is ResultsInitial || state is ResultsLoading;
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: isLoading
+                        ? SizedBox(
+                            key: const ValueKey('results-loading-bar'),
+                            height: 2,
+                            width: double.infinity,
+                            child: CustomLoadingIndicator.thin(),
+                          )
+                        : const SizedBox(
+                            key: ValueKey('results-no-loading'),
+                            height: 2,
+                          ),
+                  );
+                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         body: BlocBuilder<ResultsBloc, ResultsState>(
           builder: (context, state) {
             if (state is ResultsInitial || state is ResultsLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const SizedBox.shrink();
             }
 
             if (state is ResultsError) {
@@ -92,10 +225,17 @@ class _ResultsPageState extends State<ResultsPage> {
 
               if (all.isEmpty) {
                 return RefreshIndicator(
-                  onRefresh: () async =>
-                      _bloc.add(LoadResults(widget.studentId)),
+                  color: Theme.of(context).primaryColor,
+                  backgroundColor: Colors.white,
+                  onRefresh: () async {
+                    final authState = context.read<AuthBloc>().state;
+                    if (authState is AuthUserAuthenticated) {
+                      _bloc.add(LoadResults(widget.studentId));
+                    }
+                  },
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(24),
                     children: const [
                       SizedBox(height: 200),
                       Center(child: Text('Không có dữ liệu')),
@@ -104,14 +244,30 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // danh sách kỳ, sort giảm dần theo mã kỳ
+              // Thứ tự giữ nguyên: tăng dần -> kỳ sau ở dưới
               final semesters = all.map((e) => e.semesterCode).toSet().toList()
                 ..sort((a, b) =>
-                    (int.tryParse(b) ?? 0).compareTo(int.tryParse(a) ?? 0));
+                    (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0));
 
-              if (_semesterIndex >= semesters.length) _semesterIndex = 0;
+              // Auto-chọn kỳ mới nhất (index cuối) LẦN ĐẦU TIÊN khi đã có dữ liệu
+              if (!_autoPickedLatestOnce && semesters.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  setState(() {
+                    _semesterIndex = semesters.length - 1; // kỳ mới nhất
+                    _autoPickedLatestOnce = true;
+                  });
+                });
+              }
+
+              // Bảo vệ index hợp lệ khi dữ liệu thay đổi
               if (semesters.isEmpty) {
                 return const Center(child: Text('Không có dữ liệu học kỳ'));
+              }
+              if (_semesterIndex >= semesters.length) {
+                _semesterIndex = semesters.length - 1;
+              } else if (_semesterIndex < 0) {
+                _semesterIndex = 0;
               }
 
               final currentCode = semesters[_semesterIndex];
@@ -119,42 +275,21 @@ class _ResultsPageState extends State<ResultsPage> {
                   all.where((e) => e.semesterCode == currentCode).toList();
 
               return RefreshIndicator(
-                onRefresh: () async => _bloc.add(LoadResults(widget.studentId)),
+                color: Theme.of(context).primaryColor,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState is AuthUserAuthenticated) {
+                    _bloc.add(LoadResults(widget.studentId));
+                  }
+                },
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(24),
                   itemCount: items.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.chevron_left,
-                                  color: Colors.black54),
-                              onPressed: _semesterIndex < semesters.length - 1
-                                  ? () => setState(() => _semesterIndex++)
-                                  : null,
-                            ),
-                            Text(
-                              _formatSemesterTitle(currentCode),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.chevron_right,
-                                  color: Colors.black54),
-                              onPressed: _semesterIndex > 0
-                                  ? () => setState(() => _semesterIndex--)
-                                  : null,
-                            ),
-                          ],
-                        ),
-                      );
+                      return _buildSemesterSelector(semesters);
                     }
 
                     final s = items[index - 1];
@@ -163,8 +298,7 @@ class _ResultsPageState extends State<ResultsPage> {
                         hasTitle ? s.subjectTitle!.trim() : s.classCode;
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 6.0),
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(8),
                         onTap: () {
@@ -199,13 +333,15 @@ class _ResultsPageState extends State<ResultsPage> {
                                     Text(
                                       s.classCode,
                                       style: const TextStyle(
-                                          fontSize: 12, color: Colors.black45),
+                                        fontSize: FontSizes.small,
+                                        color: Colors.black45,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       subjectTitleText,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: FontSizes.large,
                                         color: Color(0xFF2A74BD),
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -214,7 +350,9 @@ class _ResultsPageState extends State<ResultsPage> {
                                     Text(
                                       'Số TC: ${s.credits ?? '-'}',
                                       style: const TextStyle(
-                                          fontSize: 12, color: Colors.black54),
+                                        fontSize: FontSizes.small,
+                                        color: Colors.black54,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -222,7 +360,7 @@ class _ResultsPageState extends State<ResultsPage> {
                               Text(
                                 s.scoreChar ?? '--/--',
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: FontSizes.large,
                                   color: Colors.black45,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -256,10 +394,10 @@ class _ResultsPageState extends State<ResultsPage> {
     final endYear = startYear + 1;
 
     final hkText = switch (hk) {
-      '10' => 'HỌC KÌ 1',
-      '20' => 'HỌC KÌ 2',
-      '21' => 'HỌC KÌ HÈ',
-      _ => 'HỌC KÌ 2',
+      '10' => 'HỌC KỲ 1',
+      '20' => 'HỌC KỲ 2',
+      '21' => 'HỌC KỲ HÈ',
+      _ => 'HỌC KỲ 2',
     };
     return '$hkText, $startYear-$endYear';
   }
@@ -278,7 +416,11 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Lỗi: $message', textAlign: TextAlign.center),
+            Text(
+              'Lỗi: $message',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: FontSizes.medium),
+            ),
             const SizedBox(height: 8),
             ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
           ],
