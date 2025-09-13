@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../core/services/notification_service.dart';
 import '../../../common/routes/routes.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import '../../loading/loading_bloc.dart';
 import '../bloc/auth_bloc.dart';
-import '../bloc/login_bloc.dart';
 import 'login_form.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -24,7 +24,9 @@ class _AuthScreenState extends State<AuthScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() => _showLogo = true);
+      if (mounted) {
+        setState(() => _showLogo = true);
+      }
     });
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
@@ -84,14 +86,18 @@ class _AuthScreenState extends State<AuthScreen> {
                           height: 92,
                           color: Colors.white,
                         ),
-                        SizedBox(width: 8,),
+                        SizedBox(
+                          width: 8,
+                        ),
                         SvgPicture.asset(
                           "assets/icons/svg/dDUT_u.svg",
                           width: 52,
                           height: 52,
                           color: Color(0xFFFFFF01),
                         ),
-                        SizedBox(width: 8,),
+                        SizedBox(
+                          width: 8,
+                        ),
                         SvgPicture.asset(
                           "assets/icons/svg/dDUT_t.svg",
                           width: 52,
@@ -114,11 +120,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Transform.translate(
                     offset: Offset(0,
                         _showLogo ? 120 : 300), // bắt đầu thấp hơn, trượt lên
-                    child: SvgPicture.asset(
-                      "assets/icons/svg/bg_pattern.svg",
+                    child: Image.asset(
+                      "assets/images/bg_pattern.png",
                       width: MediaQuery.of(context).size.width * 1.1,
                       fit: BoxFit.cover,
-                      color: const Color(0xFF0048FF),
                     ),
                   ),
                 ),
@@ -130,9 +135,14 @@ class _AuthScreenState extends State<AuthScreen> {
                     opacity: _showForm ? 1 : 0,
                     duration: const Duration(milliseconds: 1000),
                     curve: Curves.easeOut,
-                    child: BlocProvider(
-                      create: (context) => LoginBloc(),
-                      child: const LoginForm(),
+                    child: LoginForm(
+                      onPressed: () async {
+                        var fcmToken =
+                            await NotificationService().getFCMToken();
+                        context.read<AuthBloc>().add(
+                              MicrosoftSignInRequested(fcmToken ?? ""),
+                            );
+                      },
                     ),
                   ),
                 ),
