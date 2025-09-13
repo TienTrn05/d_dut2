@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/services/notification_service.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/login_bloc.dart';
 import 'widgets/auth_microsoft_button.dart';
-import '../../../common/extensions/custom_theme_extension.dart';
-import '../../../common/utils/app_environment.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -21,8 +18,9 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm>
     with SingleTickerProviderStateMixin {
   bool _showContainer = false;
-  bool _showLogo = false;
+
   bool _showTitle = false;
+  bool _showSubTitle = false;
   bool _showButton = false;
 
   @override
@@ -36,10 +34,10 @@ class _LoginFormState extends State<LoginForm>
 
     // Sau đó lần lượt các phần tử
     Future.delayed(const Duration(milliseconds: 800), () {
-      setState(() => _showLogo = true);
+      setState(() => _showTitle = true);
     });
     Future.delayed(const Duration(milliseconds: 1200), () {
-      setState(() => _showTitle = true);
+      setState(() => _showSubTitle = true);
     });
     Future.delayed(const Duration(milliseconds: 1600), () {
       setState(() => _showButton = true);
@@ -53,67 +51,69 @@ class _LoginFormState extends State<LoginForm>
         opacity: _showContainer ? 1 : 0,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeOut,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 64),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(77),
-                offset: const Offset(0, 6),
-                blurRadius: 12,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedOpacity(
-                opacity: _showLogo ? 1 : 0,
-                duration: const Duration(milliseconds: 500),
-                child: SvgPicture.asset(
-                  AppEnvironment.logoPath,
-                  width: 92,
-                  height: 92,
-                  color: context.theme.primaryColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedOpacity(
+              opacity: _showTitle ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: Text(
+                "Welcome to digital DUT",
+                style: GoogleFonts.baloo2(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  decoration: TextDecoration.none,
                 ),
+                textAlign: TextAlign.center,
               ),
-              AnimatedOpacity(
-                opacity: _showTitle ? 1 : 0,
-                duration: const Duration(milliseconds: 500),
-                child: Text(
-                  "Digital DUT",
-                  style: GoogleFonts.baloo2(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: context.theme.primaryColor,
-                    decoration: TextDecoration.none,
+            ),
+            const SizedBox(height: 36),
+            AnimatedOpacity(
+              opacity: _showSubTitle ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: Column(
+                children: [
+                  Text(
+                    "Đăng nhập với tài khoản email của",
+                    style: GoogleFonts.notoSans(
+                      fontSize: 16,
+                      color: Color(0xFFECECEC),
+                      decoration: TextDecoration.none,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  Text(
+                    "Trường (Office 365)",
+                    style: GoogleFonts.notoSans(
+                      fontSize: 16,
+                      color: Color(0xFFECECEC),
+                      decoration: TextDecoration.none,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              AnimatedOpacity(
-                opacity: _showButton ? 1 : 0,
-                duration: const Duration(milliseconds: 500),
-                child: BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    return AuthMicrosoftButton(
-                      text: "Đăng nhập bằng Microsoft",
-                      color: context.theme.primaryColor ?? Colors.blue,
-                      onPressed: () async {
-                        var fcmToken =
-                            await NotificationService().getFCMToken();
-                        context.read<AuthBloc>().add(
-                              MicrosoftSignInRequested(fcmToken ?? ""),
-                            );
-                      },
-                    );
-                  },
-                ),
+            ),
+            const SizedBox(height: 16),
+            AnimatedOpacity(
+              opacity: _showButton ? 1 : 0,
+              duration: const Duration(milliseconds: 500),
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return AuthMicrosoftButton(
+                    text: "ĐĂNG NHẬP",
+                    onPressed: () async {
+                      var fcmToken = await NotificationService().getFCMToken();
+                      context.read<AuthBloc>().add(
+                            MicrosoftSignInRequested(fcmToken ?? ""),
+                          );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

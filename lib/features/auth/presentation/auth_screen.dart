@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../common/routes/routes.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
@@ -39,14 +40,39 @@ class _AuthScreenState extends State<AuthScreen> {
         children: [
           Container(
             decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/background.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
+                gradient: LinearGradient(colors: [
+              Color(0xFF010099),
+              Color(0xFF0048FF),
+              Color(0xFF010099),
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
           ),
-          Container(
-            color: Colors.black.withOpacity(0.2),
+          Column(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 92),
+                    child: SvgPicture.asset(
+                      "assets/icons/svg/logo_dDUTcolor.svg",
+                      width: 92,
+                      height: 92,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Transform.translate(
+                  offset: Offset(0, 120),
+                  child: SvgPicture.asset(
+                    "assets/icons/svg/bg_pattern.svg",
+                    width: MediaQuery.of(context).size.width * 1.1,
+                    fit: BoxFit.cover,
+                    color: const Color(0xFF0048FF),
+                  ),
+                ),
+              ),
+            ],
           ),
           BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
