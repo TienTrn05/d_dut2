@@ -1,8 +1,11 @@
-import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../common/extensions/custom_theme_extension.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/extensions/custom_theme_extension.dart';
 
 class NotificationCard extends StatelessWidget {
   final String date;
@@ -66,11 +69,29 @@ class NotificationCard extends StatelessWidget {
                   fontSize: FontSizes.medium,
                 )),
             SizedBox(height: 5),
-            Text(content,
-                style: TextStyle(
-                  fontSize: FontSizes.medium,
+            Html(
+              data: content,
+              onLinkTap: (url, attributes, element) async {
+                if (url != null && await canLaunchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url),
+                      mode: LaunchMode.externalApplication);
+                } else {
+                  CustomSnackbar.showSnackBar(
+                      context,
+                      "Không thể mở liên kết",
+                      " Liên kết không hợp lệ hoặc không thể mở.",
+                      AlertType.error);
+                }
+              },
+              style: {
+                "body": Style(
+                  fontSize: FontSize(FontSizes.medium),
                   color: context.theme.grey,
-                )),
+                  margin: Margins.zero,
+                  padding: HtmlPaddings.zero,
+                ),
+              },
+            ),
           ],
         ),
       ),
