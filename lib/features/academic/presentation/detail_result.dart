@@ -1,3 +1,5 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 
 class DetailResults extends StatelessWidget {
@@ -61,10 +63,7 @@ class DetailResults extends StatelessWidget {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
+            padding: const EdgeInsets.all(16.0),
             decoration: const BoxDecoration(
               color: Color(0xFF1976D2),
               borderRadius: BorderRadius.only(
@@ -79,9 +78,9 @@ class DetailResults extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     subjectTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16.0,
+                      fontSize: FontSizes.extraLarge,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -91,7 +90,7 @@ class DetailResults extends StatelessWidget {
                   child: InkWell(
                     onTap: () => Navigator.of(context).pop(),
                     child: const Icon(
-                      Icons.close,
+                      Icons.close_rounded,
                       color: Colors.white,
                       size: 24.0,
                     ),
@@ -103,10 +102,7 @@ class DetailResults extends StatelessWidget {
 
           // Body
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
+            padding: const EdgeInsets.all(16.0),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
@@ -117,27 +113,29 @@ class DetailResults extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _kv('Mã lớp học phần', subjectCode),
+                _kv(context, 'Mã lớp học phần', subjectCode),
                 const SizedBox(height: 8.0),
-                _kv('Số tín chỉ', credits),
+                _kv(context, 'Số tín chỉ', credits),
                 const SizedBox(height: 8.0),
-                _kv('Công thức điểm', _displayOrPlaceholder(parsed.formula)),
+                _kv(context, 'Công thức điểm',
+                    _displayOrPlaceholder(parsed.formula)),
                 const SizedBox(height: 8.0),
                 ...parsed.components.map(
                   (e) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3.0),
                     child: _kv(
+                      context,
                       _labelFor(e.key),
                       _displayOrPlaceholder(e.value),
                     ),
                   ),
                 ),
                 const Divider(height: 24),
-                _kv('Tổng kết', _displayOrPlaceholder(tk)),
+                _kv(context, 'Tổng kết', _displayOrPlaceholder(tk)),
                 const SizedBox(height: 6.0),
-                _kv('Thang 4', _displayOrPlaceholder(t4)),
+                _kv(context, 'Thang 4', _displayOrPlaceholder(t4)),
                 const SizedBox(height: 6.0),
-                _kv('Thang 10', _displayOrPlaceholder(t10)),
+                _kv(context, 'Thang 10', _displayOrPlaceholder(t10)),
               ],
             ),
           ),
@@ -203,7 +201,7 @@ class DetailResults extends StatelessWidget {
   static String _displayOrPlaceholder(String s) =>
       (s.isEmpty || s == 'null') ? _placeholder : s;
 
-  Widget _kv(String label, String value) {
+  Widget _kv(BuildContext context, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -212,9 +210,8 @@ class DetailResults extends StatelessWidget {
           child: Text(
             '$label:',
             style: TextStyle(
-              fontSize: 14.0,
-              color: Colors.grey[800],
-              fontWeight: FontWeight.w500,
+              fontSize: FontSizes.medium,
+              color: context.theme.grey,
             ),
           ),
         ),
@@ -222,9 +219,9 @@ class DetailResults extends StatelessWidget {
           child: Text(
             value,
             style: const TextStyle(
-              fontSize: 14.0,
+              fontSize: FontSizes.medium,
               fontWeight: FontWeight.w500,
-              color: Colors.black, 
+              color: Colors.black,
             ),
           ),
         ),
