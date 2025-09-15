@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:e_dut/features/homeroom/data/model/noti_model.dart';
 import 'package:injectable/injectable.dart';
 
 import '/core/services/api_client.dart';
@@ -99,6 +100,68 @@ class ProfileService {
     } catch (e) {
       logger.e("Error getting teacher profile: $e");
       rethrow;
+    }
+  }
+
+  Future<String> createNotification(
+      String token, String classId, String title, String content) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/notifications/create",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        data: {"classId": classId, "title": title, "content": content, "lecturerId": ""},
+      );
+
+      if (response.statusCode == 200) {
+        final String data = response.data['data'];
+
+        // notificationId
+        return data;
+      } else {
+        throw Exception(
+          "Failed to create notification: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Failed to create notification: $e");
+      throw Exception("Failed to create notification: $e");
+    }
+  }
+
+  Future<List<NotiModel>> getNotificationsByClassId(
+    String token,
+    String classId,
+  ) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/notifications",
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+        queryParameters: {"classId": classId},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['data'];
+
+        // map sang list
+        return data
+            .map((e) => NotiModel(
+                id: e['id'],
+                title: e['title'],
+                content: e['content'],
+                date: DateTime.parse(e['createdAt'])))
+            .toList();
+      } else {
+        throw Exception(
+          "Failed to get notifications by classId: ${response.data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Error fetching notifications by classId: $e");
+      throw Exception("Failed to fetch notifications by classId: $e");
     }
   }
 }
