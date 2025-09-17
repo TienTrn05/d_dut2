@@ -147,9 +147,18 @@ class Routes {
         return MaterialPageRoute(builder: (context) => ListHomeroomScreen());
 
       case detailHomeRoom:
-        return MaterialPageRoute(builder: (context) => DetailHomeroomScreen(
-            classId: settings.arguments as String
-        ));
+        final args = settings.arguments as Map<String, dynamic>?;
+
+        // Lấy giá trị và xử lý null
+        final classId = args?["id"] as String?;
+        final homeroomName = args?["name"] as String?;
+
+        return MaterialPageRoute(
+          builder: (context) => DetailHomeroomScreen(
+            classId: classId,
+            homeroomName: homeroomName,
+          ),
+        );
 
       // ***** ACADEMIC ***** //
       case academicResults:

@@ -1,3 +1,4 @@
+import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +14,6 @@ import './info_card.dart';
 import './info_item.dart';
 
 class TeacherProfile extends StatelessWidget {
-
   const TeacherProfile({super.key});
 
   @override
@@ -42,7 +42,9 @@ class TeacherProfile extends StatelessWidget {
               profileState.teacherProfileStatus ==
                   TeacherProfileStatus.initial) {
             return Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: context.theme.primaryColor,
+              ),
             );
           } else if (profileState.teacherProfileStatus ==
               TeacherProfileStatus.failure) {
@@ -85,7 +87,8 @@ class TeacherProfile extends StatelessWidget {
                       // InfoItem(field: "Học vị", value: profile.degree),
                       // InfoItem(field: "Học hàm", value: profile.academicTitle),
                       InfoItem(
-                          field: "Đơn vị công tác", value: profileState.profile!.department),
+                          field: "Đơn vị công tác",
+                          value: profileState.profile!.department),
                       // InfoItem(field: "Chức danh", value: profile.position),
                       // InfoItem(
                       //     field: "Năm công tác",

@@ -5,6 +5,7 @@ import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
+import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/homeroom/bloc/homeroom_bloc.dart';
@@ -14,17 +15,21 @@ import 'package:e_dut/features/homeroom/presentation/widgets/detail_tab/notifica
 import 'package:e_dut/features/homeroom/presentation/widgets/items/student_item.dart';
 import 'package:e_dut/features/profile/bloc/student_profile/student_profile_bloc.dart';
 import 'package:e_dut/features/profile/domain/repository/profile_repository.dart';
-import 'package:e_dut/features/schedule/data/model/noti_model.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/custom/search_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/edit_field_item.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DetailHomeroomScreen extends StatefulWidget {
-  const DetailHomeroomScreen({super.key, required this.classId});
+import '../../../notification/domain/repositories/notification_repository.dart';
+import '../../bloc/notification/noti_bloc.dart';
+import '../../data/model/noti_model.dart';
 
-  final String classId; // Thay thế bằng classId thực tế
+class DetailHomeroomScreen extends StatefulWidget {
+  const DetailHomeroomScreen({super.key, this.classId, this.homeroomName});
+
+  final String? classId;
+  final String? homeroomName;
 
   @override
   State<DetailHomeroomScreen> createState() => _DetailHomeroomScreenState();
@@ -32,8 +37,6 @@ class DetailHomeroomScreen extends StatefulWidget {
 
 class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
     with SingleTickerProviderStateMixin {
-  List<NotiModel> notifications = NotiModel.mockData;
-
   List<StudentModel> students = [];
   List<StudentModel> filteredStudents = [];
 
@@ -54,15 +57,20 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
         'Xóa thông báo',
         'Bạn có chắc chắn muốn xóa thông báo: $truncatedTitle?',
         dialog.AlertDialogType.delete,
-        onConfirm: () => setState(() {
-              notifications.removeAt(index);
-            }),
+        onConfirm: () => {
+              // context
+              //     .read<NotiBloc>()
+              //     .add(DeleteNotiEvent(
+              //         notifications[index].id, widget.classId!, authToken)),
+              Navigator.pop(context)
+            },
         textConfirm: "Xóa");
   }
 
-  void _showCreatNewNoti(BuildContext context) {
+  void _showCreatNewNoti(
+      BuildContext contextOuter, String classId, String authToken) {
     showModalBottomSheet(
-      context: context,
+      context: contextOuter,
       isScrollControlled: true,
       showDragHandle: true,
       shape: RoundedRectangleBorder(
@@ -93,39 +101,41 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                   'Bạn có chắc chắn muốn lưu thông báo: $truncatedTitle?',
                   dialog.AlertDialogType.confirm,
                   onConfirm: () => {
-                        setState(() {
-                          notifications.insert(0, newItem);
-                        }),
+                        contextOuter
+                            .read<NotiBloc>()
+                            .add(AddNotiEvent(newItem, classId, authToken)),
                         Navigator.pop(context)
                       },
                   textConfirm: "Lưu");
             }
           }
 
-          return BottomModal(
-              title: "Thêm thông báo mới",
-              enabledMainAction: title.isNotEmpty && content.isNotEmpty,
-              mainAction: addNotification,
-              onClose: () {
-                _titleController.clear();
-                _contentController.clear();
-              },
-              child: Column(
-                children: [
-                  EditFieldItem(
-                    field: "Tiêu đề",
-                    controller: _titleController,
-                    minLine: 1,
-                    maxLine: 2,
-                  ),
-                  const SizedBox(height: 10),
-                  EditFieldItem(
-                    field: "Nội dung",
-                    controller: _contentController,
-                    minLine: 3,
-                  )
-                ],
-              ));
+          return SafeArea(
+            child: BottomModal(
+                title: "Thêm thông báo mới",
+                enabledMainAction: title.isNotEmpty && content.isNotEmpty,
+                mainAction: addNotification,
+                onClose: () {
+                  _titleController.clear();
+                  _contentController.clear();
+                },
+                child: Column(
+                  children: [
+                    EditFieldItem(
+                      field: "Tiêu đề",
+                      controller: _titleController,
+                      minLine: 1,
+                      maxLine: 2,
+                    ),
+                    const SizedBox(height: 10),
+                    EditFieldItem(
+                      field: "Nội dung",
+                      controller: _contentController,
+                      minLine: 3,
+                    )
+                  ],
+                )),
+          );
         });
       },
     ).whenComplete(() {
@@ -190,7 +200,6 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
@@ -205,99 +214,112 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: CustomAppbar(label: 'Chi tiết lớp sinh hoạt'),
-            body: BlocProvider(
-              create: (context) =>
-                  StudentProfileBloc(repository: getIt.get<ProfileRepository>())
-                    ..add(LoadStudentProfile(authToken)),
-              child: BlocBuilder<StudentProfileBloc, StudentProfileState>(
-                builder: (context, profileState) {
-                  if (profileState.studentProfileStatus ==
-                          StudentProfileStatus.loading ||
-                      profileState.studentProfileStatus ==
-                          StudentProfileStatus.initial) {
-                    return CustomLoadingIndicator.primary();
-                  } else if (profileState.studentProfileStatus ==
-                      StudentProfileStatus.failure) {
-                    return Center(
-                      child: Text(
-                        'Lỗi khi tải thông tin',
-                        style: TextStyle(fontSize: FontSizes.large),
-                      ),
-                    );
-                  }
+            body: SafeArea(
+              child: BlocProvider(
+                create: (context) => StudentProfileBloc(
+                    repository: getIt.get<ProfileRepository>())
+                  ..add(LoadStudentProfile(authToken)),
+                child: BlocBuilder<StudentProfileBloc, StudentProfileState>(
+                  builder: (context, profileState) {
+                    if (profileState.studentProfileStatus ==
+                            StudentProfileStatus.loading ||
+                        profileState.studentProfileStatus ==
+                            StudentProfileStatus.initial) {
+                      return CustomLoadingIndicator.primary();
+                    } else if (profileState.studentProfileStatus ==
+                        StudentProfileStatus.failure) {
+                      return Center(
+                        child: Text(
+                          'Lỗi khi tải thông tin',
+                          style: TextStyle(fontSize: FontSizes.large),
+                        ),
+                      );
+                    }
 
-                  // Get classId from student profile
-                  final String classId = profileState.profile?.homeroomId ?? '';
-                  final String homeroomName =
-                      profileState.profile?.homeroom ?? '';
+                    // Get classId from student profile
+                    final String classId =
+                        profileState.profile?.homeroomId ?? '';
+                    final String homeroomName =
+                        profileState.profile?.homeroom ?? '';
 
-                  return Container(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      spacing: 20.0,
-                      children: [
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            homeroomName,
-                            style: TextStyle(
-                              fontSize: FontSizes.extraLarge,
-                              fontWeight: FontWeight.bold,
-                              color: context.theme.primaryColor,
+                    return Container(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        spacing: 20.0,
+                        children: [
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              homeroomName,
+                              style: TextStyle(
+                                fontSize: FontSizes.extraLarge,
+                                fontWeight: FontWeight.bold,
+                                color: context.theme.primaryColor,
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                            child: BlocProvider(
-                          create: (_) =>
-                              HomeroomBloc(getIt.get<HomeroomRepository>())
-                                ..add(LoadStudentsOfHomeroom(
-                                    token: authToken, classId: classId)),
-                          child: BlocBuilder<HomeroomBloc, HomeroomState>(
-                            builder: (context, homeroomState) {
-                              if (homeroomState is HomeroomError) {
-                                return Center(
-                                    child: Text('Xảy ra lỗi',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: context.theme.grey ??
-                                                Colors.grey)));
-                              }
-                              if (homeroomState is HomeroomLoaded) {
-                                final newData = List<StudentModel>.from(
-                                    homeroomState.students)
-                                  ..sort((a, b) => a.studentCardNumber
-                                      .compareTo(b.studentCardNumber));
-
-                                // Only initialize if data changed or not initialized yet
-                                if (!_isDataInitialized ||
-                                    students != newData) {
-                                  WidgetsBinding.instance
-                                      .addPostFrameCallback((_) {
-                                    _initializeStudentsList(newData);
-                                    setState(() {
-                                      _isDataInitialized = true;
-                                    });
-                                  });
+                          Expanded(
+                              child: BlocProvider(
+                            create: (_) =>
+                                HomeroomBloc(getIt.get<HomeroomRepository>())
+                                  ..add(LoadStudentsOfHomeroom(
+                                      token: authToken, classId: classId)),
+                            child: BlocBuilder<HomeroomBloc, HomeroomState>(
+                              builder: (context, homeroomState) {
+                                if (homeroomState is HomeroomError) {
+                                  return Center(
+                                      child: Text('Xảy ra lỗi',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: context.theme.grey ??
+                                                  Colors.grey)));
                                 }
-                              }
+                                if (homeroomState is HomeroomLoaded) {
+                                  final newData = List<StudentModel>.from(
+                                      homeroomState.students)
+                                    ..sort((a, b) => a.studentCardNumber
+                                        .compareTo(b.studentCardNumber));
 
-                              return _buildStudentsList();
-                            },
-                          ),
-                        )),
-                      ],
-                    ),
-                  );
-                },
+                                  // Only initialize if data changed or not initialized yet
+                                  if (!_isDataInitialized ||
+                                      students != newData) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      _initializeStudentsList(newData);
+                                      setState(() {
+                                        _isDataInitialized = true;
+                                      });
+                                    });
+                                  }
+                                }
+
+                                return _buildStudentsList();
+                              },
+                            ),
+                          )),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           );
         } else {
-          return BlocProvider(
-            create: (_) => HomeroomBloc(getIt.get<HomeroomRepository>())
-              ..add(
-                  LoadStudentsOfHomeroom(token: authToken, classId: widget.classId)),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                  create: (_) => HomeroomBloc(getIt.get<HomeroomRepository>())
+                    ..add(LoadStudentsOfHomeroom(
+                        token: authToken, classId: widget.classId!))),
+              BlocProvider(
+                  create: (_) => NotiBloc(
+                        getIt.get<NotificationRepository>(),
+                        getIt.get<ProfileRepository>(),
+                        getIt.get<HomeroomRepository>(),
+                      )..add(LoadNotiEvent(
+                          authToken: authToken, classId: widget.classId!))),
+            ],
             child: BlocBuilder<HomeroomBloc, HomeroomState>(
               builder: (context, homeroomState) {
                 // Gán students từ state
@@ -318,7 +340,8 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                   }
                 }
 
-                return _buildTeacherView(context, userRole, homeroomState);
+                return _buildTeacherView(
+                    context, userRole, authToken, homeroomState);
               },
             ),
           );
@@ -327,69 +350,95 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
     );
   }
 
-  Widget _buildTeacherView(
-      BuildContext context, String userRole, HomeroomState homeroomState) {
+  Widget _buildTeacherView(BuildContext context, String userRole,
+      String authToken, HomeroomState homeroomState) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppbar(label: 'Chi tiết lớp chủ nhiệm'),
-        body: Container(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            spacing: 20.0,
-            children: [
-              Container(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '21TCLC_DT2',
-                  style: TextStyle(
-                    fontSize: FontSizes.extraLarge,
-                    fontWeight: FontWeight.bold,
-                    color: context.theme.primaryColor,
+        body: BlocListener<NotiBloc, NotiState>(
+          listener: (context, state) {
+            if (state.status == NotiStatus.failure &&
+                state.errorMessage != '') {
+              CustomSnackbar.showSnackBar(
+                  context, "Lỗi", state.errorMessage, AlertType.error);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              spacing: 20.0,
+              children: [
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.homeroomName ?? '',
+                    style: TextStyle(
+                      fontSize: FontSizes.extraLarge,
+                      fontWeight: FontWeight.bold,
+                      color: context.theme.primaryColor,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                color: Colors.white,
-                child: TabBar.secondary(
-                  controller: _tabController,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: context.theme.grey,
-                  indicator: BoxDecoration(
-                    color: context.theme.primaryColor,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(4)),
+                Container(
+                  color: Colors.white,
+                  child: TabBar.secondary(
+                    controller: _tabController,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: context.theme.grey,
+                    indicator: BoxDecoration(
+                      color: context.theme.primaryColor,
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(4)),
+                    ),
+                    dividerColor: context.theme.primaryColor,
+                    labelStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.0,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 13.0,
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    tabs: [
+                      Tab(text: "Thông báo"),
+                      Tab(text: "Danh sách sinh viên"),
+                    ],
                   ),
-                  dividerColor: context.theme.primaryColor,
-                  labelStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13.0,
-                  ),
-                  unselectedLabelStyle: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 13.0,
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  tabs: [
-                    Tab(text: "Thông báo"),
-                    Tab(text: "Danh sách sinh viên"),
-                  ],
                 ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  physics: ClampingScrollPhysics(),
-                  children: [
-                    NotificationsTab(
-                        notifications: notifications,
-                        onDelete: _deleteNotification),
-                    _buildStudentsList()
-                  ],
-                ),
-              ),
-            ],
+                BlocBuilder<NotiBloc, NotiState>(builder: (context, state) {
+                  return Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      physics: ClampingScrollPhysics(),
+                      children: [
+                        Stack(
+                          children: [
+                            NotificationsTab(
+                                notifications: state.notifications,
+                                onDelete: _deleteNotification),
+                            if (state.status == NotiStatus.loading)
+                              Positioned.fill(
+                                child: Container(
+                                  color: Colors.black.withOpacity(0),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: context.theme.primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        _buildStudentsList()
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
         ),
         floatingActionButton: _tabController.index == 0
@@ -404,7 +453,8 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                 ]),
                 child: FloatingActionButton(
                   elevation: 0,
-                  onPressed: () => _showCreatNewNoti(context),
+                  onPressed: () =>
+                      _showCreatNewNoti(context, widget.classId!, authToken),
                   backgroundColor: context.theme.primaryColor,
                   shape: const CircleBorder(),
                   child: const Icon(Icons.add_rounded,

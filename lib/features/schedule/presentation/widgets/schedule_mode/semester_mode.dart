@@ -180,12 +180,6 @@ class _SemesterModeState extends State<SemesterMode> {
               if (state is TimetableDataLoaded) {
                 selectedIndex = state.selectedIndex;
               }
-
-              if (state is TimetableError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message)),
-                );
-              }
             },
             builder: (context, state) {
               if (state is TimetableLoading) {

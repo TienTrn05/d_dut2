@@ -50,11 +50,7 @@ class HomeroomService {
 
         final List<dynamic> data = responseData['data'];
 
-        final homerooms = data.map((e) => HomeroomModel(
-            id: e['id'] ?? 'Unknown',
-            name: e['name'] ?? 'Unknown',
-            numStudent: e['numOfStudents'] ?? 0
-        )).toList();
+        final homerooms = data.map((e) => HomeroomModel.fromJson(e)).toList();
 
         return homerooms;
       } else {

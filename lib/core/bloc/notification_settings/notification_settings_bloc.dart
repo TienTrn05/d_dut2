@@ -24,8 +24,20 @@ class NotificationSettingsBloc
     });
   }
 
-  void _onLoadNotificationSettings(
-      LoadNotificationSettings event, Emitter<NotificationSettingsState> emit) {
+  void _onLoadNotificationSettings(LoadNotificationSettings event,
+      Emitter<NotificationSettingsState> emit) async {
+    bool isAllowed = await NotificationService().areNotificationsAllowed();
+    if (!isAllowed) {
+      await Storage.setGeneralNotification(false);
+      await Storage.setMyNotification(false);
+      await Storage.setExamNotification(false);
+      return emit(state.copyWith(
+        generalEnabled: () => false,
+        personalEnabled: () => false,
+        examEnabled: () => false,
+      ));
+    }
+
     emit(state.copyWith(
       generalEnabled: () => Storage.generalNotification,
       personalEnabled: () => Storage.myNotification,
@@ -35,12 +47,36 @@ class NotificationSettingsBloc
 
   Future<void> _onToggleGeneralNotification(ToggleGeneralNotification event,
       Emitter<NotificationSettingsState> emit) async {
-    await Storage.setGeneralNotification(event.isEnabled);
-    emit(state.copyWith(generalEnabled: () => event.isEnabled));
+    try {
+      if (event.isEnabled) {
+        if (!await NotificationService().areNotificationsAllowed()) {
+          // open app settings if not allowed
+          await NotificationService().openAppSettings();
+          return;
+        }
+        NotificationService().subscribeToTopic("general");
+      } else {
+        NotificationService().unsubscribeFromTopic("general");
+      }
+      await Storage.setGeneralNotification(event.isEnabled);
+      emit(state.copyWith(generalEnabled: () => event.isEnabled));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: () => "Đã có lỗi xảy ra"));
+    }
   }
 
   Future<void> _onToggleMyNotification(ToggleMyNotification event,
       Emitter<NotificationSettingsState> emit) async {
+    if (event.isEnabled) {
+      if (!await NotificationService().areNotificationsAllowed()) {
+        // open app settings if not allowed
+        await NotificationService().openAppSettings();
+        return;
+      }
+      NotificationService().subscribeToTopic("personal_${event.userId}");
+    } else {
+      NotificationService().unsubscribeFromTopic("personal_${event.userId}");
+    }
     await Storage.setMyNotification(event.isEnabled);
     emit(state.copyWith(personalEnabled: () => event.isEnabled));
   }

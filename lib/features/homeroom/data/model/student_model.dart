@@ -1,11 +1,11 @@
-import 'package:e_dut/features/homeroom/data/model/class_model.dart';
+import 'package:e_dut/features/homeroom/data/model/homeroom_model.dart';
 import 'package:e_dut/features/homeroom/data/model/program_model.dart';
 
 class StudentModel {
   final String id;
   final String studentCardNumber;
   final String classId;
-  final ClassModel homeroom;
+  final HomeroomModel homeroom;
   final String fullName;
   final int gender;
   final DateTime birthday;
@@ -30,7 +30,7 @@ class StudentModel {
         id: json['id'] ?? '',
         studentCardNumber: json['studentCardNumber'] ?? '',
         classId: json['classId'] ?? '',
-        homeroom: ClassModel.fromJson(json['class']),
+        homeroom: HomeroomModel.fromJson(json['class']),
         fullName: json['fullName'] ?? '',
         gender: json['gender'] ?? '',
         birthday: DateTime.parse(json['birthday']),

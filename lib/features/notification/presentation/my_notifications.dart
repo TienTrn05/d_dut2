@@ -41,7 +41,9 @@ class MyNotifications extends StatelessWidget {
         );
       } else if (state.myNotificationsStatus == MyNotificationsStatus.success &&
           state.myNotifications.isEmpty) {
-        return const Center(child: Text("Hiện không có thông báo nào"));
+        return Center(
+            child: Text("Hiện không có thông báo nào",
+                style: TextStyle(color: context.theme.grey ?? Colors.grey)));
       }
       return Column(
         children: [

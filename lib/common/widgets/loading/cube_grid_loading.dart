@@ -12,7 +12,7 @@ class CubeGridLoading extends StatefulWidget {
 class _CubeGridLoadingState extends State<CubeGridLoading>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late List<Animation<double>> _animations;
+  // late List<Animation<double>> _animations;
   final int gridCount = 4;
   final double gridItemSize = 20;
   final double gridSpacing = 2;
@@ -65,19 +65,19 @@ class _CubeGridLoadingState extends State<CubeGridLoading>
 
     _controller.forward(); // Bắt đầu animation
 
-    _animations = List.generate(gridCount * gridCount, (index) {
-      int step = sequence.indexWhere((list) => list.contains(index));
-      return Tween<double>(begin: 0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Interval(
-            (step / sequence.length).clamp(0.0, 1.0),
-            1.0,
-            curve: Curves.easeInOut,
-          ),
-        ),
-      );
-    });
+    // _animations = List.generate(gridCount * gridCount, (index) {
+    //   int step = sequence.indexWhere((list) => list.contains(index));
+    //   return Tween<double>(begin: 0, end: 1.0).animate(
+    //     CurvedAnimation(
+    //       parent: _controller,
+    //       curve: Interval(
+    //         (step / sequence.length).clamp(0.0, 1.0),
+    //         1.0,
+    //         curve: Curves.easeInOut,
+    //       ),
+    //     ),
+    //   );
+    // });
   }
 
   @override

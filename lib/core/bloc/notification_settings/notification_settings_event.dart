@@ -21,8 +21,9 @@ class ToggleGeneralNotification extends NotificationSettingsEvent {
 
 class ToggleMyNotification extends NotificationSettingsEvent {
   final bool isEnabled;
+  final String userId;
 
-  ToggleMyNotification({required this.isEnabled});
+  ToggleMyNotification({required this.isEnabled, required this.userId});
 
   @override
   List<Object?> get props => [isEnabled];

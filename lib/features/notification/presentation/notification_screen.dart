@@ -150,9 +150,11 @@ class NotificationScreen extends StatelessWidget {
                           }),
                           _buildSwitchTile(context, "Bật thông báo của tôi",
                               state.personalEnabled, (value) {
-                            context
-                                .read<NotificationSettingsBloc>()
-                                .add(ToggleMyNotification(isEnabled: value));
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleMyNotification(
+                                    isEnabled: value,
+                                    userId:
+                                        stateAuth.userData.userPrincipalName));
                           }),
                           _buildSwitchTile(
                               context,
@@ -198,32 +200,32 @@ class NotificationScreen extends StatelessWidget {
                   bottom: 24 + MediaQuery.of(context).padding.bottom),
               child: Column(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                        hintText: "Tìm kiếm...",
-                        hintStyle: TextStyle(color: context.theme.grey),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: SvgPicture.asset(
-                            "assets/icons/svg/flowbite_search-outline.svg",
-                            width: 24,
-                            height: 24,
-                            colorFilter:
-                                ColorFilter.mode(Colors.black, BlendMode.srcIn),
-                          ),
-                        ),
-                        filled: true,
-                        fillColor:
-                            context.theme.lightGrey ?? Color(0xffFAFAFA)),
-                    style: TextStyle(fontSize: FontSizes.large),
-                  ),
-                  const SizedBox(height: 10),
+                  // TextField(
+                  //   decoration: InputDecoration(
+                  //       hintText: "Tìm kiếm...",
+                  //       hintStyle: TextStyle(color: context.theme.grey),
+                  //       border: OutlineInputBorder(
+                  //         borderSide: BorderSide.none,
+                  //         borderRadius: BorderRadius.circular(999),
+                  //       ),
+                  //       contentPadding:
+                  //           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  //       prefixIcon: Padding(
+                  //         padding: const EdgeInsets.all(10.0),
+                  //         child: SvgPicture.asset(
+                  //           "assets/icons/svg/flowbite_search-outline.svg",
+                  //           width: 24,
+                  //           height: 24,
+                  //           colorFilter:
+                  //               ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                  //         ),
+                  //       ),
+                  //       filled: true,
+                  //       fillColor:
+                  //           context.theme.lightGrey ?? Color(0xffFAFAFA)),
+                  //   style: TextStyle(fontSize: FontSizes.large),
+                  // ),
+                  // const SizedBox(height: 10),
                   TabBar(
                       labelPadding:
                           EdgeInsets.all(0), // Khoảng cách giữa chữ và tab
