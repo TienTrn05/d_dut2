@@ -267,7 +267,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               if (state.isAttendanceDateValid) {
                 context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
                     idUos: widget.idUos,
-                    attendanceDate: widget.selectedDay,
+                    attendanceDate: _currentDate,
                     authToken: _authToken));
               } else {
                 setState(() {
@@ -297,7 +297,7 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
                 _alertSuccess(type: "lưu");
                 context.read<UosAbsentBloc>().add(LoadIsAttendanceDate(
                     idUos: widget.idUos,
-                    attendanceDate: widget.selectedDay,
+                    attendanceDate: _currentDate,
                     authToken: _authToken));
               } else {
                 _alertFailure(type: "lưu");
