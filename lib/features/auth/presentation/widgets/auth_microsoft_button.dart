@@ -38,7 +38,7 @@ class AuthMicrosoftButton extends StatelessWidget {
                   style: GoogleFonts.notoSans(
                     color: Color(0xFF0048FF),
                     fontWeight: FontWeight.w900,
-                    fontSize: FontSizes.extraLarge,
+                    fontSize: 20,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -48,6 +48,8 @@ class AuthMicrosoftButton extends StatelessWidget {
               const SizedBox(width: 8),
               SvgPicture.asset(
                 "assets/icons/svg/logo_dut.svg",
+                width: 28,
+                height: 28,
               ),
             ],
           ),

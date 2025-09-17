@@ -347,9 +347,9 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
               }
               _isSellectedAll = _listStudentIsAbsent.values
                   .every((status) => status == false);
-              _listStudentAbsent = listStudentAbsent;
-              _currentListStudentAbsent = listStudentAbsent;
             }
+            _listStudentAbsent = listStudentAbsent;
+            _currentListStudentAbsent = listStudentAbsent;
 
             return RefreshIndicator(
               color: context.theme.primaryColor,
