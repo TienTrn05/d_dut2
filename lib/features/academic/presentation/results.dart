@@ -32,6 +32,11 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
+  int _semesterIndex = 0;
+
+  /// Đánh dấu chọn kỳ mới nhất
+  bool _autoPickedLatestOnce = false;
+
   late final AcademicApiClient _client;
   late final ResultsBloc _bloc;
 
@@ -50,6 +55,117 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
+  // Semester selector
+  void _previousSemester(List<String> semesters) {
+    if (_semesterIndex > 0) {
+      setState(() => _semesterIndex--);
+    }
+  }
+
+  void _nextSemester(List<String> semesters) {
+    if (_semesterIndex < semesters.length - 1) {
+      setState(() => _semesterIndex++);
+    }
+  }
+
+  void _showSemesterPicker(BuildContext context, List<String> semesters) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 200,
+                child: CupertinoPicker(
+                  backgroundColor: Colors.transparent,
+                  itemExtent: 52,
+                  scrollController:
+                      FixedExtentScrollController(initialItem: _semesterIndex),
+                  onSelectedItemChanged: (int index) {
+                    if (_semesterIndex != index) {
+                      setState(() => _semesterIndex = index);
+                    }
+                  },
+                  selectionOverlay: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue.withAlpha(30),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  children: [
+                    for (int i = 0; i < semesters.length; i++)
+                      Center(
+                        child: Text(
+                          _formatSemesterTitle(semesters[i]),
+                          style: const TextStyle(
+                            fontSize: FontSizes.large,
+                            fontWeight: FontWeight.bold,
+                            height: 1.25,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSemesterSelector(List<String> semesters) {
+    final currentCode = semesters[_semesterIndex];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => _previousSemester(semesters),
+            child: const Icon(Icons.arrow_back_ios_new_rounded),
+          ),
+          Expanded(
+            child: InkWell(
+              onTap: () => _showSemesterPicker(context, semesters),
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(4.0),
+                child: Center(
+                  child: Text(
+                    _formatSemesterTitle(currentCode),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _nextSemester(semesters),
+            child: const Icon(Icons.arrow_forward_ios_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // UI
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -123,16 +239,31 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // Lấy danh sách mã kỳ và sắp xếp giảm dần (kỳ mới nhất ở trên)
+              // Kỳ học theo thứ tự tăng dần (kỳ sau ở dưới)
               final semesters = all.map((e) => e.semesterCode).toSet().toList()
                 ..sort((a, b) =>
                     (int.tryParse(b) ?? 0).compareTo(int.tryParse(a) ?? 0));
 
-              // Gom nhóm học phần theo học kỳ
-              final Map<String, List<dynamic>> grouped = {
-                for (final sc in semesters)
-                  sc: all.where((e) => e.semesterCode == sc).toList()
-              };
+              // Chọn kỳ mới nhất
+              if (!_autoPickedLatestOnce && semesters.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  setState(() {
+                    _semesterIndex = semesters.length - 1;
+                    _autoPickedLatestOnce = true;
+                  });
+                });
+              }
+
+              if (_semesterIndex >= semesters.length) {
+                _semesterIndex = semesters.length - 1;
+              } else if (_semesterIndex < 0) {
+                _semesterIndex = 0;
+              }
+
+              final currentCode = semesters[_semesterIndex];
+              final items =
+                  all.where((e) => e.semesterCode == currentCode).toList();
 
               return RefreshIndicator(
                 color: Theme.of(context).primaryColor,
@@ -218,18 +349,68 @@ class _ResultsPageState extends State<ResultsPage> {
                                       ),
                                       const SizedBox(height: 6),
 
-                                      // số tín chỉ - điểm thang 4 - điểm thang 10
-                                      _gradeMetrics(
-                                        credits: s.credits?.toString(),
-                                        score4: s.score4,
-                                        score10: s.score10,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => DetailResults(
+                              subjectCode: s.classCode,
+                              subjectTitle: subjectTitleText,
+                              credits: '${s.credits ?? '-'}',
+                              detailsList: s.detailLines,
+                              congThucDiem: s.formula,
+                              tongKet: s.scoreChar,
+                              thang10: s.score10?.toStringAsFixed(1),
+                              thang4: s.score4?.toStringAsFixed(1),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF2F4F7),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 12.0,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Hàng 1: Tên môn + badge điểm chữ
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      subjectTitleText,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: FontSizes.large,
+                                        color: Color(0xFF2A74BD),
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  if (s.scoreChar != null &&
+                                      s.scoreChar!.trim().isNotEmpty)
+                                    _GradeBadge(letter: s.scoreChar),
+                                ],
                               ),
-                            );
-                          },
+                              const SizedBox(height: 6),
+
+                              // Hàng 2–3: Tín chỉ – Điểm thang 4 – Điểm thang 10
+                              _gradeMetrics(
+                                credits: s.credits?.toString(),
+                                score4: s.score4,
+                                score10: s.score10,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -250,6 +431,131 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   /// Tín chỉ - Điểm thang 4 - Điểm thang 10
+  Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Tín chỉ',
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                'Điểm thang 4',
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                'Điểm thang 10',
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                credits ?? '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                score4 != null ? score4.toStringAsFixed(1) : '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                score10 != null ? score10.toStringAsFixed(1) : '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GradeBadge extends StatelessWidget {
+  final String? letter;
+  const _GradeBadge({this.letter});
+
+  Color _gradeColor(String? l) {
+    switch ((l ?? '').toUpperCase()) {
+      case 'A+':
+      case 'A':
+        return const Color(0xFF27AE60); // xanh lá
+      case 'B+':
+      case 'B':
+        return const Color(0xFF2D9CDB); // xanh dương
+      case 'C+':
+      case 'C':
+        return const Color(0xFFF2C94C); // vàng
+      case 'D+':
+      case 'D':
+        return const Color(0xFFF2994A); // cam
+      case 'F':
+        return const Color(0xFFEB5757); // đỏ
+      default:
+        return Colors.black26;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (letter == null || letter!.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final txt = letter!.toUpperCase();
+    final c = _gradeColor(letter);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: c.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        txt,
+        style: TextStyle(
+          fontSize: FontSizes.medium,
+          fontWeight: FontWeight.w600,
+          color: c,
+        ),
+      ),
+    );
+  }
+
+  //Số tín chỉ - Điểm thang 4 - Điểm thang 10
   Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
