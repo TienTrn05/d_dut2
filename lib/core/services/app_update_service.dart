@@ -6,7 +6,8 @@ class AppUpdateService {
   Future<void> checkAndPromptUpdate(BuildContext context) async {
     try {
       final newVersion = NewVersionPlus(
-        iOSId: '6749891213',
+        iOSId: 'com.bkdn.ddut',
+        iOSAppStoreCountry: 'VN',
         androidId: 'com.ddut.e_dut',
         androidPlayStoreCountry: 'VN',
         androidHtmlReleaseNotes: true,
