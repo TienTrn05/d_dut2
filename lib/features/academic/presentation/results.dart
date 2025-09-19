@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/extensions/font_sizes.dart';
@@ -14,8 +15,6 @@ import '../data/academic_api_client.dart';
 import 'detail_result.dart';
 
 import '../../../features/auth/bloc/auth_bloc.dart';
-
-import '../../../features/course_registration/features/grade/presentation/widgets/semester_card.dart';
 
 class ResultsPage extends StatefulWidget {
   final String studentId;
@@ -33,8 +32,6 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
   int _semesterIndex = 0;
-
-  /// Đánh dấu chọn kỳ mới nhất
   bool _autoPickedLatestOnce = false;
 
   late final AcademicApiClient _client;
@@ -55,17 +52,15 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
-  // Semester selector
+  // --------------------------
+  // Semester selector helpers
+  // --------------------------
   void _previousSemester(List<String> semesters) {
-    if (_semesterIndex > 0) {
-      setState(() => _semesterIndex--);
-    }
+    if (_semesterIndex > 0) setState(() => _semesterIndex--);
   }
 
   void _nextSemester(List<String> semesters) {
-    if (_semesterIndex < semesters.length - 1) {
-      setState(() => _semesterIndex++);
-    }
+    if (_semesterIndex < semesters.length - 1) setState(() => _semesterIndex++);
   }
 
   void _showSemesterPicker(BuildContext context, List<String> semesters) {
@@ -165,7 +160,9 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
+  // --------------------------
   // UI
+  // --------------------------
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -230,7 +227,7 @@ class _ResultsPageState extends State<ResultsPage> {
                   },
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(24), // padding với màn hình
+                    padding: const EdgeInsets.all(24),
                     children: const [
                       SizedBox(height: 200),
                       Center(child: Text('Không có dữ liệu')),
@@ -239,12 +236,12 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // Kỳ học theo thứ tự tăng dần (kỳ sau ở dưới)
+              // Thu thập các mã học kỳ và sắp xếp TĂNG dần (kỳ sau ở dưới)
               final semesters = all.map((e) => e.semesterCode).toSet().toList()
                 ..sort((a, b) =>
-                    (int.tryParse(b) ?? 0).compareTo(int.tryParse(a) ?? 0));
+                    (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0));
 
-              // Chọn kỳ mới nhất
+              // Auto chọn kỳ mới nhất lần đầu
               if (!_autoPickedLatestOnce && semesters.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
@@ -255,6 +252,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               }
 
+              // An toàn chỉ số
               if (_semesterIndex >= semesters.length) {
                 _semesterIndex = semesters.length - 1;
               } else if (_semesterIndex < 0) {
@@ -274,80 +272,19 @@ class _ResultsPageState extends State<ResultsPage> {
                     _bloc.add(LoadResults(widget.studentId));
                   }
                 },
-                child: ListView(
+                child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(top: 24, bottom: 24),
-                  children: [
-                    for (final entry in grouped.entries) ...[
-                      SemesterCard(
-                        semesterCode: entry.key,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: entry.value.length,
-                          itemBuilder: (context, idx) {
-                            final s = entry.value[idx];
-                            final hasTitle =
-                                (s.subjectTitle ?? '').trim().isNotEmpty;
-                            final subjectTitleText =
-                                hasTitle ? s.subjectTitle!.trim() : s.classCode;
+                  padding: const EdgeInsets.all(24), // cách AppBar 24dp
+                  itemCount: items.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return _buildSemesterSelector(semesters);
+                    }
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 6.0),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(8),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => DetailResults(
-                                      subjectCode: s.classCode,
-                                      subjectTitle: subjectTitleText,
-                                      credits: '${s.credits ?? '-'}',
-                                      detailsList: s.detailLines,
-                                      congThucDiem: s.formula,
-                                      tongKet: s.scoreChar,
-                                      thang10: s.score10?.toStringAsFixed(1),
-                                      thang4: s.score4?.toStringAsFixed(1),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF2F4F7),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                    vertical: 12.0,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // tên môn - điểm chữ
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              subjectTitleText,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: FontSizes.large,
-                                                color: Color(0xFF2A74BD),
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                          if (s.scoreChar != null &&
-                                              s.scoreChar!.trim().isNotEmpty)
-                                            _GradeBadge(letter: s.scoreChar),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
+                    final s = items[index - 1];
+                    final hasTitle = (s.subjectTitle ?? '').trim().isNotEmpty;
+                    final subjectTitleText =
+                        hasTitle ? s.subjectTitle!.trim() : s.classCode;
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -402,7 +339,6 @@ class _ResultsPageState extends State<ResultsPage> {
                                 ],
                               ),
                               const SizedBox(height: 6),
-
                               // Hàng 2–3: Tín chỉ – Điểm thang 4 – Điểm thang 10
                               _gradeMetrics(
                                 credits: s.credits?.toString(),
@@ -413,9 +349,8 @@ class _ResultsPageState extends State<ResultsPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                    ],
-                  ],
+                    );
+                  },
                 ),
               );
             }
@@ -430,7 +365,24 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
-  /// Tín chỉ - Điểm thang 4 - Điểm thang 10
+  /// Quy tắc: XXYY, với YY là học kì (10: HK1, 20: HK2, 21: Hè)
+  String _formatSemesterTitle(String code) {
+    final safe = code.padLeft(4, '0');
+    final yy = safe.substring(0, 2);
+    final hk = safe.substring(2);
+    final startYear = 2000 + (int.tryParse(yy) ?? 0);
+    final endYear = startYear + 1;
+
+    final hkText = switch (hk) {
+      '10' => 'Học kỳ 1',
+      '20' => 'Học kỳ 2',
+      '21' => 'Học kỳ hè',
+      _ => 'Học kỳ 2',
+    };
+    return '$hkText, $startYear-$endYear';
+  }
+
+  // Block 3 cột căn thẳng
   Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,28 +392,19 @@ class _ResultsPageState extends State<ResultsPage> {
             Expanded(
               child: Text(
                 'Tín chỉ',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
               ),
             ),
             Expanded(
               child: Text(
                 'Điểm thang 4',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
               ),
             ),
             Expanded(
               child: Text(
                 'Điểm thang 10',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
               ),
             ),
           ],
@@ -514,18 +457,18 @@ class _GradeBadge extends StatelessWidget {
     switch ((l ?? '').toUpperCase()) {
       case 'A+':
       case 'A':
-        return const Color(0xFF27AE60); // xanh lá
+        return const Color(0xFF27AE60);
       case 'B+':
       case 'B':
-        return const Color(0xFF2D9CDB); // xanh dương
+        return const Color(0xFF2D9CDB);
       case 'C+':
       case 'C':
-        return const Color(0xFFF2C94C); // vàng
+        return const Color(0xFFF2C94C);
       case 'D+':
       case 'D':
-        return const Color(0xFFF2994A); // cam
+        return const Color(0xFFF2994A);
       case 'F':
-        return const Color(0xFFEB5757); // đỏ
+        return const Color(0xFFEB5757);
       default:
         return Colors.black26;
     }
@@ -541,132 +484,7 @@ class _GradeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: c.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        txt,
-        style: TextStyle(
-          fontSize: FontSizes.medium,
-          fontWeight: FontWeight.w600,
-          color: c,
-        ),
-      ),
-    );
-  }
-
-  //Số tín chỉ - Điểm thang 4 - Điểm thang 10
-  Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Tín chỉ',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                'Điểm thang 4',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                'Điểm thang 10',
-                style: TextStyle(
-                  fontSize: FontSizes.small - 1,
-                  color: Colors.black45,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                credits ?? '--',
-                style: const TextStyle(
-                  fontSize: FontSizes.small + 1,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                score4 != null ? score4.toStringAsFixed(1) : '--',
-                style: const TextStyle(
-                  fontSize: FontSizes.small + 1,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                score10 != null ? score10.toStringAsFixed(1) : '--',
-                style: const TextStyle(
-                  fontSize: FontSizes.small + 1,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _GradeBadge extends StatelessWidget {
-  final String? letter;
-  const _GradeBadge({this.letter});
-
-  Color _gradeColor(String? l) {
-    switch ((l ?? '').toUpperCase()) {
-      case 'A+':
-      case 'A':
-        return const Color(0xFF27AE60); // xanh lá
-      case 'B+':
-      case 'B':
-        return const Color(0xFF2D9CDB); // xanh dương
-      case 'C+':
-      case 'C':
-        return const Color(0xFFF2C94C); // vàng
-      case 'D+':
-      case 'D':
-        return const Color(0xFFF2994A); // cam
-      case 'F':
-        return const Color(0xFFEB5757); // đỏ
-      default:
-        return Colors.black26;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (letter == null || letter!.trim().isEmpty) {
-      return const SizedBox.shrink();
-    }
-    final txt = letter!.toUpperCase();
-    final c = _gradeColor(letter);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: c.withOpacity(0.08),
+        color: c.withOpacity(0.08), // không viền
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
