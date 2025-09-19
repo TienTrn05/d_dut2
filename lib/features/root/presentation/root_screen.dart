@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../bloc/root_bloc.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
+import '/core/services/app_update_service.dart';
+
 import '../../dashboard/presentation/dashboard_screen.dart';
 // import '../../searching/presentation/searching_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
@@ -38,6 +40,9 @@ class _MainViewState extends State<_MainView> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
+        (_) => AppUpdateService().checkAndPromptUpdate(context));
   }
 
   @override

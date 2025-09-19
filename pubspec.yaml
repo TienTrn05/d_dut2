@@ -65,11 +65,14 @@ dependencies:
   linkify: ^5.0.0
   flutter_native_splash: ^2.4.6
 
-  device_info_plus: ^11.5.0
   bloc: ^9.0.0
   http: ^1.5.0
 
   app_settings: ^6.1.1
+
+  # app utils
+  new_version_plus: ^0.1.1
+  device_info_plus: ^11.5.0
 
 dev_dependencies:
   flutter_test:
