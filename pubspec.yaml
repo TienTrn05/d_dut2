@@ -4,7 +4,7 @@ publish_to: "none"
 version: 0.1.0+3
 
 environment:
-  sdk: ^3.6.1
+  sdk: ">=3.7.2 <4.0.0"
 
 dependencies:
   flutter:
@@ -71,7 +71,7 @@ dependencies:
   app_settings: ^6.1.1
 
   # app utils
-  new_version_plus: ^0.1.1
+  new_version_plus: ^0.1.0
   device_info_plus: ^11.5.0
 
 dev_dependencies:
