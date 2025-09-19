@@ -16,12 +16,17 @@ dependencies:
   equatable: ^2.0.7
   dio: ^5.8.0+1
 
+  # new dependencies
+  fl_chart: 1.0.0
+  fluentui_system_icons: ^1.1.219
+  file_picker: ^10.3.1
+
   #state management
   flutter_bloc: ^9.0.0
   dartx: ^1.2.0
 
   # local storage
-  shared_preferences: ^2.5.2
+  shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.4
   rx_shared_preferences: ^4.0.0
 
@@ -32,6 +37,7 @@ dependencies:
   animated_splash_screen: ^1.3.0
   flutter_svg: ^2.0.17
   shimmer: ^3.0.0
+  flutter_html: ^3.0.0
 
   # dependency injection
   get_it: ^8.0.3
@@ -57,6 +63,13 @@ dependencies:
   photo_view: ^0.15.0
   flutter_linkify: ^6.0.0
   linkify: ^5.0.0
+  flutter_native_splash: ^2.4.6
+
+  device_info_plus: ^11.5.0
+  bloc: ^9.0.0
+  http: ^1.5.0
+
+  app_settings: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -83,3 +96,22 @@ flutter:
     - assets/icons/
     - assets/icons/svg/
     - assets/images/
+    - assets/icons/logo_full.png
+    - assets/icons/svg/logo_dut.svg
+    - assets/icons/svg/dDUT.svg
+    - assets/icons/svg/bg_pattern.svg
+    - assets/icons/svg/logo_dDUTcolor.svg
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/icons/logo_full.png # Logo splash
+  android: true
+  ios: true
+  fullscreen: true
+
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+
+  android_12:
+    color: "#FFFFFF"
+    image: assets/icons/logo_full.png

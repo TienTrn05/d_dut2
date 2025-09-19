@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-
-import '../../../core/services/notification_service.dart';
 import '../bloc/root_bloc.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
@@ -31,27 +29,24 @@ class _MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<_MainView> {
-  final PageStorageBucket bucket = PageStorageBucket();
   List<Widget> dashBoardScreens = [
     const DashboardScreen(),
     // const SearchingScreen(),
     const ProfileScreen(),
   ];
 
-  late FirebaseAPI firebaseAPI;
-
   @override
   void initState() {
     super.initState();
-    firebaseAPI = Provider.of<FirebaseAPI>(context, listen: false);
-    firebaseAPI.init();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double bottomItemWidth = 72;
-    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * 2) / 3;
+
+    int itemCount = dashBoardScreens.length;
+    double offsetLeft = ((screenWidth - 48) - bottomItemWidth * itemCount) / (itemCount + 1);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -67,9 +62,9 @@ class _MainViewState extends State<_MainView> {
               ),
               child: BlocBuilder<MainBloc, MainState>(
                 builder: (context, state) {
-                  return PageStorage(
-                    bucket: bucket,
-                    child: dashBoardScreens[state.currentPage],
+                  return IndexedStack(
+                    index: state.currentPage,
+                    children: dashBoardScreens,
                   );
                 },
               ),

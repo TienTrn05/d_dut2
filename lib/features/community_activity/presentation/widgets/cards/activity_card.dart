@@ -69,11 +69,15 @@ class ActivityCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (_) => DetailActivityScreen(
-                      activity: activity, communityBloc: communityBloc)));
+                        activity: activity,
+                        communityBloc: communityBloc,
+                        pageOfActivity: pageOfItem,
+                      )));
         },
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(boxShadow: [
             BoxShadow(
                 color: Colors.black.withAlpha(64),

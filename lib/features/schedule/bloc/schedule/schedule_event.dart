@@ -15,3 +15,10 @@ class LoadSchedulesByDate extends ScheduleEvent {
       required this.isTeacher,
       required this.authToken});
 }
+
+class LoadScheduleDashboard extends ScheduleEvent {
+  final bool isTeacher;
+  final String authToken;
+
+  LoadScheduleDashboard({required this.isTeacher, required this.authToken});
+}

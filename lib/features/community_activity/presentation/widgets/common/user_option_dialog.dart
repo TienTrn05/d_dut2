@@ -65,9 +65,20 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
             status: widget.status,
             bloc: widget.communityBloc,
             userActivity: widget.userActivity,
+            pageOfActivity: widget.pageNumber,
           );
         },
       );
+      // .then((_) {
+      //   final bloc = widget.communityBloc;
+
+      //   StreamSubscription? subscription;
+      //   subscription = bloc.stream.listen((state) {
+      //     if (state is UserActivitiesLoaded) {
+      //       subscription?.cancel();
+      //     }
+      //   });
+      // });
     }
   }
 
@@ -163,8 +174,10 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                                       create: (_) => CommunityActivityBloc(
                                           getIt.get<CommunityRepository>()),
                                       child: DetailUserActivityScreen(
-                                          userActivity: widget.userActivity,
-                                          communityBloc: widget.communityBloc),
+                                        userActivity: widget.userActivity,
+                                        communityBloc: widget.communityBloc,
+                                        pageOfActivity: widget.pageNumber,
+                                      ),
                                     )));
                         if (result == true) {
                           widget.onRefresh?.call();

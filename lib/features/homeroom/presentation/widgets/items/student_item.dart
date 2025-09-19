@@ -62,7 +62,7 @@ class StudentItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                student.name,
+                                student.fullName,
                                 style: TextStyle(
                                   fontSize: FontSizes.medium,
                                   fontWeight: FontWeight.bold,
@@ -72,8 +72,8 @@ class StudentItem extends StatelessWidget {
                               ),
                               Text(
                                 userRole == RoleModel.roleStudent
-                                    ? maskCode(student.studentCode)
-                                    : student.mail,
+                                    ? maskCode(student.studentCardNumber)
+                                    : student.studentCardNumber,
                                 style: TextStyle(
                                   fontSize: FontSizes.small,
                                 ),

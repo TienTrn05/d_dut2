@@ -1,3 +1,4 @@
+import 'package:e_dut/common/widgets/loading/microsoft_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -9,7 +10,6 @@ import 'package:aad_oauth/model/token.dart';
 
 import '../../../common/utils/app_environment.dart';
 import '../../../common/utils/logger.dart';
-import '../../../common/widgets/loading/cube_grid_loading.dart';
 import '../../../core/data/local/storage.dart';
 import '../../../features/auth/data/model/user_model.dart';
 import '../../../features/auth/domain/repository/auth_repo.dart';
@@ -40,10 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       responseType: "code",
       scope: "User.Read",
       loginHint: savedEmail ?? "",
-      loader: const Center(
-          child: CubeGridLoading(
-        backgroundColor: Color(0xFF2A74BD),
-      )),
+      loader: MicrosoftLoading(),
       navigatorKey: navigatorKey, // Truyền navigatorKey
     ));
   }
@@ -93,7 +90,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
           if (event.FCMToken.isNotEmpty) {
             try {
-              await _notificationRepository.registerFCMToken(data["accessToken"], event.FCMToken);
+              await _notificationRepository.registerFCMToken(
+                  data["accessToken"], event.FCMToken);
             } catch (e) {
               logger.e("Failed to register FCM token: $e");
             }
@@ -138,6 +136,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
     await Storage.setHintEmail(event.email);
+    await Storage.setExamNotification(true);
+
     emit(AuthLogoutSuccess());
     emit(AuthHandlerFinished());
   }

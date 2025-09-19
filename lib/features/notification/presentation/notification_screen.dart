@@ -1,3 +1,5 @@
+import 'package:e_dut/common/widgets/snackbar/container_snackbar.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,33 +7,20 @@ import 'package:flutter_svg/svg.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/utils/getit_utils.dart';
+import '/core/bloc/notification_settings/notification_settings_bloc.dart';
 import '/features/auth/bloc/auth_bloc.dart';
 import '../domain/repositories/notification_repository.dart';
 
 import '../bloc/notifications_bloc.dart';
 import 'general_notifications.dart';
 import 'my_notifications.dart';
+import 'widgets/custom_time_dropdown.dart';
 
-class NotificationScreen extends StatefulWidget {
+class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
-  @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
-}
-
-class _NotificationScreenState extends State<NotificationScreen> {
-  bool isGeneralNotificationOn = true;
-
-  bool isMyNotificationOn = false;
-
-  String selectedTime = "30 phút";
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
+  Widget _buildSwitchTile(BuildContext context, String title, bool value,
+      Function(bool) onChanged) {
     return ListTile(
       contentPadding: EdgeInsets.all(0),
       title: Text(title,
@@ -41,34 +30,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: EdgeInsets.all(0),
         activeColor: Colors.white,
         activeTrackColor: context.theme.primaryColor,
+        inactiveThumbColor: context.theme.grey,
+        inactiveTrackColor: context.theme.lightGrey,
         value: value,
         onChanged: onChanged,
-      ),
-    );
-  }
-
-  Widget _buildDropdownTile() {
-    return ListTile(
-      contentPadding: EdgeInsets.all(0),
-      title: Text("Thông báo lịch học/thi trước",
-          style: TextStyle(
-              fontSize: FontSizes.medium, fontWeight: FontWeight.w600)),
-      trailing: DropdownButton<String>(
-        value: selectedTime,
-        onChanged: (String? newValue) {
-          setState(() {
-            selectedTime = newValue!;
-          });
-        },
-        items: ["15 phút", "30 phút", "1 giờ", "1 ngày"]
-            .map((time) => DropdownMenuItem(
-                  value: time,
-                  child: Text(time,
-                      style: TextStyle(
-                          fontSize: FontSizes.medium,
-                          fontWeight: FontWeight.bold)),
-                ))
-            .toList(),
       ),
     );
   }
@@ -84,6 +49,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         );
       }
+      final String userRole = stateAuth.userData.role.name;
+
+      final String authToken = stateAuth.accessToken;
 
       return BlocProvider(
         create: (context) => NotificationsBloc(
@@ -133,65 +101,97 @@ class _NotificationScreenState extends State<NotificationScreen> {
               ],
             ),
             backgroundColor: Colors.white,
-            endDrawer: Drawer(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
-                ),
-                backgroundColor: Colors.white,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/svg/solar_bell-bold.svg",
-                              colorFilter: ColorFilter.mode(
-                                context.theme.primaryColor ?? Colors.blue,
-                                BlendMode.srcIn,
-                              ),
-                              width: 24,
-                              height: 24,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Thông báo",
-                              style: TextStyle(
-                                fontSize: FontSizes.large,
-                                fontWeight: FontWeight.bold,
-                                color: context.theme.primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 8),
-                          height: 1,
-                          color: context.theme.primaryColor,
-                        ),
-                        _buildSwitchTile(
-                            "Bật thông báo chung", isGeneralNotificationOn,
-                            (value) {
-                          setState(() {
-                            isGeneralNotificationOn = value;
-                          });
-                        }),
-                        _buildSwitchTile(
-                            "Bật thông báo của tôi", isMyNotificationOn,
-                            (value) {
-                          setState(() {
-                            isMyNotificationOn = value;
-                          });
-                        }),
-                        _buildDropdownTile(),
-                      ],
+            endDrawer: BlocBuilder<NotificationSettingsBloc,
+                NotificationSettingsState>(builder: (context, state) {
+              return Drawer(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
                   ),
-                )),
+                  backgroundColor: Colors.white,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                "assets/icons/svg/solar_bell-bold.svg",
+                                colorFilter: ColorFilter.mode(
+                                  context.theme.primaryColor ?? Colors.blue,
+                                  BlendMode.srcIn,
+                                ),
+                                width: 24,
+                                height: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Thông báo",
+                                style: TextStyle(
+                                  fontSize: FontSizes.large,
+                                  fontWeight: FontWeight.bold,
+                                  color: context.theme.primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            height: 1,
+                            color: context.theme.primaryColor,
+                          ),
+                          _buildSwitchTile(context, "Bật thông báo chung",
+                              state.generalEnabled, (value) {
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleGeneralNotification(isEnabled: value));
+                          }),
+                          _buildSwitchTile(context, "Bật thông báo của tôi",
+                              state.personalEnabled, (value) {
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleMyNotification(
+                                    isEnabled: value,
+                                    userId:
+                                        stateAuth.userData.userPrincipalName));
+                          }),
+                          _buildSwitchTile(
+                              context,
+                              userRole == RoleModel.roleTeacher
+                                  ? "Bật thông báo lịch dạy/coi thi"
+                                  : "Bật thông báo lịch học/thi",
+                              state.examEnabled, (value) {
+                            context.read<NotificationSettingsBloc>().add(
+                                ToggleExamNotification(
+                                    isEnabled: value,
+                                    authToken: authToken,
+                                    isTeacher:
+                                        userRole == RoleModel.roleTeacher));
+                          }),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CustomTimeDropdown(),
+                            ],
+                          ),
+                          Expanded(child: SizedBox.shrink()),
+                          if (state.errorMessage != null)
+                            ContainerSnackbar(
+                              title: "Cập nhật thất bại",
+                              message: state.errorMessage ?? "Có lỗi xảy ra",
+                              alertType: AlertType.error,
+                              onClose: () {
+                                context
+                                    .read<NotificationSettingsBloc>()
+                                    .add(ClearErrorMessage());
+                              },
+                            )
+                        ],
+                      ),
+                    ),
+                  ));
+            }),
             body: Padding(
               padding: EdgeInsets.only(
                   left: 24,
@@ -200,32 +200,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   bottom: 24 + MediaQuery.of(context).padding.bottom),
               child: Column(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                        hintText: "Tìm kiếm...",
-                        hintStyle: TextStyle(color: context.theme.grey),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: SvgPicture.asset(
-                            "assets/icons/svg/flowbite_search-outline.svg",
-                            width: 24,
-                            height: 24,
-                            colorFilter:
-                                ColorFilter.mode(Colors.black, BlendMode.srcIn),
-                          ),
-                        ),
-                        filled: true,
-                        fillColor:
-                            context.theme.lightGrey ?? Color(0xffFAFAFA)),
-                    style: TextStyle(fontSize: FontSizes.large),
-                  ),
-                  const SizedBox(height: 10),
+                  // TextField(
+                  //   decoration: InputDecoration(
+                  //       hintText: "Tìm kiếm...",
+                  //       hintStyle: TextStyle(color: context.theme.grey),
+                  //       border: OutlineInputBorder(
+                  //         borderSide: BorderSide.none,
+                  //         borderRadius: BorderRadius.circular(999),
+                  //       ),
+                  //       contentPadding:
+                  //           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  //       prefixIcon: Padding(
+                  //         padding: const EdgeInsets.all(10.0),
+                  //         child: SvgPicture.asset(
+                  //           "assets/icons/svg/flowbite_search-outline.svg",
+                  //           width: 24,
+                  //           height: 24,
+                  //           colorFilter:
+                  //               ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                  //         ),
+                  //       ),
+                  //       filled: true,
+                  //       fillColor:
+                  //           context.theme.lightGrey ?? Color(0xffFAFAFA)),
+                  //   style: TextStyle(fontSize: FontSizes.large),
+                  // ),
+                  // const SizedBox(height: 10),
                   TabBar(
                       labelPadding:
                           EdgeInsets.all(0), // Khoảng cách giữa chữ và tab

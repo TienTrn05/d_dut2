@@ -14,7 +14,7 @@ class StudentInfoDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(16.0)),
+          borderRadius: BorderRadius.circular(16.0)),
       child: Container(
         padding: const EdgeInsetsDirectional.all(24.0),
         child: Column(
@@ -24,7 +24,7 @@ class StudentInfoDialog extends StatelessWidget {
           spacing: 16.0,
           children: [
             Text(
-              student.name,
+              student.fullName,
               style: TextStyle(
                 fontSize: FontSizes.large,
                 fontWeight: FontWeight.w900,
@@ -38,12 +38,12 @@ class StudentInfoDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               spacing: 8.0,
               children: [
-                InfoItem(field: "MSSV", value: student.studentCode),
-                InfoItem(field: "SĐT", value: student.phoneNumber),
-                InfoItem(field: "Email cá nhân", value: student.mail),
+                InfoItem(field: "MSSV", value: student.studentCardNumber),
+                // InfoItem(field: "SĐT", value: student.phoneNumber),
                 InfoItem(
-                    field: "SĐT người thân",
-                    value: student.relativePhoneNumber),
+                    field: "Email cá nhân",
+                    value: "${student.studentCardNumber}@sv1.dut.udn.vn"),
+                // InfoItem(field: "SĐT người thân", value: "0000000000"),
               ],
             ),
             Divider(color: context.theme.primaryColor ?? Colors.blue),

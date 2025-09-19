@@ -1,3 +1,4 @@
+import 'package:card_loading/card_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,10 +18,20 @@ class MyNotifications extends StatelessWidget {
         builder: (contextNoti, state) {
       if (state.myNotificationsStatus == MyNotificationsStatus.loading &&
           state.myNotifications.isEmpty) {
-        return Center(
-            child: CircularProgressIndicator(
-          color: context.theme.primaryColor,
-        ));
+        return Column(
+          children: [
+            CardLoading(
+              height: 100,
+              margin: EdgeInsets.only(bottom: 8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            CardLoading(
+              height: 100,
+              margin: EdgeInsets.only(bottom: 8),
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ],
+        );
       } else if (state.myNotificationsStatus == MyNotificationsStatus.failure) {
         return Center(
           child: Text(
@@ -30,7 +41,9 @@ class MyNotifications extends StatelessWidget {
         );
       } else if (state.myNotificationsStatus == MyNotificationsStatus.success &&
           state.myNotifications.isEmpty) {
-        return const Center(child: Text("Hiện không có thông báo nào"));
+        return Center(
+            child: Text("Hiện không có thông báo nào",
+                style: TextStyle(color: context.theme.grey ?? Colors.grey)));
       }
       return Column(
         children: [
@@ -45,32 +58,46 @@ class MyNotifications extends StatelessWidget {
                 // If it's the last item, show the "Load more" button
                 if (index == state.myNotifications.length) {
                   return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          context.read<NotificationsBloc>().add(
-                              MyNotificationsLoadMoreRequested(token: token));
-                        },
-                        child: (state.myNotificationsStatus ==
-                                    MyNotificationsStatus.loading &&
-                                state.myNotifications.isNotEmpty)
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                color: context.theme.primaryColor,
-                              ))
-                            : Text(
-                                "Xem thêm",
-                                style: TextStyle(
-                                  color: context.theme.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: context.theme.grey,
-                                ),
+                    child: (state.myNotificationsStatus ==
+                                MyNotificationsStatus.loading &&
+                            state.myNotifications.isNotEmpty)
+                        ? Column(
+                            children: [
+                              CardLoading(
+                                height: 100,
+                                margin: EdgeInsets.only(bottom: 8),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                      ),
-                    ),
+                              CardLoading(
+                                height: 100,
+                                margin: EdgeInsets.only(bottom: 8),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ],
+                          )
+                        : (state.myNotificationsStatus ==
+                                MyNotificationsStatus.unchange
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    context.read<NotificationsBloc>().add(
+                                        MyNotificationsLoadMoreRequested(
+                                            token: token));
+                                  },
+                                  child: Text(
+                                    "Xem thêm",
+                                    style: TextStyle(
+                                      color: context.theme.grey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: context.theme.grey,
+                                    ),
+                                  ),
+                                ),
+                              )),
                   );
                 }
 

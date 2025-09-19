@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
@@ -16,11 +18,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DetailUserActivityScreen extends StatefulWidget {
   final UserActivityModel userActivity;
-
   final CommunityActivityBloc communityBloc;
+  final int pageOfActivity;
 
   const DetailUserActivityScreen(
-      {super.key, required this.userActivity, required this.communityBloc});
+      {super.key,
+      required this.userActivity,
+      required this.communityBloc,
+      required this.pageOfActivity});
 
   @override
   State<DetailUserActivityScreen> createState() =>
@@ -57,7 +62,7 @@ class _DetailUserActivityScreenState extends State<DetailUserActivityScreen> {
           academicYearId: widget.userActivity.activity.academicYearActivity!.id,
           status: null,
           idActivity: widget.userActivity.activity.id,
-          pageNumber: 1,
+          pageNumber: widget.pageOfActivity,
         ));
       },
     );
@@ -80,7 +85,7 @@ class _DetailUserActivityScreenState extends State<DetailUserActivityScreen> {
           academicYearId: widget.userActivity.activity.academicYearActivity!.id,
           status: null,
           idActivity: widget.userActivity.activity.id,
-          pageNumber: 1,
+          pageNumber: widget.pageOfActivity,
         ));
       },
     );
@@ -109,11 +114,31 @@ class _DetailUserActivityScreenState extends State<DetailUserActivityScreen> {
             status: null,
             bloc: widget.communityBloc,
             userActivity: widget.userActivity,
+            pageOfActivity: widget.pageOfActivity,
             fromCard: false,
           ),
         );
       },
-    );
+    ).then((_) {
+      final bloc = widget.communityBloc;
+
+      StreamSubscription? subscription;
+      subscription = bloc.stream.listen((state) {
+        if (state is UserActivitiesLoaded) {
+          final updatedActivity = state.pagedActivities.activities.firstWhere(
+            (a) => a.id == _currentUserActivity.id,
+            orElse: () => _currentUserActivity,
+          );
+
+          setState(() {
+            _currentUserActivity = updatedActivity;
+            _isLoading = false;
+          });
+
+          subscription?.cancel();
+        }
+      });
+    });
   }
 
   @override

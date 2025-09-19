@@ -1,17 +1,23 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/features/homeroom/data/model/homeroom_model.dart';
 import 'package:flutter/material.dart';
 
 class HomeroomItem extends StatelessWidget {
-  final String name;
-  final String numStudent;
-  const HomeroomItem({super.key, required this.name, required this.numStudent});
+  final HomeroomModel homeroom;
+  const HomeroomItem({super.key, required this.homeroom});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(Routes.detailHomeRoom);
+        Navigator.of(context).pushNamed(
+          Routes.detailHomeRoom,
+          arguments: {
+            "id": homeroom.id,
+            "name": homeroom.name,
+          },
+        );
       },
       child: Container(
         width: double.infinity,
@@ -23,7 +29,7 @@ class HomeroomItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              name,
+              homeroom.name,
               style: TextStyle(
                 fontSize: FontSizes.medium,
                 fontWeight: FontWeight.bold,
@@ -34,7 +40,7 @@ class HomeroomItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              "$numStudent sinh viên",
+              "${homeroom.numOfStudents} sinh viên",
               style: TextStyle(
                 fontSize: FontSizes.small,
                 fontWeight: FontWeight.normal,
