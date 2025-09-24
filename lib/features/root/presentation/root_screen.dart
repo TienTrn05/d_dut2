@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import '../bloc/root_bloc.dart';
 
+import '/common/routes/routes.dart';
+import '/core/services/auto_redirect_service.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/core/services/app_update_service.dart';
 
@@ -38,9 +39,26 @@ class _MainViewState extends State<_MainView> {
   void initState() {
     super.initState();
 
-    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
-      (_) => AppUpdateService().checkAndPromptUpdate(context),
-    );
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
+      AppUpdateService().checkAndPromptUpdate(context);
+      final redirect = AutoRedirectService.parsePayload(
+        AutoRedirectService.pendingPayload,
+      );
+
+      switch (redirect) {
+        case AutoRedirectName.redirectToNotificationScreen:
+          Navigator.pushNamed(context, Routes.notification);
+          break;
+        case AutoRedirectName.redirectToScheduleScreen:
+          Navigator.pushNamed(context, Routes.schedule);
+          break;
+        case AutoRedirectName.unknown:
+          // Không redirect nếu không xác định được payload
+          break;
+      }
+
+      AutoRedirectService.pendingPayload = null;
+    });
   }
 
   @override
