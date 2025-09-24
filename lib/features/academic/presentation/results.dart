@@ -32,8 +32,6 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
   int _semesterIndex = 0;
-
-  /// Đánh dấu đã auto-chọn kỳ mới nhất lần đầu hay chưa
   bool _autoPickedLatestOnce = false;
 
   late final AcademicApiClient _client;
@@ -54,17 +52,15 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
-  // Chọn học kỳ
+  // --------------------------
+  // Semester selector helpers
+  // --------------------------
   void _previousSemester(List<String> semesters) {
-    if (_semesterIndex > 0) {
-      setState(() => _semesterIndex--);
-    }
+    if (_semesterIndex > 0) setState(() => _semesterIndex--);
   }
 
   void _nextSemester(List<String> semesters) {
-    if (_semesterIndex < semesters.length - 1) {
-      setState(() => _semesterIndex++);
-    }
+    if (_semesterIndex < semesters.length - 1) setState(() => _semesterIndex++);
   }
 
   void _showSemesterPicker(BuildContext context, List<String> semesters) {
@@ -123,7 +119,6 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
-  // Widget selector: mũi tên trái – nhãn – mũi tên phải + mở picker
   Widget _buildSemesterSelector(List<String> semesters) {
     final currentCode = semesters[_semesterIndex];
     return Padding(
@@ -241,25 +236,23 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // Thứ tự giữ nguyên: tăng dần -> kỳ sau ở dưới
+              // Thu thập các mã học kỳ và sắp xếp TĂNG dần (kỳ sau ở dưới)
               final semesters = all.map((e) => e.semesterCode).toSet().toList()
                 ..sort((a, b) =>
                     (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0));
 
-              // Auto-chọn kỳ mới nhất (index cuối) LẦN ĐẦU TIÊN khi đã có dữ liệu
+              // Auto chọn kỳ mới nhất lần đầu
               if (!_autoPickedLatestOnce && semesters.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
                   setState(() {
-                    _semesterIndex = semesters.length - 1; // kỳ mới nhất
+                    _semesterIndex = semesters.length - 1;
                     _autoPickedLatestOnce = true;
                   });
                 });
               }
 
-              if (semesters.isEmpty) {
-                return const Center(child: Text('Không có dữ liệu học kỳ'));
-              }
+              // An toàn chỉ số
               if (_semesterIndex >= semesters.length) {
                 _semesterIndex = semesters.length - 1;
               } else if (_semesterIndex < 0) {
@@ -281,7 +274,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 },
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(24), // cách AppBar 24dp
                   itemCount: items.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
@@ -318,48 +311,39 @@ class _ResultsPageState extends State<ResultsPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            horizontal: 16.0,
+                            vertical: 12.0,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      s.classCode,
-                                      style: const TextStyle(
-                                        fontSize: FontSizes.small,
-                                        color: Colors.black45,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
+                              // Hàng 1: Tên môn + badge điểm chữ
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
                                       subjectTitleText,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: FontSizes.large,
                                         color: Color(0xFF2A74BD),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Số TC: ${s.credits ?? '-'}',
-                                      style: const TextStyle(
-                                        fontSize: FontSizes.small,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  if (s.scoreChar != null &&
+                                      s.scoreChar!.trim().isNotEmpty)
+                                    _GradeBadge(letter: s.scoreChar),
+                                ],
                               ),
-                              Text(
-                                s.scoreChar ?? '--/--',
-                                style: const TextStyle(
-                                  fontSize: FontSizes.large,
-                                  color: Colors.black45,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              const SizedBox(height: 6),
+                              // Hàng 2–3: Tín chỉ – Điểm thang 4 – Điểm thang 10
+                              _gradeMetrics(
+                                credits: s.credits?.toString(),
+                                score4: s.score4,
+                                score10: s.score10,
                               ),
                             ],
                           ),
@@ -396,6 +380,122 @@ class _ResultsPageState extends State<ResultsPage> {
       _ => 'Học kỳ 2',
     };
     return '$hkText, $startYear-$endYear';
+  }
+
+  // Block 3 cột căn thẳng
+  Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Tín chỉ',
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                'Điểm thang 4',
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                'Điểm thang 10',
+                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                credits ?? '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                score4 != null ? score4.toStringAsFixed(1) : '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                score10 != null ? score10.toStringAsFixed(1) : '--',
+                style: const TextStyle(
+                  fontSize: FontSizes.small + 1,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GradeBadge extends StatelessWidget {
+  final String? letter;
+  const _GradeBadge({this.letter});
+
+  Color _gradeColor(String? l) {
+    switch ((l ?? '').toUpperCase()) {
+      case 'A+':
+      case 'A':
+        return const Color(0xFF27AE60);
+      case 'B+':
+      case 'B':
+        return const Color(0xFF2D9CDB);
+      case 'C+':
+      case 'C':
+        return const Color(0xFFF2C94C);
+      case 'D+':
+      case 'D':
+        return const Color(0xFFF2994A);
+      case 'F':
+        return const Color(0xFFEB5757);
+      default:
+        return Colors.black26;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (letter == null || letter!.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final txt = letter!.toUpperCase();
+    final c = _gradeColor(letter);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: c.withOpacity(0.08), // không viền
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        txt,
+        style: TextStyle(
+          fontSize: FontSizes.medium,
+          fontWeight: FontWeight.w600,
+          color: c,
+        ),
+      ),
+    );
   }
 }
 
