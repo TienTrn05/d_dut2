@@ -45,9 +45,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
     super.dispose();
   }
 
-  double? _asGpa4(StatsModel d) {
+  double? _overallGpa4(StatsModel d) {
     if (d.gpa4 != null) return d.gpa4;
-    if (d.gpa10 != null) return (d.gpa10! / 10.0) * 4.0;
     return null;
   }
 
@@ -108,21 +107,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
               final displaySemesters =
                   semesters.map(_formatSemesterShort).toList();
 
-              final gpaPerSem = data.gpaPerSemester; // thang 4
-              final conductScores = data.conductPerSemester; // ĐRL 0-100
+              final gpaPerSem = data.gpaPerSemester; // DiemTBTL (0-4)
+              final conductScores =
+                  data.conductPerSemester; // ĐRL 0-100 (mỗi kỳ)
               final credits =
                   data.creditsPerSemester.map((e) => e.toDouble()).toList();
 
-              final double? overallGpa4 = _asGpa4(data);
-              final double totalCredits = data.totalCredits.toDouble();
-              final String? studyStage = data.stage;
+              final double? overallGpa4 = _overallGpa4(data);
+              final double totalAccumCredits =
+                  data.totalAccumCredits?.toDouble() ?? 0.0;
 
-              // Trung bình điểm rèn luyện
+              // Điểm rèn luyện trung bình
               final double? avgConduct =
-                  conductScores.isEmpty
+                  data.avgConduct ??
+                  (conductScores.isEmpty
                       ? null
                       : conductScores.reduce((a, b) => a + b) /
-                          conductScores.length;
+                          conductScores.length);
+
+              final String? studyStage = data.stage; // Năm học
 
               final double creditsYMax = () {
                 if (credits.isEmpty) return 20.0;
@@ -178,7 +181,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             ),
                             Expanded(
                               child: _InfoSummaryInline(
-                                totalCredits: totalCredits,
+                                totalAccumCredits: totalAccumCredits,
                                 avgConduct: avgConduct,
                                 studyStage: studyStage,
                               ),
@@ -192,7 +195,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
                     // GPA (thang 4.0)
                     _ChartCard(
-                      title: 'GPA (4.0)',
+                      title: 'Điểm tích luỹ theo từng kỳ',
                       child:
                           gpaPerSem.isNotEmpty
                               ? _LineChart(
@@ -208,7 +211,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
                     // Điểm rèn luyện
                     _ChartCard(
-                      title: 'Điểm rèn luyện',
+                      title: 'Điểm rèn luyện theo từng kỳ',
                       child:
                           conductScores.isNotEmpty
                               ? _LineChart(
@@ -389,7 +392,6 @@ class _LineChart extends StatelessWidget {
                   if (i < 0 || i >= labels.length) {
                     return const SizedBox.shrink();
                   }
-
                   final shouldShow = labels.length <= 10 || i % 2 == 0;
                   if (!shouldShow) return const SizedBox.shrink();
                   return Padding(
@@ -446,14 +448,14 @@ class _BigMetricCard extends StatelessWidget {
 
 class _InfoSummaryInline extends StatelessWidget {
   const _InfoSummaryInline({
-    required this.totalCredits,
+    required this.totalAccumCredits,
     this.avgConduct,
     this.studyStage,
   });
 
-  final double totalCredits;
-  final double? avgConduct; // điểm rèn luyện trung bình
-  final String? studyStage;
+  final double totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final double? avgConduct; // trung bình DiemRL các kỳ
+  final String? studyStage; // Namhoc (string)
 
   static const Color _labelColor = Color(0xFF424242);
   static const TextStyle _labelStyle = TextStyle(
@@ -469,12 +471,12 @@ class _InfoSummaryInline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String stageDisplay = '—';
-    if (studyStage != null && studyStage!.trim().isNotEmpty) {
-      stageDisplay = 'Năm thứ ${studyStage!}';
-    }
     final conductDisplay =
         (avgConduct == null) ? '—' : avgConduct!.toStringAsFixed(0);
+    final stageDisplay =
+        (studyStage == null || studyStage!.trim().isEmpty)
+            ? '—'
+            : studyStage!.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -484,7 +486,7 @@ class _InfoSummaryInline extends StatelessWidget {
             children: [
               const TextSpan(text: 'Số tín chỉ tích luỹ: ', style: _labelStyle),
               TextSpan(
-                text: totalCredits.toStringAsFixed(0),
+                text: totalAccumCredits.toStringAsFixed(0),
                 style: _valueStyle,
               ),
             ],
@@ -501,7 +503,7 @@ class _InfoSummaryInline extends StatelessWidget {
         RichText(
           text: TextSpan(
             children: [
-              const TextSpan(text: 'Năm học: ', style: _labelStyle),
+              const TextSpan(text: 'Năm học: Năm thứ ', style: _labelStyle),
               TextSpan(text: stageDisplay, style: _valueStyle),
             ],
           ),
