@@ -36,9 +36,7 @@ class Header extends StatelessWidget {
         height: 72,
         padding: const EdgeInsets.all(0),
         color: context.theme.primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 0,
         focusElevation: 0,
         highlightElevation: 0,
@@ -50,7 +48,11 @@ class Header extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 16, right: 10, top: 16, bottom: 16),
+                  left: 16,
+                  right: 10,
+                  top: 16,
+                  bottom: 16,
+                ),
                 child: Row(
                   children: [
                     // Avatar
@@ -60,18 +62,31 @@ class Header extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1,
-                        ),
+                        border: Border.all(color: Colors.white, width: 1),
                       ),
                       child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/default_avatar.jpg',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
+                        child:
+                            userPrincipalName.endsWith("@sv1.dut.udn.vn")
+                                ? Image.network(
+                                  'https://cb.dut.udn.vn/ImageSV/${userPrincipalName.substring(3, 5)}/${userPrincipalName.substring(0, 9)}.jpg',
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/default_avatar.jpg',
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                )
+                                : Image.asset(
+                                  'assets/images/default_avatar.jpg',
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
                       ),
                     ),
 
@@ -83,47 +98,45 @@ class Header extends StatelessWidget {
                         children: [
                           isLoading
                               ? Shimmer.fromColors(
-                                  baseColor: baseColor,
-                                  highlightColor: highlightColor,
-                                  child: Container(
-                                    height: 14,
-                                    width: 100,
-                                    color: baseColor,
-                                  ),
-                                )
-                              : Text(
-                                  displayName,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily:
-                                        GoogleFonts.notoSans().fontFamily,
-                                    fontSize: FontSizes.large,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.25,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                baseColor: baseColor,
+                                highlightColor: highlightColor,
+                                child: Container(
+                                  height: 14,
+                                  width: 100,
+                                  color: baseColor,
                                 ),
+                              )
+                              : Text(
+                                displayName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: GoogleFonts.notoSans().fontFamily,
+                                  fontSize: FontSizes.large,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.25,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                           isLoading
                               ? Shimmer.fromColors(
-                                  baseColor: baseColor,
-                                  highlightColor: highlightColor,
-                                  child: Container(
-                                    height: 12,
-                                    width: 140,
-                                    color: baseColor,
-                                  ),
-                                )
-                              : Text(
-                                  userPrincipalName,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily:
-                                        GoogleFonts.notoSans().fontFamily,
-                                    fontSize: FontSizes.small,
-                                    height: 1.5,
-                                  ),
+                                baseColor: baseColor,
+                                highlightColor: highlightColor,
+                                child: Container(
+                                  height: 12,
+                                  width: 140,
+                                  color: baseColor,
                                 ),
+                              )
+                              : Text(
+                                userPrincipalName,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: GoogleFonts.notoSans().fontFamily,
+                                  fontSize: FontSizes.small,
+                                  height: 1.5,
+                                ),
+                              ),
                         ],
                       ),
                     ),
@@ -131,10 +144,7 @@ class Header extends StatelessWidget {
                 ),
               ),
             ),
-            NotificationButton(
-              notificationCount: 0,
-              onTap: onTap,
-            ),
+            NotificationButton(notificationCount: 0, onTap: onTap),
           ],
         ),
       ),

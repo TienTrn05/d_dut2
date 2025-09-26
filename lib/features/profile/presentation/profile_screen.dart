@@ -46,42 +46,74 @@ class ProfileScreen extends StatelessWidget {
                       color: context.theme.primaryColor,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            // shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            child: Image.asset(
-                              'assets/images/default_avatar.jpg',
+                    child: BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        final String displayName =
+                            (state is AuthUserAuthenticated)
+                                ? state.userData.displayName
+                                : 'No Name';
+
+                        final String userPrincipalName =
+                            (state is AuthUserAuthenticated)
+                                ? state.userData.userPrincipalName
+                                : 'No Email';
+
+                        final String userRole =
+                            state is AuthUserAuthenticated
+                                ? state.userData.role.name
+                                : '';
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
                               width: 80,
                               height: 80,
-                              fit: BoxFit.cover,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                // shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                                child:
+                                    userRole == "Student" &&
+                                            userPrincipalName.endsWith(
+                                              "@sv1.dut.udn.vn",
+                                            )
+                                        ? Image.network(
+                                          'https://cb.dut.udn.vn/ImageSV/${userPrincipalName.substring(3, 5)}/${userPrincipalName.substring(0, 9)}.jpg',
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) {
+                                            return Image.asset(
+                                              'assets/images/default_avatar.jpg',
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        )
+                                        : Image.asset(
+                                          'assets/images/default_avatar.jpg',
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                        ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        BlocBuilder<AuthBloc, AuthState>(
-                          builder: (context, state) {
-                            final String displayName =
-                                (state is AuthUserAuthenticated)
-                                    ? state.userData.displayName
-                                    : 'No Name';
-
-                            final String userPrincipalName =
-                                (state is AuthUserAuthenticated)
-                                    ? state.userData.userPrincipalName
-                                    : 'No Email';
-
-                            return Expanded(
+                            const SizedBox(width: 10),
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -110,10 +142,10 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 10),
