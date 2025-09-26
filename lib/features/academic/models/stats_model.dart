@@ -1,17 +1,16 @@
 class StatsModel {
   // Overall
-  final double? gpa4; // GPA thang 4
-  final double? gpa10; // GPA thang 10
-  final int totalCredits; // tổng TC đăng ký
-  // final int? passedCredits;
-  // final int? failedCredits;
+  final double? gpa4; // GPA thang 4 (kỳ mới nhất)
+  final double? gpa10; // fallback nếu server có
+  final int totalCredits; // tổng TC đăng ký (giữ để tương thích)
+  final int? totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final double? avgConduct; // Điểm rèn luyện trung bình
   final String? stage; // Năm học
-  final String? warningLevel;
 
   final List<String> semesters;
-  final List<double> gpaPerSemester; // GPA thang 4
-  final List<double> conductPerSemester; // ĐRL thang 100
-  final List<int> creditsPerSemester;
+  final List<double> gpaPerSemester; // DiemTBTL 4.0 theo kỳ
+  final List<double> conductPerSemester; // DiemRL 0-100 theo kỳ
+  final List<int> creditsPerSemester; // HPDangky theo kỳ
 
   /// Breakdown theo kỳ
   final List<SemesterStat> bySemester;
@@ -20,10 +19,9 @@ class StatsModel {
     this.gpa4,
     this.gpa10,
     required this.totalCredits,
-    // this.passedCredits,
-    // this.failedCredits,
+    this.totalAccumCredits,
+    this.avgConduct,
     this.stage,
-    this.warningLevel,
     this.semesters = const [],
     this.gpaPerSemester = const [],
     this.conductPerSemester = const [],
@@ -55,17 +53,20 @@ class StatsModel {
                 .toList()
             : const <int>[];
 
+    // Mảng cho biểu đồ
     final semesters = _strList(json['semesters']);
     final gpaPerSem = _doubleList(json['gpaPerSemester']);
     final conductPerSem = _doubleList(json['conductPerSemester']);
     final creditsPerSem = _intList(json['creditsPerSemester']);
 
+    // Tổng quan
     final ov = (json['overall'] as Map?) ?? const {};
     final gpa4 = _d(ov['gpa4']) ?? _d(ov['gpa10']);
     final gpa10 = _d(ov['gpa10']);
-    final totalCredits = _i(ov['totalCredits']) ?? 0;
+    final totalAccumCredits = _i(ov['totalAccumCredits']);
+    final totalCredits = _i(ov['totalCredits'] ?? ov['totalAccumCredits']) ?? 0;
+    final avgConduct = _d(ov['avgConduct']);
     final stage = _s(ov['stage'] ?? ov['studyStage']);
-    final warningLevel = _s(ov['warningLevel']);
 
     final n = [
       semesters.length,
@@ -80,7 +81,6 @@ class StatsModel {
         SemesterStat(
           semester: i < semesters.length ? semesters[i] : null,
           gpa4: i < gpaPerSem.length ? gpaPerSem[i] : null,
-          // gpa10: null,
           credits: i < creditsPerSem.length ? creditsPerSem[i] : null,
           conduct: i < conductPerSem.length ? conductPerSem[i] : null,
         ),
@@ -91,10 +91,9 @@ class StatsModel {
       gpa4: gpa4,
       gpa10: gpa10,
       totalCredits: totalCredits,
-      // passedCredits: _i(json['passedCredits'] ?? json['TinChiDat']),
-      // failedCredits: _i(json['failedCredits'] ?? json['TinChiRot']),
+      totalAccumCredits: totalAccumCredits,
+      avgConduct: avgConduct,
       stage: stage,
-      warningLevel: warningLevel,
       semesters: semesters,
       gpaPerSemester: gpaPerSem,
       conductPerSemester: conductPerSem,
@@ -108,7 +107,7 @@ class SemesterStat {
   final String? semester;
   final double? gpa10;
   final double? gpa4; // GPA thang 4
-  final int? credits; // Tín chỉ
+  final int? credits; // Tín chỉ đăng ký
   final double? conduct; // ĐRL 0-100
 
   SemesterStat({
