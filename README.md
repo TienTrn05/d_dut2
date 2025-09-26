@@ -1,5 +1,13 @@
 # dDUT App
 
+## Setup project
+1. Setup firebase for development
+    ```
+    flutterfire configure \
+    --project=push-notifications-3cc7d \
+    --out=lib/firebase_options_dev.dart
+    ```
+
 ## Steps to Run the Project
 
 1. **Add the `.env` file** to the root of the project and include your API URL:

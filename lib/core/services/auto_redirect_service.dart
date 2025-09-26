@@ -7,6 +7,8 @@ class AutoRedirectService {
     switch (payload) {
       case 'RedirectToNotificationScreen':
         return AutoRedirectName.redirectToNotificationScreen;
+      case 'RedirectToNotificationScreenGeneralTab':
+        return AutoRedirectName.redirectToNotificationScreenGeneralTab;
       case 'RedirectToScheduleScreen':
         return AutoRedirectName.redirectToScheduleScreen;
       default:
@@ -17,6 +19,7 @@ class AutoRedirectService {
 
 enum AutoRedirectName {
   redirectToNotificationScreen,
+  redirectToNotificationScreenGeneralTab,
   redirectToScheduleScreen,
   unknown,
 }
