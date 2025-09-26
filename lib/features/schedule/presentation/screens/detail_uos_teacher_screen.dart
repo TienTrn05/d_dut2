@@ -90,7 +90,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
   }
 
   void _showCreatNewNoti(
-      BuildContext contextOuter, String idUos, String authToken) {
+      BuildContext contextOuter, String idUos, String subjectName, String authToken) {
     showModalBottomSheet(
       context: contextOuter,
       isScrollControlled: true,
@@ -128,7 +128,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                         // }),
                         contextOuter
                             .read<NotiBloc>()
-                            .add(AddNotiEvent(newItem, idUos, authToken)),
+                            .add(AddNotiEvent(newItem, idUos, subjectName, authToken)),
                         Navigator.pop(context)
                       },
                   textConfirm: "Lưu");
@@ -479,6 +479,7 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 onPressed: () => _showCreatNewNoti(
                                     infoContext,
                                     uosFullInfo.uosDetail.idUnitOfStudy,
+                                    uosFullInfo.uosDetail.subjectName,
                                     authToken),
                                 backgroundColor: context.theme.primaryColor,
                                 shape: const CircleBorder(),

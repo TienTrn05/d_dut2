@@ -15,12 +15,13 @@ class LoadNotiEvent extends NotiEvent {
 class AddNotiEvent extends NotiEvent {
   final NotiModel newNoti;
   final String classId;
+  final String className;
   final String authToken;
 
-  AddNotiEvent(this.newNoti, this.classId, this.authToken);
+  AddNotiEvent(this.newNoti, this.classId, this.className, this.authToken);
 
   @override
-  List<Object?> get props => [newNoti, classId, authToken];
+  List<Object?> get props => [newNoti, classId, className, authToken];
 }
 
 class DeleteNotiEvent extends NotiEvent {
