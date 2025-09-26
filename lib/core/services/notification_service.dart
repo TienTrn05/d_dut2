@@ -160,6 +160,7 @@ class NotificationService {
     String? imageUrl = message.notification?.android?.imageUrl;
     String? title = message.notification?.title ?? message.data['title'];
     String? body = message.notification?.body ?? message.data['body'];
+    bool isGeneral = message.data['isGeneral']?.toString().toLowerCase() == 'true';
 
     if (title == null && body == null) {
       logger.i('Thông báo remote rỗng, không hiển thị');
@@ -203,7 +204,7 @@ class NotificationService {
       title,
       body,
       notificationDetails,
-      payload: 'RedirectToNotificationScreen'
+      payload: isGeneral == true ? 'RedirectToNotificationScreenGeneralTab' : 'RedirectToNotificationScreen',
     );
   }
 

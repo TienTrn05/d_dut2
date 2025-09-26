@@ -18,7 +18,9 @@ import 'my_notifications.dart';
 import 'widgets/custom_time_dropdown.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+  const NotificationScreen({super.key, required this.initialTabIndex});
+
+  final int initialTabIndex;
 
   Widget _buildSwitchTile(BuildContext context, String title, bool value,
       Function(bool) onChanged) {
@@ -58,6 +60,7 @@ class NotificationScreen extends StatelessWidget {
               token: stateAuth.accessToken)),
         child: DefaultTabController(
           length: 2,
+          initialIndex: initialTabIndex,
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: context.theme.primaryColor, // Màu nền xanh dương
