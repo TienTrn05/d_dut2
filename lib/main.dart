@@ -1,5 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,11 +20,6 @@ import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
 import 'features/notification/domain/repositories/notification_repository.dart';
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -35,8 +28,6 @@ Future<void> main() async {
   await AppEnvironment.setup();
   await Storage.setup();
   await GetItUtils.setup();
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await NotificationService().init();
   NotificationService().registerMessageHandlers();
