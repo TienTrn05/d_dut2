@@ -113,64 +113,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final String month = 'Tháng ${today.month}';
     final String day = today.day.toString().padLeft(2, '0');
 
-    Future<void> sendFeedbackMail() async {
+    Future<void> sendFeedbackMail(String mail) async {
       const String to = "tolaptrinh@dut.udn.vn"; // mail bạn muốn nhận góp ý
       const String subject = "Feedback for dDUT";
-      const String body = "Xin chào, tôi muốn góp ý...";
+      String body =
+          "Xin chào, tôi muốn góp ý... \n\n\n*Lưu ý: Sử dụng tài khoản $mail để gửi mail";
 
       // 1. Outlook app
-      final Uri outlookUri = Uri.parse(
-        "ms-outlook://compose"
-        "?to=$to"
-        "&subject=${Uri.encodeComponent(subject)}"
-        "&body=${Uri.encodeComponent(body)}",
-      );
+      // final Uri outlookUri = Uri.parse(
+      //   "ms-outlook://compose"
+      //   "?to=$to"
+      //   "&subject=${Uri.encodeComponent(subject)}"
+      //   "&body=${Uri.encodeComponent(body)}",
+      // );
 
-      if (await canLaunchUrl(outlookUri)) {
-        await launchUrl(outlookUri, mode: LaunchMode.externalApplication);
-        return;
-      }
+      // if (await canLaunchUrl(outlookUri)) {
+      //   await launchUrl(outlookUri, mode: LaunchMode.externalApplication);
+      //   return;
+      // }
 
       // 2. Gmail app
-      final Uri gmailUri = Uri.parse(
-        "googlegmail://co"
-        "?to=$to"
-        "&subject=${Uri.encodeComponent(subject)}"
-        "&body=${Uri.encodeComponent(body)}",
-      );
+      // final Uri gmailUri = Uri.parse(
+      //   "googlegmail://co"
+      //   "?to=$to"
+      //   "&subject=${Uri.encodeComponent(subject)}"
+      //   "&body=${Uri.encodeComponent(body)}",
+      // );
 
-      if (await canLaunchUrl(gmailUri)) {
-        await launchUrl(gmailUri, mode: LaunchMode.externalApplication);
-        return;
-      }
+      // if (await canLaunchUrl(gmailUri)) {
+      //   await launchUrl(gmailUri, mode: LaunchMode.externalApplication);
+      //   return;
+      // }
 
       // 3. Mailto (hệ thống sẽ hỏi app nào xử lý, thường là Outlook/Gmail mặc định)
-      final Uri emailUri = Uri(
-        scheme: 'mailto',
-        path: to,
-        query:
-            "subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
-      );
-
-      if (await canLaunchUrl(emailUri)) {
+      try {
+        final Uri emailUri = Uri(
+          scheme: 'mailto',
+          path: to,
+          query:
+              "subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
+        );
         await launchUrl(emailUri, mode: LaunchMode.externalApplication);
-        return;
+      } catch (e) {
+        CustomSnackbar.showSnackBar(
+          context,
+          "Đã xảy ra lỗi",
+          "Không thể gửi mail: $e",
+          AlertType.error,
+        );
       }
 
       // 4. Gmail Web fallback
-      final Uri webGmailUri = Uri.parse(
-        "https://mail.google.com/mail/?view=cm&fs=1"
-        "&to=$to"
-        "&su=${Uri.encodeComponent(subject)}"
-        "&body=${Uri.encodeComponent(body)}",
-      );
+      // final Uri webGmailUri = Uri.parse(
+      //   "https://mail.google.com/mail/?view=cm&fs=1"
+      //   "&to=$to"
+      //   "&su=${Uri.encodeComponent(subject)}"
+      //   "&body=${Uri.encodeComponent(body)}",
+      // );
 
-      if (await canLaunchUrl(webGmailUri)) {
-        await launchUrl(webGmailUri, mode: LaunchMode.externalApplication);
-        return;
-      }
-
-      print("❌ Không tìm thấy cách nào mở mail");
+      // if (await canLaunchUrl(webGmailUri)) {
+      //   await launchUrl(webGmailUri, mode: LaunchMode.externalApplication);
+      //   return;
+      // }
     }
 
     return MultiBlocProvider(
@@ -497,13 +501,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         }
                                       },
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
-                                      title: "Góp ý",
-                                      onTap: () {
-                                        sendFeedbackMail();
-                                      },
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
+                                                "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
+                                            title: "Góp ý",
+                                            onTap: () {
+                                              if (state
+                                                  is AuthUserAuthenticated) {
+                                                sendFeedbackMail(
+                                                  state.userData.mail,
+                                                );
+                                              }
+                                            },
+                                          ),
                                     ),
                                   ];
                                 } else {
@@ -596,13 +608,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         }
                                       },
                                     ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
-                                      title: "Góp ý",
-                                      onTap: () {
-                                        sendFeedbackMail();
-                                      },
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
+                                                "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
+                                            title: "Góp ý",
+                                            onTap: () {
+                                              if (state
+                                                  is AuthUserAuthenticated) {
+                                                sendFeedbackMail(
+                                                  state.userData.mail,
+                                                );
+                                              }
+                                            },
+                                          ),
                                     ),
                                   ];
                                 }
