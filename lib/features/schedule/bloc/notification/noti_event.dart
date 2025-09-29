@@ -15,9 +15,10 @@ class LoadNotiEvent extends NotiEvent {
 class AddNotiEvent extends NotiEvent {
   final NotiModel newNoti;
   final String idUos;
+  final String subjectName;
   final String authToken;
 
-  AddNotiEvent(this.newNoti, this.idUos, this.authToken);
+  AddNotiEvent(this.newNoti, this.idUos, this.subjectName, this.authToken);
 
   @override
   List<Object?> get props => [newNoti, idUos, authToken];

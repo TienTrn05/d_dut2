@@ -68,7 +68,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
   }
 
   void _showCreatNewNoti(
-      BuildContext contextOuter, String classId, String authToken) {
+      BuildContext contextOuter, String classId, String className, String authToken) {
     showModalBottomSheet(
       context: contextOuter,
       isScrollControlled: true,
@@ -103,7 +103,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                   onConfirm: () => {
                         contextOuter
                             .read<NotiBloc>()
-                            .add(AddNotiEvent(newItem, classId, authToken)),
+                            .add(AddNotiEvent(newItem, classId, className, authToken)),
                         Navigator.pop(context)
                       },
                   textConfirm: "Lưu");
@@ -454,7 +454,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                 child: FloatingActionButton(
                   elevation: 0,
                   onPressed: () =>
-                      _showCreatNewNoti(context, widget.classId!, authToken),
+                      _showCreatNewNoti(context, widget.classId!, widget.homeroomName!, authToken),
                   backgroundColor: context.theme.primaryColor,
                   shape: const CircleBorder(),
                   child: const Icon(Icons.add_rounded,
