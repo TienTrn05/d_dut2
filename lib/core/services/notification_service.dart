@@ -20,9 +20,7 @@ import 'auto_redirect_service.dart';
 // Handler cho background messages phải là một top-level function
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  logger.i("Handling a background message: ${message.messageId}");
-  // Nếu bạn muốn hiển thị thông báo từ background, bạn cũng có thể gọi logic show ở đây
+  print('Handling a background message ${message.messageId}');
 }
 
 class NotificationService {
@@ -101,7 +99,7 @@ class NotificationService {
         );
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: onNotificationTap,
+      onDidReceiveNotificationResponse: onNotificationTapped,
     );
 
     await _requestPermissions();
@@ -149,6 +147,14 @@ class NotificationService {
   void registerMessageHandlers() {
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    FirebaseMessaging.onMessageOpenedApp.listen(onRemoteNotificationTapped);
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        onRemoteNotificationTapped(message);
+      }
+    });
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
@@ -160,7 +166,8 @@ class NotificationService {
     String? imageUrl = message.notification?.android?.imageUrl;
     String? title = message.notification?.title ?? message.data['title'];
     String? body = message.notification?.body ?? message.data['body'];
-    bool isGeneral = message.data['isGeneral']?.toString().toLowerCase() == 'true';
+    bool isGeneral =
+        message.data['isGeneral']?.toString().toLowerCase() == 'true';
 
     if (title == null && body == null) {
       logger.i('Thông báo remote rỗng, không hiển thị');
@@ -204,7 +211,10 @@ class NotificationService {
       title,
       body,
       notificationDetails,
-      payload: isGeneral == true ? 'RedirectToNotificationScreenGeneralTab' : 'RedirectToNotificationScreen',
+      payload:
+          isGeneral == true
+              ? 'RedirectToNotificationScreenGeneralTab'
+              : 'RedirectToNotificationScreen',
     );
   }
 
@@ -280,16 +290,49 @@ class NotificationService {
     }
   }
 
-  void onNotificationTap(NotificationResponse response) {
-    logger.i("Notification tapped with payload: ${response.payload}");
-    // Example: if (response.payload.startsWith('class_id=')) { ... }
-    // Lưu payload để xử lý sau khi app khởi tạo RootScreen
-    AutoRedirectService.pendingPayload = response.payload;
+  void onRemoteNotificationTapped(RemoteMessage message) {
+    try {
+      logger.i("Notification tapped with payload: ${message.data}");
 
-    navigatorKey.currentState?.pushNamedAndRemoveUntil(
-      Routes.root, // hoặc Routes.auth nếu muốn quay lại màn hình đăng nhập
-      (route) => false,
-    );
+      bool isGeneral =
+          message.data['isGeneral']?.toString().toLowerCase() == 'true';
+
+      AutoRedirectService.pendingPayload =
+          isGeneral == true
+              ? 'RedirectToNotificationScreenGeneralTab'
+              : 'RedirectToNotificationScreen';
+
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        Routes.root,
+        (route) => false,
+      );
+    } catch (e, stack) {
+      logger.e(
+        "Error handling notification tap: $e",
+        exception: e,
+        stackTrace: stack,
+      );
+      AutoRedirectService.pendingPayload = message.data['payload'];
+    }
+  }
+
+  void onNotificationTapped(NotificationResponse response) {
+    try {
+      logger.i("Notification tapped with payload: ${response.payload}");
+      AutoRedirectService.pendingPayload = response.payload;
+
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        Routes.root,
+        (route) => false,
+      );
+    } catch (e, stack) {
+      logger.e(
+        "Error handling notification tap: $e",
+        exception: e,
+        stackTrace: stack,
+      );
+      AutoRedirectService.pendingPayload = response.payload;
+    }
   }
 
   // Đăng ký topic
