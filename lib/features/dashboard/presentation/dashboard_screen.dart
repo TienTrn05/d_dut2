@@ -1,5 +1,6 @@
 import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
@@ -118,11 +119,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Kiểm tra có app Mail nào không
       bool available = await OpenMailLauncher.isMailAppAvailable();
       if (!available) {
-        CustomSnackbar.showSnackBar(
+        CustomAlertDialog.showCustomDialog(
           context,
-          "Thông báo",
-          "Không có ứng dụng email khả dụng",
-          AlertType.notice,
+          'Không tìm thấy ứng dụng Email',
+          "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+          AlertDialogType.warning,
+          textCancel: "Đóng",
         );
         return;
       }
@@ -153,20 +155,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             emailContent: emailContent,
           );
           if (!opened) {
-            CustomSnackbar.showSnackBar(
+            CustomAlertDialog.showCustomDialog(
               context,
-              "Lỗi mở app",
-              "Không thể mở ứng dụng đã chọn",
-              AlertType.error,
+              'không thể mở app',
+              "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+              AlertDialogType.warning,
+              textCancel: "Đóng",
             );
           }
         }
       } else {
-        CustomSnackbar.showSnackBar(
+        CustomAlertDialog.showCustomDialog(
           context,
-          "Lỗi mở app",
-          "Không thể mở ứng dụng email: ${result.error}",
-          AlertType.error,
+          'không thể mở app',
+          "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+          AlertDialogType.warning,
+          textCancel: "Đóng",
         );
       }
     }
