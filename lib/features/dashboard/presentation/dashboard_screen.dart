@@ -169,12 +169,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return;
       }
       final String userRole = state.userData.role.name;
-      bool isTeacher = userRole == RoleModel.roleTeacher;
+      bool isStudent = userRole == RoleModel.roleStudent;
 
       final userId =
-          isTeacher
-              ? _extractTeacherId(state.userData)
-              : _extractStudentId(state.userData);
+          isStudent
+              ? _extractStudentId(state.userData)
+              : _extractTeacherId(state.userData);
 
       final emailContent = EmailContent(
         to: ['tolaptrinh@dut.udn.vn'],
