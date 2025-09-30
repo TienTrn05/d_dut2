@@ -2,6 +2,7 @@ import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/dashboard/presentation/widgets/custom_mail_picker.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:flutter/material.dart';
@@ -136,42 +137,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
         isHtml: false,
       );
 
-      OpenMailAppResult result = await OpenMailLauncher.openMailApp(
-        emailContent: emailContent,
-      );
+      // Lấy danh sách mail apps
+      final apps = await OpenMailLauncher.getMailApps();
 
-      if (result.didOpen) {
-        // Đã mở ứng dụng email
-        print("Opened mail app");
-      } else if (result.hasMultipleOptions) {
-        MailApp? selected = await OpenMailLauncher.showMailAppPicker(
-          context: context,
-          mailApps: result.options,
-          title: "Chọn ứng dụng Email",
-        );
-        if (selected != null) {
-          bool opened = await OpenMailLauncher.openSpecificMailApp(
-            mailApp: selected,
-            emailContent: emailContent,
-          );
-          if (!opened) {
-            CustomAlertDialog.showCustomDialog(
-              context,
-              'không thể mở app',
-              "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
-              AlertDialogType.warning,
-              textCancel: "Đóng",
-            );
-          }
-        }
-      } else {
+      if (apps.isEmpty) {
+        // Không có app
         CustomAlertDialog.showCustomDialog(
           context,
-          'không thể mở app',
+          'Không tìm thấy ứng dụng Email',
           "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
           AlertDialogType.warning,
           textCancel: "Đóng",
         );
+        return;
+      }
+
+      // Nếu chỉ có 1 app → mở thẳng
+      if (apps.length == 1) {
+        final opened = await OpenMailLauncher.openSpecificMailApp(
+          mailApp: apps.first,
+          emailContent: emailContent,
+        );
+        if (!opened) {
+          CustomAlertDialog.showCustomDialog(
+            context,
+            'Không thể mở ứng dụng',
+            "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+            AlertDialogType.warning,
+            textCancel: "Đóng",
+          );
+        }
+        return;
+      }
+
+      // Nếu có nhiều app → hiện dialog custom để chọn
+      MailApp? selected = await CustomMailAppPicker.showCustomMailAppPicker(
+        context: context,
+        mailApps: apps,
+        title: "Chọn ứng dụng Email",
+        cancelText: "Hủy",
+      );
+
+      if (selected != null) {
+        final opened = await OpenMailLauncher.openSpecificMailApp(
+          mailApp: selected,
+          emailContent: emailContent,
+        );
+        if (!opened) {
+          CustomAlertDialog.showCustomDialog(
+            context,
+            'Không thể mở ứng dụng',
+            "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+            AlertDialogType.warning,
+            textCancel: "Đóng",
+          );
+        }
       }
     }
 
