@@ -74,7 +74,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final local = v.contains('@') ? v.split('@').first : v;
     final digits =
         RegExp(r'\d+').allMatches(local).map((m) => m.group(0)!).join();
+
     return digits;
+  }
+
+  String _extractTeacherId(dynamic userData) {
+    String? v;
+    try {
+      v = userData.studentId as String?;
+    } catch (_) {}
+    v ??=
+        (() {
+          try {
+            return userData.studentCode as String?;
+          } catch (_) {}
+          return null;
+        })();
+    v ??=
+        (() {
+          try {
+            return userData.code as String?;
+          } catch (_) {}
+          return null;
+        })();
+    v ??=
+        (() {
+          try {
+            return userData.userPrincipalName as String?;
+          } catch (_) {}
+          return null;
+        })();
+
+    if (v == null || v.trim().isEmpty) return '';
+    final local = v.contains('@') ? v.split('@').first : v;
+    final digits =
+        RegExp(r'\d+').allMatches(local).map((m) => m.group(0)!).join();
+
+    return digits != "" ? digits : local;
   }
 
   void _openAcademicResults(BuildContext context, AuthUserAuthenticated state) {
@@ -116,7 +152,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final String month = 'Tháng ${today.month}';
     final String day = today.day.toString().padLeft(2, '0');
 
-    Future<void> _sendEmail(BuildContext context) async {
+    Future<void> _sendEmail(
+      BuildContext context,
+      AuthUserAuthenticated state,
+    ) async {
       // Kiểm tra có app Mail nào không
       bool available = await OpenMailLauncher.isMailAppAvailable();
       if (!available) {
@@ -129,10 +168,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
         return;
       }
+      final String userRole = state.userData.role.name;
+      bool isTeacher = userRole == RoleModel.roleTeacher;
+
+      final userId =
+          isTeacher
+              ? _extractTeacherId(state.userData)
+              : _extractStudentId(state.userData);
 
       final emailContent = EmailContent(
         to: ['tolaptrinh@dut.udn.vn'],
-        subject: 'Feedback for dDUT',
+        subject: '[$userId] Đóng góp ý kiến cho ứng dụng dDUT',
         body: 'Góp ý về dDUT',
         isHtml: false,
       );
@@ -528,7 +574,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             onTap: () {
                                               if (state
                                                   is AuthUserAuthenticated) {
-                                                _sendEmail(context);
+                                                _sendEmail(context, state);
                                               }
                                             },
                                           ),
@@ -633,7 +679,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             onTap: () {
                                               if (state
                                                   is AuthUserAuthenticated) {
-                                                _sendEmail(context);
+                                                _sendEmail(context, state);
                                               }
                                             },
                                           ),
