@@ -1,18 +1,22 @@
-import 'package:e_dut/common/extensions/custom_theme_extension.dart';
-import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/utils/getit_utils.dart';
-import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
-import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
-import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
-import 'package:e_dut/features/community_activity/bloc/user_info/user_info_bloc.dart';
-import 'package:e_dut/features/community_activity/domain/repository/community_repo.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_scores.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/all_activities.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_activities.dart';
-import 'package:e_dut/features/community_activity/presentation/widgets/community_mode/user_proofs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '/common/extensions/custom_theme_extension.dart';
+import '/common/extensions/font_sizes.dart';
+import '/common/utils/getit_utils.dart';
+import '/common/widgets/appbar/custom_appbar.dart';
+
+import '/features/auth/bloc/auth_bloc.dart';
+import '/features/auth/presentation/unauthorized_page.dart';
+
+import '../../bloc/community_activity/community_activity_bloc.dart';
+import '../../bloc/user_info/user_info_bloc.dart';
+import '../../domain/repository/community_repo.dart';
+import '../widgets/community_mode/user_scores.dart';
+import '../widgets/community_mode/all_activities.dart';
+import '../widgets/community_mode/user_activities.dart';
+import '../widgets/community_mode/user_proofs.dart';
 
 class CommunityActivitiesScreen extends StatefulWidget {
   const CommunityActivitiesScreen({super.key});
@@ -46,42 +50,7 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
       if (authState is! AuthUserAuthenticated) {
-        return Scaffold(
-            appBar: AppBar(
-              backgroundColor: context.theme.primaryColor ?? Colors.blue,
-              elevation: 0, // Xóa bóng dưới AppBar
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(context); // Quay lại màn hình trước
-                  },
-                ),
-              ),
-              title: Text(
-                'Hoạt động cộng đồng',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: FontSizes.medium,
-                ),
-              ),
-              centerTitle: true,
-            ),
-            backgroundColor: Colors.white,
-            body: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: Text(
-                  'Bạn cần đăng nhập để sử dụng tính năng này.',
-                  style: TextStyle(
-                      color: context.theme.grey!, fontSize: FontSizes.large),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ));
+        return UnauthorizedPage(title: "Hoạt động cộng đồng");
       }
       return MultiBlocProvider(
           providers: [

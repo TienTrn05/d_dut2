@@ -45,6 +45,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
     super.dispose();
   }
 
+  double? _overallGpa4(StatsModel d) {
+    if (d.gpa4 != null) return d.gpa4;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -62,17 +67,18 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 builder: (context, state) {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: state.isLoading
-                        ? SizedBox(
-                            key: const ValueKey('stats-loading-bar'),
-                            height: 2,
-                            width: double.infinity,
-                            child: CustomLoadingIndicator.thin(),
-                          )
-                        : const SizedBox(
-                            key: ValueKey('stats-no-loading'),
-                            height: 2,
-                          ),
+                    child:
+                        state.isLoading
+                            ? SizedBox(
+                              key: const ValueKey('stats-loading-bar'),
+                              height: 2,
+                              width: double.infinity,
+                              child: CustomLoadingIndicator.thin(),
+                            )
+                            : const SizedBox(
+                              key: ValueKey('stats-no-loading'),
+                              height: 2,
+                            ),
                   );
                 },
               ),
@@ -88,8 +94,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
               if (state.error != null) {
                 return _ErrorView(
                   message: state.error!,
-                  onRetry: () =>
-                      _bloc.add(StatsRequested(studentId: widget.studentId)),
+                  onRetry:
+                      () => _bloc.add(
+                        StatsRequested(studentId: widget.studentId),
+                      ),
                 );
               }
 
@@ -99,27 +107,42 @@ class _StatisticsPageState extends State<StatisticsPage> {
               final displaySemesters =
                   semesters.map(_formatSemesterShort).toList();
 
-              final gpaPerSem = data.gpaPerSemester; // thang 4
-              final conductScores = data.conductPerSemester; // ĐRL 0-100
+              final gpaPerSem = data.gpaPerSemester; // DiemTBTL (0-4)
+              final conductScores =
+                  data.conductPerSemester; // ĐRL 0-100 (mỗi kỳ)
               final credits =
                   data.creditsPerSemester.map((e) => e.toDouble()).toList();
 
-              final double? overallGpa4 = data.gpa4 ?? data.gpa10;
-              final double totalCredits = data.totalCredits.toDouble();
-              final String? warningLevel = data.warningLevel;
-              final String? studyStage = data.stage;
+              final double? overallGpa4 = _overallGpa4(data);
+              final double totalAccumCredits =
+                  data.totalAccumCredits?.toDouble() ?? 0.0;
+
+              // Điểm rèn luyện trung bình
+              final double? avgConduct =
+                  data.avgConduct ??
+                  (conductScores.isEmpty
+                      ? null
+                      : conductScores.reduce((a, b) => a + b) /
+                          conductScores.length);
+
+              final String? studyStage = data.stage; // Năm học
 
               final double creditsYMax = () {
-                if (credits.isEmpty) return 10.0;
+                if (credits.isEmpty) return 20.0;
                 final maxVal = credits.reduce(math.max);
-                return (((maxVal ~/ 10) + 1) * 10).toDouble();
+                final rounded = (((maxVal ~/ 10) + 1) * 10).toDouble();
+                return math.max(rounded, 20.0);
               }();
 
               return RefreshIndicator(
                 color: Theme.of(context).primaryColor,
                 backgroundColor: Colors.white,
-                onRefresh: () async =>
-                    _bloc.add(StatsRefreshed(studentId: widget.studentId)),
+                onRefresh: () async {
+                  _bloc.add(StatsRefreshed(studentId: widget.studentId));
+                  await _bloc.stream
+                      .skipWhile((s) => !s.isLoading)
+                      .firstWhere((s) => !s.isLoading);
+                },
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
@@ -144,20 +167,22 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             _BigMetricCard(
-                              value: overallGpa4 == null
-                                  ? '--'
-                                  : overallGpa4.toStringAsFixed(2),
+                              value:
+                                  overallGpa4 == null
+                                      ? '--'
+                                      : overallGpa4.toStringAsFixed(2),
                             ),
                             Container(
                               width: 1,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 12),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               color: const Color(0xFFBAC7D5).withOpacity(0.6),
                             ),
                             Expanded(
                               child: _InfoSummaryInline(
-                                totalCredits: totalCredits,
-                                warningLevel: warningLevel,
+                                totalAccumCredits: totalAccumCredits,
+                                avgConduct: avgConduct,
                                 studyStage: studyStage,
                               ),
                             ),
@@ -168,44 +193,52 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
                     const SizedBox(height: 24),
 
-                    // GPA
+                    // GPA (thang 4.0)
                     _ChartCard(
-                      title: 'GPA',
-                      child: _LineChart(
-                        xLabels: displaySemesters,
-                        values: gpaPerSem,
-                        minY: 0,
-                        maxY: 4,
-                        yInterval: 1,
-                      ),
+                      title: 'Điểm tích luỹ theo từng kỳ',
+                      child:
+                          gpaPerSem.isNotEmpty
+                              ? _LineChart(
+                                xLabels: displaySemesters,
+                                values: gpaPerSem,
+                                minY: 0,
+                                maxY: 4,
+                                yInterval: 1,
+                              )
+                              : const _EmptyChart(),
                     ),
                     const SizedBox(height: 12),
 
                     // Điểm rèn luyện
                     _ChartCard(
-                      title: 'Điểm rèn luyện',
-                      child: conductScores.isNotEmpty
-                          ? _LineChart(
-                              xLabels: displaySemesters,
-                              values: conductScores,
-                              minY: 0,
-                              maxY: 100,
-                              yInterval: 20,
-                            )
-                          : const _EmptyChart(),
+                      title: 'Điểm rèn luyện theo từng kỳ',
+                      child:
+                          conductScores.isNotEmpty
+                              ? _LineChart(
+                                xLabels: displaySemesters,
+                                values: conductScores,
+                                minY: 0,
+                                maxY: 100,
+                                yInterval: 20,
+                              )
+                              : const _EmptyChart(),
                     ),
                     const SizedBox(height: 12),
 
                     // Số TC đăng ký
                     _ChartCard(
                       title: 'Số tín chỉ đăng ký từng kỳ',
-                      child: _LineChart(
-                        xLabels: displaySemesters,
-                        values: credits,
-                        minY: 0,
-                        maxY: creditsYMax,
-                        yInterval: 10,
-                      ),
+                      child:
+                          credits.isNotEmpty
+                              ? _LineChart(
+                                xLabels: displaySemesters,
+                                values: credits,
+                                minY: 0,
+                                maxY: creditsYMax,
+                                yInterval: 10,
+                                tooltipDigits: 1,
+                              )
+                              : const _EmptyChart(),
                     ),
                   ],
                 ),
@@ -217,12 +250,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
     );
   }
 
-  // Định dạng học kỳ XX.Y
   String _formatSemesterShort(String raw) {
-    var s = raw.trim();
-    if (s.length < 3) s = s.padLeft(3, '0');
-    final yy = s.substring(0, 2);
-    final hk = s.substring(s.length - 1);
+    var s = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    if (s.isEmpty) return raw;
+    final hk = s.characters.last;
+    final yy =
+        (s.length >= 3)
+            ? s.substring(s.length - 3, s.length - 1)
+            : s.padLeft(2, '0').substring(0, 2);
     return '$yy.$hk';
   }
 }
@@ -237,9 +272,7 @@ class _ChartCard extends StatelessWidget {
     return Material(
       elevation: 0,
       color: const Color(0xFFFAFAFA),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: Column(
@@ -268,16 +301,20 @@ class _LineChart extends StatelessWidget {
     this.minY,
     this.maxY,
     this.yInterval,
+    this.tooltipDigits,
   });
 
   final List<String> xLabels;
   final List<double> values;
   final double? minY, maxY, yInterval;
+  final int? tooltipDigits;
 
   @override
   Widget build(BuildContext context) {
+    final len = math.min(xLabels.length, values.length);
+    final labels = xLabels.take(len).toList();
     final spots = <FlSpot>[
-      for (int i = 0; i < values.length; i++) FlSpot(i.toDouble(), values[i]),
+      for (int i = 0; i < len; i++) FlSpot(i.toDouble(), values[i]),
     ];
 
     final borderColor = const Color(0xFF9E9E9E).withOpacity(0.3);
@@ -292,18 +329,28 @@ class _LineChart extends StatelessWidget {
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
               getTooltipColor: (_) => Colors.white,
-              tooltipBorder:
-                  const BorderSide(color: Color(0xFF133D87), width: 1.0),
-              getTooltipItems: (touchedSpots) => touchedSpots
-                  .map((spot) => LineTooltipItem(
-                        spot.y.toString(),
-                        const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF133D87),
-                          fontSize: FontSizes.medium,
-                        ),
-                      ))
-                  .toList(),
+              tooltipBorder: const BorderSide(
+                color: Color(0xFF133D87),
+                width: 1.0,
+              ),
+              getTooltipItems:
+                  (touchedSpots) =>
+                      touchedSpots.map((spot) {
+                        final v = spot.y;
+                        final isConductChart =
+                            (maxY ?? 0) == 100; // điểm rèn luyện
+                        final digits =
+                            isConductChart ? 0 : (tooltipDigits ?? 2);
+                        final text = v.toStringAsFixed(digits);
+                        return LineTooltipItem(
+                          text,
+                          const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF133D87),
+                            fontSize: FontSizes.medium,
+                          ),
+                        );
+                      }).toList(),
             ),
           ),
           gridData: const FlGridData(show: true),
@@ -315,17 +362,18 @@ class _LineChart extends StatelessWidget {
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: yInterval,
-                reservedSize: 28,
+                interval: yInterval ?? 1,
+                reservedSize: 32,
                 getTitlesWidget: (v, meta) {
-                  final d = (v * 2).roundToDouble() / 2.0;
-                  final isTick = (v - d).abs() < 1e-6;
+                  final interval = yInterval ?? 1.0;
+                  final isTick = (v % interval).abs() < 1e-6;
                   if (!isTick) return const SizedBox.shrink();
-                  final text = (v % 1 == 0)
-                      ? v.toInt().toString()
-                      : v.toStringAsFixed(1);
+                  final text =
+                      v == v.roundToDouble()
+                          ? v.toInt().toString()
+                          : v.toStringAsFixed(1);
                   return SideTitleWidget(
-                    space: 7,
+                    space: 6,
                     meta: meta,
                     child: Text(
                       text,
@@ -341,23 +389,27 @@ class _LineChart extends StatelessWidget {
                 interval: 1,
                 getTitlesWidget: (value, meta) {
                   final i = value.toInt();
-                  if (i < 0 || i >= xLabels.length) {
+                  if (i < 0 || i >= labels.length) {
                     return const SizedBox.shrink();
                   }
+                  final shouldShow = labels.length <= 10 || i % 2 == 0;
+                  if (!shouldShow) return const SizedBox.shrink();
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      xLabels[i],
+                      labels[i],
                       style: const TextStyle(fontSize: FontSizes.small),
                     ),
                   );
                 },
               ),
             ),
-            rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           lineBarsData: [
             LineChartBarData(
@@ -396,14 +448,14 @@ class _BigMetricCard extends StatelessWidget {
 
 class _InfoSummaryInline extends StatelessWidget {
   const _InfoSummaryInline({
-    required this.totalCredits,
-    this.warningLevel,
+    required this.totalAccumCredits,
+    this.avgConduct,
     this.studyStage,
   });
 
-  final double totalCredits;
-  final String? warningLevel;
-  final String? studyStage;
+  final double totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final double? avgConduct; // trung bình DiemRL các kỳ
+  final String? studyStage; // Namhoc (string)
 
   static const Color _labelColor = Color(0xFF424242);
   static const TextStyle _labelStyle = TextStyle(
@@ -419,14 +471,12 @@ class _InfoSummaryInline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String stageDisplay = '—';
-    if (studyStage != null && studyStage!.trim().isNotEmpty) {
-      stageDisplay = 'Năm thứ ${studyStage!}';
-    }
-    final warningDisplay =
-        (warningLevel == null || warningLevel!.trim().isEmpty)
+    final conductDisplay =
+        (avgConduct == null) ? '—' : avgConduct!.toStringAsFixed(0);
+    final stageDisplay =
+        (studyStage == null || studyStage!.trim().isEmpty)
             ? '—'
-            : warningLevel!;
+            : studyStage!.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,27 +486,24 @@ class _InfoSummaryInline extends StatelessWidget {
             children: [
               const TextSpan(text: 'Số tín chỉ tích luỹ: ', style: _labelStyle),
               TextSpan(
-                text: totalCredits.toStringAsFixed(0),
+                text: totalAccumCredits.toStringAsFixed(0),
                 style: _valueStyle,
               ),
             ],
           ),
         ),
         const SizedBox(height: 6),
-        RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(
-                  text: 'Mức cảnh báo học tập: ', style: _labelStyle),
-              TextSpan(text: warningDisplay, style: _valueStyle),
-            ],
-          ),
+        Row(
+          children: [
+            const Text('Điểm rèn luyện trung bình: ', style: _labelStyle),
+            Text(conductDisplay, style: _valueStyle),
+          ],
         ),
         const SizedBox(height: 6),
         RichText(
           text: TextSpan(
             children: [
-              const TextSpan(text: 'Năm học: ', style: _labelStyle),
+              const TextSpan(text: 'Năm học: Năm thứ ', style: _labelStyle),
               TextSpan(text: stageDisplay, style: _valueStyle),
             ],
           ),

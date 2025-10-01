@@ -74,14 +74,18 @@ class Routes {
         return MaterialPageRoute(builder: (context) => const AuthScreen());
 
       case notification:
+        final args = settings.arguments as int?;
+
         return MaterialPageRoute(
-            builder: (settings) => const NotificationScreen());
+          builder: (settings) => NotificationScreen(initialTabIndex: args ?? 0),
+        );
 
       case msteamtool:
         return MaterialPageRoute(
-          builder: (context) => const Scaffold(
-            body: Center(child: Text('MSTeamTool Screen')),
-          ),
+          builder:
+              (context) => const Scaffold(
+                body: Center(child: Text('MSTeamTool Screen')),
+              ),
         );
 
       // ***** TIMETABLE ***** //
@@ -97,26 +101,30 @@ class Routes {
       case detailUnitOfStudyTeacher:
         final args = settings.arguments as UosAbsentArgs;
         return MaterialPageRoute(
-          builder: (context) => DetailUOSTeacherScreen(
-            idUos: args.idUos,
-            selectedDay: args.selectedDay,
-          ),
+          builder:
+              (context) => DetailUOSTeacherScreen(
+                idUos: args.idUos,
+                selectedDay: args.selectedDay,
+              ),
         );
 
       case detailExamShiftTeacher:
         final args = settings.arguments as ExamShiftArgs;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => UosDetailBloc(getIt.get<ScheduleRepository>())
-              ..add(LoadExamShiftDetail(
-                idExamShift: args.idExamShift,
-                authToken: args.authToken,
-              )),
-            child: DetailExamShiftScreen(
-              idExamShift: args.idExamShift,
-              examShiftName: args.examShiftName,
-            ),
-          ),
+          builder:
+              (_) => BlocProvider(
+                create:
+                    (_) => UosDetailBloc(getIt.get<ScheduleRepository>())..add(
+                      LoadExamShiftDetail(
+                        idExamShift: args.idExamShift,
+                        authToken: args.authToken,
+                      ),
+                    ),
+                child: DetailExamShiftScreen(
+                  idExamShift: args.idExamShift,
+                  examShiftName: args.examShiftName,
+                ),
+              ),
         );
 
       // ***** COURSE REGISTRATION ***** //
@@ -126,9 +134,7 @@ class Routes {
         );
 
       case courseRegistrationGrade:
-        return MaterialPageRoute(
-          builder: (context) => const GradeScreen(),
-        );
+        return MaterialPageRoute(builder: (context) => const GradeScreen());
 
       // ***** COMMUNITY ACTIVITY ***** //
       case communityActivities:
@@ -154,10 +160,11 @@ class Routes {
         final homeroomName = args?["name"] as String?;
 
         return MaterialPageRoute(
-          builder: (context) => DetailHomeroomScreen(
-            classId: classId,
-            homeroomName: homeroomName,
-          ),
+          builder:
+              (context) => DetailHomeroomScreen(
+                classId: classId,
+                homeroomName: homeroomName,
+              ),
         );
 
       // ***** ACADEMIC ***** //
@@ -166,10 +173,9 @@ class Routes {
           final studentId = settings.arguments as String;
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
-            builder: (context) => ResultsPage(
-              studentId: studentId,
-              apiBase: apiBase,
-            ),
+            builder:
+                (context) =>
+                    ResultsPage(studentId: studentId, apiBase: apiBase),
           );
         }
 
@@ -178,19 +184,19 @@ class Routes {
           final studentId = settings.arguments as String;
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
-            builder: (context) => StatisticsPage(
-              studentId: studentId,
-              apiBase: apiBase,
-            ),
+            builder:
+                (context) =>
+                    StatisticsPage(studentId: studentId, apiBase: apiBase),
           );
         }
 
       // ===== default ===== //
       default:
         return MaterialPageRoute(
-          builder: (context) => const Scaffold(
-            body: Center(child: Text('No page route provided')),
-          ),
+          builder:
+              (context) => const Scaffold(
+                body: Center(child: Text('No page route provided')),
+              ),
         );
     }
   }
