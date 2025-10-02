@@ -1,6 +1,8 @@
 import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
+import 'package:e_dut/features/dashboard/presentation/widgets/custom_mail_picker.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:open_mail_launcher/open_mail_launcher.dart';
 
 import '../../root/bloc/root_bloc.dart';
 import '../bloc/dashboard_bloc.dart';
@@ -71,7 +74,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final local = v.contains('@') ? v.split('@').first : v;
     final digits =
         RegExp(r'\d+').allMatches(local).map((m) => m.group(0)!).join();
+
     return digits;
+  }
+
+  String _extractTeacherId(dynamic userData) {
+    String? v;
+    try {
+      v = userData.studentId as String?;
+    } catch (_) {}
+    v ??=
+        (() {
+          try {
+            return userData.studentCode as String?;
+          } catch (_) {}
+          return null;
+        })();
+    v ??=
+        (() {
+          try {
+            return userData.code as String?;
+          } catch (_) {}
+          return null;
+        })();
+    v ??=
+        (() {
+          try {
+            return userData.userPrincipalName as String?;
+          } catch (_) {}
+          return null;
+        })();
+
+    if (v == null || v.trim().isEmpty) return '';
+    final local = v.contains('@') ? v.split('@').first : v;
+    final digits =
+        RegExp(r'\d+').allMatches(local).map((m) => m.group(0)!).join();
+
+    return digits != "" ? digits : local;
   }
 
   void _openAcademicResults(BuildContext context, AuthUserAuthenticated state) {
@@ -112,6 +151,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final String weekday = DateFormat.EEEE('vi').format(today);
     final String month = 'Tháng ${today.month}';
     final String day = today.day.toString().padLeft(2, '0');
+
+    Future<void> _sendEmail(
+      BuildContext context,
+      AuthUserAuthenticated state,
+    ) async {
+      // Kiểm tra có app Mail nào không
+      bool available = await OpenMailLauncher.isMailAppAvailable();
+      if (!available) {
+        CustomAlertDialog.showCustomDialog(
+          context,
+          'Không tìm thấy ứng dụng Email',
+          "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+          AlertDialogType.warning,
+          textCancel: "Đóng",
+        );
+        return;
+      }
+      final String userRole = state.userData.role.name;
+      bool isStudent = userRole == RoleModel.roleStudent;
+
+      final userId =
+          isStudent
+              ? _extractStudentId(state.userData)
+              : _extractTeacherId(state.userData);
+
+      final emailContent = EmailContent(
+        to: ['tolaptrinh@dut.udn.vn'],
+        subject: '[$userId] Đóng góp ý kiến cho ứng dụng dDUT',
+        body: 'Góp ý về dDUT',
+        isHtml: false,
+      );
+
+      // Lấy danh sách mail apps
+      final apps = await OpenMailLauncher.getMailApps();
+
+      if (apps.isEmpty) {
+        // Không có app
+        CustomAlertDialog.showCustomDialog(
+          context,
+          'Không tìm thấy ứng dụng Email',
+          "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+          AlertDialogType.warning,
+          textCancel: "Đóng",
+        );
+        return;
+      }
+
+      // Nếu chỉ có 1 app → mở thẳng
+      if (apps.length == 1) {
+        final opened = await OpenMailLauncher.openSpecificMailApp(
+          mailApp: apps.first,
+          emailContent: emailContent,
+        );
+        if (!opened) {
+          CustomAlertDialog.showCustomDialog(
+            context,
+            'Không thể mở ứng dụng',
+            "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+            AlertDialogType.warning,
+            textCancel: "Đóng",
+          );
+        }
+        return;
+      }
+
+      // Nếu có nhiều app → hiện dialog custom để chọn
+      MailApp? selected = await CustomMailAppPicker.showCustomMailAppPicker(
+        context: context,
+        mailApps: apps,
+        title: "Chọn ứng dụng Email",
+        cancelText: "Hủy",
+      );
+
+      if (selected != null) {
+        final opened = await OpenMailLauncher.openSpecificMailApp(
+          mailApp: selected,
+          emailContent: emailContent,
+        );
+        if (!opened) {
+          CustomAlertDialog.showCustomDialog(
+            context,
+            'Không thể mở ứng dụng',
+            "Bạn có thể gửi góp ý trực tiếp đến: tolaptrinh@dut.udn.vn",
+            AlertDialogType.warning,
+            textCancel: "Đóng",
+          );
+        }
+      }
+    }
 
     return MultiBlocProvider(
       providers: [
@@ -437,6 +565,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         }
                                       },
                                     ),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
+                                                "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
+                                            title: "Góp ý",
+                                            onTap: () {
+                                              if (state
+                                                  is AuthUserAuthenticated) {
+                                                _sendEmail(context, state);
+                                              }
+                                            },
+                                          ),
+                                    ),
                                   ];
                                 } else {
                                   gridItems = [
@@ -527,6 +669,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           );
                                         }
                                       },
+                                    ),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
+                                                "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
+                                            title: "Góp ý",
+                                            onTap: () {
+                                              if (state
+                                                  is AuthUserAuthenticated) {
+                                                _sendEmail(context, state);
+                                              }
+                                            },
+                                          ),
                                     ),
                                   ];
                                 }

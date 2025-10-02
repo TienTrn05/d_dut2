@@ -63,5 +63,14 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>mailto</string>
+			<string>googlegmail</string>
+			<string>ms-outlook</string>
+			<string>ymail</string>
+			<string>readdle-spark</string>
+		</array>
 	</dict>
 </plist>

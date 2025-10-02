@@ -1,7 +1,7 @@
 name: e_dut
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.0.4+13
+version: 1.0.5+1
 
 environment:
   sdk: ">=3.7.2 <4.0.0"
@@ -20,6 +20,7 @@ dependencies:
   fl_chart: 1.0.0
   fluentui_system_icons: ^1.1.219
   file_picker: ^10.3.1
+  open_mail_launcher: ^0.1.0
 
   #state management
   flutter_bloc: ^9.0.0
@@ -46,7 +47,7 @@ dependencies:
   # talker & logger
   talker_flutter: ^4.6.11
   table_calendar: ^3.2.0
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   intl: ^0.20.2
   cached_network_image: ^3.4.1
   card_loading: ^0.3.2
