@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:open_mail_launcher/open_mail_launcher.dart';
 
 class CustomMailAppPicker {
@@ -56,17 +57,34 @@ class CustomMailAppPickerDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children:
               mailApps.map((mailApp) {
+                // chọn icon dựa trên tên app
+                String svgIconPath;
+                final lowerName = mailApp.name.toLowerCase();
+                if (lowerName.contains('gmail')) {
+                  svgIconPath = 'assets/icons/svg/gmail.svg';
+                } else if (lowerName.contains('outlook')) {
+                  svgIconPath = 'assets/icons/svg/outlook.svg';
+                } else {
+                  svgIconPath = 'assets/icons/svg/default_mail.svg';
+                }
+
                 return ListTile(
-                  leading:
-                      mailApp.icon != null
-                          ? Image.memory(
-                            Uri.parse(mailApp.icon!).data!.contentAsBytes(),
-                            width: 32,
-                            height: 32,
-                            errorBuilder:
-                                (_, __, ___) => const Icon(Icons.email),
-                          )
-                          : const Icon(Icons.email),
+                  leading: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Color(0xFFECECEC)),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        svgIconPath,
+                        width: 16,
+                        height: 16,
+                      ),
+                    ),
+                  ),
                   title: Text(mailApp.name),
                   subtitle: mailApp.isDefault ? const Text('Mặc định') : null,
                   onTap: () => Navigator.of(context).pop(mailApp),
