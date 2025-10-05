@@ -40,23 +40,29 @@ class CustomMailAppPickerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Lọc trùng tên ứng dụng (theo mailApp.name)
+    final uniqueApps = <String, MailApp>{};
+    for (var app in mailApps) {
+      uniqueApps.putIfAbsent(app.name, () => app);
+    }
+
     return AlertDialog(
-      backgroundColor: Colors.white, // 👈 custom màu nền
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16), // 👈 bo góc
+        borderRadius: BorderRadius.circular(16),
       ),
       title: Text(
         title ?? 'Chọn ứng dụng Email',
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: context.theme.primaryColor, // 👈 màu title
+          color: context.theme.primaryColor,
         ),
       ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children:
-              mailApps.map((mailApp) {
+              uniqueApps.values.map((mailApp) {
                 // chọn icon dựa trên tên app
                 String svgIconPath;
                 final lowerName = mailApp.name.toLowerCase();
@@ -86,7 +92,6 @@ class CustomMailAppPickerDialog extends StatelessWidget {
                     ),
                   ),
                   title: Text(mailApp.name),
-                  subtitle: mailApp.isDefault ? const Text('Mặc định') : null,
                   onTap: () => Navigator.of(context).pop(mailApp),
                 );
               }).toList(),
