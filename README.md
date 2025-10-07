@@ -7,6 +7,8 @@
     --project=push-notifications-3cc7d \
     --out=lib/firebase_options_dev.dart
     ```
+2. Configure a Android project
+- https://kotlinlang.org/docs/gradle-configure-project.html
 
 ## Steps to Run the Project
 
