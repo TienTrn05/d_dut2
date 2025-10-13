@@ -493,13 +493,20 @@ class _InfoSummaryInline extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            const Text('Điểm rèn luyện trung bình: ', style: _labelStyle),
-            Text(conductDisplay, style: _valueStyle),
-          ],
+
+        RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Điểm rèn luyện trung bình: ',
+                style: _labelStyle,
+              ),
+              TextSpan(text: conductDisplay, style: _valueStyle),
+            ],
+          ),
         ),
         const SizedBox(height: 6),
+
         RichText(
           text: TextSpan(
             children: [
