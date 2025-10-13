@@ -674,6 +674,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       builder:
                                           (context, state) => FeatureCard(
                                             iconUrl:
+                                                "assets/icons/svg/bx_bot.svg",
+                                            title: "Trợ lý dDUT",
+                                            onTap: () {
+                                              context.read<DashboardBloc>().add(
+                                                DashboardNavigateRequested(
+                                                  scopes,
+                                                  Routes.chatBot,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                    ),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
                                                 "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
                                             title: "Góp ý",
                                             onTap: () {

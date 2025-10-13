@@ -21,6 +21,7 @@ import 'package:e_dut/features/academic/presentation/statistics.dart';
 import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
+import '../../features/chatbot/presentations/chat_bot_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
@@ -64,6 +65,9 @@ class Routes {
   // academic
   static const String academicResults = "/academic/results";
   static const String academicStatistics = "/academic/statistics";
+
+  // chat bot
+  static const String chatBot = "/chatBot";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -189,6 +193,9 @@ class Routes {
                     StatisticsPage(studentId: studentId, apiBase: apiBase),
           );
         }
+
+      case chatBot:
+        return MaterialPageRoute(builder: (context) => ChatBotScreen());
 
       // ===== default ===== //
       default:
