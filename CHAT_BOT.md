@@ -2,9 +2,9 @@
 
 ### Các biến sử dụng
 
--   <JWT>: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtZzdxY2J2MzAwMTd4bmk2N29mMnN2b24iLCJlbWFpbCI6ImRvbnRsb29rbWVwbHNAZ21haWwuY29tIiwiaWF0IjoxNzYwMDgxMDk5LCJleHAiOjE3NjI2NzMwOTl9.2pben-I_kDaUYkchynYQDQgUrV0-x8HwxCwGQ0r8kTw
+-   <JWT>: 
 -   <CHATBOT_ID>: cmgkj1m26000c14lcvzlds075
--   <API_KEY>: 3lTZgSpjgCSYH2nL17dqbt0q3lolCnO35H2uxf7gkhDyRvV7iO7LTSvsxdo1ErwI
+-   <API_KEY>: 
 -   <HOST>: http://171.244.46.201:8080
 
 ---
