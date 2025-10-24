@@ -6,7 +6,12 @@ import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String label;
-  const CustomAppbar({super.key, required this.label});
+  final bool showNotificationButton;
+  const CustomAppbar({
+    super.key,
+    required this.label,
+    this.showNotificationButton = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +39,11 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: [
-        NotificationButton(
-          notificationCount: 0,
-          onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
-        ),
+        if (showNotificationButton)
+          NotificationButton(
+            notificationCount: 0,
+            onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
+          ),
       ],
     );
   }

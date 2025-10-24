@@ -10,6 +10,7 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
+import 'package:e_dut/features/tuition_fee/presentations/tuition_fee_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -68,6 +69,9 @@ class Routes {
 
   // chat bot
   static const String chatBot = "/chatBot";
+
+  // tuition fee
+  static const String tuitionFee = "/tuitionFee";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -196,6 +200,9 @@ class Routes {
 
       case chatBot:
         return MaterialPageRoute(builder: (context) => ChatBotScreen());
+
+      case tuitionFee:
+        return MaterialPageRoute(builder: (context) => TuitionFeeScreen());
 
       // ===== default ===== //
       default:
