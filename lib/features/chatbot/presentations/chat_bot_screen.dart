@@ -19,16 +19,27 @@ class ChatBotScreen extends StatefulWidget {
 class _ChatBotScreenState extends State<ChatBotScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
+  final FocusNode _inputFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _inputFocusNode.addListener(() {
+      if (_inputFocusNode.hasFocus) {
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (mounted) {
+            _scrollToBottom();
+          }
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    _inputFocusNode.dispose();
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -67,7 +78,22 @@ class _ChatBotScreenState extends State<ChatBotScreen>
           (context) =>
               ConversationCubit(conversationRepo: getIt<ConversationRepo>())
                 ..loadConversation(),
-      child: BlocBuilder<ConversationCubit, ConversationState>(
+      child: BlocConsumer<ConversationCubit, ConversationState>(
+        listener: (context, state) {
+          if (state.status == ConversationStatus.success) {
+            // Khi load xong, cuộn xuống cuối
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _scrollToBottom(),
+            );
+          }
+
+          // Nếu có tin nhắn mới thì cũng cuộn xuống cuối
+          if (state.conversation?.messages.isNotEmpty == true) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _scrollToBottom(),
+            );
+          }
+        },
         builder: (context, state) {
           final cubit = context.read<ConversationCubit>();
           final messages = state.conversation?.messages ?? [];
@@ -140,163 +166,74 @@ class _ChatBotScreenState extends State<ChatBotScreen>
           }
 
           // ✅ 3️⃣ Normal conversation UI
-          return Scaffold(
-            appBar: ChatBotAppbar(
-              label: state.conversation?.title ?? "Trợ lý ảo BKĐN",
-            ),
-            backgroundColor: context.theme.lightBlue,
-            body: Column(
-              children: [
-                Expanded(
-                  child:
-                      messages.isEmpty
-                          ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Text(
-                                "Tôi là AI hỗ trợ phòng đào tạo BKĐN.\n"
-                                "Tôi có thể giúp gì cho bạn hôm nay?",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black.withOpacity(0.7),
-                                  fontWeight: FontWeight.w500,
+          return GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            behavior: HitTestBehavior.translucent,
+            child: Scaffold(
+              appBar: ChatBotAppbar(
+                label: state.conversation?.title ?? "Trợ lý ảo BKĐN",
+              ),
+              backgroundColor: context.theme.lightBlue,
+              body: Column(
+                children: [
+                  Expanded(
+                    child:
+                        messages.isEmpty
+                            ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Text(
+                                  "Tôi là AI hỗ trợ phòng đào tạo BKĐN.\n"
+                                  "Tôi có thể giúp gì cho bạn hôm nay?",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black.withOpacity(0.7),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
+                            )
+                            : ListView.builder(
+                              controller: _scrollController,
+                              itemCount: messages.length,
+                              padding: const EdgeInsets.all(6),
+                              itemBuilder:
+                                  (context, index) =>
+                                      ChatBubble(message: messages[index]),
                             ),
-                          )
-                          : ListView.builder(
-                            controller: _scrollController,
-                            itemCount: messages.length,
-                            padding: const EdgeInsets.all(6),
-                            itemBuilder:
-                                (context, index) =>
-                                    ChatBubble(message: messages[index]),
-                          ),
-                ),
-                if (_isLoading)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.theme.primaryColor,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text("Bot đang nhập..."),
-                      ],
-                    ),
                   ),
-                Divider(height: 1, color: context.theme.grey),
-                _buildInputArea(context),
-              ],
+                  if (_isLoading)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: context.theme.primaryColor,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text("Bot đang nhập..."),
+                        ],
+                      ),
+                    ),
+                  Divider(height: 1, color: context.theme.lightGrey),
+                  _buildInputArea(context),
+                ],
+              ),
             ),
           );
         },
       ),
     );
   }
-
-  // Widget _buildDrawer(BuildContext context, ConversationState state) {
-  //   final cubit = context.read<ConversationCubit>();
-
-  //   return Drawer(
-  //     backgroundColor: Colors.white,
-  //     child: SafeArea(
-  //       child: Column(
-  //         children: [
-  //           DrawerHeader(
-  //             margin: EdgeInsets.zero,
-  //             padding: const EdgeInsets.all(16),
-  //             child: Row(
-  //               children: [
-  //                 const CircleAvatar(
-  //                   radius: 28,
-  //                   backgroundColor: Colors.blueAccent,
-  //                   child: Icon(Icons.smart_toy, color: Colors.white, size: 28),
-  //                 ),
-  //                 const SizedBox(width: 12),
-  //                 Expanded(
-  //                   child: Text(
-  //                     "Conversations",
-  //                     style: TextStyle(
-  //                       fontSize: 20,
-  //                       fontWeight: FontWeight.bold,
-  //                       color: context.theme.primaryColor,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //           const Divider(),
-  //           Expanded(
-  //             child: ListView.builder(
-  //               itemCount: state.conversations.length,
-  //               itemBuilder: (context, index) {
-  //                 final convo = state.conversations[index];
-  //                 final selected = convo.id == state.selectedConversation?.id;
-
-  //                 return ListTile(
-  //                   leading: Icon(
-  //                     Icons.chat_bubble_outline,
-  //                     color:
-  //                         selected
-  //                             ? context.theme.primaryColor
-  //                             : Colors.grey.shade600,
-  //                   ),
-  //                   title: Text(
-  //                     convo.title,
-  //                     style: TextStyle(
-  //                       fontWeight:
-  //                           selected ? FontWeight.bold : FontWeight.normal,
-  //                       color:
-  //                           selected
-  //                               ? context.theme.primaryColor
-  //                               : Colors.black87,
-  //                     ),
-  //                   ),
-  //                   onTap: () {
-  //                     Navigator.pop(context);
-  //                     cubit.selectConversation(convo);
-  //                   },
-  //                 );
-  //               },
-  //             ),
-  //           ),
-  //           const Divider(height: 1),
-  //           Padding(
-  //             padding: const EdgeInsets.all(12),
-  //             child: ElevatedButton.icon(
-  //               style: ElevatedButton.styleFrom(
-  //                 backgroundColor: context.theme.primaryColor,
-  //                 minimumSize: const Size.fromHeight(48),
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(12),
-  //                 ),
-  //               ),
-  //               icon: const Icon(Icons.add, color: Colors.white),
-  //               label: const Text(
-  //                 "New Conversation",
-  //                 style: TextStyle(color: Colors.white, fontSize: 16),
-  //               ),
-  //               onPressed: () {
-  //                 cubit.createConversation();
-  //                 Navigator.pop(context);
-  //               },
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildInputArea(BuildContext context) {
     return SafeArea(
@@ -321,6 +258,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                 ),
                 child: TextField(
                   controller: _textController,
+                  focusNode: _inputFocusNode,
                   minLines: 1,
                   maxLines: 4,
                   textInputAction: TextInputAction.newline,
