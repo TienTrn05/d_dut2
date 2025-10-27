@@ -28,6 +28,10 @@ import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.d
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
 
+// New: Weekly Schedule (lịch tuần)
+import 'package:e_dut/features/weekly_schedule/bloc/weekly_schedule_bloc.dart';
+import 'package:e_dut/features/weekly_schedule/presentation/weekly_schedule.dart';
+
 String _resolveApiBase() {
   const fromDefine = String.fromEnvironment('API_BASE', defaultValue: '');
   if (fromDefine.isNotEmpty) return fromDefine;
@@ -73,6 +77,9 @@ class Routes {
   // tuition fee
   static const String tuitionFee = "/tuitionFee";
 
+  // weekly schedule
+  static const String weeklySchedule = "/weekly_schedule";
+
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case root:
@@ -83,7 +90,6 @@ class Routes {
 
       case notification:
         final args = settings.arguments as int?;
-
         return MaterialPageRoute(
           builder: (settings) => NotificationScreen(initialTabIndex: args ?? 0),
         );
@@ -162,11 +168,8 @@ class Routes {
 
       case detailHomeRoom:
         final args = settings.arguments as Map<String, dynamic>?;
-
-        // Lấy giá trị và xử lý null
         final classId = args?["id"] as String?;
         final homeroomName = args?["name"] as String?;
-
         return MaterialPageRoute(
           builder:
               (context) => DetailHomeroomScreen(
@@ -195,6 +198,22 @@ class Routes {
             builder:
                 (context) =>
                     StatisticsPage(studentId: studentId, apiBase: apiBase),
+          );
+        }
+
+      // ***** WEEKLY SCHEDULE ***** //
+      case weeklySchedule:
+        {
+          final email = settings.arguments as String;
+          return MaterialPageRoute(
+            builder:
+                (_) => BlocProvider(
+                  create:
+                      (_) =>
+                          getIt.get<WeeklyScheduleBloc>()
+                            ..add(WeeklyScheduleRequested(email)),
+                  child: WeeklySchedulePage(email: email),
+                ),
           );
         }
 
