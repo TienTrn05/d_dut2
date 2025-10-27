@@ -1,4 +1,5 @@
 import 'package:e_dut/common/utils/getit_utils.dart';
+import 'package:e_dut/common/widgets/errors/error_view.dart';
 import 'package:e_dut/features/chatbot/domain/repository/conversation_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,7 +64,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 60,
+          _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -112,55 +113,9 @@ class _ChatBotScreenState extends State<ChatBotScreen>
             return Scaffold(
               appBar: ChatBotAppbar(label: "Chat Bot"),
               backgroundColor: context.theme.lightBlue,
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: Colors.redAccent,
-                        size: 64,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Không thể tải cuộc hội thoại 😢",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.redAccent.shade200,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        state.errorMessage ?? "Đã xảy ra lỗi không xác định.",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.black54),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: context.theme.primaryColor,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () => cubit.loadConversation(),
-                        icon: const Icon(Icons.refresh, color: Colors.white),
-                        label: const Text(
-                          "Thử lại",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              body: ErrorView(
+                message: state.errorMessage ?? "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
+                onRetry: cubit.loadConversation,
               ),
             );
           }

@@ -39,7 +39,7 @@ class TuitionFeeService {
       }
     } catch (e) {
       logger.e("Error fetching pending tuition fees $e");
-      throw Exception("Failed to fetch pending tuition fees: $e");
+      rethrow;
     }
   }
 
@@ -63,7 +63,7 @@ class TuitionFeeService {
       }
     } catch (e) {
       logger.e("Error fetching paid tuition fees $e");
-      throw Exception("Failed to fetch paid tuition fees: $e");
+      rethrow;
     }
   }
 
@@ -89,7 +89,7 @@ class TuitionFeeService {
       }
     } catch (e) {
       logger.e("Error fetching tuition fees by subject $e");
-      throw Exception("Failed to fetch tuition fees by subject: $e");
+      rethrow;
     }
   }
 }

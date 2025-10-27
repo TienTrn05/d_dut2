@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '/common/mixin/cancelable_base_bloc.dart';
@@ -19,30 +20,49 @@ class TuitionFeeCubit extends Cubit<TuitionFeeState>
     : super(const TuitionFeeState.initial());
 
   Future<void> load({required String authToken}) async {
+    emit(const TuitionFeeState.loading());
+
     try {
-      emit(TuitionFeeState.loading());
       final summary = await _tuitionFeeRepository.getTuitionFeeSummary(
         authToken,
       );
-
       emit(TuitionFeeState.loaded(tuitionFees: summary));
-    } on SocketException catch (_) {
-      // 🛜 Lỗi mạng / không có Internet
+    } on DioException catch (e) {
+      // 🧭 Bắt lỗi mạng & server từ Dio
+      if (e.error is SocketException ||
+          e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        emit(
+          const TuitionFeeState.networkError(
+            "Kết nối mạng bị gián đoạn hoặc máy chủ không phản hồi. Vui lòng thử lại sau.",
+          ),
+        );
+      } else {
+        emit(
+          const TuitionFeeState.error(
+            "Không thể tải thông tin học phí.\nVui lòng thử lại sau.",
+          ),
+        );
+      }
+    } on TimeoutException {
       emit(
         const TuitionFeeState.networkError(
-          "Mạng chậm chờn hoặc bị mất kết nối. Vui lòng kiểm tra lại mạng và thử lại.",
+          "Máy chủ phản hồi chậm.\nVui lòng thử lại sau.",
         ),
       );
-    } on TimeoutException catch (_) {
-      // ⏱️ Server phản hồi quá lâu
+    } on SocketException {
       emit(
         const TuitionFeeState.networkError(
-          "Máy chủ phản hồi chậm. Vui lòng thử lại sau.",
+          "Không thể kết nối Internet.\nVui lòng kiểm tra kết nối mạng.",
         ),
       );
-    } catch (e) {
-      // ❌ Lỗi khác
-      emit(TuitionFeeState.error(e.toString()));
+    } catch (_) {
+      emit(
+        const TuitionFeeState.error(
+          "Đã xảy ra lỗi không xác định.\nVui lòng thử lại sau.",
+        ),
+      );
     }
   }
 }

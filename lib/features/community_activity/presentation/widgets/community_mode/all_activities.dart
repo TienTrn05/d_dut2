@@ -257,10 +257,12 @@ class _AllActivitiesState extends State<AllActivities> {
                   ),
                 );
               } else if (state is CommunityActivityError) {
-                return Center(
-                    child: Text('Không thể tải dữ liệu hoạt động cộng đồng',
-                        style: TextStyle(
-                            color: context.theme.grey ?? Colors.grey)));
+                return Expanded(
+                  child: Center(
+                      child: Text('Không thể tải dữ liệu hoạt động cộng đồng',
+                          style: TextStyle(
+                              color: context.theme.grey ?? Colors.grey))),
+                );
               } else {
                 return const SizedBox.shrink();
               }
