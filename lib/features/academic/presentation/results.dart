@@ -66,56 +66,58 @@ class _ResultsPageState extends State<ResultsPage> {
   void _showSemesterPicker(BuildContext context, List<String> semesters) {
     showCupertinoModalPopup(
       context: context,
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 200,
-                child: CupertinoPicker(
-                  backgroundColor: Colors.transparent,
-                  itemExtent: 52,
-                  scrollController:
-                      FixedExtentScrollController(initialItem: _semesterIndex),
-                  onSelectedItemChanged: (int index) {
-                    if (_semesterIndex != index) {
-                      setState(() => _semesterIndex = index);
-                    }
-                  },
-                  selectionOverlay: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue.withAlpha(30),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                  children: [
-                    for (int i = 0; i < semesters.length; i++)
-                      Center(
-                        child: Text(
-                          _formatSemesterTitle(semesters[i]),
-                          style: const TextStyle(
-                            fontSize: FontSizes.large,
-                            fontWeight: FontWeight.bold,
-                            height: 1.25,
-                          ),
+      builder:
+          (_) => Container(
+            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    child: CupertinoPicker(
+                      backgroundColor: Colors.transparent,
+                      itemExtent: 52,
+                      scrollController: FixedExtentScrollController(
+                        initialItem: _semesterIndex,
+                      ),
+                      onSelectedItemChanged: (int index) {
+                        if (_semesterIndex != index) {
+                          setState(() => _semesterIndex = index);
+                        }
+                      },
+                      selectionOverlay: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.lightBlue.withAlpha(30),
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
-                  ],
-                ),
+                      children: [
+                        for (int i = 0; i < semesters.length; i++)
+                          Center(
+                            child: Text(
+                              _formatSemesterTitle(semesters[i]),
+                              style: const TextStyle(
+                                fontSize: FontSizes.large,
+                                fontWeight: FontWeight.bold,
+                                height: 1.25,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -182,17 +184,18 @@ class _ResultsPageState extends State<ResultsPage> {
                       state is ResultsInitial || state is ResultsLoading;
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
-                    child: isLoading
-                        ? SizedBox(
-                            key: const ValueKey('results-loading-bar'),
-                            height: 2,
-                            width: double.infinity,
-                            child: CustomLoadingIndicator.thin(),
-                          )
-                        : const SizedBox(
-                            key: ValueKey('results-no-loading'),
-                            height: 2,
-                          ),
+                    child:
+                        isLoading
+                            ? SizedBox(
+                              key: const ValueKey('results-loading-bar'),
+                              height: 2,
+                              width: double.infinity,
+                              child: CustomLoadingIndicator.thin(),
+                            )
+                            : const SizedBox(
+                              key: ValueKey('results-no-loading'),
+                              height: 2,
+                            ),
                   );
                 },
               ),
@@ -237,9 +240,11 @@ class _ResultsPageState extends State<ResultsPage> {
               }
 
               // Thu thập các mã học kỳ và sắp xếp TĂNG dần (kỳ sau ở dưới)
-              final semesters = all.map((e) => e.semesterCode).toSet().toList()
-                ..sort((a, b) =>
-                    (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0));
+              final semesters =
+                  all.map((e) => e.semesterCode).toSet().toList()..sort(
+                    (a, b) =>
+                        (int.tryParse(a) ?? 0).compareTo(int.tryParse(b) ?? 0),
+                  );
 
               // Auto chọn kỳ mới nhất lần đầu
               if (!_autoPickedLatestOnce && semesters.isNotEmpty) {
@@ -293,16 +298,17 @@ class _ResultsPageState extends State<ResultsPage> {
                         onTap: () {
                           showDialog(
                             context: context,
-                            builder: (_) => DetailResults(
-                              subjectCode: s.classCode,
-                              subjectTitle: subjectTitleText,
-                              credits: '${s.credits ?? '-'}',
-                              detailsList: s.detailLines,
-                              congThucDiem: s.formula,
-                              tongKet: s.scoreChar,
-                              thang10: s.score10?.toStringAsFixed(1),
-                              thang4: s.score4?.toStringAsFixed(1),
-                            ),
+                            builder:
+                                (_) => DetailResults(
+                                  subjectCode: s.classCode,
+                                  subjectTitle: subjectTitleText,
+                                  credits: '${s.credits ?? '-'}',
+                                  detailsList: s.detailLines,
+                                  congThucDiem: s.formula,
+                                  tongKet: s.scoreChar,
+                                  thang10: s.score10?.toStringAsFixed(1),
+                                  thang4: s.score4?.toStringAsFixed(1),
+                                ),
                           );
                         },
                         child: Container(
@@ -392,19 +398,28 @@ class _ResultsPageState extends State<ResultsPage> {
             Expanded(
               child: Text(
                 'Tín chỉ',
-                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
               ),
             ),
             Expanded(
               child: Text(
                 'Điểm thang 4',
-                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
               ),
             ),
             Expanded(
               child: Text(
                 'Điểm thang 10',
-                style: TextStyle(fontSize: FontSizes.small - 1, color: Colors.black45),
+                style: TextStyle(
+                  fontSize: FontSizes.small - 1,
+                  color: Colors.black45,
+                ),
               ),
             ),
           ],
@@ -513,7 +528,7 @@ class _ErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Lỗi: $message',
+              'Kiểm tra kết nối Internet và tải lại trang',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: FontSizes.medium),
             ),
