@@ -22,6 +22,9 @@ class _Keys {
   static const examNotification = 'exam_notification';
   static const remindBefore = 'remind_before';
   static const scheduleNotifications = 'schedule_notifications';
+
+  // chatbot
+  static const chatBotConversationId = 'chat_bot_conversation_id';
 }
 
 class Storage {
@@ -159,4 +162,9 @@ class Storage {
     final key = _Keys.scheduleNotifications;
     return _set(key, val);
   }
+
+  static String get chatBotConversationId =>
+      _get<String>(_Keys.chatBotConversationId) ?? "";
+  static Future<void> setChatBotConversationId(String val) =>
+      _set(_Keys.chatBotConversationId, val, notify: true);
 }

@@ -60,7 +60,7 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
       await notificationRepository.sendNotificationToMultiUsers(
         "event.token",
         userIds: listEmails,
-        title: event.newNoti.title,
+        title: "Lớp ${event.subjectName}: ${event.newNoti.title}",
         body: event.newNoti.content,
         notiTimeTableId: notificationId,
         link: "",

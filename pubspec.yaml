@@ -1,10 +1,10 @@
 name: e_dut
 description: "A new Flutter project."
 publish_to: "none"
-version: 0.1.0+3
+version: 1.1.0+17
 
 environment:
-  sdk: ^3.6.1
+  sdk: ">=3.7.2 <4.0.0"
 
 dependencies:
   flutter:
@@ -20,6 +20,11 @@ dependencies:
   fl_chart: 1.0.0
   fluentui_system_icons: ^1.1.219
   file_picker: ^10.3.1
+  open_mail_launcher: ^0.1.0
+
+  # generation models
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
 
   #state management
   flutter_bloc: ^9.0.0
@@ -46,7 +51,7 @@ dependencies:
   # talker & logger
   talker_flutter: ^4.6.11
   table_calendar: ^3.2.0
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   intl: ^0.20.2
   cached_network_image: ^3.4.1
   card_loading: ^0.3.2
@@ -65,11 +70,14 @@ dependencies:
   linkify: ^5.0.0
   flutter_native_splash: ^2.4.6
 
-  device_info_plus: ^11.5.0
   bloc: ^9.0.0
   http: ^1.5.0
 
   app_settings: ^6.1.1
+
+  # app utils
+  new_version_plus: ^0.1.0
+  device_info_plus: ^11.5.0
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +90,12 @@ dev_dependencies:
 
   injectable_generator: ^2.7.0
   build_runner: ^2.4.15
+  freezed: ^3.0.6
+  json_serializable: ^6.9.5
+  auto_route_generator: ^10.2.3
+  flutter_gen_runner: ^5.10.0
+  intl_utils: ^2.8.10
+  retrofit_generator: ^9.2.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -100,9 +114,7 @@ flutter:
     - assets/icons/svg/logo_dut.svg
     - assets/icons/svg/dDUT.svg
     - assets/icons/svg/bg_pattern.svg
-    - assets/icons/svg/dDUT_d.svg
-    - assets/icons/svg/dDUT_u.svg
-    - assets/icons/svg/dDUT_t.svg
+    - assets/icons/svg/logo_dDUTcolor.svg
 
 flutter_native_splash:
   color: "#FFFFFF"

@@ -1,5 +1,3 @@
-import 'package:e_dut/common/widgets/snackbar/container_snackbar.dart';
-import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,17 +5,22 @@ import 'package:flutter_svg/svg.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/utils/getit_utils.dart';
+import '/common/widgets/snackbar/container_snackbar.dart';
 import '/core/bloc/notification_settings/notification_settings_bloc.dart';
 import '/features/auth/bloc/auth_bloc.dart';
-import '../domain/repositories/notification_repository.dart';
+import '/features/auth/data/model/role_model.dart';
+import '/features/auth/presentation/unauthorized_page.dart';
 
 import '../bloc/notifications_bloc.dart';
+import '../domain/repositories/notification_repository.dart';
 import 'general_notifications.dart';
 import 'my_notifications.dart';
 import 'widgets/custom_time_dropdown.dart';
 
 class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+  const NotificationScreen({super.key, required this.initialTabIndex});
+
+  final int initialTabIndex;
 
   Widget _buildSwitchTile(BuildContext context, String title, bool value,
       Function(bool) onChanged) {
@@ -42,12 +45,7 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (contextAuth, stateAuth) {
       if (stateAuth is! AuthUserAuthenticated) {
-        return Center(
-          child: Text(
-            'Bạn cần đăng nhập để sử dụng tính năng này.',
-            style: TextStyle(fontSize: FontSizes.large),
-          ),
-        );
+        return UnauthorizedPage(title: 'Thông báo');
       }
       final String userRole = stateAuth.userData.role.name;
 
@@ -62,6 +60,7 @@ class NotificationScreen extends StatelessWidget {
               token: stateAuth.accessToken)),
         child: DefaultTabController(
           length: 2,
+          initialIndex: initialTabIndex,
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: context.theme.primaryColor, // Màu nền xanh dương

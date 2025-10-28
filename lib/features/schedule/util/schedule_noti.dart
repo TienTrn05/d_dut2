@@ -5,6 +5,7 @@ import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/core/data/local/storage.dart';
 import 'package:e_dut/core/services/notification_service.dart';
 import 'package:e_dut/features/schedule/data/data_sources/remote_data_source/schedule_service.dart';
+import 'package:e_dut/features/schedule/data/model/schedule_noti/academic_event_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/exam_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/study_shift_model.dart';
 import 'package:e_dut/features/schedule/data/model/schedule_noti/uos_model.dart';
@@ -13,23 +14,33 @@ import 'package:e_dut/features/schedule/util/functions.dart';
 
 class ScheduleNoti {
   static Future<bool> setupScheduleNotifications(
-      bool isTeacher, String authToken) async {
+    bool isTeacher,
+    String authToken,
+  ) async {
     try {
       final repository = ScheduleRepository(getIt.get<ScheduleService>());
-      final scheduleNotis =
-          await repository.getScheduleNotification(isTeacher, authToken);
+      final scheduleNotis = await repository.getScheduleNotification(
+        isTeacher,
+        authToken,
+      );
+
+      final academicEvents = await repository.getAcademicEventForReminder(
+        authToken,
+      );
 
       // Convert scheduleNotis to JSON string for comparison
-      final newScheduleJson =
-          json.encode(scheduleNotis.map((uos) => uos.toJson()).toList());
+      final newDataJson = json.encode({
+        'schedule': scheduleNotis.map((uos) => uos.toJson()).toList(),
+        'events': academicEvents.map((event) => event.toJson()).toList(),
+      });
 
       // Get stored schedule from SharedPreferences
-      final storedScheduleJson = Storage.getScheduleNotifications();
+      final storedDataJson = Storage.getScheduleNotifications();
 
       // Compare to old data
-      if (storedScheduleJson != null && storedScheduleJson == newScheduleJson) {
+      if (storedDataJson != null && storedDataJson == newDataJson) {
         logger.i("Schedule notifications unchanged, skipping update");
-        return true; // Trả về true vì không cần update
+        return true;
       }
 
       logger.i("Schedule notifications changed, updating...");
@@ -46,6 +57,7 @@ class ScheduleNoti {
             uos: uos,
             studyShift: studyShift,
             notificationId: notificationId++,
+            academicEvents: academicEvents,
           );
         }
 
@@ -60,10 +72,23 @@ class ScheduleNoti {
         }
       }
 
-      await Storage.setScheduleNotifications(newScheduleJson);
+      // Process Rescheduled Study Events (eventType == 5)
+      for (var event in academicEvents) {
+        if (event.eventType == 5) {
+          await scheduleRescheduledStudyNotification(
+            isTeacher: isTeacher,
+            event: event,
+            notificationId: notificationId++,
+          );
+        }
+      }
+
+      await Storage.setScheduleNotifications(newDataJson);
 
       logger.i(
-          "Successfully setup ${scheduleNotis.length} schedule notifications");
+        "Successfully setup ${scheduleNotis.length} schedule notifications "
+        "with ${academicEvents.length} academic events",
+      );
       return true; // Trả về true khi setup thành công
     } catch (e) {
       logger.e("Failed to setup schedule notifications: $e");
@@ -76,67 +101,147 @@ class ScheduleNoti {
     required UosModel uos,
     required StudyShiftModel studyShift,
     required int notificationId,
+    required List<AcademicEventModel> academicEvents,
   }) async {
-    if (Storage.examNotification) {
-      try {
-        final now = DateTime.now();
-        final studyStartDate =
-            studyShift.studyStartDate; // Ngày học thực tế của tuần startWeek
+    try {
+      final now = DateTime.now();
+      final studyStartDate =
+          studyShift.studyStartDate; // Ngày học thực tế của tuần startWeek
 
-        // Parse study time (format: "HH:MM:SS")
-        final timeParts = studyShift.startStudyTime.split(':');
+      // Parse study time (format: "HH:MM:SS")
+      final timeParts = studyShift.startStudyTime.split(':');
+      final hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
 
-        // Tính số tuần cần tạo thông báo (từ startWeek đến endWeek)
-        final totalWeeks = studyShift.endWeek - studyShift.startWeek + 1;
+      final totalWeeks = studyShift.endWeek - studyShift.startWeek + 1;
 
-        // Tạo thông báo cho từng tuần
-        for (int weekOffset = 0; weekOffset < totalWeeks; weekOffset++) {
-          // Tính ngày học cho tuần hiện tại (cộng thêm 7 ngày cho mỗi tuần)
-          final classDate = studyStartDate.add(Duration(days: weekOffset * 7));
+      // Filter cancellation events for this UOS (eventType == 4)
+      final cancellationEvents =
+          academicEvents
+              .where(
+                (e) => e.eventType == 4 && e.idUnitOfStudy == uos.idUnitOfStudy,
+              )
+              .toList();
 
-          // Tạo DateTime đầy đủ với thời gian học
-          final classDateTime = DateTime(
-            classDate.year,
-            classDate.month,
-            classDate.day,
-            int.parse(timeParts[0]), // hour
-            int.parse(timeParts[1]), // minute
+      // Tạo thông báo cho từng tuần
+      for (int weekOffset = 0; weekOffset < totalWeeks; weekOffset++) {
+        // Tính ngày học cho tuần hiện tại (cộng thêm 7 ngày cho mỗi tuần)
+        final classDate = studyStartDate.add(Duration(days: weekOffset * 7));
+
+        // Tạo DateTime đầy đủ với thời gian học
+        final classDateTime = DateTime(
+          classDate.year,
+          classDate.month,
+          classDate.day,
+          hour,
+          minute,
+        );
+
+        // Check if this class is cancelled
+        final isCancelled = cancellationEvents.any((event) {
+          // Compare exact date and time (year, month, day, hour, minute)
+          return event.eventDate.year == classDateTime.year &&
+              event.eventDate.month == classDateTime.month &&
+              event.eventDate.day == classDateTime.day;
+        });
+
+        if (isCancelled) {
+          logger.d(
+            "Skipping cancelled class for ${uos.subjectName} on $classDateTime",
           );
-
-          // Chỉ tạo thông báo cho các tiết học trong tương lai
-          if (classDateTime.isAfter(now)) {
-            final notificationTime =
-                classDateTime.subtract(Duration(minutes: Storage.remindBefore));
-
-            final isPreviousDay = notificationTime.day != classDateTime.day ||
-                notificationTime.month != classDateTime.month ||
-                notificationTime.year != classDateTime.year;
-
-            final title =
-                'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
-
-            final body = isPreviousDay
-                ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
-                : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
-
-            if (notificationTime.isAfter(now)) {
-              await NotificationService().scheduleClassNotification(
-                id: notificationId +
-                    (weekOffset * 1000), // Unique ID cho mỗi notification
-                title: title,
-                body: body,
-                scheduledTime: notificationTime,
-              );
-            }
-          }
+          continue;
         }
 
-        logger.d(
-            "Scheduled $totalWeeks weeks of notifications for ${uos.subjectName}");
-      } catch (e) {
-        logger.e(
-            "Failed to schedule study shift notification for ${uos.subjectName}: $e");
+        // Chỉ tạo thông báo cho các tiết học trong tương lai
+        if (classDateTime.isAfter(now)) {
+          final notificationTime = classDateTime.subtract(
+            Duration(minutes: Storage.remindBefore),
+          );
+
+          final isPreviousDay =
+              notificationTime.day != classDateTime.day ||
+              notificationTime.month != classDateTime.month ||
+              notificationTime.year != classDateTime.year;
+
+          final title =
+              'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
+
+          final body =
+              isPreviousDay
+                  ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
+                  : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
+
+          if (notificationTime.isAfter(now)) {
+            await NotificationService().scheduleClassNotification(
+              id:
+                  notificationId +
+                  (weekOffset * 1000), // Unique ID cho mỗi notification
+              title: title,
+              body: body,
+              scheduledTime: notificationTime,
+              payload: 'RedirectToScheduleScreen',
+            );
+          }
+        }
       }
+
+      logger.d(
+        "Scheduled $totalWeeks weeks of notifications for ${uos.subjectName}",
+      );
+    } catch (e) {
+      logger.e(
+        "Failed to schedule study shift notification for ${uos.subjectName}: $e",
+      );
+    }
+  }
+
+  static Future<void> scheduleRescheduledStudyNotification({
+    required bool isTeacher,
+    required AcademicEventModel event,
+    required int notificationId,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final classDateTime = event.eventDate;
+
+      // Only create notifications for future classes
+      if (classDateTime.isAfter(now)) {
+        final notificationTime = classDateTime.subtract(
+          Duration(minutes: Storage.remindBefore),
+        );
+
+        final isPreviousDay =
+            notificationTime.day != classDateTime.day ||
+            notificationTime.month != classDateTime.month ||
+            notificationTime.year != classDateTime.year;
+
+        final title =
+            'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'} BÙ: ${event.subjectName}';
+
+        final body =
+            isPreviousDay
+                ? 'Tiết ${isTeacher ? 'dạy' : 'học'} BÙ sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${event.room}'
+                : 'Tiết ${isTeacher ? 'dạy' : 'học'} BÙ sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${event.room}';
+
+        if (notificationTime.isAfter(now)) {
+          await NotificationService().scheduleClassNotification(
+            id: notificationId,
+            title: title,
+            body: body,
+            scheduledTime: notificationTime,
+            payload: 'RedirectToScheduleScreen',
+          );
+
+          logger.d(
+            "Rescheduled class notification for ${event.subjectName} on ${notificationTime.toString()}",
+          );
+        }
+      }
+    } catch (e) {
+      logger.e(
+        "Failed to schedule rescheduled study notification for "
+        "${event.subjectName}: $e",
+      );
     }
   }
 
@@ -152,20 +257,24 @@ class ScheduleNoti {
 
       // Only schedule notifications cho future exams
       if (examDateTime != null && examDateTime.isAfter(now)) {
-        final notificationTime =
-            examDateTime.subtract(const Duration(hours: 11));
+        final notificationTime = examDateTime.subtract(
+          const Duration(hours: 11),
+        );
 
-        final isPreviousDay = notificationTime.day != examDateTime.day ||
+        final isPreviousDay =
+            notificationTime.day != examDateTime.day ||
             notificationTime.month != examDateTime.month ||
             notificationTime.year != examDateTime.year;
 
-        final title = isTeacher
-            ? 'Nhắc nhở lịch coi thi: ${examShift.examShiftName}'
-            : 'Nhắc nhở lịch thi: ${uos.subjectName}';
+        final title =
+            isTeacher
+                ? 'Nhắc nhở lịch coi thi: ${examShift.examShiftName}'
+                : 'Nhắc nhở lịch thi: ${uos.subjectName}';
 
-        final body = isPreviousDay
-            ? 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào ngày mai (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}'
-            : 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào lúc (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}';
+        final body =
+            isPreviousDay
+                ? 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào ngày mai (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}'
+                : 'Bạn có lịch ${isTeacher ? 'coi thi' : 'thi'} vào lúc (${Functions.formatDateTime(examDateTime)}) tại phòng ${examShift.room}';
 
         if (notificationTime.isAfter(now)) {
           await NotificationService().scheduleClassNotification(
@@ -173,12 +282,14 @@ class ScheduleNoti {
             title: title,
             body: body,
             scheduledTime: notificationTime,
+            payload: 'RedirectToScheduleScreen',
           );
         }
       }
     } catch (e) {
-      logger
-          .e("Failed to schedule exam notification for ${uos.subjectName}: $e");
+      logger.e(
+        "Failed to schedule exam notification for ${uos.subjectName}: $e",
+      );
     }
   }
 }

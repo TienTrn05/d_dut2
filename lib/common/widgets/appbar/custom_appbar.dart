@@ -6,21 +6,28 @@ import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String label;
-  const CustomAppbar({super.key, required this.label});
+  final bool showNotificationButton;
+  const CustomAppbar({
+    super.key,
+    required this.label,
+    this.showNotificationButton = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: context.theme.primaryColor ?? Colors.blue,
       elevation: 0,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 16),
-        child: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      leading: Row(
+        children: [
+          const SizedBox(width: 8),
+          IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       title: Text(
         label,
@@ -32,10 +39,11 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       ),
       centerTitle: true,
       actions: [
-        NotificationButton(
-          notificationCount: 0,
-          onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
-        ),
+        if (showNotificationButton)
+          NotificationButton(
+            notificationCount: 0,
+            onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
+          ),
       ],
     );
   }

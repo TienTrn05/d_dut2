@@ -8,6 +8,7 @@ import '/common/extensions/custom_theme_extension.dart';
 import '/common/utils/getit_utils.dart';
 import '/common/routes/routes.dart';
 import '/features/auth/bloc/auth_bloc.dart';
+import '/features/auth/presentation/unauthorized_page.dart';
 
 import '../../domain/repositories/course_section_repository.dart';
 import '../../domain/repositories/registration_signalr_repository.dart';
@@ -24,42 +25,7 @@ class CourseRegistrationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context2, state) {
       if (state is! AuthUserAuthenticated) {
-        return Scaffold(
-            appBar: AppBar(
-              backgroundColor: context.theme.primaryColor ?? Colors.blue,
-              elevation: 0, // Xóa bóng dưới AppBar
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(context); // Quay lại màn hình trước
-                  },
-                ),
-              ),
-              title: Text(
-                'Đăng ký lớp học phần',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: FontSizes.medium,
-                ),
-              ),
-              centerTitle: true,
-            ),
-            backgroundColor: Colors.white,
-            body: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: Text(
-                  'Bạn cần đăng nhập để sử dụng tính năng này.',
-                  style: TextStyle(
-                      color: context.theme.grey!, fontSize: FontSizes.large),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ));
+        return UnauthorizedPage(title: 'Đăng ký lớp học phần');
       }
 
       return MultiBlocProvider(
