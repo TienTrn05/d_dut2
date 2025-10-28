@@ -528,7 +528,7 @@ class _ErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Lỗi: $message',
+              'Kiểm tra kết nối Internet và tải lại trang',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: FontSizes.medium),
             ),

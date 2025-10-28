@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/widgets/errors/error_view.dart';
+import '/common/widgets/errors/network_error_view.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/presentation/unauthorized_page.dart';
 import '/common/extensions/custom_theme_extension.dart';
@@ -42,7 +44,7 @@ class TuitionFeeScreen extends StatelessWidget {
                   loading:
                       () => const Center(child: CircularProgressIndicator()),
                   networkError:
-                      (msg) => _NetworkErrorView(
+                      (msg) => NetworkErrorView(
                         message: msg,
                         onRetry:
                             () => context.read<TuitionFeeCubit>().load(
@@ -50,7 +52,7 @@ class TuitionFeeScreen extends StatelessWidget {
                             ),
                       ),
                   error:
-                      (msg) => _ErrorView(
+                      (msg) => ErrorView(
                         message: msg,
                         onRetry:
                             () => context.read<TuitionFeeCubit>().load(
@@ -111,74 +113,6 @@ class _SectionTitle extends StatelessWidget {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: context.theme.primaryColor,
-      ),
-    );
-  }
-}
-
-class _NetworkErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _NetworkErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.wifi_off, size: 40, color: Colors.redAccent),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text("Thử lại"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 80, color: Colors.orange),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text("Thử lại"),
-            ),
-          ],
-        ),
       ),
     );
   }
