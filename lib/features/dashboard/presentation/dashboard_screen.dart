@@ -569,6 +569,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       builder:
                                           (context, state) => FeatureCard(
                                             iconUrl:
+                                                "assets/icons/svg/bx_bot.svg",
+                                            title: "Trợ lý dDUT",
+                                            onTap: () {
+                                              context.read<DashboardBloc>().add(
+                                                DashboardNavigateRequested(
+                                                  scopes,
+                                                  Routes.chatBot,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                    ),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
                                                 "assets/icons/svg/material-symbols_feedback-outline-rounded.svg",
                                             title: "Góp ý",
                                             onTap: () {
@@ -591,43 +607,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           DashboardNavigateRequested(
                                             scopes,
                                             Routes.schedule,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/hugeicons_note-edit.svg",
-                                      title: "Đăng ký tín chỉ",
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.courseRegistration,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
-                                      title: "Hoạt động \ncộng đồng",
-                                      onTap: () {
-                                        Navigator.of(
-                                          context,
-                                        ).pushNamed(Routes.communityActivities);
-                                      },
-                                    ),
-                                    FeatureCard(
-                                      iconUrl:
-                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
-                                      title: "Lớp sinh hoạt",
-                                      // disabled: true,
-                                      onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.detailHomeRoom,
                                           ),
                                         );
                                       },
@@ -669,6 +648,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           );
                                         }
                                       },
+                                    ),
+                                    // FeatureCard(
+                                    //   iconUrl:
+                                    //       "assets/icons/svg/hugeicons_note-edit.svg",
+                                    //   title: "Đăng ký tín chỉ",
+                                    //   onTap: () {
+                                    //     context.read<DashboardBloc>().add(
+                                    //       DashboardNavigateRequested(
+                                    //         scopes,
+                                    //         Routes.courseRegistration,
+                                    //       ),
+                                    //     );
+                                    //   },
+                                    // ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/solar_users-group-rounded-broken.svg",
+                                      title: "Lớp sinh hoạt",
+                                      // disabled: true,
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                            scopes,
+                                            Routes.detailHomeRoom,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/tabler_coin.svg",
+                                      title: "Học phí",
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                            scopes,
+                                            Routes.tuitionFee,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
+                                      title: "Hoạt động \ncộng đồng",
+                                      onTap: () {
+                                        Navigator.of(
+                                          context,
+                                        ).pushNamed(Routes.communityActivities);
+                                      },
+                                    ),
+                                    BlocBuilder<AuthBloc, AuthState>(
+                                      builder:
+                                          (context, state) => FeatureCard(
+                                            iconUrl:
+                                                "assets/icons/svg/bx_bot.svg",
+                                            title: "Trợ lý dDUT",
+                                            onTap: () {
+                                              context.read<DashboardBloc>().add(
+                                                DashboardNavigateRequested(
+                                                  scopes,
+                                                  Routes.chatBot,
+                                                ),
+                                              );
+                                            },
+                                          ),
                                     ),
                                     BlocBuilder<AuthBloc, AuthState>(
                                       builder:

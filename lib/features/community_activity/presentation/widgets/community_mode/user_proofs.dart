@@ -291,12 +291,14 @@ class _UserProofsState extends State<UserProofs> {
                 ],
               ));
             } else if (state is CommunityActivityError) {
-              return const Center(
-                child: Text(
-                  'Không thể tải dữ liệu minh chứng của tôi',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: FontSizes.medium,
+              return Expanded(
+                child: const Center(
+                  child: Text(
+                    'Không thể tải dữ liệu minh chứng của tôi',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: FontSizes.medium,
+                    ),
                   ),
                 ),
               );

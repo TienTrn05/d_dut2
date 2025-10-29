@@ -21,6 +21,7 @@ import 'package:e_dut/features/schedule/util/functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/widgets/errors/error_view.dart';
 import '../../../notification/domain/repositories/notification_repository.dart';
 import '../../bloc/notification/noti_bloc.dart';
 import '../../data/model/noti_model.dart';
@@ -228,11 +229,8 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                       return CustomLoadingIndicator.primary();
                     } else if (profileState.studentProfileStatus ==
                         StudentProfileStatus.failure) {
-                      return Center(
-                        child: Text(
-                          'Lỗi khi tải thông tin',
-                          style: TextStyle(fontSize: FontSizes.large),
-                        ),
+                      return ErrorView(
+                        message: "Lỗi khi tải thông tin.\nVui lòng thử lại sau.",
                       );
                     }
 

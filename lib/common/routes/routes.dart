@@ -10,6 +10,7 @@ import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_uos_screen.dart';
 import 'package:e_dut/features/schedule/presentation/screens/detail_exam_shift_screen.dart';
+import 'package:e_dut/features/tuition_fee/presentations/tuition_fee_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -21,6 +22,7 @@ import 'package:e_dut/features/academic/presentation/statistics.dart';
 import '../../../features/auth/presentation/auth_screen.dart';
 import '../../../features/root/presentation/root_screen.dart';
 import '../../../features/notification/presentation/notification_screen.dart';
+import '../../features/chatbot/presentations/chat_bot_screen.dart';
 import '../../features/schedule/presentation/screens/schedule_screen.dart';
 import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.dart';
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
@@ -64,6 +66,12 @@ class Routes {
   // academic
   static const String academicResults = "/academic/results";
   static const String academicStatistics = "/academic/statistics";
+
+  // chat bot
+  static const String chatBot = "/chatBot";
+
+  // tuition fee
+  static const String tuitionFee = "/tuitionFee";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -189,6 +197,12 @@ class Routes {
                     StatisticsPage(studentId: studentId, apiBase: apiBase),
           );
         }
+
+      case chatBot:
+        return MaterialPageRoute(builder: (context) => ChatBotScreen());
+
+      case tuitionFee:
+        return MaterialPageRoute(builder: (context) => TuitionFeeScreen());
 
       // ===== default ===== //
       default:

@@ -339,12 +339,14 @@ class _UserActivitiesState extends State<UserActivities> {
                   ),
                 );
               } else if (state is CommunityActivityError) {
-                return const Center(
-                  child: Text(
-                    'Không thể tải dữ liệu hoạt động cộng đồng',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
+                return const Expanded(
+                  child: Center(
+                    child: Text(
+                      'Không thể tải dữ liệu hoạt động cộng đồng',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: FontSizes.medium,
+                      ),
                     ),
                   ),
                 );

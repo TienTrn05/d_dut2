@@ -2,6 +2,7 @@ import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/widgets/errors/error_view.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/utils/getit_utils.dart';
 
@@ -48,12 +49,9 @@ class TeacherProfile extends StatelessWidget {
             );
           } else if (profileState.teacherProfileStatus ==
               TeacherProfileStatus.failure) {
-            return Center(
-              child: Text(
-                'Lỗi khi tải thông tin',
-                style: TextStyle(fontSize: FontSizes.large),
-              ),
-            );
+            return ErrorView(
+                  message: "Lỗi khi tải thông tin.\nVui lòng thử lại sau.",
+                );
           }
 
           return SingleChildScrollView(
