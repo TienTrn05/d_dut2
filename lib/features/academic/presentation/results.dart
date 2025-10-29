@@ -127,6 +127,7 @@ class _ResultsPageState extends State<ResultsPage> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        spacing: 24.0,
         children: [
           GestureDetector(
             onTap: () => _previousSemester(semesters),
