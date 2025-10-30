@@ -100,34 +100,43 @@ class ConversationCubit extends Cubit<ConversationState> {
 
     // ✉️ Add user message immediately
     final userMsg = Message(text: text, isUser: true);
-    final updatedConv = conv.copyWith(messages: [...conv.messages, userMsg]);
+    var updatedConv = conv.copyWith(messages: [...conv.messages, userMsg]);
     emit(state.copyWith(conversation: updatedConv));
 
-    // 🔹 Call API
     try {
-      final reply = await conversationRepo.sendMessage(
+      var botMsg = Message(text: '', isUser: false);
+
+      await conversationRepo.sendMessageStream(
         conversationId: conv.id,
         message: text,
-      );
+        onChunk: (partialText) async {
+          botMsg = botMsg.copyWith(additionalText: partialText);
 
-      final botMsg = Message(
-        text: reply ?? "Bot hiện chưa phản hồi. Vui lòng thử lại sau.",
-        isUser: false,
-      );
+          await Future.delayed(const Duration(milliseconds: 100));
 
-      // 🪄 Append bot message
-      final newConv = updatedConv.copyWith(
-        messages: [...updatedConv.messages, botMsg],
+          // ✅ Check trước khi emit
+          if (!isClosed) {
+            emit(
+              state.copyWith(
+                conversation: updatedConv.copyWith(
+                  messages: [...updatedConv.messages, botMsg],
+                ),
+              ),
+            );
+          }
+        },
       );
+    } catch (e, stack) {
+      logger.e("❌ Error in sendMessage: $e\n$stack");
 
-      emit(state.copyWith(conversation: newConv));
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: ConversationStatus.error,
-          errorMessage: e.toString(),
-        ),
-      );
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            status: ConversationStatus.error,
+            errorMessage: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+          ),
+        );
+      }
     }
   }
 

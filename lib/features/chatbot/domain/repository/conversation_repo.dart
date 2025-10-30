@@ -40,4 +40,16 @@ class ConversationRepo {
       message: message,
     );
   }
+
+  Future<void> sendMessageStream({
+    required String conversationId,
+    required String message,
+    required Future Function(String partialText) onChunk,
+  }) async {
+    await _conversationService.sendMessageStream(
+      conversationId: conversationId,
+      message: message,
+      onChunk: onChunk,
+    );
+  }
 }
