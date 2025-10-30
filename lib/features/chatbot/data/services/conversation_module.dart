@@ -10,5 +10,5 @@ abstract class ConversationModule {
   @Named('chatbotConversationAPIKey')
   String get chatbotConversationAPIKey => AppEnvironment.chatbotConversationAPIKey;
   @Named('chatbotConversationChatbotId')
-  String get chatbotConversationChatbotId => "cmgkj1m26000c14lcvzlds075";
+  String get chatbotConversationChatbotId => "cmhcdmls100iukdfp9qgzasid";
 }

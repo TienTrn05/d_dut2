@@ -5,11 +5,8 @@ class Message extends Equatable {
   final bool isUser;
   final DateTime timestamp;
 
-  Message({
-    required this.text,
-    required this.isUser,
-    DateTime? timestamp,
-  }) : timestamp = timestamp ?? DateTime.now();
+  Message({required this.text, required this.isUser, DateTime? timestamp})
+    : timestamp = timestamp ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
     return {
@@ -29,4 +26,8 @@ class Message extends Equatable {
 
   @override
   List<Object?> get props => [text, isUser, timestamp];
+
+  Message copyWith({required String additionalText}) {
+    return Message(text: text + additionalText, isUser: isUser);
+  }
 }
