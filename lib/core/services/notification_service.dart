@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
+import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,6 +12,8 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:device_info_plus/device_info_plus.dart';
 
+import '../../features/schedule/util/schedule_noti.dart';
+import '../data/local/storage.dart';
 import '/common/routes/routes.dart';
 import '/common/utils/logger.dart';
 import '/firebase_options.dart';
@@ -160,6 +163,20 @@ class NotificationService {
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     logger.i("Received a foreground message: ${message.notification?.title}");
     await showRemoteNotification(message);
+
+    try {
+      final isTeacher = Storage.user?.role.name == RoleModel.roleTeacher;
+      final accessToken = await Storage.accessToken;
+
+      if (accessToken != null) {
+        await ScheduleNoti.setupScheduleNotifications(isTeacher, accessToken);
+      }
+    } catch (e) {
+      logger.e(
+        "[Notification Service] Error when setup schedule notifications: $e",
+        exception: e,
+      );
+    }
   }
 
   Future<void> showRemoteNotification(RemoteMessage message) async {
