@@ -27,13 +27,14 @@ class UosInfoTab extends StatefulWidget {
   final int? absentTimes;
   final List<StudyShiftModel> studyShifts;
   final ExamShiftModel? examShift;
-  const UosInfoTab(
-      {super.key,
-      required this.uosDetail,
-      this.teacherName,
-      this.absentTimes,
-      required this.studyShifts,
-      this.examShift});
+  const UosInfoTab({
+    super.key,
+    required this.uosDetail,
+    this.teacherName,
+    this.absentTimes,
+    required this.studyShifts,
+    this.examShift,
+  });
 
   @override
   State<UosInfoTab> createState() => _UosInfoTabState();
@@ -78,11 +79,14 @@ class _UosInfoTabState extends State<UosInfoTab> {
               dialog.AlertDialogType.confirm,
               textConfirm: "Xác nhận",
               onConfirm: () {
-                detailBloc.add(UpdateMsTeamsInfo(
+                detailBloc.add(
+                  UpdateMsTeamsInfo(
                     idUos: widget.uosDetail.idUnitOfStudy,
                     authToken: authToken,
                     msTeamCode: _codeController.text.trim(),
-                    msTeamLink: _linkController.text.trim()));
+                    msTeamLink: _linkController.text.trim(),
+                  ),
+                );
                 setState(() {});
                 Navigator.pop(context);
               },
@@ -90,16 +94,13 @@ class _UosInfoTabState extends State<UosInfoTab> {
           },
           child: Column(
             children: [
-              EditFieldItem(
-                field: "Mã truy cập",
-                controller: _codeController,
-              ),
+              EditFieldItem(field: "Mã truy cập", controller: _codeController),
               const SizedBox(height: 10),
               EditFieldItem(
                 field: "Đường link truy cập",
                 controller: _linkController,
                 minLine: 5,
-              )
+              ),
             ],
           ),
         );
@@ -109,196 +110,223 @@ class _UosInfoTabState extends State<UosInfoTab> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List<String>> timetable =
-        Functions.analyzeStudyShifts(widget.studyShifts);
+    Map<String, List<String>> timetable = Functions.analyzeStudyShifts(
+      widget.studyShifts,
+    );
     final entries = timetable.entries.toList();
-    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-      final String userRole = authState is AuthUserAuthenticated
-          ? authState.userData.role.name
-          : '';
-      final String authToken =
-          authState is AuthUserAuthenticated ? authState.accessToken : '';
-      return RefreshIndicator(
-        color: context.theme.primaryColor,
-        backgroundColor: Colors.white,
-        onRefresh: () async {
-          context.read<UosDetailBloc>().add(LoadFullInfoUosDetail(
-              idUos: widget.uosDetail.idUnitOfStudy, authToken: authToken));
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              UosInfoCard(
-                title: 'Thông tin chung',
-                child: Column(
-                  children: [
-                    InfoItem(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        final String userRole =
+            authState is AuthUserAuthenticated
+                ? authState.userData.role.name
+                : '';
+        final String authToken =
+            authState is AuthUserAuthenticated ? authState.accessToken : '';
+        return RefreshIndicator(
+          color: context.theme.primaryColor,
+          backgroundColor: Colors.white,
+          onRefresh: () async {
+            context.read<UosDetailBloc>().add(
+              LoadFullInfoUosDetail(
+                idUos: widget.uosDetail.idUnitOfStudy,
+                isTeacher: userRole == RoleModel.roleTeacher,
+                authToken: authToken,
+              ),
+            );
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                UosInfoCard(
+                  title: 'Thông tin chung',
+                  child: Column(
+                    children: [
+                      InfoItem(
                         field: "Mã lớp học phần",
-                        value: widget.uosDetail.noUOS),
-                    InfoItem(
-                        field: "Mã môn", value: widget.uosDetail.noSubject),
-                    // InfoItem(
-                    //   field: "Hệ",
-                    //   value: widget.uosDetail.clc == 1 ? "CLC" : "",
-                    // ),
-                    InfoItem(
-                      field: "Số tín chỉ",
-                      value: widget.uosDetail.credit.toString(),
-                    ),
-                    InfoItem(
-                      field: "Kỳ học",
-                      value: widget.uosDetail.semester,
-                    ),
-                  ],
+                        value: widget.uosDetail.noUOS,
+                      ),
+                      InfoItem(
+                        field: "Mã môn",
+                        value: widget.uosDetail.noSubject,
+                      ),
+                      // InfoItem(
+                      //   field: "Hệ",
+                      //   value: widget.uosDetail.clc == 1 ? "CLC" : "",
+                      // ),
+                      InfoItem(
+                        field: "Số tín chỉ",
+                        value: widget.uosDetail.credit.toString(),
+                      ),
+                      InfoItem(
+                        field: "Kỳ học",
+                        value: widget.uosDetail.semester,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              UosInfoCard(
-                title: 'Giảng dạy',
-                canEdit: userRole == RoleModel.roleTeacher,
-                action: () => _showEditLinkModal(
-                    context.read<UosDetailBloc>(), authToken),
-                child: Column(
-                  children: [
-                    if (userRole == RoleModel.roleStudent)
-                      InfoItem(field: "Giảng viên", value: widget.teacherName!),
-                    InfoItem(
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title: 'Giảng dạy',
+                  canEdit: userRole == RoleModel.roleTeacher,
+                  action:
+                      () => _showEditLinkModal(
+                        context.read<UosDetailBloc>(),
+                        authToken,
+                      ),
+                  child: Column(
+                    children: [
+                      if (userRole == RoleModel.roleStudent)
+                        InfoItem(
+                          field: "Giảng viên",
+                          value: widget.teacherName!,
+                        ),
+                      InfoItem(
                         field: "Hình thức GD",
-                        value: widget.uosDetail.methodOfTeaching),
-                    UosInfoItem(
-                      field: "Mã truy cập",
-                      value: (_codeController.text.trim().isNotEmpty)
-                          ? Text(
-                              _codeController.text,
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                height: 1.5,
-                              ),
-                            )
-                          : Text(
-                              "Chưa cập nhật",
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontStyle: FontStyle.italic,
-                                color: context.theme.grey ?? Colors.grey,
-                                height: 1.5,
-                              ),
-                            ),
-                      linkIconAsset: (_codeController.text.trim().isNotEmpty)
-                          ? "assets/icons/svg/lucide_copy.svg"
-                          : null,
-                      action: () {
-                        try {
-                          Clipboard.setData(
-                              ClipboardData(text: _codeController.text));
-                          // debugPrint("Copied: 012ajsh");
-                          CustomSnackbar.showSnackBar(
-                            context,
-                            "Thành công",
-                            "Đã sao chép mã ${_codeController.text}",
-                            AlertType.success,
-                          );
-                        } catch (e) {
-                          CustomSnackbar.showSnackBar(
-                            context,
-                            "Lỗi",
-                            "Không thể sao chép",
-                            AlertType.error,
-                          );
-                        }
-                      },
-                    ),
-                    UosInfoItem(
-                      field: "Link tham gia",
-                      value: (_linkController.text.trim().isNotEmpty)
-                          ? GestureDetector(
-                              onTap: () async {
-                                final Uri url = Uri.parse("");
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(url);
-                                } else if (context.mounted) {
-                                  CustomSnackbar.showSnackBar(
-                                    context,
-                                    "Lỗi",
-                                    "Không thể truy cập link",
-                                    AlertType.error,
-                                  );
-                                }
-                              },
-                              child: Text(
-                                "Link tham gia Teams",
-                                style: TextStyle(
-                                  fontSize: FontSizes.medium,
-                                  fontWeight: FontWeight.w400,
-                                  color:
-                                      context.theme.primaryColor ?? Colors.blue,
-                                  fontStyle: FontStyle.italic,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor:
-                                      context.theme.primaryColor ?? Colors.blue,
-                                  height: 1.5,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              "Chưa cập nhật",
-                              style: TextStyle(
-                                fontSize: FontSizes.medium,
-                                fontStyle: FontStyle.italic,
-                                color: context.theme.grey ?? Colors.grey,
-                                height: 1.5,
-                              ),
-                            ),
-                      linkIconAsset: (_linkController.text.trim().isNotEmpty)
-                          ? "assets/icons/svg/lucide_copy.svg"
-                          : null,
-                      action: () {
-                        try {
-                          Clipboard.setData(
-                              ClipboardData(text: _linkController.text));
-                          // debugPrint("Copied: 012ajsh");
-                          CustomSnackbar.showSnackBar(
-                            context,
-                            "Thành công",
-                            "Đã sao chép đường link",
-                            AlertType.success,
-                          );
-                        } catch (e) {
-                          CustomSnackbar.showSnackBar(
-                            context,
-                            "Lỗi",
-                            "Không thể sao chép",
-                            AlertType.error,
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              UosInfoCard(
-                title: 'Đánh giá',
-                child: Column(
-                  children: [
-                    if (userRole == RoleModel.roleStudent)
+                        value: widget.uosDetail.methodOfTeaching,
+                      ),
                       UosInfoItem(
+                        field: "Mã truy cập",
+                        value:
+                            (_codeController.text.trim().isNotEmpty)
+                                ? Text(
+                                  _codeController.text,
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    height: 1.5,
+                                  ),
+                                )
+                                : Text(
+                                  "Chưa cập nhật",
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontStyle: FontStyle.italic,
+                                    color: context.theme.grey ?? Colors.grey,
+                                    height: 1.5,
+                                  ),
+                                ),
+                        linkIconAsset:
+                            (_codeController.text.trim().isNotEmpty)
+                                ? "assets/icons/svg/lucide_copy.svg"
+                                : null,
+                        action: () {
+                          try {
+                            Clipboard.setData(
+                              ClipboardData(text: _codeController.text),
+                            );
+                            // debugPrint("Copied: 012ajsh");
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Thành công",
+                              "Đã sao chép mã ${_codeController.text}",
+                              AlertType.success,
+                            );
+                          } catch (e) {
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Lỗi",
+                              "Không thể sao chép",
+                              AlertType.error,
+                            );
+                          }
+                        },
+                      ),
+                      UosInfoItem(
+                        field: "Link tham gia",
+                        value:
+                            (_linkController.text.trim().isNotEmpty)
+                                ? GestureDetector(
+                                  onTap: () async {
+                                    final Uri url = Uri.parse("");
+                                    if (await canLaunchUrl(url)) {
+                                      await launchUrl(url);
+                                    } else if (context.mounted) {
+                                      CustomSnackbar.showSnackBar(
+                                        context,
+                                        "Lỗi",
+                                        "Không thể truy cập link",
+                                        AlertType.error,
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    "Link tham gia Teams",
+                                    style: TextStyle(
+                                      fontSize: FontSizes.medium,
+                                      fontWeight: FontWeight.w400,
+                                      color:
+                                          context.theme.primaryColor ??
+                                          Colors.blue,
+                                      fontStyle: FontStyle.italic,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor:
+                                          context.theme.primaryColor ??
+                                          Colors.blue,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                )
+                                : Text(
+                                  "Chưa cập nhật",
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontStyle: FontStyle.italic,
+                                    color: context.theme.grey ?? Colors.grey,
+                                    height: 1.5,
+                                  ),
+                                ),
+                        linkIconAsset:
+                            (_linkController.text.trim().isNotEmpty)
+                                ? "assets/icons/svg/lucide_copy.svg"
+                                : null,
+                        action: () {
+                          try {
+                            Clipboard.setData(
+                              ClipboardData(text: _linkController.text),
+                            );
+                            // debugPrint("Copied: 012ajsh");
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Thành công",
+                              "Đã sao chép đường link",
+                              AlertType.success,
+                            );
+                          } catch (e) {
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Lỗi",
+                              "Không thể sao chép",
+                              AlertType.error,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title: 'Đánh giá',
+                  child: Column(
+                    children: [
+                      if (userRole == RoleModel.roleStudent)
+                        UosInfoItem(
                           field: "Số lần vắng",
                           value: GestureDetector(
                             onTap: () {
                               showDialog(
-                                  context: context,
-                                  builder: (dialogContext) =>
-                                      BlocProvider.value(
-                                        value: context.read<ListAbsentBloc>(),
-                                        child: AbsentsCard(
-                                          isTeacher: false,
-                                          idUos: widget.uosDetail.idUnitOfStudy,
-                                          idStudent: '',
-                                        ),
-                                      ));
+                                context: context,
+                                builder:
+                                    (dialogContext) => BlocProvider.value(
+                                      value: context.read<ListAbsentBloc>(),
+                                      child: AbsentsCard(
+                                        isTeacher: false,
+                                        idUos: widget.uosDetail.idUnitOfStudy,
+                                        idStudent: '',
+                                      ),
+                                    ),
+                              );
                             },
                             child: Text(
                               widget.absentTimes!.toString(),
@@ -312,18 +340,21 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                 height: 1.5,
                               ),
                             ),
-                          )),
-                    InfoItem(
+                          ),
+                        ),
+                      InfoItem(
                         field: "Công thức điểm",
-                        value: widget.uosDetail.scoreFormula),
-                  ],
+                        value: widget.uosDetail.scoreFormula,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              UosInfoCard(
-                  title: userRole == RoleModel.roleTeacher
-                      ? 'Thời khóa biểu'
-                      : 'Lịch học',
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title:
+                      userRole == RoleModel.roleTeacher
+                          ? 'Thời khóa biểu'
+                          : 'Lịch học',
                   child: Container(
                     width: double.infinity,
                     alignment: Alignment.topLeft,
@@ -348,13 +379,15 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                 ...entry.value.map((shiftStr) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
+                                      horizontal: 8,
+                                    ),
                                     child: Container(
                                       padding: const EdgeInsets.only(left: 10),
                                       decoration: BoxDecoration(
                                         border: Border(
                                           left: BorderSide(
-                                            color: context.theme.grey ??
+                                            color:
+                                                context.theme.grey ??
                                                 Colors.grey,
                                             width: 1,
                                           ),
@@ -379,38 +412,49 @@ class _UosInfoTabState extends State<UosInfoTab> {
                         );
                       }),
                     ),
-                  )),
-              const SizedBox(height: 10),
-              if (userRole == RoleModel.roleStudent)
-                if (widget.examShift != null &&
-                    widget.examShift!.idExamShift.isNotEmpty)
-                  UosInfoCard(
-                    title: 'Lịch thi',
-                    child: Column(
-                      children: [
-                        InfoItem(
-                            field: "Ngày giờ",
-                            value: widget.examShift!.examDate != null
-                                ? Functions.formatDateTime(
-                                    widget.examShift!.examDate!)
-                                : ''),
-                        InfoItem(field: "Phòng", value: widget.examShift!.room),
-                        InfoItem(
-                            field: "Xuất",
-                            value: widget.examShift!.noExamShift),
-                        InfoItem(
-                            field: "Nhóm",
-                            value: widget.examShift!.noExamGroup),
-                        InfoItem(
-                            field: "Hình thức thi",
-                            value: widget.examShift!.methodOfExam),
-                      ],
-                    ),
                   ),
-            ],
+                ),
+                const SizedBox(height: 10),
+                if (userRole == RoleModel.roleStudent)
+                  if (widget.examShift != null &&
+                      widget.examShift!.idExamShift.isNotEmpty)
+                    UosInfoCard(
+                      title: 'Lịch thi',
+                      child: Column(
+                        children: [
+                          InfoItem(
+                            field: "Ngày giờ",
+                            value:
+                                widget.examShift!.examDate != null
+                                    ? Functions.formatDateTime(
+                                      widget.examShift!.examDate!,
+                                    )
+                                    : '',
+                          ),
+                          InfoItem(
+                            field: "Phòng",
+                            value: widget.examShift!.room,
+                          ),
+                          InfoItem(
+                            field: "Xuất",
+                            value: widget.examShift!.noExamShift,
+                          ),
+                          InfoItem(
+                            field: "Nhóm",
+                            value: widget.examShift!.noExamGroup,
+                          ),
+                          InfoItem(
+                            field: "Hình thức thi",
+                            value: widget.examShift!.methodOfExam,
+                          ),
+                        ],
+                      ),
+                    ),
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }

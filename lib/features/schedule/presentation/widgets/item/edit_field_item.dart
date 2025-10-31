@@ -10,14 +10,16 @@ class EditFieldItem extends StatelessWidget {
   final int? minLine;
   final int? maxLine;
   final bool hasError;
-  const EditFieldItem(
-      {super.key,
-      required this.field,
-      required this.controller,
-      this.minLine = 1,
-      this.maxLine = 7,
-      this.hasError = false,
-      this.hintText});
+
+  const EditFieldItem({
+    super.key,
+    required this.field,
+    required this.controller,
+    this.minLine = 1,
+    this.maxLine = 7,
+    this.hasError = false,
+    this.hintText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +28,29 @@ class EditFieldItem extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(field,
-                style: TextStyle(
-                  fontFamily: GoogleFonts.notoSans().fontFamily,
-                  fontSize: FontSizes.medium,
-                  fontWeight: FontWeight.w500,
-                )),
+            Text(
+              field,
+              style: TextStyle(
+                fontFamily: GoogleFonts.notoSans().fontFamily,
+                fontSize: FontSizes.medium,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             if (hasError)
-              Text("*",
-                  style: TextStyle(
-                      fontSize: FontSizes.medium, color: context.theme.red)),
+              Text(
+                "*",
+                style: TextStyle(
+                  fontSize: FontSizes.medium,
+                  color: context.theme.red,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 4),
         TextField(
-          textInputAction: TextInputAction.done,
           controller: controller,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
           cursorColor: context.theme.grey ?? Colors.grey,
           maxLines: maxLine,
           minLines: minLine,
@@ -49,22 +58,23 @@ class EditFieldItem extends StatelessWidget {
             FocusScope.of(context).unfocus();
           },
           style: TextStyle(
-            fontSize: FontSizes.small,
+            fontSize: FontSizes.medium + 1,
             color: context.theme.grey ?? Colors.grey,
           ),
           decoration: InputDecoration(
-              filled: true,
-              fillColor: Color(0xFFF5F5F5),
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: context.theme.grey ?? Colors.grey,
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+            filled: true,
+            fillColor: const Color(0xFFF5F5F5),
+            hintText: hintText,
+            hintStyle: TextStyle(
+              color: context.theme.grey ?? Colors.grey,
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
         ),
       ],
     );

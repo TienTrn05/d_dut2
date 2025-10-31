@@ -73,7 +73,7 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
     } catch (e) {
       logger.e("Error adding notification: $e");
       emit(state.copyWith(
-          status: () => NotiStatus.failure, errorMessage: () => e.toString()));
+          status: () => NotiStatus.failure, errorMessage: () => "Đã có lỗi xảy ra khi tạo thông báo mới. Vui lòng thử lại sau"));
     }
   }
 
@@ -111,7 +111,7 @@ class NotiBloc extends Bloc<NotiEvent, NotiState> {
       logger.e("Error deleting notification: $e");
       emit(state.copyWith(
         status: () => NotiStatus.failure,
-        errorMessage: () => e.toString(),
+        errorMessage: () => "Đã có lỗi xảy ra khi xóa thông báo. Vui lòng thử lại sau",
       ));
     }
   }

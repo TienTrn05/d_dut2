@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -131,5 +134,35 @@ class ConversationService {
       logger.e('❌ Failed to send message: ${e.response?.data}');
     }
     return null;
+  }
+
+  Future<void> sendMessageStream({
+    required String conversationId,
+    required String message,
+    required Future Function(String partialText) onChunk,
+  }) async {
+    try {
+      final response = await _dio.post<ResponseBody>(
+        '/ai/chat',
+        options: Options(
+          headers: {'x-api-key': _apiKey},
+          responseType: ResponseType.stream,
+        ),
+        data: {
+          'message': message,
+          'chatbot_id': _chatbotId,
+          'conversation_id': conversationId,
+          'stream': true,
+        },
+      );
+
+      await for (var chunk in response.data!.stream.cast<List<int>>().transform(
+        utf8.decoder,
+      )) {
+        await onChunk(chunk);
+      }
+    } on DioException catch (e) {
+      logger.e('❌ Stream error: ${e.response?.data}');
+    }
   }
 }
