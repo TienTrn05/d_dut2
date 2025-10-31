@@ -22,7 +22,8 @@ import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
 import 'features/notification/domain/repositories/notification_repository.dart';
-
+import 'features/schedule/bloc/schedule/calendar_bloc.dart';
+import 'features/schedule/domain/repository/schedule_repo.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
@@ -76,6 +77,10 @@ class MyApp extends StatelessWidget {
           create:
               (_) =>
                   NotificationSettingsBloc()..add(LoadNotificationSettings()),
+        ),
+
+        BlocProvider<CalendarBloc>(
+          create: (_) => CalendarBloc(getIt.get<ScheduleRepository>()),
         ),
       ],
       child: BlocBuilder<AuthBloc, AuthState>(
