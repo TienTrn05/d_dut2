@@ -22,9 +22,14 @@ import 'features/auth/domain/repository/auth_repo.dart';
 import 'features/loading/loading_bloc.dart';
 import 'features/loading/loading_overlay.dart';
 import 'features/notification/domain/repositories/notification_repository.dart';
+import 'features/schedule/bloc/schedule/calendar_bloc.dart';
+import 'features/schedule/domain/repository/schedule_repo.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: '.env');
 
   // Initialize app dependencies
   await AppEnvironment.setup();
@@ -72,6 +77,10 @@ class MyApp extends StatelessWidget {
           create:
               (_) =>
                   NotificationSettingsBloc()..add(LoadNotificationSettings()),
+        ),
+
+        BlocProvider<CalendarBloc>(
+          create: (_) => CalendarBloc(getIt.get<ScheduleRepository>()),
         ),
       ],
       child: BlocBuilder<AuthBloc, AuthState>(
@@ -155,7 +164,7 @@ class MyApp extends StatelessWidget {
     colorScheme: ColorScheme.fromSeed(
       seedColor: Color(0xFF2A74BD), // Color(0xFF2A74BD)
       brightness: Brightness.light,
-      background: Colors.white
+      background: Colors.white,
     ),
   );
 
