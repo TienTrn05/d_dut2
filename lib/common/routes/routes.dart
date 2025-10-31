@@ -28,15 +28,30 @@ import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.d
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
 
-// New: Weekly Schedule (lịch tuần)
+// Weekly Schedule (lịch tuần)
 import 'package:e_dut/features/weekly_schedule/bloc/weekly_schedule_bloc.dart';
 import 'package:e_dut/features/weekly_schedule/presentation/weekly_schedule.dart';
+import 'package:e_dut/features/weekly_schedule/data/weekly_schedule_repository.dart';
 
 String _resolveApiBase() {
   const fromDefine = String.fromEnvironment('API_BASE', defaultValue: '');
   if (fromDefine.isNotEmpty) return fromDefine;
   try {
     return dotenv.env['API_BASE'] ?? '';
+  } catch (_) {
+    return '';
+  }
+}
+
+// Endpoint cho Weekly Schedule
+String _resolveWeeklyApiBase() {
+  const fromDefine = String.fromEnvironment(
+    'WEEKLY_SCHEDULE_API_BASE',
+    defaultValue: '',
+  );
+  if (fromDefine.isNotEmpty) return fromDefine;
+  try {
+    return dotenv.env['WEEKLY_SCHEDULE_API_BASE'] ?? '';
   } catch (_) {
     return '';
   }
@@ -205,12 +220,17 @@ class Routes {
       case weeklySchedule:
         {
           final email = settings.arguments as String;
+
+          final repo = WeeklyScheduleRepository(
+            endpoint: _resolveWeeklyApiBase(),
+          );
+
           return MaterialPageRoute(
             builder:
                 (_) => BlocProvider(
                   create:
                       (_) =>
-                          getIt.get<WeeklyScheduleBloc>()
+                          WeeklyScheduleBloc(repo)
                             ..add(WeeklyScheduleRequested(email)),
                   child: WeeklySchedulePage(email: email),
                 ),
