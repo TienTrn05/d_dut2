@@ -67,7 +67,7 @@ class _PendingFeesListState extends State<PendingFeesList> {
                 Text(
                   "Học phí sinh viên cần nộp",
                   style: const TextStyle(
-                    fontSize: FontSizes.large,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -112,31 +112,50 @@ class _PendingFeesListState extends State<PendingFeesList> {
                                             8,
                                           ),
                                         ),
-                                        child: ListTile(
-                                          title: Text(
-                                            "Đợt ${fee.paymentRound}",
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                              fontSize: FontSizes.medium,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            fee.note ?? "Không có ghi chú",
-                                            style: TextStyle(
-                                              color: context.theme.grey,
-                                              fontSize: FontSizes.small,
-                                            ),
-                                          ),
-                                          trailing: Text(
-                                            TuitionFeeHelper.formatCurrency(
-                                              fee.amount,
-                                            ),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                              fontSize: FontSizes.large,
-                                            ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Đợt ${fee.paymentRound}",
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                        fontSize:
+                                                            FontSizes.medium,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      fee.note ??
+                                                          "Không có ghi chú",
+                                                      style: TextStyle(
+                                                        color:
+                                                            context.theme.grey,
+                                                        fontSize:
+                                                            FontSizes.small,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                TuitionFeeHelper.formatCurrency(
+                                                  fee.amount,
+                                                ),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                  fontSize: FontSizes.large,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       );

@@ -69,7 +69,7 @@ class _PaidFeesListState extends State<PaidFeesList> {
                 Text(
                   "Học phí đã nộp trong kỳ",
                   style: const TextStyle(
-                    fontSize: FontSizes.large,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -125,56 +125,81 @@ class _PaidFeesListState extends State<PaidFeesList> {
                                               16,
                                             ),
                                           ),
-                                          child: ListTile(
-                                            leading: Container(
-                                              width: 32,
-                                              height: 32,
-                                              padding: EdgeInsets.all(7),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFB8F8C4),
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(999),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 32,
+                                                  height: 32,
+                                                  padding: EdgeInsets.all(7),
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xFFB8F8C4),
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                          Radius.circular(999),
+                                                        ),
+                                                  ),
+                                                  child: SvgPicture.asset(
+                                                    Assets
+                                                        .icons
+                                                        .svg
+                                                        .mingcuteCheckFill,
+                                                    color: Colors.black,
+                                                    width: 16,
+                                                    height: 16,
+                                                  ),
                                                 ),
-                                              ),
-                                              child: SvgPicture.asset(
-                                                Assets
-                                                    .icons
-                                                    .svg
-                                                    .mingcuteCheckFill,
-                                                color: Colors.black,
-                                                width: 16,
-                                                height: 16,
-                                              ),
-                                            ),
-                                            title: Text(
-                                              fee.note ?? '---',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: FontSizes.medium,
-                                                color: Colors.black,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                            subtitle: Text(
-                                              TuitionFeeHelper.formatDate(
-                                                fee.paymentDate,
-                                              ),
-                                              style: TextStyle(
-                                                color: context.theme.grey,
-                                                fontSize: FontSizes.small,
-                                                height: 1.1,
-                                              ),
-                                            ),
-                                            trailing: Text(
-                                              TuitionFeeHelper.formatCurrency(
-                                                fee.amountPaid,
-                                              ),
-                                              style: TextStyle(
-                                                color:
-                                                    context.theme.primaryColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: FontSizes.medium,
-                                              ),
+                                                const SizedBox(width: 16),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        fee.note ?? '---',
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize:
+                                                              FontSizes.medium,
+                                                          color: Colors.black,
+                                                          height: 1.2,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        TuitionFeeHelper.formatDate(
+                                                          fee.paymentDate,
+                                                        ),
+                                                        style: TextStyle(
+                                                          color:
+                                                              context
+                                                                  .theme
+                                                                  .grey,
+                                                          fontSize:
+                                                              FontSizes.small,
+                                                          height: 1.1,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Text(
+                                                  TuitionFeeHelper.formatCurrency(
+                                                    fee.amountPaid,
+                                                  ),
+                                                  style: TextStyle(
+                                                    color:
+                                                        context
+                                                            .theme
+                                                            .primaryColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: FontSizes.large,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),

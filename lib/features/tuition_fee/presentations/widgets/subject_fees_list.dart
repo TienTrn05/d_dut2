@@ -77,9 +77,9 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "Học phí sinh viên cần nộp",
+                  "Học phí lớp học phần",
                   style: const TextStyle(
-                    fontSize: FontSizes.large,
+                    fontSize: FontSizes.medium,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -180,10 +180,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                                 side: BorderSide(color: Color(0xFFECECEC)),
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 12.0,
-                                ),
+                                padding: const EdgeInsets.all(16),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -197,7 +194,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                                             fee.className,
                                             style: const TextStyle(
                                               fontSize: FontSizes.large,
-                                              color: Color(0xFF2A74BD),
+                                              color: Color(0xFF263238),
                                               fontWeight: FontWeight.w600,
                                               height: 1.1,
                                             ),
@@ -248,7 +245,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                                       ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: FontSizes.large,
+                                        fontSize: FontSizes.medium,
                                         color: Color(0xFF263238),
                                       ),
                                     ),
