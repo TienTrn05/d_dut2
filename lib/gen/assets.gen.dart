@@ -159,6 +159,9 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/lucide_copy.svg
   String get lucideCopy => 'assets/icons/svg/lucide_copy.svg';
 
+  /// File path: assets/icons/svg/lucide_dot.svg
+  String get lucideDot => 'assets/icons/svg/lucide_dot.svg';
+
   /// File path: assets/icons/svg/lucide_file-check-2.svg
   String get lucideFileCheck2 => 'assets/icons/svg/lucide_file-check-2.svg';
 
@@ -195,6 +198,9 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/mdi_timeline-check-outline.svg
   String get mdiTimelineCheckOutline =>
       'assets/icons/svg/mdi_timeline-check-outline.svg';
+
+  /// File path: assets/icons/svg/mingcute_check-fill.svg
+  String get mingcuteCheckFill => 'assets/icons/svg/mingcute_check-fill.svg';
 
   /// File path: assets/icons/svg/mingcute_star-fill.svg
   String get mingcuteStarFill => 'assets/icons/svg/mingcute_star-fill.svg';
@@ -304,6 +310,7 @@ class $AssetsIconsSvgGen {
     logoDDUTcolor,
     logoDut,
     lucideCopy,
+    lucideDot,
     lucideFileCheck2,
     lucidePen,
     lucideSortAsc,
@@ -315,6 +322,7 @@ class $AssetsIconsSvgGen {
     mdiMicrosoftTeams,
     mdiMicrosoft,
     mdiTimelineCheckOutline,
+    mingcuteCheckFill,
     mingcuteStarFill,
     mynauiActivitySquare,
     mynauiDeleteSolid,

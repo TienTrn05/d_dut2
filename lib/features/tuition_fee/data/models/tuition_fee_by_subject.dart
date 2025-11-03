@@ -21,21 +21,36 @@ class TuitionFeeBySubject {
     return TuitionFeeBySubject(
       subjectId: json['subjectId'] ?? '',
       classId: json['classId'] ?? '',
-      credits: json['credits'] ?? 0,
+      credits: _parseInt(json['credits']),
       classType: json['classType'] == 1 || json['classType'] == true,
       className: json['className'] ?? '',
-      tuitionFee: (json['tuitionFee'] as num).toDouble(),
+      tuitionFee: _parseDouble(json['tuitionFee']),
       retake: json['retake'] == 1 || json['retake'] == true,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'subjectId': subjectId,
-        'classId': classId,
-        'credits': credits,
-        'classType': classType,
-        'className': className,
-        'tuitionFee': tuitionFee,
-        'retake': retake,
-      };
+    'subjectId': subjectId,
+    'classId': classId,
+    'credits': credits,
+    'classType': classType,
+    'className': className,
+    'tuitionFee': tuitionFee,
+    'retake': retake,
+  };
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
+  }
 }
