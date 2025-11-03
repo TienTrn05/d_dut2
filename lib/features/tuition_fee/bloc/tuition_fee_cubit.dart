@@ -7,7 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '/common/mixin/cancelable_base_bloc.dart';
 import '/features/tuition_fee/domain/repository/tuition_fee_repo.dart';
-import '../data/models/tuition_fee_summary.dart';
+import '../data/models/tuition_fee.dart';
 
 part 'tuition_fee_cubit.freezed.dart';
 part 'tuition_fee_state.dart';
@@ -23,7 +23,7 @@ class TuitionFeeCubit extends Cubit<TuitionFeeState>
     emit(const TuitionFeeState.loading());
 
     try {
-      final summary = await _tuitionFeeRepository.getTuitionFeeSummary(
+      final summary = await _tuitionFeeRepository.getAllTuitionFee(
         authToken,
       );
       emit(TuitionFeeState.loaded(tuitionFees: summary));

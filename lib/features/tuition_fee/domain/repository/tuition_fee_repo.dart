@@ -1,9 +1,11 @@
 import 'package:injectable/injectable.dart';
+
 import '../../data/data_sources/remote_data_sources/tuition_fee_service.dart';
 import '../../data/models/pending_tuition_fee.dart';
 import '../../data/models/paid_tuition_fee.dart';
 import '../../data/models/tuition_fee_by_subject.dart';
 import '../../data/models/tuition_fee_summary.dart';
+import '../../data/models/tuition_fee.dart';
 
 @singleton
 class TuitionFeeRepository {
@@ -23,7 +25,6 @@ class TuitionFeeRepository {
     return _tuitionFeeService.getTuitionFeesBySubject(authToken);
   }
 
-  /// 👉 Hàm tổng hợp, gom 3 API lại
   Future<TuitionFeeSummary> getTuitionFeeSummary(
     String authToken,
   ) async {
@@ -42,5 +43,11 @@ class TuitionFeeRepository {
       paidFees: results[1] as List<PaidTuitionFee>,
       subjectFees: results[2] as List<TuitionFeeBySubject>,
     );
+  }
+
+  Future<List<TuitionFee>> getAllTuitionFee(
+    String authToken,
+  ) async {
+    return _tuitionFeeService.getAllTuitionFee(authToken);
   }
 }

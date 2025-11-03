@@ -131,7 +131,7 @@ return networkError(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( TuitionFeeSummary tuitionFees)?  loaded,TResult Function( String message)?  error,TResult Function( String message)?  networkError,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<TuitionFee> tuitionFees)?  loaded,TResult Function( String message)?  error,TResult Function( String message)?  networkError,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
@@ -156,7 +156,7 @@ return networkError(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( TuitionFeeSummary tuitionFees)  loaded,required TResult Function( String message)  error,required TResult Function( String message)  networkError,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<TuitionFee> tuitionFees)  loaded,required TResult Function( String message)  error,required TResult Function( String message)  networkError,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loading():
@@ -180,7 +180,7 @@ return networkError(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( TuitionFeeSummary tuitionFees)?  loaded,TResult? Function( String message)?  error,TResult? Function( String message)?  networkError,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<TuitionFee> tuitionFees)?  loaded,TResult? Function( String message)?  error,TResult? Function( String message)?  networkError,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
@@ -263,10 +263,16 @@ String toString() {
 
 
 class _Loaded implements TuitionFeeState {
-  const _Loaded({required this.tuitionFees});
+  const _Loaded({required final  List<TuitionFee> tuitionFees}): _tuitionFees = tuitionFees;
   
 
- final  TuitionFeeSummary tuitionFees;
+ final  List<TuitionFee> _tuitionFees;
+ List<TuitionFee> get tuitionFees {
+  if (_tuitionFees is EqualUnmodifiableListView) return _tuitionFees;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_tuitionFees);
+}
+
 
 /// Create a copy of TuitionFeeState
 /// with the given fields replaced by the non-null parameter values.
@@ -278,12 +284,12 @@ _$LoadedCopyWith<_Loaded> get copyWith => __$LoadedCopyWithImpl<_Loaded>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaded&&(identical(other.tuitionFees, tuitionFees) || other.tuitionFees == tuitionFees));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaded&&const DeepCollectionEquality().equals(other._tuitionFees, _tuitionFees));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tuitionFees);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_tuitionFees));
 
 @override
 String toString() {
@@ -298,7 +304,7 @@ abstract mixin class _$LoadedCopyWith<$Res> implements $TuitionFeeStateCopyWith<
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) = __$LoadedCopyWithImpl;
 @useResult
 $Res call({
- TuitionFeeSummary tuitionFees
+ List<TuitionFee> tuitionFees
 });
 
 
@@ -317,8 +323,8 @@ class __$LoadedCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? tuitionFees = null,}) {
   return _then(_Loaded(
-tuitionFees: null == tuitionFees ? _self.tuitionFees : tuitionFees // ignore: cast_nullable_to_non_nullable
-as TuitionFeeSummary,
+tuitionFees: null == tuitionFees ? _self._tuitionFees : tuitionFees // ignore: cast_nullable_to_non_nullable
+as List<TuitionFee>,
   ));
 }
 
