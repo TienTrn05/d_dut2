@@ -21,10 +21,6 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.subjectFees.isEmpty) {
-      return const Text("Không có dữ liệu học phí theo lớp học phần.");
-    }
-
     final totalCredits = widget.subjectFees.fold<int>(
       0,
       (sum, item) => sum + (item.credits),
@@ -174,7 +170,9 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                           // 📚 Danh sách chi tiết từng học phần
                           ...widget.subjectFees.map((fee) {
                             return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
+                              margin: EdgeInsets.only(
+                                bottom: fee == widget.subjectFees.last ? 0 : 16,
+                              ),
                               color: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
