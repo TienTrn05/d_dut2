@@ -254,10 +254,10 @@ class _TuitionFeeContentState extends State<_TuitionFeeContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    PendingFeesList(tuitionFee.tuitionFees.pendingFees),
+                    PendingFeesList([]),
 
                     const SizedBox(height: 16),
-                    PaidFeesList(tuitionFee.tuitionFees.paidFees),
+                    PaidFeesList([]),
 
                     const SizedBox(height: 16),
                     SubjectFeesList(tuitionFee.tuitionFees.subjectFees),

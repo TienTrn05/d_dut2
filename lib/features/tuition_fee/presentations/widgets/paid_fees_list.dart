@@ -181,9 +181,12 @@ class _PaidFeesListState extends State<PaidFeesList> {
                                       );
                                     }).toList(),
                               )
-                              : Text(
-                                "Chưa có học phí đã nộp",
-                                textAlign: TextAlign.center,
+                              : Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text(
+                                  "Chưa có học phí đã nộp",
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                     )
                     : const SizedBox(),
