@@ -11,6 +11,10 @@ class AppEnvironment {
   static final tenantId = dotenv.env['TENANT_ID'] ?? '';
   static final clientId = dotenv.env['CLIENT_ID'] ?? '';
   static final redirectUri = dotenv.env['REDIRECT_URI'] ?? '';
-  static final chatbotConversationJwt = dotenv.env['CHATBOT_CONVERSATION_JWT'] ?? '';
-  static final chatbotConversationAPIKey = dotenv.env['CHATBOT_CONVERSATION_API_KEY'] ?? '';
+  static final chatbotConversationJwt =
+      dotenv.env['CHATBOT_CONVERSATION_JWT'] ?? '';
+  static final chatbotConversationAPIKey =
+      dotenv.env['CHATBOT_CONVERSATION_API_KEY'] ?? '';
+  static final pushNotificationsAPIKey =
+      dotenv.env['PUSH_NOTIFICATIONS_API_KEY'] ?? '';
 }
