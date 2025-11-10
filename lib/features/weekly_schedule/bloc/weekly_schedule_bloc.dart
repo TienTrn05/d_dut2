@@ -22,7 +22,7 @@ class WeeklyScheduleBloc
   ) async {
     emit(const WeeklyScheduleState.loading());
     try {
-      final resp = await _repo.fetchByEmail(event.email, date: event.date);
+      final resp = await _repo.fetchByEmail(event.email);
       emit(WeeklyScheduleState.loaded(resp));
     } catch (e) {
       emit(WeeklyScheduleState.error(e.toString()));

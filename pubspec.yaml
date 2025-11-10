@@ -1,7 +1,7 @@
 name: e_dut
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.1.1+18
+version: 1.1.2+19
 
 environment:
   sdk: ">=3.7.2 <4.0.0"

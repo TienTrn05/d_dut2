@@ -149,9 +149,11 @@ class DetailScheduleDialog extends StatelessWidget {
 
     out = out.replaceAllMapped(RegExp(r'(\n|^)\+(\d)'), (m) => '\n- ${m[2]}');
 
-
     final lines =
-        out.split('\n').map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim()).toList();
+        out
+            .split('\n')
+            .map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim())
+            .toList();
     final filtered = <String>[];
     for (var line in lines) {
       if (line.isEmpty) {
@@ -171,7 +173,10 @@ class DetailScheduleDialog extends StatelessWidget {
     return result;
   }
 
-  String _formatHtmlForDisplay(String? html, {bool usePlaceholderWhenEmpty = false}) {
+  String _formatHtmlForDisplay(
+    String? html, {
+    bool usePlaceholderWhenEmpty = false,
+  }) {
     final raw = (html ?? '').trim();
     if (raw.isEmpty && usePlaceholderWhenEmpty) return _placeholder;
     final plain = _htmlToPlain(raw);
@@ -319,12 +324,12 @@ class DetailSchedulePage extends StatelessWidget {
   }
 
   Widget _sectionTitle(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontSize: FontSizes.large,
-          fontWeight: FontWeight.bold,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontSize: FontSizes.large,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 
   String _stripTags(String html) {
     return html
