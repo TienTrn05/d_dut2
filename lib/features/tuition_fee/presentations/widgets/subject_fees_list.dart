@@ -140,7 +140,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                                       Row(
                                         children: [
                                           _buildSummaryItem(
-                                            "Môn học",
+                                            "Học phần",
                                             totalSubjects.toString(),
                                           ),
                                           const SizedBox(width: 16),
@@ -193,7 +193,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
                                           Text(
                                             fee.className,
                                             style: const TextStyle(
-                                              fontSize: FontSizes.large,
+                                              fontSize: FontSizes.medium,
                                               color: Color(0xFF263238),
                                               fontWeight: FontWeight.w600,
                                               height: 1.1,
