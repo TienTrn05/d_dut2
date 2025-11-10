@@ -23,7 +23,7 @@ class DetailScheduleDialog extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header (tiêu đề popup)
+          // Header popup
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: const BoxDecoration(
@@ -83,12 +83,16 @@ class DetailScheduleDialog extends StatelessWidget {
                   '${tf.format(item.start)} - ${tf.format(item.end)}',
                 ),
                 const SizedBox(height: 8.0),
-                _kv(context, 'Nội dung', _displayOrPlaceholder(item.content)),
+                _kvMultiline(
+                  context,
+                  'Nội dung',
+                  _formatHtmlForDisplay(item.content),
+                ),
                 const SizedBox(height: 8.0),
-                _kv(
+                _kvMultiline(
                   context,
                   'Người tham gia',
-                  _displayOrPlaceholder(_stripTags(item.participants)),
+                  _formatHtmlForDisplay(item.participants),
                 ),
                 const SizedBox(height: 8.0),
                 _kv(
@@ -116,11 +120,68 @@ class DetailScheduleDialog extends StatelessWidget {
     );
   }
 
-  String _stripTags(String html) {
-    return html
-        .replaceAll(RegExp(r'<[^>]+>'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+  String _htmlToPlain(String? html) {
+    final s = (html ?? '').trim();
+    if (s.isEmpty) return '';
+
+    var out = s;
+
+    out = out.replaceAll(RegExp(r'<li[^>]*>', caseSensitive: false), '\n- ');
+    out = out.replaceAll(RegExp(r'</li>', caseSensitive: false), '');
+
+    out = out.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
+    out = out.replaceAll(RegExp(r'</p>', caseSensitive: false), '\n');
+    out = out.replaceAll(RegExp(r'<p[^>]*>', caseSensitive: false), '');
+
+    out = out.replaceAll(RegExp(r'<[^>]+>'), '');
+
+    out = out.replaceAll('&nbsp;', ' ').replaceAll('&amp;', '&');
+
+    out = out.replaceAll(RegExp(r'\)\s*;\s*\+', caseSensitive: false), ')\n- ');
+    out = out.replaceAll(RegExp(r';\s*\+', caseSensitive: false), ';\n- ');
+    out = out.replaceAll(RegExp(r':\s*\+', caseSensitive: false), ':\n- ');
+
+    out = out.replaceAll(RegExp(r'(^|\n)\s*\+\s*'), '\n- ');
+
+    out = out.replaceAll(RegExp(r':\+'), ':\n- ');
+
+    out = out.replaceAll(RegExp(r';\s*\n\s*-'), '\n- ');
+
+    out = out.replaceAllMapped(RegExp(r'(\n|^)\+(\d)'), (m) => '\n- ${m[2]}');
+
+    final lines =
+        out
+            .split('\n')
+            .map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim())
+            .toList();
+    final filtered = <String>[];
+    for (var line in lines) {
+      if (line.isEmpty) {
+        if (filtered.isNotEmpty && filtered.last.isEmpty) continue;
+        filtered.add('');
+      } else {
+        filtered.add(line);
+      }
+    }
+
+    var result = filtered.join('\n').trim();
+
+    result = result.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+
+    result = result.replaceFirst(RegExp(r'^\-+\s*'), '- ').trimLeft();
+
+    return result;
+  }
+
+  String _formatHtmlForDisplay(
+    String? html, {
+    bool usePlaceholderWhenEmpty = false,
+  }) {
+    final raw = (html ?? '').trim();
+    if (raw.isEmpty && usePlaceholderWhenEmpty) return _placeholder;
+    final plain = _htmlToPlain(raw);
+    if (plain.isEmpty) return _placeholder;
+    return plain;
   }
 
   String _displayOrPlaceholder(
@@ -154,6 +215,31 @@ class DetailScheduleDialog extends StatelessWidget {
               fontWeight: FontWeight.w500,
               color: Colors.black,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _kvMultiline(BuildContext context, String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label:',
+          style: TextStyle(
+            fontSize: FontSizes.medium,
+            color: context.theme.grey,
+          ),
+        ),
+        const SizedBox(height: 6.0),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: FontSizes.medium,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+            height: 1.35,
           ),
         ),
       ],
