@@ -1,17 +1,21 @@
 part of 'weekly_schedule_bloc.dart';
 
 abstract class WeeklyScheduleEvent extends Equatable {
-  const WeeklyScheduleEvent(this.email);
+  const WeeklyScheduleEvent(this.email, {this.date});
+
   final String email;
+  final DateTime? date;
 
   @override
-  List<Object?> get props => [email];
+  List<Object?> get props => [email, date];
 }
 
 class WeeklyScheduleRequested extends WeeklyScheduleEvent {
-  const WeeklyScheduleRequested(String email) : super(email);
+  const WeeklyScheduleRequested(String email, {DateTime? date})
+    : super(email, date: date);
 }
 
 class WeeklyScheduleRefreshed extends WeeklyScheduleEvent {
-  const WeeklyScheduleRefreshed(String email) : super(email);
+  const WeeklyScheduleRefreshed(String email, {DateTime? date})
+    : super(email, date: date);
 }

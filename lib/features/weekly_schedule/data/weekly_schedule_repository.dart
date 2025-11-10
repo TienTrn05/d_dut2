@@ -13,7 +13,10 @@ class WeeklyScheduleRepository {
   final http.Client _client;
   final String _endpoint;
 
-  Future<WeeklyScheduleResponse> fetchByEmail(String email) async {
+  Future<WeeklyScheduleResponse> fetchByEmail(
+    String email, {
+    DateTime? date,
+  }) async {
     if (_endpoint.trim().isEmpty) {
       throw StateError(
         'Weekly schedule API base is empty. '
@@ -21,7 +24,13 @@ class WeeklyScheduleRepository {
       );
     }
 
-    final uri = Uri.parse(_endpoint).replace(queryParameters: {'email': email});
+    final Map<String, String> queryParameters = {'email': email};
+
+    if (date != null) {
+      queryParameters['date'] = _formatDateAsYyyyMmDd(date);
+    }
+
+    final uri = Uri.parse(_endpoint).replace(queryParameters: queryParameters);
 
     final res = await _client.get(
       uri,
@@ -54,4 +63,10 @@ String _resolveWeeklyApiBase() {
   } catch (_) {
     return '';
   }
+}
+String _formatDateAsYyyyMmDd(DateTime d) {
+  final y = d.year.toString().padLeft(4, '0');
+  final m = d.month.toString().padLeft(2, '0');
+  final day = d.day.toString().padLeft(2, '0');
+  return '$y-$m-$day';
 }
