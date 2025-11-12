@@ -113,6 +113,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return digits != "" ? digits : local;
   }
 
+  String _extractEmail(dynamic userData) {
+    String? v;
+    try {
+      v = userData.userPrincipalName as String?;
+    } catch (_) {}
+    v ??=
+        (() {
+          try {
+            return userData.email as String?;
+          } catch (_) {}
+          return null;
+        })();
+
+    if (v == null) return '';
+    v = v.trim();
+    return v.contains('@') ? v : '';
+  }
+
   void _openAcademicResults(BuildContext context, AuthUserAuthenticated state) {
     final studentId = _extractStudentId(state.userData);
     if (studentId.isEmpty) {
@@ -519,27 +537,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         );
                                       },
                                     ),
+
+                                    // Update lịch tuần
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/fluent_calendar-work-week-32-regular.svg",
                                       title: "Lịch tuần",
-                                      onTap: () async {
-                                        final url = Uri.parse(
-                                          'https://lichtuan.dut.udn.vn',
-                                        );
-                                        if (await canLaunchUrl(url)) {
-                                          await launchUrl(
-                                            url,
-                                            mode: LaunchMode.inAppBrowserView,
-                                          );
-                                        } else {
+                                      onTap: () {
+                                        final auth =
+                                            context.read<AuthBloc>().state;
+                                        if (auth is! AuthUserAuthenticated) {
                                           CustomSnackbar.showSnackBar(
                                             context,
-                                            'Không thể mở liên kết',
-                                            'Vui lòng kiểm tra kết nối internet hoặc thử lại sau',
+                                            'Chưa đăng nhập',
+                                            'Vui lòng đăng nhập để xem Lịch tuần',
+                                            AlertType.warning,
+                                          );
+                                          return;
+                                        }
+
+                                        final email = _extractEmail(
+                                          auth.userData,
+                                        );
+                                        if (email.isEmpty) {
+                                          CustomSnackbar.showSnackBar(
+                                            context,
+                                            'Thiếu thông tin',
+                                            'Không tìm thấy email để tải Lịch tuần',
                                             AlertType.error,
                                           );
+                                          return;
                                         }
+
+                                        Navigator.of(context).pushNamed(
+                                          Routes.weeklySchedule,
+                                          arguments: email,
+                                        );
                                       },
                                     ),
                                     FeatureCard(
@@ -649,19 +682,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         }
                                       },
                                     ),
-                                    // FeatureCard(
-                                    //   iconUrl:
-                                    //       "assets/icons/svg/hugeicons_note-edit.svg",
-                                    //   title: "Đăng ký tín chỉ",
-                                    //   onTap: () {
-                                    //     context.read<DashboardBloc>().add(
-                                    //       DashboardNavigateRequested(
-                                    //         scopes,
-                                    //         Routes.courseRegistration,
-                                    //       ),
-                                    //     );
-                                    //   },
-                                    // ),
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/solar_users-group-rounded-broken.svg",

@@ -7,6 +7,7 @@ import '/common/utils/logger.dart';
 import '../../models/pending_tuition_fee.dart';
 import '../../models/paid_tuition_fee.dart';
 import '../../models/tuition_fee_by_subject.dart';
+import '../../models/tuition_fee.dart';
 
 @injectable
 class TuitionFeeService {
@@ -44,9 +45,7 @@ class TuitionFeeService {
   }
 
   /// 💰 Danh sách học phí đã nộp
-  Future<List<PaidTuitionFee>> getPaidTuitionFees(
-    String authToken,
-  ) async {
+  Future<List<PaidTuitionFee>> getPaidTuitionFees(String authToken) async {
     try {
       final response = await _apiClient.dio.get(
         "$_url/api/tuation_fees/paid",
@@ -89,6 +88,29 @@ class TuitionFeeService {
       }
     } catch (e) {
       logger.e("Error fetching tuition fees by subject $e");
+      rethrow;
+    }
+  }
+
+  Future<List<TuitionFee>> getAllTuitionFee(String authToken) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/tuation_fees",
+        options: Options(headers: {"Authorization": "Bearer $authToken"}),
+      );
+
+      final data = response.data;
+
+      if (data['isSuccess'] == true) {
+        final List<dynamic> raw = data['data'];
+        return raw.map((e) => TuitionFee.fromJson(e)).toList();
+      } else {
+        throw Exception(
+          "Failed to load tuition fees: ${data['message']}",
+        );
+      }
+    } catch (e) {
+      logger.e("Error fetching tuition fees: $e");
       rethrow;
     }
   }

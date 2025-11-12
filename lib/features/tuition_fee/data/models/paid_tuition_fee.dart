@@ -19,21 +19,35 @@ class PaidTuitionFee {
     return PaidTuitionFee(
       studentId: json['studentId'] ?? '',
       academicYearCode: json['academicYearCode'] ?? '',
-      amountPaid: (json['amountPaid'] as num).toDouble(),
+      amountPaid: _parseDouble(json['amountPaid']),
       note: json['note'],
-      paymentDate: json['paymentDate'] != null
-          ? DateTime.tryParse(json['paymentDate'])
-          : null,
+      paymentDate: _parseDate(json['paymentDate']),
       receiptNumber: json['receiptNumber'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'studentId': studentId,
-        'academicYearCode': academicYearCode,
-        'amountPaid': amountPaid,
-        'note': note,
-        'paymentDate': paymentDate?.toIso8601String(),
-        'receiptNumber': receiptNumber,
-      };
+    'studentId': studentId,
+    'academicYearCode': academicYearCode,
+    'amountPaid': amountPaid,
+    'note': note,
+    'paymentDate': paymentDate?.toIso8601String(),
+    'receiptNumber': receiptNumber,
+  };
+
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null || value.toString().isEmpty) return null;
+    try {
+      return DateTime.tryParse(value.toString());
+    } catch (_) {
+      return null;
+    }
+  }
 }

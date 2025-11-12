@@ -19,8 +19,10 @@
     CLIENT_ID=Enter the client ID obtained from the Microsoft Entra admin center
     REDIRECT_URI=Enter the REDIRECT_URI obtained the Microsoft Entra admin center
     API_BASE=ACADEMIC_API_BASE
+    WEEKLY_SCHEDULE_API_BASE=WEEKLY_SCHEDULE_API_BASE
     CHATBOT_CONVERSATION_JWT=CHATBOT_CONVERSATION_JWT
     CHATBOT_CONVERSATION_API_KEY=CHATBOT_CONVERSATION_API_KEY
+    PUSH_NOTIFICATIONS_API_KEY=PUSH_NOTIFICATIONS_API_KEY
     ```
 
 2. **Generate necessary files** (for packages like freezed, json_serializable, etc.):
