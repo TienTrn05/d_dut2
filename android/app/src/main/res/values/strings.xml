@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Lịch học hôm nay</string>
-    <string name="app_widget_description">Tiện ích giúp bạn theo dõi lịch học nhanh chóng trên màn hình chính</string>
+    <!-- Schedule widget -->
+    <string name="schedule_widget_title">Lịch học hôm nay</string>
+    <string name="schedule_widget_description">Tiện ích giúp bạn theo dõi lịch học nhanh chóng trên màn hình chính</string>
+    <string name="schedule_widget_weekday">Thứ 3</string>
+    <string name="schedule_widget_month">Tháng 11</string>
+    <string name="schedule_widget_day">18</string>
+    <string name="schedule_widget_subject_name">Nhập môn ngành</string>
+    <string name="schedule_widget_room">E101</string>
+    <string name="schedule_widget_time">7:00-9:50</string>
 </resources>
