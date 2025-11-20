@@ -39,29 +39,29 @@ class _MainViewState extends State<_MainView> {
   void initState() {
     super.initState();
 
-    // WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
-    //   AppUpdateService().checkAndPromptUpdate(context);
-    //   final redirect = AutoRedirectService.parsePayload(
-    //     AutoRedirectService.pendingPayload,
-    //   );
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) {
+      AppUpdateService().checkAndPromptUpdate(context);
+      final redirect = AutoRedirectService.parsePayload(
+        AutoRedirectService.pendingPayload,
+      );
 
-    //   switch (redirect) {
-    //     case AutoRedirectName.redirectToNotificationScreen:
-    //       Navigator.pushNamed(context, Routes.notification);
-    //       break;
-    //     case AutoRedirectName.redirectToNotificationScreenGeneralTab:
-    //       Navigator.pushNamed(context, Routes.notification, arguments: 1,);
-    //       break;
-    //     case AutoRedirectName.redirectToScheduleScreen:
-    //       Navigator.pushNamed(context, Routes.schedule);
-    //       break;
-    //     case AutoRedirectName.unknown:
-    //       // Không redirect nếu không xác định được payload
-    //       break;
-    //   }
+      switch (redirect) {
+        case AutoRedirectName.redirectToNotificationScreen:
+          Navigator.pushNamed(context, Routes.notification);
+          break;
+        case AutoRedirectName.redirectToNotificationScreenGeneralTab:
+          Navigator.pushNamed(context, Routes.notification, arguments: 1);
+          break;
+        case AutoRedirectName.redirectToScheduleScreen:
+          Navigator.pushNamed(context, Routes.schedule);
+          break;
+        case AutoRedirectName.unknown:
+          // Không redirect nếu không xác định được payload
+          break;
+      }
 
-    //   AutoRedirectService.pendingPayload = null;
-    // });
+      AutoRedirectService.pendingPayload = null;
+    });
   }
 
   @override
