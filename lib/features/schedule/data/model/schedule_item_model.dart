@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class ScheduleItemModel {
   final String idUnitOfStudy;
   final String idExamShift;
@@ -71,4 +73,22 @@ class ScheduleItemModel {
       noExamGroup: json['noExamGroup'] ?? '',
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'idUnitOfStudy': idUnitOfStudy,
+      'idExamShift': idExamShift,
+      'subjectName': subjectName,
+      'room': room,
+      'startStudyTime': startStudyTime,
+      'endStudyTime': endStudyTime,
+      'examTime': examTime?.toIso8601String(),
+      'isExam': isExam,
+      'noExamShift': noExamShift,
+      'examShiftName': examShiftName,
+      'noExamGroup': noExamGroup,
+    };
+  }
+
+  String toJson() => jsonEncode(toMap());
 }
