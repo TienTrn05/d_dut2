@@ -11,7 +11,6 @@ import '../bloc/weekly_schedule_bloc.dart';
 import '../models/weekly_schedule_model.dart';
 import 'detail_schedule.dart';
 
-// Lấy tuần theo năm học
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 
@@ -28,50 +27,39 @@ DateTime _mondayOf(DateTime day) {
 
 int _isoWeekNumber(DateTime date) {
   final dUtc = DateTime.utc(date.year, date.month, date.day);
-
   final int weekday = dUtc.weekday;
   final thursday = dUtc.add(Duration(days: (4 - weekday)));
   final yearOfThursday = thursday.year;
-
   final jan4 = DateTime.utc(yearOfThursday, 1, 4);
-
   final mondayOfWeek1 = jan4.subtract(Duration(days: jan4.weekday - 1));
   final diffDays = thursday.difference(mondayOfWeek1).inDays;
-
-  final weekNumber = (diffDays ~/ 7) + 1;
-  return weekNumber;
+  return (diffDays ~/ 7) + 1;
 }
 
-DateTime _firstDayWithEventOrMonday(
+DateTime _determineBestDayToSelect(
   DateTime anyDayInWeek,
   Map<DateTime, List> events,
 ) {
   final monday = _mondayOf(anyDayInWeek);
-  final mondayNorm = _normalize(monday);
-
-  // Nếu T2 có event => focus T2
-  if ((events[mondayNorm] ?? []).isNotEmpty) {
-    return mondayNorm;
-  }
-
-  // Nếu có event trong tuần => focus ngày đầu tiên có event
-  for (int i = 0; i < 7; i++) {
-    final day = _normalize(monday.add(Duration(days: i)));
-    if ((events[day] ?? []).isNotEmpty) {
-      return day;
-    }
-  }
-
-  // Nếu không có event, nhưng hôm nay nằm trong tuần => focus hôm nay
   final today = _normalize(DateTime.now());
-  final weekStart = mondayNorm;
+  final weekStart = _normalize(monday);
   final weekEnd = _normalize(monday.add(const Duration(days: 6)));
+
+  // Tuần hiện tại, chọn ngày hôm nay
   if (!today.isBefore(weekStart) && !today.isAfter(weekEnd)) {
     return today;
   }
 
-  // Ngược lại trả về T2
-  return mondayNorm;
+  // Chuyển tuần, tìm ngày có lịch
+  for (int i = 0; i < 7; i++) {
+    final day = _normalize(monday.add(Duration(days: i)));
+    if ((events[day] ?? []).isNotEmpty) {
+      return day; // Tìm thấy ngày có lịch -> Focus ngay
+    }
+  }
+
+  // Nếu không có, focus T2
+  return monday;
 }
 
 Map<DateTime, List<WeeklyScheduleItem>> _eventMap(
@@ -83,6 +71,16 @@ Map<DateTime, List<WeeklyScheduleItem>> _eventMap(
     (map[key] ??= []).add(it);
   }
   return map;
+}
+
+bool _isConnectionError(String? error) {
+  if (error == null) return false;
+  final e = error.toLowerCase();
+  return e.contains('socket') ||
+      e.contains('connection') ||
+      e.contains('network') ||
+      e.contains('internet') ||
+      e.contains('kết nối');
 }
 
 class WeeklySchedulePage extends StatefulWidget {
@@ -99,22 +97,24 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
 
   String _academicWeekLabel = '';
   Map<DateTime, List<WeeklyScheduleItem>> _cachedEvents = {};
-  bool _ignoreNextWeeklyListener = false;
 
-  bool _initialLoadInProgress = true;
+  bool _autoSelectDayOnLoad = true;
+  bool _isFirstMount = true;
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now();
-    _selectedDay = DateTime.now();
-    _initialLoadInProgress = true;
+    final now = DateTime.now();
+    _focusedDay = now;
+    _selectedDay = _normalize(now);
+
+    _isFirstMount = true;
+    _autoSelectDayOnLoad = true;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-
       context.read<WeeklyScheduleBloc>().add(
-        WeeklyScheduleRequested(widget.email),
+        WeeklyScheduleRequested(widget.email, date: _focusedDay),
       );
       _requestAcademicWeek(_focusedDay);
     });
@@ -125,21 +125,11 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
     final authState = context.read<AuthBloc>().state;
     final token =
         authState is AuthUserAuthenticated ? authState.accessToken : '';
-
     try {
       context.read<CalendarBloc>().add(
         LoadCalendarWeek(inputDate: monday, authToken: token),
       );
     } catch (_) {}
-  }
-
-  bool _hasEventsOn(
-    DateTime day,
-    Map<DateTime, List<WeeklyScheduleItem>> events,
-  ) {
-    final key = _normalize(day);
-    final list = events[key];
-    return list != null && list.isNotEmpty;
   }
 
   List<WeeklyScheduleItem> _itemsOfSelectedDayFromCache() {
@@ -155,45 +145,37 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
-
-      // Header + thanh loading mảnh
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 2),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CustomAppbar(label: 'Lịch tuần'),
-            BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
-              buildWhen:
-                  (p, c) =>
-                      p.isLoading != c.isLoading ||
-                      (p.data == null) != (c.data == null),
-              builder: (context, state) {
-                final showLoading =
-                    state.isLoading &&
-                    state.data == null &&
-                    _initialLoadInProgress;
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child:
-                      showLoading
-                          ? SizedBox(
-                            key: const ValueKey('weekly-loading'),
-                            height: 2,
-                            width: double.infinity,
-                            child: CustomLoadingIndicator.thin(),
-                          )
-                          : const SizedBox(
-                            key: ValueKey('weekly-not-loading'),
-                            height: 2,
-                          ),
-                );
-              },
-            ),
-          ],
+        preferredSize: const Size.fromHeight(kToolbarHeight + 4),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CustomAppbar(label: 'Lịch tuần'),
+              BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
+                buildWhen: (p, c) => p.isLoading != c.isLoading,
+                builder: (context, state) {
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child:
+                        state.isLoading
+                            ? SizedBox(
+                              key: const ValueKey('weekly-loading'),
+                              height: 2,
+                              width: double.infinity,
+                              child: CustomLoadingIndicator.thin(),
+                            )
+                            : const SizedBox(
+                              key: ValueKey('weekly-not-loading'),
+                              height: 2,
+                            ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
-
       body: BlocListener<CalendarBloc, CalendarState>(
         listenWhen: (prev, curr) => curr is CalendarWeekLoaded,
         listener: (context, state) {
@@ -206,69 +188,58 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
         },
         child: BlocListener<WeeklyScheduleBloc, WeeklyScheduleState>(
           listenWhen:
-              (prev, curr) => prev.data != curr.data && curr.data != null,
+              (prev, curr) =>
+                  prev.data != curr.data || prev.error != curr.error,
           listener: (context, state) {
-            if (mounted && _initialLoadInProgress) {
+            if (_isFirstMount && (state.data != null || state.error != null)) {
               setState(() {
-                _initialLoadInProgress = false;
+                _isFirstMount = false;
               });
             }
 
             if (state.data != null) {
               _cachedEvents = _eventMap(state.data!.schedules);
-            }
 
-            if (_ignoreNextWeeklyListener) {
-              _ignoreNextWeeklyListener = false;
-              print(
-                '[weekly_listener] skipped clobber due to user tap. selected=$_selectedDay focused=$_focusedDay',
-              );
-              return;
-            }
+              if (_autoSelectDayOnLoad) {
+                final correctDay = _determineBestDayToSelect(
+                  _focusedDay,
+                  _cachedEvents,
+                );
 
-            final data = state.data!;
-            final events = _eventMap(data.schedules);
-
-            final weekStart = _mondayOf(_normalize(_focusedDay));
-            final weekEnd = _normalize(weekStart.add(const Duration(days: 6)));
-
-            final selectedIsInWeek =
-                !_selectedDay.isBefore(weekStart) &&
-                !_selectedDay.isAfter(weekEnd);
-            final selectedHasEvent = _hasEventsOn(_selectedDay, events);
-
-            if (!selectedIsInWeek || !selectedHasEvent) {
-              final newSelected = _firstDayWithEventOrMonday(
-                _normalize(_focusedDay),
-                events,
-              );
-
-              if (mounted) {
                 setState(() {
-                  _selectedDay = _normalize(newSelected);
-                  _focusedDay = _normalize(newSelected);
+                  _selectedDay = _normalize(correctDay);
+                  _focusedDay = _normalize(correctDay);
+                  _autoSelectDayOnLoad = false;
                 });
               }
             }
-
-            print(
-              '[weekly_listener] cachedEvents=${_cachedEvents.keys.length}, selected=$_selectedDay, focused=$_focusedDay',
-            );
           },
           child: BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
             builder: (context, state) {
-              if (state.error != null && _cachedEvents.isEmpty) {
+              // Kiểm tra kết nối mạng
+              if (state.error != null && _isConnectionError(state.error)) {
                 return _ErrorView(
-                  message: state.error!,
-                  onRetry:
-                      () => context.read<WeeklyScheduleBloc>().add(
-                        WeeklyScheduleRequested(widget.email),
-                      ),
+                  message: 'Kiểm tra kết nối mạng và thử lại.',
+                  onRetry: () {
+                    context.read<WeeklyScheduleBloc>().add(
+                      WeeklyScheduleRequested(widget.email, date: _focusedDay),
+                    );
+                    _requestAcademicWeek(_focusedDay);
+                  },
                 );
               }
 
-              if (state.data != null) {
-                _cachedEvents = _eventMap(state.data!.schedules);
+              if (_isFirstMount &&
+                  _cachedEvents.isEmpty &&
+                  state.error != null) {
+                return _ErrorView(
+                  message: 'Không thể tải dữ liệu. Vui lòng thử lại.',
+                  onRetry: () {
+                    context.read<WeeklyScheduleBloc>().add(
+                      WeeklyScheduleRequested(widget.email, date: _focusedDay),
+                    );
+                  },
+                );
               }
 
               final itemsOfDay = _itemsOfSelectedDayFromCache();
@@ -341,44 +312,44 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                 ),
                               ),
                               onPageChanged: (d) {
-                                setState(() => _focusedDay = _normalize(d));
-                                _requestAcademicWeek(d);
-
                                 final monday = _mondayOf(d);
+                                final now = _normalize(DateTime.now());
                                 final weekStart = _normalize(monday);
                                 final weekEnd = _normalize(
                                   monday.add(const Duration(days: 6)),
                                 );
-                                final todayNorm = _normalize(DateTime.now());
 
-                                final provisional =
-                                    (!todayNorm.isBefore(weekStart) &&
-                                            !todayNorm.isAfter(weekEnd))
-                                        ? todayNorm
-                                        : monday;
+                                final isCurrentWeek =
+                                    !now.isBefore(weekStart) &&
+                                    !now.isAfter(weekEnd);
 
                                 setState(() {
-                                  _selectedDay = _normalize(provisional);
+                                  _focusedDay = _normalize(d);
+                                  _autoSelectDayOnLoad = true;
+
+                                  if (isCurrentWeek) {
+                                    _selectedDay = now;
+                                  } else {
+                                    _selectedDay = _normalize(monday);
+                                  }
                                 });
 
+                                _requestAcademicWeek(d);
                                 context.read<WeeklyScheduleBloc>().add(
                                   WeeklyScheduleRequested(
                                     widget.email,
-                                    date: _selectedDay,
+                                    date: isCurrentWeek ? now : _selectedDay,
                                   ),
                                 );
                               },
-
                               selectedDayPredicate:
                                   (day) => _isSameLocalDay(day, _selectedDay),
-
                               onDaySelected: (sel, foc) {
                                 setState(() {
                                   _selectedDay = _normalize(sel);
                                   _focusedDay = _normalize(sel);
+                                  _autoSelectDayOnLoad = false;
                                 });
-
-                                _ignoreNextWeeklyListener = true;
 
                                 _requestAcademicWeek(sel);
                                 context.read<WeeklyScheduleBloc>().add(
@@ -388,12 +359,10 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                   ),
                                 );
                               },
-
                               eventLoader:
                                   (day) =>
                                       _cachedEvents[_normalize(day)] ??
                                       const [],
-
                               daysOfWeekStyle: const DaysOfWeekStyle(
                                 weekdayStyle: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -425,7 +394,6 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                   color: Colors.black,
                                   fontWeight: FontWeight.w500,
                                 ),
-                                // Focus vào hôm nay
                                 todayDecoration: const BoxDecoration(
                                   color: Color(0xFFEFF3F8),
                                   shape: BoxShape.circle,
@@ -435,7 +403,6 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                   color: Colors.black,
                                   fontWeight: FontWeight.w700,
                                 ),
-                                // Focus vào ngày được chọn
                                 selectedDecoration: const BoxDecoration(
                                   color: Color(0xFFD6E6F6),
                                   shape: BoxShape.circle,
@@ -443,15 +410,15 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                 cellMargin: EdgeInsets.zero,
                               ),
                               calendarBuilders: CalendarBuilders(
-                                // chấm xanh: có lịch họp; chấm đỏ: hôm nay có lịch họp
                                 markerBuilder: (context, day, items) {
                                   if (items.isEmpty) {
                                     return const SizedBox.shrink();
                                   }
                                   final isToday = _isSameLocalDay(day, today);
                                   final color =
+                                      // Chấm xanh ngày có lịch họp, chấm đỏ ngày hôm nay có lịch họp
                                       isToday
-                                          ? Colors.red
+                                          ? const Color(0xFFCC0102)
                                           : const Color(0xFF2A74BD);
                                   return Positioned(
                                     bottom: 10,
@@ -497,9 +464,7 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
                       if (itemsOfDay.isEmpty)
                         const Padding(
                           padding: EdgeInsets.only(top: 12.0),
@@ -545,6 +510,7 @@ class _ScheduleCard extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 4,
@@ -575,17 +541,21 @@ class _ScheduleCard extends StatelessWidget {
                           '${tf.format(item.start)} - ${tf.format(item.end)}',
                           style: const TextStyle(
                             fontSize: FontSizes.medium,
-                            color: Colors.black87,
-                            fontWeight: FontWeight.w600,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         const Spacer(),
-                        Text(
-                          item.location,
-                          style: const TextStyle(
-                            fontSize: FontSizes.medium,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w700,
+                        Flexible(
+                          child: Text(
+                            item.location,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: FontSizes.medium,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
@@ -615,7 +585,7 @@ class _ErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Kiểm tra kết nối mạng và thử lại.',
+              message,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: FontSizes.medium),
             ),
