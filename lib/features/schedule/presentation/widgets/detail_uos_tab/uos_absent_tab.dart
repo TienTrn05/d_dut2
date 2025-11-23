@@ -399,10 +399,28 @@ class _UosAbsentTabState extends State<UosAbsentTab> {
         ),
         BlocListener<ExportAbsentBloc, ExportAbsentState>(
           listener: (context, state) {
+            if (state is ExportAbsentLoading) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (_) => Center(
+                      child: CircularProgressIndicator(
+                        color: context.theme.primaryColor,
+                      ),
+                    ),
+              );
+            }
             if (state is ExportAbsentError) {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context); // đóng loading
+              }
               _alertFailure(type: "gửi");
             }
             if (state is ExportAbsentSuccess) {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context); // đóng loading
+              }
               _alertSuccess(type: "gửi");
             }
           },
