@@ -6,6 +6,7 @@ class AcademicEventModel {
   final String room;
   final int noWeek;
   final String subjectName;
+  final String? startStillStudyTime;
 
   AcademicEventModel({
     required this.idAcademicEvent,
@@ -15,6 +16,7 @@ class AcademicEventModel {
     required this.room,
     required this.noWeek,
     required this.subjectName,
+    required this.startStillStudyTime,
   });
 
   factory AcademicEventModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class AcademicEventModel {
       room: json['room'] ?? '',
       noWeek: (json['noWeek'] as num?)?.toInt() ?? 0,
       subjectName: json['subjectName'] ?? '',
+      startStillStudyTime: json['startStillStudyTime'],
     );
   }
 
@@ -38,6 +41,7 @@ class AcademicEventModel {
       'room': room,
       'noWeek': noWeek,
       'subjectName': subjectName,
+      'startStillStudyTime': startStillStudyTime,
     };
   }
 }
