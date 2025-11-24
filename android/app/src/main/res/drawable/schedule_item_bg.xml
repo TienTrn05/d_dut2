@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Viền trái -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1976D2" />
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
+
+    <!-- Lớp nền trắng -->
+    <item android:left="2dp">  <!-- độ dày viền trái -->
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
+
+</layer-list>

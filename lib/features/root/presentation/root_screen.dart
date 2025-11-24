@@ -50,7 +50,7 @@ class _MainViewState extends State<_MainView> {
           Navigator.pushNamed(context, Routes.notification);
           break;
         case AutoRedirectName.redirectToNotificationScreenGeneralTab:
-          Navigator.pushNamed(context, Routes.notification, arguments: 1,);
+          Navigator.pushNamed(context, Routes.notification, arguments: 1);
           break;
         case AutoRedirectName.redirectToScheduleScreen:
           Navigator.pushNamed(context, Routes.schedule);
