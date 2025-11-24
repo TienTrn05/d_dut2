@@ -1,14 +1,18 @@
-import 'package:e_dut/common/utils/getit_utils.dart';
-import 'package:e_dut/common/widgets/errors/error_view.dart';
-import 'package:e_dut/features/chatbot/domain/repository/conversation_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/utils/getit_utils.dart';
+import '/common/widgets/errors/error_view.dart';
+import '/common/extensions/font_sizes.dart';
+
+import '../bloc/conversation_list_cubit.dart';
+import '../bloc/conversation_list_state.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '../bloc/conversation_cubit.dart';
 import '../bloc/conversation_state.dart';
 import './widgets/chat_bubble.dart';
 import './widgets/chat_bot_appbar.dart';
+import '../domain/repository/conversation_repo.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
@@ -74,11 +78,21 @@ class _ChatBotScreenState extends State<ChatBotScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create:
-          (context) =>
-              ConversationCubit(conversationRepo: getIt<ConversationRepo>())
-                ..loadConversation(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (_) =>
+                  ConversationListCubit(repo: getIt<ConversationRepo>())
+                    ..loadList(),
+        ),
+        BlocProvider(
+          create:
+              (context) =>
+                  ConversationCubit(conversationRepo: getIt<ConversationRepo>())
+                    ..loadConversation(),
+        ),
+      ],
       child: BlocConsumer<ConversationCubit, ConversationState>(
         listener: (context, state) {
           if (state.status == ConversationStatus.success) {
@@ -114,7 +128,9 @@ class _ChatBotScreenState extends State<ChatBotScreen>
               appBar: ChatBotAppbar(label: "Chat Bot"),
               backgroundColor: context.theme.lightBlue,
               body: ErrorView(
-                message: state.errorMessage ?? "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
+                message:
+                    state.errorMessage ??
+                    "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
                 onRetry: cubit.loadConversation,
               ),
             );
@@ -131,6 +147,62 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                 label: state.conversation?.title ?? "Trợ lý ảo BKĐN",
               ),
               backgroundColor: context.theme.lightBlue,
+              drawer: Drawer(
+                backgroundColor: context.theme.lightBlue,
+                child: BlocBuilder<
+                  ConversationListCubit,
+                  ConversationListState
+                >(
+                  builder: (context, state) {
+                    if (state.status == ConversationListStatus.loading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    return SafeArea(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                              "Phòng ban",
+                              style: TextStyle(
+                                color: context.theme.primaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: FontSizes.large,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: state.conversations.length,
+                              itemBuilder: (_, index) {
+                                final conv = state.conversations[index];
+                                final selected = conv.id == state.selectedId;
+
+                                return ListTile(
+                                  title: Text(conv.title),
+                                  selected: selected,
+                                  onTap: () {
+                                    context
+                                        .read<ConversationListCubit>()
+                                        .selectConversation(conv.id);
+
+                                    context
+                                        .read<ConversationCubit>()
+                                        .loadConversationById(conv.id);
+
+                                    Navigator.pop(context); // đóng drawer
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
               body: Column(
                 children: [
                   Expanded(

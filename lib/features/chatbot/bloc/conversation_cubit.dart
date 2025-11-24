@@ -93,6 +93,39 @@ class ConversationCubit extends Cubit<ConversationState> {
     }
   }
 
+  Future<void> loadConversationById(String conversationId) async {
+    emit(state.copyWith(status: ConversationStatus.loading));
+
+    try {
+      final messagesData =
+          await conversationRepo.getConversationDetail(conversationId);
+
+      final messagesList =
+          messagesData?['messages'] as List<dynamic>? ?? [];
+
+      final messages = messagesList
+          .map((m) => Message(
+                text: m['content'] ?? '',
+                isUser: m['role'] == 'user',
+              ))
+          .toList();
+
+      emit(state.copyWith(
+        status: ConversationStatus.success,
+        conversation: Conversation(
+          id: conversationId,
+          title: messagesData?['title'] ?? "Untitled",
+          messages: messages,
+        ),
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ConversationStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
   /// Send a message to the bot
   Future<void> sendMessage(String text) async {
     final conv = state.conversation;
