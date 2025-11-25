@@ -1,3 +1,4 @@
+import 'package:e_dut/features/schedule/bloc/export_absent/export_absent_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -115,6 +116,9 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
             ),
             BlocProvider(
               create: (_) => ListAbsentBloc(getIt.get<ScheduleRepository>()),
+            ),
+            BlocProvider(
+              create: (_) => ExportAbsentBloc(getIt.get<ScheduleRepository>()),
             ),
             BlocProvider(
               create:

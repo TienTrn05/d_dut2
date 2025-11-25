@@ -25,7 +25,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
 
       emit(UosAbsentLoaded(listStudentAbsent: listStudentAbsent));
     } catch (e) {
-      emit(UosAbsentError(message: e.toString()));
+      emit(UosAbsentError(message: "Có lỗi xảy ra"));
     }
   }
 
@@ -40,7 +40,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           idUos, attendanceDate!, authToken);
       emit(UosCheckIsAttendanceDateLoaded(isAttendanceDate: isAttendanceDate));
     } catch (e) {
-      emit(UosAbsentError(message: e.toString()));
+      emit(UosAbsentError(message: "Có lỗi xảy ra"));
     }
   }
 
@@ -56,7 +56,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
       emit(UosCheckIsAttendanceDateValidLoaded(
           isAttendanceDateValid: isAttendanceDate));
     } catch (e) {
-      emit(UosAbsentError(message: e.toString()));
+      emit(UosAbsentError(message: "Có lỗi xảy ra"));
     }
   }
 
@@ -72,7 +72,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           idUnitOfStudy, absenceDate, idStudentsAbsent, authToken);
       emit(UosTakeAttendanceLoaded(isSuccess: isSuccess));
     } catch (e) {
-      emit(UosAbsentError(message: e.toString()));
+      emit(UosAbsentError(message: "Có lỗi xảy ra"));
     }
   }
 
@@ -87,7 +87,7 @@ class UosAbsentBloc extends Bloc<UosAbsentEvent, UosAbsentState> {
           idUos, attendanceDate, authToken);
       emit(UosDeleteAttendanceHistoryLoaded(isSuccess: isSuccess));
     } catch (e) {
-      emit(UosAbsentError(message: e.toString()));
+      emit(UosAbsentError(message: "Có lỗi xảy ra"));
     }
   }
 }
