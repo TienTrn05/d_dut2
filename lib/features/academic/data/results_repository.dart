@@ -102,16 +102,11 @@ class ResultsRepository {
   }
 
   // Lấy danh sách kết quả học tập theo studentId
-  Future<List<SubjectResult>> fetchResults(String studentId) async {
-    final id = studentId.trim();
-    if (id.isEmpty) {
-      throw ArgumentError('studentId is required and must not be empty');
-    }
-
+  Future<List<SubjectResult>> fetchResults(String authToken) async {
     try {
       final list = await _api.getList(
         '/results',
-        query: {'studentId': id},
+        header: {"Authorization": "Bearer $authToken"},
       );
 
       // Chuẩn hoá từng phần tử và map sang model
@@ -126,7 +121,7 @@ class ResultsRepository {
       rethrow;
     } catch (e) {
       // Gói lỗi lại cho dễ debug
-      throw HttpException('Failed to fetch results for $id: $e');
+      throw HttpException('Failed to fetch results: $e');
     }
   }
 }

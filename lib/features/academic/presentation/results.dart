@@ -42,7 +42,10 @@ class _ResultsPageState extends State<ResultsPage> {
     super.initState();
     _client = AcademicApiClient(baseUrl: widget.apiBase);
     _bloc = ResultsBloc(ResultsRepository(_client));
-    _bloc.add(LoadResults(widget.studentId));
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthUserAuthenticated) {
+      _bloc.add(LoadResults(authState.accessToken));
+    }
   }
 
   @override
@@ -212,7 +215,12 @@ class _ResultsPageState extends State<ResultsPage> {
             if (state is ResultsError) {
               return _ErrorView(
                 message: state.message,
-                onRetry: () => _bloc.add(LoadResults(widget.studentId)),
+                onRetry: () {
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState is AuthUserAuthenticated) {
+                    _bloc.add(LoadResults(authState.accessToken));
+                  }
+                },
               );
             }
 
@@ -226,7 +234,7 @@ class _ResultsPageState extends State<ResultsPage> {
                   onRefresh: () async {
                     final authState = context.read<AuthBloc>().state;
                     if (authState is AuthUserAuthenticated) {
-                      _bloc.add(LoadResults(widget.studentId));
+                      _bloc.add(LoadResults(authState.accessToken));
                     }
                   },
                   child: ListView(
@@ -275,7 +283,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 onRefresh: () async {
                   final authState = context.read<AuthBloc>().state;
                   if (authState is AuthUserAuthenticated) {
-                    _bloc.add(LoadResults(widget.studentId));
+                    _bloc.add(LoadResults(authState.accessToken));
                   }
                 },
                 child: ListView.builder(
@@ -364,7 +372,12 @@ class _ResultsPageState extends State<ResultsPage> {
 
             return _ErrorView(
               message: 'Lỗi tải dữ liệu',
-              onRetry: () => _bloc.add(LoadResults(widget.studentId)),
+              onRetry: () {
+                final authState = context.read<AuthBloc>().state;
+                if (authState is AuthUserAuthenticated) {
+                  _bloc.add(LoadResults(authState.accessToken));
+                }
+              },
             );
           },
         ),

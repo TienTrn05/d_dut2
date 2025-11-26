@@ -47,9 +47,16 @@ class AcademicApiClient {
     String path, {
     Map<String, String>? query,
     Map<String, String>? headers,
+    required Map<String, String> header,
   }) async {
     final uri = _buildUri(path, query);
-    final res = await _client.get(uri, headers: _defaultHeaders(headers));
+
+    final mergedHeaders = {
+      ..._defaultHeaders(headers),
+      ...header,
+    };
+
+    final res = await _client.get(uri, headers: mergedHeaders);
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = json.decode(utf8.decode(res.bodyBytes));
@@ -73,10 +80,16 @@ class AcademicApiClient {
   Future<Map<String, dynamic>> getObject(
     String path, {
     Map<String, String>? query,
-    Map<String, String>? headers,
+    Map<String, String>? headers, required Map<String, String> header,
   }) async {
     final uri = _buildUri(path, query);
-    final res = await _client.get(uri, headers: _defaultHeaders(headers));
+
+    final mergedHeaders = {
+      ..._defaultHeaders(headers),
+      ...header,
+    };
+
+    final res = await _client.get(uri, headers: _defaultHeaders(mergedHeaders),);
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = json.decode(utf8.decode(res.bodyBytes));

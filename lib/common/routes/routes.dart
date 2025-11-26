@@ -207,12 +207,11 @@ class Routes {
 
       case academicStatistics:
         {
-          final studentId = settings.arguments as String;
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
             builder:
                 (context) =>
-                    StatisticsPage(studentId: studentId, apiBase: apiBase),
+                    StatisticsPage(apiBase: apiBase),
           );
         }
 
