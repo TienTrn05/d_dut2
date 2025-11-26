@@ -7,11 +7,11 @@ abstract class ResultsEvent extends Equatable {
 }
 
 class LoadResults extends ResultsEvent {
-  final String studentId;
-  const LoadResults(this.studentId);
+  final String authToken;
+  const LoadResults(this.authToken);
 
   @override
-  List<Object?> get props => [studentId];
+  List<Object?> get props => [authToken];
 }
 
 class NextSemesterPressed extends ResultsEvent {}

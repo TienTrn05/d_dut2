@@ -7,20 +7,18 @@ class StatsRepository {
   StatsRepository(this._api);
   final acad.AcademicApiClient _api;
 
-  Future<StatsModel> fetchStats({required String studentId}) async {
-    final id = studentId.trim();
-    if (id.isEmpty) {
-      throw ArgumentError('studentId is required and must not be empty');
-    }
-
+  Future<StatsModel> fetchStats({required String authToken}) async {
     try {
-      final raw = await _api.getObject('/stats', query: {'studentId': id});
+      final raw = await _api.getObject(
+        '/stats',
+        header: {"Authorization": "Bearer $authToken"},
+      );
       final normalized = _normalizeStatsJson(raw);
       return StatsModel.fromJson(normalized);
     } on HttpException {
       rethrow;
     } catch (e) {
-      throw HttpException('Failed to fetch stats for $id: $e');
+      throw HttpException('Failed to fetch stats: $e');
     }
   }
 
