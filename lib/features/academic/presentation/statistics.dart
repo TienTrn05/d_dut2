@@ -7,19 +7,15 @@ import '../../../common/extensions/font_sizes.dart';
 import '../../../common/widgets/appbar/custom_appbar.dart';
 import '../../../common/widgets/loading/loading_progress_bar.dart';
 
+import '../../auth/bloc/auth_bloc.dart';
 import '../bloc/stats_bloc.dart';
 import '../data/stats_repository.dart';
 import '../data/academic_api_client.dart';
 import '../models/stats_model.dart';
 
 class StatisticsPage extends StatefulWidget {
-  const StatisticsPage({
-    super.key,
-    required this.studentId,
-    required this.apiBase,
-  });
+  const StatisticsPage({super.key, required this.apiBase});
 
-  final String studentId;
   final String apiBase;
 
   @override
@@ -35,7 +31,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
     super.initState();
     _client = AcademicApiClient(baseUrl: widget.apiBase);
     _bloc = StatsBloc(StatsRepository(_client));
-    _bloc.add(StatsRequested(studentId: widget.studentId));
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthUserAuthenticated) {
+      _bloc.add(StatsRequested(authToken: authState.accessToken));
+    }
   }
 
   @override
@@ -94,10 +93,14 @@ class _StatisticsPageState extends State<StatisticsPage> {
               if (state.error != null) {
                 return _ErrorView(
                   message: state.error!,
-                  onRetry:
-                      () => _bloc.add(
-                        StatsRequested(studentId: widget.studentId),
-                      ),
+                  onRetry: () {
+                    final authState = context.read<AuthBloc>().state;
+                    if (authState is AuthUserAuthenticated) {
+                      _bloc.add(
+                        StatsRequested(authToken: authState.accessToken),
+                      );
+                    }
+                  },
                 );
               }
 
@@ -138,7 +141,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 color: Theme.of(context).primaryColor,
                 backgroundColor: Colors.white,
                 onRefresh: () async {
-                  _bloc.add(StatsRefreshed(studentId: widget.studentId));
+                  final authState = context.read<AuthBloc>().state;
+                  if (authState is AuthUserAuthenticated) {
+                    _bloc.add(StatsRequested(authToken: authState.accessToken));
+                  }
                   await _bloc.stream
                       .skipWhile((s) => !s.isLoading)
                       .firstWhere((s) => !s.isLoading);

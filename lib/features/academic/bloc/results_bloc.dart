@@ -15,7 +15,7 @@ class ResultsBloc extends Bloc<ResultsEvent, ResultsState> {
   Future<void> _onLoad(LoadResults event, Emitter<ResultsState> emit) async {
     try {
       emit(ResultsLoading());
-      final data = await repo.fetchResults(event.studentId);
+      final data = await repo.fetchResults(event.authToken);
 
       // Lấy currentSemester & startYear từ mã học kỳ đầu tiên, ví dụ: "2021.1"
       int curSem = 1;
