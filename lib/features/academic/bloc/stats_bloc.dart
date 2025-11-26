@@ -18,7 +18,7 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
   Future<void> _onRequested(StatsEvent event, Emitter<StatsState> emit) async {
     emit(const StatsState.loading());
     try {
-      final stats = await _repo.fetchStats(studentId: event.studentId ?? '');
+      final stats = await _repo.fetchStats(authToken: event.authToken ?? '');
       emit(StatsState.loaded(stats));
     } catch (e) {
       emit(StatsState.error(e.toString()));
