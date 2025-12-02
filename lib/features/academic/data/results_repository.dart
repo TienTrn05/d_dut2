@@ -2,17 +2,16 @@ import 'dart:io';
 import 'academic_api_client.dart';
 
 class SubjectResult {
-  final String semesterCode; // "Kỳ học"
-  final String subjectCode; // (nếu có)
-  final String classCode; // "Mã lớp học phần"
-  final int? credits; // "Số tín chỉ"
-  final double? score10; // "Thang 10"
-  final String? scoreChar; // "Tổng kết" (chữ)
-  final double? score4; // "Thang 4"
-  final String? subjectTitle; // "Tên học phần"
-  final String? formula; // "Công thức điểm"
-  final List<String> detailLines; // "Chi tiết điểm" (List<String>)
-
+  final String semesterCode; // Kỳ học
+  final String subjectCode; // Mã học phần
+  final String classCode; // Mã lớp học phần
+  final int? credits; // Số tín chỉ
+  final double? score10; // Thang 10
+  final String? scoreChar; // Tổng kết thang chữ
+  final double? score4; // Thang 4
+  final String? subjectTitle; // Tên học phần
+  final String? formula; // Công thức điểm
+  final List<String> detailLines; // Chi tiết điểm (List<String>)
   const SubjectResult({
     required this.semesterCode,
     required this.subjectCode,
@@ -48,7 +47,7 @@ class ResultsRepository {
   ResultsRepository(this._api);
   final AcademicApiClient _api;
 
-  // ---- helpers ----
+  // Chuyển dynamic sang int
   int? _toInt(dynamic v) {
     if (v == null) return null;
     if (v is num) return v.toInt();
@@ -64,9 +63,6 @@ class ResultsRepository {
   String _toStr(dynamic v) => v?.toString() ?? '';
 
   Map<String, dynamic> _normalizeItem(Map raw) {
-    // "Kỳ học", "Mã lớp học phần", "Số tín chỉ",
-    // "Thang 10", "Thang 4", "Tổng kết", "Tên học phần",
-    // "Công thức điểm", "Chi tiết điểm"
     final semesterCode = raw['semesterCode'] ?? raw['Kỳ học'];
     final classCode = raw['classCode'] ?? raw['Mã lớp học phần'];
     final credits = raw['credits'] ?? raw['Số tín chỉ'];
@@ -76,7 +72,6 @@ class ResultsRepository {
     final subjectTitle = raw['subjectTitle'] ?? raw['Tên học phần'];
     final formula = raw['formula'] ?? raw['Công thức điểm'];
 
-    // "Chi tiết điểm" có thể là List<String>
     final rawDetail = raw['detailLines'] ?? raw['Chi tiết điểm'];
     List<String> detailLines = const [];
     if (rawDetail is List) {
@@ -89,7 +84,7 @@ class ResultsRepository {
     return {
       'semesterCode': _toStr(semesterCode),
       'subjectCode':
-          _toStr(raw['subjectCode']), // có thể rỗng nếu API không trả
+          _toStr(raw['subjectCode']),
       'classCode': _toStr(classCode),
       'credits': _toInt(credits),
       'score10': _toDouble(score10),
@@ -111,7 +106,7 @@ class ResultsRepository {
 
       // Chuẩn hoá từng phần tử và map sang model
       return list
-          .whereType<Map>() // chỉ nhận object
+          .whereType<Map>() 
           .map((raw) => _normalizeItem(raw))
           .map((m) => SubjectResult.fromJson(
                 Map<String, dynamic>.from(m),
