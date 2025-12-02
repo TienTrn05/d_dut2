@@ -55,9 +55,7 @@ class _ResultsPageState extends State<ResultsPage> {
     super.dispose();
   }
 
-  // --------------------------
-  // Semester selector helpers
-  // --------------------------
+  // Logic chọn kỳ học
   void _previousSemester(List<String> semesters) {
     if (_semesterIndex > 0) setState(() => _semesterIndex--);
   }
@@ -166,9 +164,7 @@ class _ResultsPageState extends State<ResultsPage> {
     );
   }
 
-  // --------------------------
   // UI
-  // --------------------------
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -248,7 +244,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 );
               }
 
-              // Thu thập các mã học kỳ và sắp xếp TĂNG dần (kỳ sau ở dưới)
+              // Thu thập các mã học kỳ và sắp xếp tăng dần (kỳ sau ở dưới)
               final semesters =
                   all.map((e) => e.semesterCode).toSet().toList()..sort(
                     (a, b) =>
@@ -266,7 +262,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 });
               }
 
-              // An toàn chỉ số
+              // Thứ tự kì học không vượt quá kì hiện tại
               if (_semesterIndex >= semesters.length) {
                 _semesterIndex = semesters.length - 1;
               } else if (_semesterIndex < 0) {
@@ -288,7 +284,7 @@ class _ResultsPageState extends State<ResultsPage> {
                 },
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(24), // cách AppBar 24dp
+                  padding: const EdgeInsets.all(24),
                   itemCount: items.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
@@ -402,7 +398,6 @@ class _ResultsPageState extends State<ResultsPage> {
     return '$hkText, $startYear-$endYear';
   }
 
-  // Block 3 cột căn thẳng
   Widget _gradeMetrics({String? credits, double? score4, double? score10}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -513,7 +508,7 @@ class _GradeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: c.withOpacity(0.08), // không viền
+        color: c.withOpacity(0.08),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

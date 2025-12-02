@@ -1,8 +1,7 @@
 class StatsModel {
-  // Overall
   final double? gpa4; // GPA thang 4 (kỳ mới nhất)
-  final double? gpa10; // fallback nếu server có
-  final int totalCredits; // tổng TC đăng ký (giữ để tương thích)
+  final double? gpa10;
+  final int totalCredits; // tổng TC đăng ký
   final int? totalAccumCredits; // HPTichLuy (kỳ mới nhất)
   final double? avgConduct; // Điểm rèn luyện trung bình
   final String? stage; // Năm học
@@ -12,7 +11,7 @@ class StatsModel {
   final List<double> conductPerSemester; // DiemRL 0-100 theo kỳ
   final List<int> creditsPerSemester; // HPDangky theo kỳ
 
-  /// Breakdown theo kỳ
+  /// Thống kê theo kỳ
   final List<SemesterStat> bySemester;
 
   StatsModel({
