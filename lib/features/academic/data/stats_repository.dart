@@ -7,29 +7,32 @@ class StatsRepository {
   StatsRepository(this._api);
   final acad.AcademicApiClient _api;
 
-  Future<StatsModel> fetchStats({required String studentId}) async {
-    final id = studentId.trim();
-    if (id.isEmpty) {
-      throw ArgumentError('studentId is required and must not be empty');
-    }
-
+  Future<StatsModel> fetchStats({required String authToken}) async {
     try {
-      final raw = await _api.getObject('/stats', query: {'studentId': id});
+      final raw = await _api.getObject(
+        '/stats',
+        header: {"Authorization": "Bearer $authToken"},
+      );
       final normalized = _normalizeStatsJson(raw);
       return StatsModel.fromJson(normalized);
     } on HttpException {
       rethrow;
     } catch (e) {
-      throw HttpException('Failed to fetch stats for $id: $e');
+      throw HttpException('Failed to fetch stats: $e');
     }
   }
 
-  Map<String, dynamic> _normalizeStatsJson(dynamic v) {
-    if (v is! Map) return <String, dynamic>{};
+  Map<String, dynamic> _normalizeStatsJson(dynamic input) {
+    if (input is! Map) return <String, dynamic>{};
+
+    Map<String, dynamic> v = input.cast<String, dynamic>();
+    if (v.containsKey('data') && v['data'] is Map) {
+      v = (v['data'] as Map).cast<String, dynamic>();
+    }
 
     final hasEnglishKeys =
         v.containsKey('semesters') && v.containsKey('overall');
-    if (hasEnglishKeys) return v.cast<String, dynamic>();
+    if (hasEnglishKeys) return v;
 
     final kyHocVN = v['Kỳ học'] ?? v['kyHoc'] ?? v['ky_hoc'];
     final gpaVN = v['GPA từng kỳ'] ?? v['gpa_tung_ky'];
@@ -67,7 +70,8 @@ class StatsRepository {
       return v
           .map((e) {
             if (e is num) return e.toDouble();
-            return double.tryParse('$e');
+            final s = '$e'.replaceAll(',', '.');
+            return double.tryParse(s);
           })
           .whereType<double>()
           .toList();

@@ -683,4 +683,22 @@ class ScheduleService {
       throw Exception("Failed to delete notification by IdUOS: $e");
     }
   }
+
+  Future<bool> exportAttendanceSummary(String token, String idUos) async {
+    try {
+      final response = await _apiClient.dio.get(
+        "$_url/api/ExportExcel/ExportAttendanceSummary",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+        queryParameters: {"idUos": idUos},
+      );
+      if (response.statusCode == 200) return true;
+      
+      final msg = response.data['data'] ?? 'Unknown error';
+      logger.e("Export failed: $msg");
+      return false;
+    } catch (e) {
+      logger.e("Error export Attendance Summary: $e");
+      throw Exception("Error export Attendance Summary: $e");
+    }
+  }
 }

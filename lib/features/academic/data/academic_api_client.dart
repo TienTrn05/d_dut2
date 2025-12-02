@@ -8,11 +8,9 @@ const String _apiFromEnvironment = String.fromEnvironment(
 );
 
 class AcademicApiClient {
-  AcademicApiClient({
-    String? baseUrl,
-    http.Client? httpClient,
-  })  : baseUrl = (baseUrl ?? _apiFromEnvironment).trim(),
-        _client = httpClient ?? http.Client() {
+  AcademicApiClient({String? baseUrl, http.Client? httpClient})
+    : baseUrl = (baseUrl ?? _apiFromEnvironment).trim(),
+      _client = httpClient ?? http.Client() {
     if (this.baseUrl.isEmpty) {
       throw Exception(
         'Missing ACADEMIC_API_BASE. '
@@ -21,15 +19,14 @@ class AcademicApiClient {
     }
   }
 
-  // http://171.244.142.248/ddut/api
   final String baseUrl;
   final http.Client _client;
 
   Map<String, String> _defaultHeaders([Map<String, String>? headers]) => {
-        HttpHeaders.acceptHeader: 'application/json',
-        HttpHeaders.contentTypeHeader: 'application/json; charset=utf-8',
-        ...?headers,
-      };
+    HttpHeaders.acceptHeader: 'application/json',
+    HttpHeaders.contentTypeHeader: 'application/json; charset=utf-8',
+    ...?headers,
+  };
 
   String _join(String base, String path) {
     var b = base;
@@ -47,9 +44,13 @@ class AcademicApiClient {
     String path, {
     Map<String, String>? query,
     Map<String, String>? headers,
+    required Map<String, String> header,
   }) async {
     final uri = _buildUri(path, query);
-    final res = await _client.get(uri, headers: _defaultHeaders(headers));
+
+    final mergedHeaders = {..._defaultHeaders(headers), ...header};
+
+    final res = await _client.get(uri, headers: mergedHeaders);
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = json.decode(utf8.decode(res.bodyBytes));
@@ -74,9 +75,13 @@ class AcademicApiClient {
     String path, {
     Map<String, String>? query,
     Map<String, String>? headers,
+    required Map<String, String> header,
   }) async {
     final uri = _buildUri(path, query);
-    final res = await _client.get(uri, headers: _defaultHeaders(headers));
+
+    final mergedHeaders = {..._defaultHeaders(headers), ...header};
+
+    final res = await _client.get(uri, headers: _defaultHeaders(mergedHeaders));
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = json.decode(utf8.decode(res.bodyBytes));

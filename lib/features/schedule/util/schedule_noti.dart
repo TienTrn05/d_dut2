@@ -137,39 +137,58 @@ class ScheduleNoti {
           minute,
         );
 
-        // Check if this class is cancelled
-        final isCancelled = cancellationEvents.any((event) {
-          // Compare exact date and time (year, month, day, hour, minute)
-          return event.eventDate.year == classDateTime.year &&
-              event.eventDate.month == classDateTime.month &&
-              event.eventDate.day == classDateTime.day;
-        });
+        // Check if this class has a cancellation event
+        AcademicEventModel? cancellationEvent;
+        try {
+          cancellationEvent = cancellationEvents.firstWhere((event) {
+            // Compare exact date (year, month, day)
+            return event.eventDate.year == classDateTime.year &&
+                event.eventDate.month == classDateTime.month &&
+                event.eventDate.day == classDateTime.day;
+          });
+        } catch (e) {
+          // No cancellation event found for this date
+          cancellationEvent = null;
+        }
 
-        if (isCancelled) {
-          logger.d(
-            "Skipping cancelled class for ${uos.subjectName} on $classDateTime",
-          );
-          continue;
+        DateTime actualClassDateTime = classDateTime;
+
+        if (cancellationEvent != null) {
+          if (cancellationEvent.startStillStudyTime == null) {
+            // Nếu startStillStudyTime là null => hủy hẳn lịch học này
+            logger.d(
+              "Skipping fully cancelled class for ${uos.subjectName} on $classDateTime",
+            );
+            continue;
+          } else {
+            // Nếu startStillStudyTime không null => vẫn có học nhưng thời gian thay đổi
+            actualClassDateTime = DateTime.parse(
+              cancellationEvent.startStillStudyTime!,
+            );
+            logger.d(
+              "Rescheduled class for ${uos.subjectName} from $classDateTime to $actualClassDateTime",
+            );
+          }
         }
 
         // Chỉ tạo thông báo cho các tiết học trong tương lai
-        if (classDateTime.isAfter(now)) {
-          final notificationTime = classDateTime.subtract(
+        if (actualClassDateTime.isAfter(now)) {
+          final notificationTime = actualClassDateTime.subtract(
             Duration(minutes: Storage.remindBefore),
           );
 
           final isPreviousDay =
-              notificationTime.day != classDateTime.day ||
-              notificationTime.month != classDateTime.month ||
-              notificationTime.year != classDateTime.year;
+              notificationTime.day != actualClassDateTime.day ||
+              notificationTime.month != actualClassDateTime.month ||
+              notificationTime.year != actualClassDateTime.year;
 
           final title =
               'Nhắc nhở lịch ${isTeacher ? 'dạy' : 'học'}: ${uos.subjectName}';
 
           final body =
               isPreviousDay
-                  ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}'
-                  : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(classDateTime)} tại phòng ${studyShift.room}';
+                  ? 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu vào ngày mai lúc ${Functions.formatTime(actualClassDateTime)} tại phòng ${studyShift.room}'
+                  : 'Tiết ${isTeacher ? 'dạy' : 'học'} sẽ bắt đầu lúc ${Functions.formatTime(actualClassDateTime)} tại phòng ${studyShift.room}';
 
           if (notificationTime.isAfter(now)) {
             await NotificationService().scheduleClassNotification(
@@ -258,7 +277,7 @@ class ScheduleNoti {
       // Only schedule notifications cho future exams
       if (examDateTime != null && examDateTime.isAfter(now)) {
         final notificationTime = examDateTime.subtract(
-          const Duration(hours: 11),
+          Duration(minutes: Storage.remindBefore),
         );
 
         final isPreviousDay =

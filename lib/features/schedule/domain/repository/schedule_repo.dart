@@ -218,4 +218,8 @@ class ScheduleRepository {
   Future<String> deleteNotification(String token, String idNotification) {
     return _scheduleService.deleteNotification(token, idNotification);
   }
+
+  Future<bool> exportAttendanceSummary(String token, String idUos) {
+    return _scheduleService.exportAttendanceSummary(token, idUos);
+  }
 }
