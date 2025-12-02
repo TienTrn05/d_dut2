@@ -51,6 +51,8 @@ struct SharedScheduleStore {
         if !list.isEmpty {
             return list
         }
+
+        return []
         
         // Sample 5 items
         return [
