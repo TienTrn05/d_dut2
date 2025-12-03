@@ -7,7 +7,6 @@ class DetailResults extends StatelessWidget {
   final String subjectTitle; // Tên học phần
   final String credits; // Số tín chỉ
 
-  // Danh sách chi tiết dạng chuỗi từ API:
   // ["Công thức điểm: [GK]*0.20+[BT]*0.20+[CK]*0.60", "GK: 7.5", "BT: 8.0", "CK: 6.0"]
   final List<String>? detailsList;
 
@@ -144,9 +143,7 @@ class DetailResults extends StatelessWidget {
     );
   }
 
-  // Kết quả phân tích `detailsList`
-  //[formula]: chuỗi công thức (nếu có)
-  // [components]: danh sách (giữ nguyên thứ tự xuất hiện) các cặp thành phần - điểm
+  // Phân tích điểm thành phần
   _ParsedDetails _parseDetails(List<String>? list) {
     final comps = <MapEntry<String, String>>[];
     String formula = '';
@@ -305,7 +302,6 @@ class DetailResults extends StatelessWidget {
   }
 }
 
-/// Struct nhỏ giữ kết quả parse
 class _ParsedDetails {
   String formula;
   final List<MapEntry<String, String>> components;

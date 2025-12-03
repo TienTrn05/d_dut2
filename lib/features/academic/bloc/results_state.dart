@@ -12,8 +12,8 @@ class ResultsInitial extends ResultsState {}
 class ResultsLoading extends ResultsState {}
 
 class ResultsLoaded extends ResultsState {
-  final int currentSemester; // năm 1,2, ...
-  final int startYear; // 2021, 2022, ...
+  final int currentSemester; // kì học hiện tại
+  final int startYear; // năm bắt đầu học
   final List<SubjectResult> subjects;
 
   const ResultsLoaded({

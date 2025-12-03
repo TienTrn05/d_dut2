@@ -9,7 +9,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical">
+        android:gravity="top">
         <LinearLayout
             android:id="@+id/date_section"
             android:orientation="vertical"
@@ -30,10 +30,11 @@
                 android:id="@+id/tvMonth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="@string/schedule_widget_month"
                 android:contentDescription="@string/schedule_widget_month"
                 android:textSize="14sp"
-                android:textColor="#555555"/>
+                android:textColor="#747474"/>
 
             <TextView
                 android:id="@+id/tvDay"
@@ -43,7 +44,7 @@
                 android:contentDescription="@string/schedule_widget_day"
                 android:textSize="42sp"
                 android:textStyle="bold"
-                android:textColor="#2979FF"/>
+                android:textColor="#2A74BD"/>
         </LinearLayout>
         
         <LinearLayout
@@ -60,13 +61,24 @@
                 android:background="#E7F1F9" />
         </LinearLayout>
 
-    <ListView
-        android:id="@+id/lvSchedule"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_toEndOf="@id/scheduleContainer"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="8dp"/>
+        <ListView
+            android:id="@+id/lvSchedule"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/scheduleContainer"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="8dp"/>
+
+        <FrameLayout
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:foregroundGravity="center">
+
+            <include layout="@layout/widget_schedule_empty" />
+
+        </FrameLayout>
     </LinearLayout>
 
 </RelativeLayout>
