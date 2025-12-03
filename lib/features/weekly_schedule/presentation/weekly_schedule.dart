@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../common/extensions/font_sizes.dart';
 import '../../../common/widgets/loading/loading_progress_bar.dart';
@@ -13,6 +14,8 @@ import 'detail_schedule.dart';
 
 import 'package:e_dut/features/schedule/bloc/schedule/calendar_bloc.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
+
+import 'widgets/error_view.dart';
 
 DateTime _normalize(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -45,20 +48,17 @@ DateTime _determineBestDayToSelect(
   final weekStart = _normalize(monday);
   final weekEnd = _normalize(monday.add(const Duration(days: 6)));
 
-  // Tuần hiện tại, chọn ngày hôm nay
   if (!today.isBefore(weekStart) && !today.isAfter(weekEnd)) {
     return today;
   }
 
-  // Chuyển tuần, tìm ngày có lịch
   for (int i = 0; i < 7; i++) {
     final day = _normalize(monday.add(Duration(days: i)));
     if ((events[day] ?? []).isNotEmpty) {
-      return day; // Tìm thấy ngày có lịch -> Focus ngay
+      return day;
     }
   }
 
-  // Nếu không có, focus T2
   return monday;
 }
 
@@ -120,6 +120,61 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
     });
   }
 
+  Future<void> _launchWebSchedule() async {
+    final Uri url = Uri.parse('https://lichtuan.dut.udn.vn');
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không thể mở liên kết')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      }
+    }
+  }
+
+  Widget _buildWebButton() {
+    return Center(
+      child: InkWell(
+        onTap: _launchWebSchedule,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF3F8),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFD6E6F6)),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Xem lịch toàn trường',
+                style: TextStyle(
+                  color: Color(0xFF2A74BD),
+                  fontSize: FontSizes.small,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(width: 6),
+              Icon(
+                Icons.open_in_new_rounded,
+                size: 14,
+                color: Color(0xFF2A74BD),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _requestAcademicWeek(DateTime anyDayInWeek) {
     final monday = _mondayOf(anyDayInWeek);
     final authState = context.read<AuthBloc>().state;
@@ -147,7 +202,6 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight + 4),
-        child: SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -174,7 +228,6 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
               ),
             ],
           ),
-        ),
       ),
       body: BlocListener<CalendarBloc, CalendarState>(
         listenWhen: (prev, curr) => curr is CalendarWeekLoaded,
@@ -216,9 +269,8 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
           },
           child: BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
             builder: (context, state) {
-              // Kiểm tra kết nối mạng
               if (state.error != null && _isConnectionError(state.error)) {
-                return _ErrorView(
+                return ErrorView(
                   message: 'Kiểm tra kết nối mạng và thử lại.',
                   onRetry: () {
                     context.read<WeeklyScheduleBloc>().add(
@@ -232,7 +284,7 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
               if (_isFirstMount &&
                   _cachedEvents.isEmpty &&
                   state.error != null) {
-                return _ErrorView(
+                return ErrorView(
                   message: 'Không thể tải dữ liệu. Vui lòng thử lại.',
                   onRetry: () {
                     context.read<WeeklyScheduleBloc>().add(
@@ -416,7 +468,6 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                   }
                                   final isToday = _isSameLocalDay(day, today);
                                   final color =
-                                      // Chấm xanh ngày có lịch họp, chấm đỏ ngày hôm nay có lịch họp
                                       isToday
                                           ? const Color(0xFFCC0102)
                                           : const Color(0xFF2A74BD);
@@ -460,20 +511,25 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 8),
                           ],
                         ),
                       ),
                       const SizedBox(height: 12),
+
                       if (itemsOfDay.isEmpty)
                         const Padding(
-                          padding: EdgeInsets.only(top: 12.0),
+                          padding: EdgeInsets.only(top: 24.0, bottom: 24.0),
                           child: Center(
                             child: Text('Không có lịch nào trong ngày này'),
                           ),
                         )
                       else
                         ...itemsOfDay.map((it) => _ScheduleCard(item: it)),
+
+                      const SizedBox(height: 12),
+                      _buildWebButton(),
+                      const SizedBox(height: 12),
                     ],
                   ),
                 ),
@@ -565,33 +621,6 @@ class _ScheduleCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: FontSizes.medium),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
-          ],
         ),
       ),
     );
