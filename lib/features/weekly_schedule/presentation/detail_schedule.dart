@@ -1,16 +1,16 @@
-import 'package:e_dut/common/extensions/custom_theme_extension.dart';
-import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:e_dut/common/extensions/font_sizes.dart';
 
 import '../models/weekly_schedule_model.dart';
+
+import '../utils/html_utils.dart';
+import 'widgets/info_row.dart';
 
 class DetailScheduleDialog extends StatelessWidget {
   const DetailScheduleDialog({super.key, required this.item, this.title});
   final WeeklyScheduleItem item;
   final String? title;
-
-  static const _placeholder = '--/--';
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class DetailScheduleDialog extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     title ?? 'Chi tiết cuộc họp',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: FontSizes.extraLarge,
                       fontWeight: FontWeight.bold,
@@ -62,52 +62,48 @@ class DetailScheduleDialog extends StatelessWidget {
             ),
           ),
 
-          // Body
+          // Body - Sử dụng InfoRow
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16.0),
-                bottomRight: Radius.circular(16.0),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(16.0),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _kv(context, 'Ngày', df.format(item.day)),
+                InfoRow(label: 'Ngày', value: df.format(item.day)),
                 const SizedBox(height: 8.0),
-                _kv(
-                  context,
-                  'Giờ',
-                  '${tf.format(item.start)} - ${tf.format(item.end)}',
+                InfoRow(
+                  label: 'Giờ',
+                  value: '${tf.format(item.start)} - ${tf.format(item.end)}',
                 ),
                 const SizedBox(height: 8.0),
-                _kvMultiline(
-                  context,
-                  'Nội dung',
-                  _formatHtmlForDisplay(item.content),
+                InfoRow(
+                  label: 'Nội dung',
+                  value: HtmlUtils.htmlToPlain(item.content),
+                  isMultiline: true,
                 ),
                 const SizedBox(height: 8.0),
-                _kvMultiline(
-                  context,
-                  'Người tham gia',
-                  _formatHtmlForDisplay(item.participants),
+                InfoRow(
+                  label: 'Người tham gia',
+                  value: HtmlUtils.htmlToPlain(item.participants),
+                  isMultiline: true,
                 ),
                 const SizedBox(height: 8.0),
-                _kv(
-                  context,
-                  'Địa điểm',
-                  _displayOrPlaceholder(
+                InfoRow(
+                  label: 'Địa điểm',
+                  value: HtmlUtils.displayOrPlaceholder(
                     item.location,
                     usePlaceholderWhenEmpty: true,
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                _kv(
-                  context,
-                  'Người chủ trì',
-                  _displayOrPlaceholder(
+                InfoRow(
+                  label: 'Người chủ trì',
+                  value: HtmlUtils.displayOrPlaceholder(
                     item.host,
                     usePlaceholderWhenEmpty: true,
                   ),
@@ -117,132 +113,6 @@ class DetailScheduleDialog extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  String _htmlToPlain(String? html) {
-    final s = (html ?? '').trim();
-    if (s.isEmpty) return '';
-
-    var out = s;
-
-    out = out.replaceAll(RegExp(r'<li[^>]*>', caseSensitive: false), '\n- ');
-    out = out.replaceAll(RegExp(r'</li>', caseSensitive: false), '');
-
-    out = out.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
-    out = out.replaceAll(RegExp(r'</p>', caseSensitive: false), '\n');
-    out = out.replaceAll(RegExp(r'<p[^>]*>', caseSensitive: false), '');
-
-    out = out.replaceAll(RegExp(r'<[^>]+>'), '');
-
-    out = out.replaceAll('&nbsp;', ' ').replaceAll('&amp;', '&');
-
-    out = out.replaceAll(RegExp(r'\)\s*;\s*\+', caseSensitive: false), ')\n- ');
-    out = out.replaceAll(RegExp(r';\s*\+', caseSensitive: false), ';\n- ');
-    out = out.replaceAll(RegExp(r':\s*\+', caseSensitive: false), ':\n- ');
-
-    out = out.replaceAll(RegExp(r'(^|\n)\s*\+\s*'), '\n- ');
-
-    out = out.replaceAll(RegExp(r':\+'), ':\n- ');
-
-    out = out.replaceAll(RegExp(r';\s*\n\s*-'), '\n- ');
-
-    out = out.replaceAllMapped(RegExp(r'(\n|^)\+(\d)'), (m) => '\n- ${m[2]}');
-
-    final lines =
-        out
-            .split('\n')
-            .map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim())
-            .toList();
-    final filtered = <String>[];
-    for (var line in lines) {
-      if (line.isEmpty) {
-        if (filtered.isNotEmpty && filtered.last.isEmpty) continue;
-        filtered.add('');
-      } else {
-        filtered.add(line);
-      }
-    }
-
-    var result = filtered.join('\n').trim();
-
-    result = result.replaceAll(RegExp(r'\n{3,}'), '\n\n');
-
-    result = result.replaceFirst(RegExp(r'^\-+\s*'), '- ').trimLeft();
-
-    return result;
-  }
-
-  String _formatHtmlForDisplay(
-    String? html, {
-    bool usePlaceholderWhenEmpty = false,
-  }) {
-    final raw = (html ?? '').trim();
-    if (raw.isEmpty && usePlaceholderWhenEmpty) return _placeholder;
-    final plain = _htmlToPlain(raw);
-    if (plain.isEmpty) return _placeholder;
-    return plain;
-  }
-
-  String _displayOrPlaceholder(
-    String? s, {
-    bool usePlaceholderWhenEmpty = false,
-  }) {
-    final v = (s ?? '').trim();
-    if (v.isEmpty && usePlaceholderWhenEmpty) return _placeholder;
-    return (v.isEmpty || v == 'null') ? _placeholder : v;
-  }
-
-  Widget _kv(BuildContext context, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 140.0,
-          child: Text(
-            '$label:',
-            style: TextStyle(
-              fontSize: FontSizes.medium,
-              color: context.theme.grey,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _kvMultiline(BuildContext context, String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$label:',
-          style: TextStyle(
-            fontSize: FontSizes.medium,
-            color: context.theme.grey,
-          ),
-        ),
-        const SizedBox(height: 6.0),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: FontSizes.medium,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            height: 1.35,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -265,7 +135,7 @@ class DetailSchedulePage extends StatelessWidget {
         ),
         title: Text(
           pageTitle ?? 'Chi tiết cuộc họp',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: FontSizes.large,
             fontWeight: FontWeight.w700,
           ),
@@ -275,30 +145,35 @@ class DetailSchedulePage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         children: [
-          _kv(context, 'Ngày', df.format(item.day)),
+          InfoRow(label: 'Ngày', value: df.format(item.day)),
           const SizedBox(height: 8),
-          _kv(
-            context,
-            'Giờ',
-            '${tf.format(item.start)} - ${tf.format(item.end)}',
+          InfoRow(
+            label: 'Giờ',
+            value: '${tf.format(item.start)} - ${tf.format(item.end)}',
           ),
           const SizedBox(height: 8),
-          _kv(
-            context,
-            'Địa điểm',
-            _displayOrPlaceholder(item.location, usePlaceholderWhenEmpty: true),
+          InfoRow(
+            label: 'Địa điểm',
+            value: HtmlUtils.displayOrPlaceholder(
+              item.location,
+              usePlaceholderWhenEmpty: true,
+            ),
           ),
           const SizedBox(height: 8),
-          _kv(
-            context,
-            'Người chủ trì',
-            _displayOrPlaceholder(item.host, usePlaceholderWhenEmpty: true),
+          InfoRow(
+            label: 'Người chủ trì',
+            value: HtmlUtils.displayOrPlaceholder(
+              item.host,
+              usePlaceholderWhenEmpty: true,
+            ),
           ),
+
           const Divider(height: 24),
+
           _sectionTitle('Nội dung'),
           const SizedBox(height: 8),
           Text(
-            _displayOrPlaceholder(item.content),
+            HtmlUtils.displayOrPlaceholder(item.content),
             style: const TextStyle(
               fontSize: FontSizes.medium,
               fontWeight: FontWeight.w500,
@@ -306,11 +181,15 @@ class DetailSchedulePage extends StatelessWidget {
               height: 1.35,
             ),
           ),
+
           const SizedBox(height: 16),
+
           _sectionTitle('Người tham gia'),
           const SizedBox(height: 8),
           Text(
-            _displayOrPlaceholder(_stripTags(item.participants)),
+            HtmlUtils.displayOrPlaceholder(
+              HtmlUtils.stripTags(item.participants),
+            ),
             style: const TextStyle(
               fontSize: FontSizes.medium,
               color: Colors.black87,
@@ -330,52 +209,4 @@ class DetailSchedulePage extends StatelessWidget {
       fontWeight: FontWeight.bold,
     ),
   );
-
-  String _stripTags(String html) {
-    return html
-        .replaceAll(RegExp(r'<[^>]+>'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-  }
-
-  String _displayOrPlaceholder(
-    String? s, {
-    bool usePlaceholderWhenEmpty = false,
-  }) {
-    final v = (s ?? '').trim();
-    if (v.isEmpty && usePlaceholderWhenEmpty) {
-      return DetailScheduleDialog._placeholder;
-    }
-    return (v.isEmpty || v == 'null') ? DetailScheduleDialog._placeholder : v;
-  }
-
-  Widget _kv(BuildContext context, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 140.0,
-          child: Text(
-            '$label:',
-            style: TextStyle(
-              fontSize: FontSizes.medium,
-              color: Theme.of(
-                context,
-              ).textTheme.bodySmall?.color?.withOpacity(0.6),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: FontSizes.medium,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
