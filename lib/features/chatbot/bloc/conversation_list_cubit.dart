@@ -1,28 +1,39 @@
-import 'package:e_dut/features/chatbot/data/models/conversation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../data/models/conversation.dart';
+import '../domain/repository/chatbot_repo.dart';
 import '../domain/repository/conversation_repo.dart';
 import 'conversation_list_state.dart';
 
 class ConversationListCubit extends Cubit<ConversationListState> {
   final ConversationRepo repo;
+  final ChatbotRepo chatBotRepo;
 
-  ConversationListCubit({required this.repo})
+  ConversationListCubit({required this.repo, required this.chatBotRepo})
     : super(const ConversationListState());
 
   Future<void> loadList() async {
     emit(state.copyWith(status: ConversationListStatus.loading));
 
     try {
-      final listRaw = await repo.getConversations() as List<dynamic>? ?? [];
-      final list =
-          listRaw
-              .map((m) => Conversation(id: m["id"], title: m["name"]))
+      final chatBotList = await chatBotRepo.getChatBots();
+
+      final conversations =
+          chatBotList
+              .map(
+                (c) => Conversation(
+                  chatbotId: c.id,
+                  title: c.name,
+                  id: c.id,
+                  jwt: c.jwt,
+                  messages: [],
+                ),
+              )
               .toList();
       emit(
         state.copyWith(
           status: ConversationListStatus.success,
-          conversations: list,
+          conversations: conversations,
         ),
       );
     } catch (e) {
@@ -35,8 +46,8 @@ class ConversationListCubit extends Cubit<ConversationListState> {
     }
   }
 
-  void selectConversation(String id) {
-    emit(state.copyWith(selectedId: id));
+  void selectConversation({required String chatbotId}) {
+    emit(state.copyWith(selectedId: chatbotId));
   }
 
   Future<void> createNew() async {

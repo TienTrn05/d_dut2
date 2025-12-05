@@ -167,4 +167,12 @@ class Storage {
       _get<String>(_Keys.chatBotConversationId) ?? "";
   static Future<void> setChatBotConversationId(String val) =>
       _set(_Keys.chatBotConversationId, val, notify: true);
+
+  static String getConversationIdByChatbot(String chatbotId) =>
+      _get<String>("${_Keys.chatBotConversationId}__$chatbotId") ?? "";
+
+  static Future<void> setConversationIdByChatbot(
+    String chatbotId,
+    String val,
+  ) => _set("${_Keys.chatBotConversationId}__$chatbotId", val, notify: true);
 }

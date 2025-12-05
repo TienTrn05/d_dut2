@@ -14,14 +14,18 @@ class ConversationRepo {
     return _conversationService.createConversation();
   }
 
+  Future<String?> createConversationByChatbotId(String chatbotId, String jwt) async {
+    return _conversationService.createConversationByChatbotId(chatbotId, jwt);
+  }
+
   /// Get list of conversations
   Future<List<Map<String, dynamic>>> getConversations() async {
     return _conversationService.getConversations();
   }
 
   /// Get detail by ID
-  Future<Map<String, dynamic>?> getConversationDetail(String id) async {
-    return _conversationService.getConversationDetail(id);
+  Future<Map<String, dynamic>?> getConversationDetail(String id, String jwt) async {
+    return _conversationService.getConversationDetail(id, jwt);
   }
 
   /// Delete conversation
