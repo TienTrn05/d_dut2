@@ -29,10 +29,11 @@
                 android:id="@+id/tvMonthPreview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="@string/schedule_widget_month"
                 android:contentDescription="@string/schedule_widget_month"
                 android:textSize="14sp"
-                android:textColor="#555555"/>
+                android:textColor="#747474"/>
 			<TextView
                 android:id="@+id/tvDayPreview"
                 android:layout_width="wrap_content"
@@ -41,7 +42,7 @@
                 android:contentDescription="@string/schedule_widget_day"
                 android:textSize="42sp"
                 android:textStyle="bold"
-                android:textColor="#2979FF"/>
+                android:textColor="#2A74BD"/>
 		</LinearLayout>
 
 		<LinearLayout
