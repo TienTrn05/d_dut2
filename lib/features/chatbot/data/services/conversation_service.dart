@@ -110,6 +110,9 @@ class ConversationService {
     String jwt,
   ) async {
     try {
+      if (id == "") {
+        return null;
+      }
       final res = await _dio.get(
         '/api/conversations/$id',
         options: Options(headers: {"Authorization": "Bearer $jwt"}),
