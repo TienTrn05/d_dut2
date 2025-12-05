@@ -1,14 +1,15 @@
-import 'package:e_dut/common/utils/getit_utils.dart';
-import 'package:e_dut/common/widgets/errors/error_view.dart';
-import 'package:e_dut/features/chatbot/domain/repository/conversation_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '/common/utils/getit_utils.dart';
+import '/common/widgets/errors/error_view.dart';
 import '/common/extensions/custom_theme_extension.dart';
+
 import '../bloc/conversation_cubit.dart';
 import '../bloc/conversation_state.dart';
 import './widgets/chat_bubble.dart';
 import './widgets/chat_bot_appbar.dart';
+import '/features/chatbot/domain/repository/conversation_repo.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});

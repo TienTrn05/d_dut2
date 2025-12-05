@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../../../../common/widgets/snackbar/custom_snackbar.dart';
 import '/common/extensions/font_sizes.dart';
@@ -94,9 +93,8 @@ class CourseRegistrationScreen extends StatelessWidget {
                   ),
                 ),
                 centerTitle: true,
-                actions: true
-                    ? []
-                    : [
+                actions:
+                  [
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0),
                           child: GradeButton(
@@ -109,34 +107,7 @@ class CourseRegistrationScreen extends StatelessWidget {
                       ],
               ),
               backgroundColor: Colors.white,
-              body: true
-                  ? Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/svg/hugeicons_note-edit.svg",
-                              width: 54,
-                              height: 54,
-                              colorFilter: ColorFilter.mode(
-                                  context.theme.grey!, BlendMode.srcIn),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Hiện không phải thời gian đăng ký tín chỉ.',
-                              style: TextStyle(
-                                  color: context.theme.grey!,
-                                  fontSize: FontSizes.large),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                  )
-                  : Padding(
+              body: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
                         children: [
