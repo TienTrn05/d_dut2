@@ -1,0 +1,14 @@
+{
+    "chatbots": [
+        {
+            "id": "cmi5rbaeb03qnkdfpkdnnwfui",
+            "name": "Trung tâm Hỗ trợ Sinh viên và Quan hệ Doanh nghiệp",
+            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRua2pxcTAzbmprZGZwcjB6cnhjbG8iLCJlbWFpbCI6InNzZXJjQGR1dC51ZG4udm4iLCJpYXQiOjE3NjQ5MjA2MjQsImV4cCI6MTc2NzUxMjYyNH0.FH4MoKxKTFtNAx5LqXW_Gc8QZK9hWDNLlmEEXh7fNE4"
+        },
+        {
+            "id": "cmifhnssj04l7kdfpl4lnwy47",
+            "name": "Phòng Công tác sinh viên",
+            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRudTRqdzAzbnNrZGZwaWppdHhoZnoiLCJlbWFpbCI6ImN0c3YuZGhia0BkdXQudWRuLnZuIiwiaWF0IjoxNzY0OTAzNDM1LCJleHAiOjE3Njc0OTU0MzV9.gv9iN_uOpMWOHFKrAxrGvFlCRPrvT0azXWW4M-q_7mM"
+        }
+    ]
+}
