@@ -28,7 +28,7 @@ class ConversationCubit extends Cubit<ConversationState> {
       if (conversationId.isNotEmpty) {
         messagesData = await conversationRepo.getConversationDetail(
           conversationId,
-          ""
+          "",
         );
       }
 
@@ -101,7 +101,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     try {
       final messagesData = await conversationRepo.getConversationDetail(
         conversationId,
-        ""
+        "",
       );
 
       final messagesList = messagesData?['messages'] as List<dynamic>? ?? [];
@@ -147,7 +147,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     try {
       final messagesData = await conversationRepo.getConversationDetail(
         conversationId,
-        jwt
+        jwt,
       );
 
       if (messagesData == null) {
@@ -167,9 +167,22 @@ class ConversationCubit extends Cubit<ConversationState> {
 
         // Save to local storage for future sessions
         await Storage.setConversationIdByChatbot(chatbotId, newConversationId);
+
+        emit(
+          state.copyWith(
+            status: ConversationStatus.success,
+            conversation: Conversation(
+              id: newConversationId,
+              title: messagesData?['title'] ?? "Untitled",
+              chatbotId: chatbotId,
+              messages: [],
+            ),
+          ),
+        );
+        return;
       }
 
-      final messagesList = messagesData?['messages'] as List<dynamic>? ?? [];
+      final messagesList = messagesData['messages'] as List<dynamic>? ?? [];
 
       final messages =
           messagesList
@@ -186,8 +199,8 @@ class ConversationCubit extends Cubit<ConversationState> {
           status: ConversationStatus.success,
           conversation: Conversation(
             id: conversationId,
-            title: messagesData?['title'] ?? "Untitled",
-            chatbotId: "",
+            title: messagesData['title'] ?? "Untitled",
+            chatbotId: chatbotId,
             messages: messages,
           ),
         ),
