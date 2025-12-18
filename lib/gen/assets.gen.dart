@@ -11,6 +11,16 @@
 
 import 'package:flutter/widgets.dart';
 
+class $AssetsDataGen {
+  const $AssetsDataGen();
+
+  /// File path: assets/data/chatbots.json
+  String get chatbots => 'assets/data/chatbots.json';
+
+  /// List of all assets
+  List<String> get values => [chatbots];
+}
+
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
@@ -356,6 +366,7 @@ class Assets {
   const Assets._();
 
   static const String aEnv = '.env';
+  static const $AssetsDataGen data = $AssetsDataGen();
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
 

@@ -1,7 +1,7 @@
 name: e_dut
 description: "A new Flutter project."
 publish_to: "none"
-version: 1.1.7+24
+version: 1.1.8+25
 
 environment:
   sdk: ">=3.7.2 <4.0.0"
@@ -116,6 +116,7 @@ flutter:
     - assets/icons/svg/dDUT.svg
     - assets/icons/svg/bg_pattern.svg
     - assets/icons/svg/logo_dDUTcolor.svg
+    - assets/data/chatbots.json
 
 flutter_native_splash:
   color: "#FFFFFF"
