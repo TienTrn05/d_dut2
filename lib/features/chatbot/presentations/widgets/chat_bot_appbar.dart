@@ -39,7 +39,7 @@ class ChatBotAppbar extends StatelessWidget implements PreferredSizeWidget {
             icon: const Icon(Icons.menu_rounded, color: Colors.white),
             tooltip: 'Open conversations',
             onPressed: () {
-              Scaffold.of(context).openDrawer();
+              Scaffold.of(context).openEndDrawer();
             },
           ),
         ),
