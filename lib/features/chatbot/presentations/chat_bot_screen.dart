@@ -1,21 +1,24 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
-import '../../../core/data/local/storage.dart';
+import '/gen/assets.gen.dart';
+import '/core/data/local/storage.dart';
 import '/common/extensions/font_sizes.dart';
-import '../bloc/conversation_list_cubit.dart';
-import '../bloc/conversation_list_state.dart';
 import '/common/utils/getit_utils.dart';
 import '/common/widgets/errors/error_view.dart';
 import '/common/extensions/custom_theme_extension.dart';
 
+import '../bloc/conversation_list_cubit.dart';
+import '../bloc/conversation_list_state.dart';
 import '../bloc/conversation_cubit.dart';
 import '../bloc/conversation_state.dart';
-import './widgets/chat_bubble.dart';
-import './widgets/chat_bot_appbar.dart';
 import '/features/chatbot/domain/repository/chatbot_repo.dart';
 import '/features/chatbot/domain/repository/conversation_repo.dart';
+import './widgets/chat_bubble.dart';
+import './widgets/chat_bot_appbar.dart';
+import './widgets/loading_row.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
@@ -81,6 +84,8 @@ class _ChatBotScreenState extends State<ChatBotScreen>
 
   @override
   Widget build(BuildContext context) {
+    var widthScreen = MediaQuery.sizeOf(context).width;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -222,39 +227,47 @@ class _ChatBotScreenState extends State<ChatBotScreen>
 
                 return Scaffold(
                   appBar: ChatBotAppbar(
-                    label: conv != null ? conv.title : "Trợ lý ảo BKĐN",
+                    label: conv != null ? conv.title : "Trợ lý dDUT",
                   ),
                   backgroundColor: context.theme.lightBlue,
-                  drawer: Drawer(
+                  endDrawer: Drawer(
                     backgroundColor: context.theme.lightBlue,
-                    child: BlocBuilder<
-                      ConversationListCubit,
-                      ConversationListState
-                    >(
-                      builder: (context, state) {
-                        if (state.status == ConversationListStatus.loading) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        return SafeArea(
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: Text(
-                                  "Phòng ban",
-                                  style: TextStyle(
-                                    color: context.theme.primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: FontSizes.large,
-                                  ),
-                                ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 18,
+                        right: 18,
+                        top: 48,
+                        bottom: 24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Phòng ban',
+                              style: TextStyle(
+                                fontSize: FontSizes.large,
+                                height: 1,
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    context.theme.primaryColor ?? Colors.blue,
                               ),
-                              Expanded(
+                            ),
+                          ),
+                          Divider(color: context.theme.primaryColor),
+                          BlocBuilder<
+                            ConversationListCubit,
+                            ConversationListState
+                          >(
+                            builder: (context, state) {
+                              if (state.status ==
+                                  ConversationListStatus.loading) {
+                                return CircularProgressIndicator();
+                              }
+
+                              return Expanded(
                                 child: ListView.builder(
                                   itemCount: state.conversations.length,
                                   itemBuilder: (_, index) {
@@ -262,39 +275,47 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                                     final selected =
                                         conv.id == state.selectedId;
 
-                                    return ListTile(
-                                      title: Text(conv.title),
-                                      selected: selected,
-                                      onTap: () {
-                                        context
-                                            .read<ConversationListCubit>()
-                                            .selectConversation(
-                                              chatbotId: conv.chatbotId,
-                                            );
+                                    return Column(
+                                      children: [
+                                        _buildMenuItem(
+                                          conv.title,
+                                          isSelected: selected,
+                                          onPressed: () {
+                                            context
+                                                .read<ConversationListCubit>()
+                                                .selectConversation(
+                                                  chatbotId: conv.chatbotId,
+                                                );
 
-                                        final convId =
-                                            Storage.getConversationIdByChatbot(
-                                              conv.chatbotId,
-                                            );
+                                            final convId =
+                                                Storage.getConversationIdByChatbot(
+                                                  conv.chatbotId,
+                                                );
 
-                                        context
-                                            .read<ConversationCubit>()
-                                            .loadConversationByChatbotId(
-                                              conv.chatbotId,
-                                              convId,
-                                              conv.jwt,
-                                            );
+                                            context
+                                                .read<ConversationCubit>()
+                                                .loadConversationByChatbotId(
+                                                  conv.chatbotId,
+                                                  convId,
+                                                  conv.jwt,
+                                                );
 
-                                        Navigator.pop(context); // đóng drawer
-                                      },
+                                            Navigator.pop(
+                                              context,
+                                            ); // đóng drawer
+                                          },
+                                          context: context,
+                                        ),
+                                        const SizedBox(height: 10),
+                                      ],
                                     );
                                   },
                                 ),
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
                   ),
                   body: Column(
@@ -323,16 +344,36 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
+                                            if (conv == null)
+                                              SvgPicture.asset(
+                                                Assets.images.chatbotHero,
+                                                width: widthScreen * 6 / 10,
+                                              ),
+                                            if (conv == null)
+                                              const SizedBox(height: 20),
                                             Text(
                                               conv != null
-                                                  ? "Xin chào bạn, tôi là ${conv.title}.\nTôi có thể giúp gì cho bạn?"
-                                                  : "Tôi là AI hỗ trợ phòng đào tạo BKĐN.\n"
-                                                      "Tôi có thể giúp gì cho bạn hôm nay?",
+                                                  ? "Chào bạn! Trợ lý ảo\n ${conv.title} đã sẵn sàng."
+                                                  : "Chào mừng đến với\n"
+                                                      "Trợ lý ảo BKĐN!",
+                                              style: TextStyle(
+                                                fontSize:
+                                                    conv != null ? 20 : 28,
+                                                color: Color(0xff263238),
+                                                fontWeight: FontWeight.w500,
+                                                height:
+                                                    conv != null ? 1.5 : 1.14,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              conv != null
+                                                  ? "Tôi có thể thông tin gì đến bạn?"
+                                                  : "Tôi có thể giúp gì cho bạn hôm nay?",
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: Colors.black.withOpacity(
-                                                  0.7,
-                                                ),
+                                                color: context.theme.grey,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                               textAlign: TextAlign.center,
@@ -340,34 +381,61 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                                             if (state.selectedId == null)
                                               Column(
                                                 children: [
-                                                  const SizedBox(height: 12),
+                                                  const SizedBox(height: 20),
                                                   MaterialButton(
                                                     onPressed: () {
                                                       Scaffold.of(
                                                         context,
-                                                      ).openDrawer();
+                                                      ).openEndDrawer();
                                                     },
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          vertical: 12,
+                                                          horizontal: 16,
+                                                        ),
                                                     color:
                                                         context
                                                             .theme
                                                             .primaryColor,
-                                                    elevation: 0,
-                                                    focusElevation: 0,
-                                                    hoverElevation: 0,
-                                                    highlightElevation: 0,
+                                                    // elevation: 0,
+                                                    // focusElevation: 0,
+                                                    // hoverElevation: 0,
+                                                    // highlightElevation: 0,
                                                     shape: RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             999,
                                                           ),
                                                     ),
-                                                    child: Text(
-                                                      "Chat ngay!",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize:
-                                                            FontSizes.large,
-                                                      ),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        SvgPicture.asset(
+                                                          Assets
+                                                              .icons
+                                                              .svg
+                                                              .biChatDotsFill,
+                                                          colorFilter:
+                                                              ColorFilter.mode(
+                                                                Colors.white,
+                                                                BlendMode.srcIn,
+                                                              ),
+                                                          width: 24,
+                                                          height: 24,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Text(
+                                                          "Bắt đầu trò chuyện",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize:
+                                                                FontSizes.large,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
@@ -390,21 +458,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                       if (_isLoading)
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: context.theme.primaryColor,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text("Bot đang nhập..."),
-                            ],
-                          ),
+                          child: LoadingRow(),
                         ),
                       BlocBuilder<ConversationListCubit, ConversationListState>(
                         builder: (context, state) {
@@ -461,7 +515,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                   maxLines: 4,
                   textInputAction: TextInputAction.newline,
                   decoration: InputDecoration(
-                    hintText: "Type a message...",
+                    hintText: "Nhập tin nhắn...",
                     hintStyle: TextStyle(color: Colors.grey.shade500),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -496,6 +550,37 @@ class _ChatBotScreenState extends State<ChatBotScreen>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(
+    String title, {
+    bool isSelected = false,
+    VoidCallback? onPressed,
+    required BuildContext context,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            isSelected
+                ? context.theme.primaryColor ?? Colors.blue
+                : Colors.white,
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: isSelected ? 2 : 0,
+        padding: EdgeInsets.all(16),
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: FontSizes.medium,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+          ),
         ),
       ),
     );
