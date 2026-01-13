@@ -95,15 +95,19 @@ class Header extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        spacing: 1,
                         children: [
                           isLoading
                               ? Shimmer.fromColors(
                                 baseColor: baseColor,
                                 highlightColor: highlightColor,
                                 child: Container(
-                                  height: 14,
+                                  height: FontSizes.large * 1.25,
                                   width: 100,
-                                  color: baseColor,
+                                  decoration: BoxDecoration(
+                                    color: baseColor,
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
                               )
                               : Text(
@@ -123,9 +127,12 @@ class Header extends StatelessWidget {
                                 baseColor: baseColor,
                                 highlightColor: highlightColor,
                                 child: Container(
-                                  height: 12,
-                                  width: 140,
-                                  color: baseColor,
+                                  height: FontSizes.small * 1.5,
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                    color: baseColor,
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
                               )
                               : Text(

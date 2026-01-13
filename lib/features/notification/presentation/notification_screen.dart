@@ -139,11 +139,7 @@ class NotificationScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 8),
-                              height: 1,
-                              color: context.theme.primaryColor,
-                            ),
+                            Divider(color: context.theme.primaryColor),
                             _buildSwitchTile(
                               context,
                               "Bật thông báo chung",

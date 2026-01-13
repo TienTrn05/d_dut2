@@ -114,7 +114,6 @@ class _QueueScreenState extends State<QueueScreen> {
                 fontWeight: FontWeight.normal,
                 color: context.theme.grey,
                 fontSize: FontSizes.small + 1,
-                // height: 1.5,
               ),
             ),
           ],
@@ -290,11 +289,7 @@ class _QueueScreenState extends State<QueueScreen> {
                                   ),
                                 ],
                               ),
-                              Container(
-                                margin: EdgeInsets.symmetric(vertical: 8),
-                                height: 1,
-                                color: context.theme.primaryColor,
-                              ),
+                              Divider(color: context.theme.primaryColor),
                               _buildSwitchTile(
                                 context,
                                 "Bật thông báo sắp đến lượt",

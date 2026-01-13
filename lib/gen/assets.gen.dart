@@ -110,9 +110,6 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/bi_chat-dots-fill.svg
   String get biChatDotsFill => 'assets/icons/svg/bi_chat-dots-fill.svg';
 
-  /// File path: assets/icons/svg/bx_bot.svg
-  String get bxBot => 'assets/icons/svg/bx_bot.svg';
-
   /// File path: assets/icons/svg/carbon_book.svg
   String get carbonBook => 'assets/icons/svg/carbon_book.svg';
 
@@ -318,7 +315,6 @@ class $AssetsIconsSvgGen {
   List<String> get values => [
     bgPattern,
     biChatDotsFill,
-    bxBot,
     carbonBook,
     chatbotIcon,
     dDUT,
