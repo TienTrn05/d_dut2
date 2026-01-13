@@ -285,6 +285,9 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/tabler_filter-search.svg
   String get tablerFilterSearch => 'assets/icons/svg/tabler_filter-search.svg';
 
+  /// File path: assets/icons/svg/tabler_ticket.svg
+  String get tablerTicket => 'assets/icons/svg/tabler_ticket.svg';
+
   /// File path: assets/icons/svg/uil_chart-line.svg
   String get uilChartLine => 'assets/icons/svg/uil_chart-line.svg';
 
@@ -355,6 +358,7 @@ class $AssetsIconsSvgGen {
     systemUiconsCalendarDate,
     tablerCoin,
     tablerFilterSearch,
+    tablerTicket,
     uilChartLine,
     uiwSwapRight,
     undrawNoData,

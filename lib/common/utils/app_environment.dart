@@ -17,4 +17,5 @@ class AppEnvironment {
       dotenv.env['CHATBOT_CONVERSATION_API_KEY'] ?? '';
   static final pushNotificationsAPIKey =
       dotenv.env['PUSH_NOTIFICATIONS_API_KEY'] ?? '';
+  static final queueAPIKey = dotenv.env['QUEUE_API_KEY'] ?? '';
 }

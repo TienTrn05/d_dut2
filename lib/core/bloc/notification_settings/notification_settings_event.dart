@@ -29,15 +29,34 @@ class ToggleMyNotification extends NotificationSettingsEvent {
   List<Object?> get props => [isEnabled];
 }
 
+class ToggleQueueNotification extends NotificationSettingsEvent {
+  final bool isEnabled;
+
+  ToggleQueueNotification({required this.isEnabled});
+
+  @override
+  List<Object?> get props => [isEnabled];
+}
+
+class RemainTurnsChanged extends NotificationSettingsEvent {
+  final int remainTurn;
+
+  RemainTurnsChanged({required this.remainTurn});
+
+  @override
+  List<Object?> get props => [remainTurn];
+}
+
 class ToggleExamNotification extends NotificationSettingsEvent {
   final bool isEnabled;
   final String authToken;
   final bool isTeacher;
 
-  ToggleExamNotification(
-      {required this.isEnabled,
-      required this.authToken,
-      required this.isTeacher});
+  ToggleExamNotification({
+    required this.isEnabled,
+    required this.authToken,
+    required this.isTeacher,
+  });
 
   @override
   List<Object?> get props => [isEnabled];
@@ -48,10 +67,11 @@ class RemindBeforeChanged extends NotificationSettingsEvent {
   final String authToken;
   final bool isTeacher;
 
-  RemindBeforeChanged(
-      {required this.remindBefore,
-      required this.authToken,
-      required this.isTeacher});
+  RemindBeforeChanged({
+    required this.remindBefore,
+    required this.authToken,
+    required this.isTeacher,
+  });
 
   @override
   List<Object?> get props => [remindBefore];

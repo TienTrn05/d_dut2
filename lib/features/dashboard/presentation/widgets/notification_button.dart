@@ -5,13 +5,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 class NotificationButton extends StatelessWidget {
   final int notificationCount;
   final Function()? onTap;
-  const NotificationButton(
-      {super.key, required this.notificationCount, this.onTap});
+  const NotificationButton({
+    super.key,
+    required this.notificationCount,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(right: 24),
+      padding: const EdgeInsets.only(right: 16),
       child: GestureDetector(
         onTap: onTap,
         child: Stack(

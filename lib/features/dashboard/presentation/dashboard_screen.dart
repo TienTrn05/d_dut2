@@ -749,6 +749,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             },
                                           ),
                                     ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/tabler_ticket.svg",
+                                      title: "Lấy số tổ 1 cửa",
+                                      originIconColor: true,
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                            scopes,
+                                            Routes.queue,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ];
                                 }
                               }
