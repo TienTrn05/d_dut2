@@ -76,6 +76,9 @@ class $AssetsImagesGen {
   AssetGenImage get bgPattern =>
       const AssetGenImage('assets/images/bg_pattern.png');
 
+  /// File path: assets/images/chatbot_hero.svg
+  String get chatbotHero => 'assets/images/chatbot_hero.svg';
+
   /// File path: assets/images/default_avatar.jpg
   AssetGenImage get defaultAvatar =>
       const AssetGenImage('assets/images/default_avatar.jpg');
@@ -91,6 +94,7 @@ class $AssetsImagesGen {
   List<dynamic> get values => [
     background,
     bgPattern,
+    chatbotHero,
     defaultAvatar,
     defaultImage,
     freeSchedule,
@@ -103,11 +107,17 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/bg_pattern.svg
   String get bgPattern => 'assets/icons/svg/bg_pattern.svg';
 
+  /// File path: assets/icons/svg/bi_chat-dots-fill.svg
+  String get biChatDotsFill => 'assets/icons/svg/bi_chat-dots-fill.svg';
+
   /// File path: assets/icons/svg/bx_bot.svg
   String get bxBot => 'assets/icons/svg/bx_bot.svg';
 
   /// File path: assets/icons/svg/carbon_book.svg
   String get carbonBook => 'assets/icons/svg/carbon_book.svg';
+
+  /// File path: assets/icons/svg/chatbot_icon.svg
+  String get chatbotIcon => 'assets/icons/svg/chatbot_icon.svg';
 
   /// File path: assets/icons/svg/dDUT.svg
   String get dDUT => 'assets/icons/svg/dDUT.svg';
@@ -264,6 +274,10 @@ class $AssetsIconsSvgGen {
   String get solarUsersGroupRoundedBroken =>
       'assets/icons/svg/solar_users-group-rounded-broken.svg';
 
+  /// File path: assets/icons/svg/streamline-ultimate_loading-bold.svg
+  String get streamlineUltimateLoadingBold =>
+      'assets/icons/svg/streamline-ultimate_loading-bold.svg';
+
   /// File path: assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg
   String get streamlineUltimateWorkflowTeamworkUserHighFive =>
       'assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg';
@@ -303,8 +317,10 @@ class $AssetsIconsSvgGen {
   /// List of all assets
   List<String> get values => [
     bgPattern,
+    biChatDotsFill,
     bxBot,
     carbonBook,
+    chatbotIcon,
     dDUT,
     dDUTD,
     dDUTT,
@@ -352,6 +368,7 @@ class $AssetsIconsSvgGen {
     solarUserBold,
     solarUserBroken,
     solarUsersGroupRoundedBroken,
+    streamlineUltimateLoadingBold,
     streamlineUltimateWorkflowTeamworkUserHighFive,
     studentTracking,
     studentTrackingOverview,
