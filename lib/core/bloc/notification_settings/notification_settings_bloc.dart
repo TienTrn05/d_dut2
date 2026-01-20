@@ -49,6 +49,7 @@ class NotificationSettingsBloc
           personalEnabled: () => false,
           examEnabled: () => false,
           queueEnabled: () => false,
+          remainTurn: () => Storage.remainTurn
         ),
       );
     }
@@ -59,6 +60,7 @@ class NotificationSettingsBloc
         personalEnabled: () => Storage.myNotification,
         examEnabled: () => Storage.examNotification,
         queueEnabled: () => Storage.queueNotification,
+        remainTurn: () => Storage.remainTurn
       ),
     );
   }
@@ -122,7 +124,7 @@ class NotificationSettingsBloc
     final oldRemainTurn = state.remainTurn;
     emit(state.copyWith(remainTurn: () => event.remainTurn));
     try {
-      await Storage.setRemindBefore(event.remainTurn);
+      await Storage.setRemainTurn(event.remainTurn);
       await notificationSettingsService.setRemainTurn(event.token, event.remainTurn);
     } catch (e) {
       await Storage.setRemainTurn(oldRemainTurn);
