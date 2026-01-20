@@ -271,6 +271,10 @@ class $AssetsIconsSvgGen {
   String get solarUsersGroupRoundedBroken =>
       'assets/icons/svg/solar_users-group-rounded-broken.svg';
 
+  /// File path: assets/icons/svg/streamline-logos_microsoft-teams-logo-block.svg
+  String get streamlineLogosMicrosoftTeamsLogoBlock =>
+      'assets/icons/svg/streamline-logos_microsoft-teams-logo-block.svg';
+
   /// File path: assets/icons/svg/streamline-ultimate_loading-bold.svg
   String get streamlineUltimateLoadingBold =>
       'assets/icons/svg/streamline-ultimate_loading-bold.svg';
@@ -364,6 +368,7 @@ class $AssetsIconsSvgGen {
     solarUserBold,
     solarUserBroken,
     solarUsersGroupRoundedBroken,
+    streamlineLogosMicrosoftTeamsLogoBlock,
     streamlineUltimateLoadingBold,
     streamlineUltimateWorkflowTeamworkUserHighFive,
     studentTracking,

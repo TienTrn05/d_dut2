@@ -16,9 +16,12 @@ import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/edit_field_item.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/uos_info_item.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UosInfoTab extends StatefulWidget {
@@ -101,6 +104,59 @@ class _UosInfoTabState extends State<UosInfoTab> {
                 controller: _linkController,
                 minLine: 5,
               ),
+              const SizedBox(height: 20),
+              if (_linkController.text.trim().isEmpty)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {},
+
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                        Set<WidgetState> states,
+                      ) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return context.theme.grey?.withAlpha(40) ??
+                              Colors.grey.withAlpha(40);
+                        }
+                        return Color(0XFF6E6EE2);
+                      }),
+                      padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      shape: WidgetStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      spacing: 8,
+                      children: [
+                        SvgPicture.asset(
+                          Assets
+                              .icons
+                              .svg
+                              .streamlineLogosMicrosoftTeamsLogoBlock,
+                        ),
+                        Text(
+                          'Tạo Teams',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: FontSizes.medium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         );
@@ -149,10 +205,6 @@ class _UosInfoTabState extends State<UosInfoTab> {
                         field: "Mã môn",
                         value: widget.uosDetail.noSubject,
                       ),
-                      // InfoItem(
-                      //   field: "Hệ",
-                      //   value: widget.uosDetail.clc == 1 ? "CLC" : "",
-                      // ),
                       InfoItem(
                         field: "Số tín chỉ",
                         value: widget.uosDetail.credit.toString(),
@@ -208,7 +260,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                 ),
                         linkIconAsset:
                             (_codeController.text.trim().isNotEmpty)
-                                ? "assets/icons/svg/lucide_copy.svg"
+                                ? Assets.icons.svg.lucideCopy
                                 : null,
                         action: () {
                           try {
@@ -251,7 +303,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                     }
                                   },
                                   child: Text(
-                                    "Link tham gia Teams",
+                                    "Link Teams",
                                     style: TextStyle(
                                       fontSize: FontSizes.medium,
                                       fontWeight: FontWeight.w400,
@@ -267,25 +319,70 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                     ),
                                   ),
                                 )
-                                : Text(
-                                  "Chưa cập nhật",
-                                  style: TextStyle(
-                                    fontSize: FontSizes.medium,
-                                    fontStyle: FontStyle.italic,
-                                    color: context.theme.grey ?? Colors.grey,
-                                    height: 1.5,
-                                  ),
+                                : Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: 4,
+                                  children: [
+                                    Text(
+                                      "Chưa cập nhật",
+                                      style: TextStyle(
+                                        fontSize: FontSizes.medium,
+                                        fontStyle: FontStyle.italic,
+                                        color:
+                                            context.theme.grey ?? Colors.grey,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                    if (_linkController.text.trim().isEmpty)
+                                      InkWell(
+                                        onTap: () {},
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                            border: Border.all(
+                                              color: Color(0XFF6E6EE2),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            spacing: 4,
+                                            children: [
+                                              Icon(
+                                                MaterialCommunityIcons
+                                                    .microsoft_teams,
+                                                color: Color(0XFF6E6EE2),
+                                                size: 20,
+                                              ),
+                                              Text(
+                                                'Tạo Teams',
+                                                style: TextStyle(
+                                                  color: Color(0XFF6E6EE2),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: FontSizes.medium,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                         linkIconAsset:
                             (_linkController.text.trim().isNotEmpty)
-                                ? "assets/icons/svg/lucide_copy.svg"
+                                ? Assets.icons.svg.lucideCopy
                                 : null,
                         action: () {
                           try {
                             Clipboard.setData(
                               ClipboardData(text: _linkController.text),
                             );
-                            // debugPrint("Copied: 012ajsh");
                             CustomSnackbar.showSnackBar(
                               context,
                               "Thành công",

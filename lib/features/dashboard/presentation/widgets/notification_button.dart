@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -24,7 +25,7 @@ class NotificationButton extends StatelessWidget {
               height: 50,
               child: Center(
                 child: SvgPicture.asset(
-                  'assets/icons/svg/solar_bell-bold.svg',
+                  Assets.icons.svg.solarBellBold,
                   colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   width: 32,
                   height: 32,

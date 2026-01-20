@@ -92,7 +92,6 @@ class ScheduleService {
     bool isTeacher,
     String authToken,
   ) async {
-    logger.d(authToken);
     try {
       dynamic response;
       if (isTeacher) {
@@ -692,7 +691,7 @@ class ScheduleService {
         queryParameters: {"idUos": idUos},
       );
       if (response.statusCode == 200) return true;
-      
+
       final msg = response.data['data'] ?? 'Unknown error';
       logger.e("Export failed: $msg");
       return false;

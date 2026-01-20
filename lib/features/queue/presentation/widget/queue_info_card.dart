@@ -49,32 +49,54 @@ class _QueueInfoCardState extends State<QueueInfoCard> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 4,
               children: [
-                Row(
-                  spacing: 8,
+                Column(
                   children: [
-                    TweenAnimationBuilder(
-                      tween: Tween<double>(begin: 0, end: isShowing ? 0 : -1),
-                      duration: const Duration(milliseconds: 300),
-                      builder: (context, double value, child) {
-                        return Transform.rotate(
-                          angle: value * (3.1415926535 / 2),
-                          child: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Colors.black,
-                            size: 28,
+                    Row(
+                      spacing: 8,
+                      children: [
+                        TweenAnimationBuilder(
+                          tween: Tween<double>(
+                            begin: 0,
+                            end: isShowing ? 0 : -1,
                           ),
-                        );
-                      },
+                          duration: const Duration(milliseconds: 300),
+                          builder: (context, double value, child) {
+                            return Transform.rotate(
+                              angle: value * (3.1415926535 / 2),
+                              child: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Colors.black,
+                                size: 28,
+                              ),
+                            );
+                          },
+                        ),
+                        Text(
+                          widget.title,
+                          style: const TextStyle(
+                            fontSize: FontSizes.medium,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: FontSizes.medium,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+
+                    if (widget.counter != null)
+                      Padding(
+                        padding: const EdgeInsetsGeometry.only(left: 28 + 8),
+                        child: Text(
+                          widget.counter!.departmentName,
+                          style: TextStyle(
+                            color: context.theme.grey,
+                            fontSize: FontSizes.small,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 if (widget.counter != null)

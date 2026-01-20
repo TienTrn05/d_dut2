@@ -11,6 +11,7 @@ import 'package:e_dut/features/schedule/presentation/widgets/card/uos_card.dart'
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/features/schedule/presentation/widgets/item/uos_item.dart';
 import 'package:e_dut/features/schedule/util/functions.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,73 +32,80 @@ class _SemesterModeState extends State<SemesterMode> {
   void _showPicker(BuildContext context, List<SemesterModel> semesterList) {
     showCupertinoModalPopup(
       context: context,
-      builder: (_) => Container(
-        padding: const EdgeInsets.all(24),
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 200,
-                child: CupertinoPicker(
-                  backgroundColor: Colors.transparent,
-                  itemExtent: 52,
-                  scrollController:
-                      FixedExtentScrollController(initialItem: selectedIndex),
-                  onSelectedItemChanged: (int index) {
-                    if (selectedIndex != index) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                      final authState = context.read<AuthBloc>().state;
+      builder:
+          (_) => Container(
+            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    child: CupertinoPicker(
+                      backgroundColor: Colors.transparent,
+                      itemExtent: 52,
+                      scrollController: FixedExtentScrollController(
+                        initialItem: selectedIndex,
+                      ),
+                      onSelectedItemChanged: (int index) {
+                        if (selectedIndex != index) {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                          final authState = context.read<AuthBloc>().state;
 
-                      final String userRole = authState is AuthUserAuthenticated
-                          ? authState.userData.role.name
-                          : '';
-                      final String authToken =
-                          authState is AuthUserAuthenticated
-                              ? authState.accessToken
-                              : '';
-                      context.read<TimetableBloc>().add(
+                          final String userRole =
+                              authState is AuthUserAuthenticated
+                                  ? authState.userData.role.name
+                                  : '';
+                          final String authToken =
+                              authState is AuthUserAuthenticated
+                                  ? authState.accessToken
+                                  : '';
+                          context.read<TimetableBloc>().add(
                             LoadListUOSBySemester(
-                                idSemester: semesterList[index].idSemester,
-                                selectedIndex: index,
-                                isTeacher: userRole == RoleModel.roleTeacher,
-                                authToken: authToken),
+                              idSemester: semesterList[index].idSemester,
+                              selectedIndex: index,
+                              isTeacher: userRole == RoleModel.roleTeacher,
+                              authToken: authToken,
+                            ),
                           );
-                    }
-                  },
-                  selectionOverlay: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue.withAlpha(30),
-                      borderRadius: BorderRadius.circular(999),
+                        }
+                      },
+                      selectionOverlay: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.lightBlue.withAlpha(30),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                      children:
+                          semesterList
+                              .map(
+                                (e) => Center(
+                                  child: Text(
+                                    'Học kỳ ${e.noSemester}, ${e.startYear}-${e.endYear}',
+                                    style: const TextStyle(
+                                      fontSize: FontSizes.large,
+                                      fontWeight: FontWeight.bold,
+                                      height: 1.25,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
                     ),
                   ),
-                  children: semesterList
-                      .map((e) => Center(
-                            child: Text(
-                              'Học kỳ ${e.noSemester}, ${e.startYear}-${e.endYear}',
-                              style: const TextStyle(
-                                fontSize: FontSizes.large,
-                                fontWeight: FontWeight.bold,
-                                height: 1.25,
-                              ),
-                            ),
-                          ))
-                      .toList(),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -108,20 +116,22 @@ class _SemesterModeState extends State<SemesterMode> {
       });
       final authState = context.read<AuthBloc>().state;
 
-      final String userRole = authState is AuthUserAuthenticated
-          ? authState.userData.role.name
-          : '';
+      final String userRole =
+          authState is AuthUserAuthenticated
+              ? authState.userData.role.name
+              : '';
 
       final String authToken =
           authState is AuthUserAuthenticated ? authState.accessToken : '';
 
       context.read<TimetableBloc>().add(
-            LoadListUOSBySemester(
-                idSemester: semesterList[selectedIndex].idSemester,
-                selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher,
-                authToken: authToken),
-          );
+        LoadListUOSBySemester(
+          idSemester: semesterList[selectedIndex].idSemester,
+          selectedIndex: selectedIndex,
+          isTeacher: userRole == RoleModel.roleTeacher,
+          authToken: authToken,
+        ),
+      );
     }
   }
 
@@ -132,19 +142,21 @@ class _SemesterModeState extends State<SemesterMode> {
       });
       final authState = context.read<AuthBloc>().state;
 
-      final String userRole = authState is AuthUserAuthenticated
-          ? authState.userData.role.name
-          : '';
+      final String userRole =
+          authState is AuthUserAuthenticated
+              ? authState.userData.role.name
+              : '';
       final String authToken =
           authState is AuthUserAuthenticated ? authState.accessToken : '';
 
       context.read<TimetableBloc>().add(
-            LoadListUOSBySemester(
-                idSemester: semesterList[selectedIndex].idSemester,
-                selectedIndex: selectedIndex,
-                isTeacher: userRole == RoleModel.roleTeacher,
-                authToken: authToken),
-          );
+        LoadListUOSBySemester(
+          idSemester: semesterList[selectedIndex].idSemester,
+          selectedIndex: selectedIndex,
+          isTeacher: userRole == RoleModel.roleTeacher,
+          authToken: authToken,
+        ),
+      );
     }
   }
 
@@ -159,8 +171,12 @@ class _SemesterModeState extends State<SemesterMode> {
     final String authToken =
         authState is AuthUserAuthenticated ? authState.accessToken : '';
 
-    context.read<TimetableBloc>().add(LoadListSemesters(
-        isTeacher: userRole == RoleModel.roleTeacher, authToken: authToken));
+    context.read<TimetableBloc>().add(
+      LoadListSemesters(
+        isTeacher: userRole == RoleModel.roleTeacher,
+        authToken: authToken,
+      ),
+    );
   }
 
   @override
@@ -168,9 +184,10 @@ class _SemesterModeState extends State<SemesterMode> {
     return SafeArea(
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, authState) {
-          final String userRole = authState is AuthUserAuthenticated
-              ? authState.userData.role.name
-              : '';
+          final String userRole =
+              authState is AuthUserAuthenticated
+                  ? authState.userData.role.name
+                  : '';
 
           final String authToken =
               authState is AuthUserAuthenticated ? authState.accessToken : '';
@@ -186,41 +203,48 @@ class _SemesterModeState extends State<SemesterMode> {
                 return CustomLoadingIndicator.primary();
               } else if (state is TimetableDataLoaded) {
                 return RefreshIndicator(
-                    color: context.theme.primaryColor,
-                    backgroundColor: Colors.white,
-                    onRefresh: () async {
-                      final completer = Completer<void>();
+                  color: context.theme.primaryColor,
+                  backgroundColor: Colors.white,
+                  onRefresh: () async {
+                    final completer = Completer<void>();
 
-                      // Listen để biết khi nào refresh hoàn tất
-                      final subscription =
-                          context.read<TimetableBloc>().stream.listen((state) {
-                        if (state is TimetableDataLoaded ||
-                            state is TimetableError) {
-                          if (!completer.isCompleted) {
-                            completer.complete();
+                    // Listen để biết khi nào refresh hoàn tất
+                    final subscription = context
+                        .read<TimetableBloc>()
+                        .stream
+                        .listen((state) {
+                          if (state is TimetableDataLoaded ||
+                              state is TimetableError) {
+                            if (!completer.isCompleted) {
+                              completer.complete();
+                            }
                           }
-                        }
-                      });
+                        });
 
-                      // Trigger refresh
-                      context.read<TimetableBloc>().add(LoadListSemesters(
-                          isTeacher: userRole == RoleModel.roleTeacher,
-                          authToken: authToken));
+                    // Trigger refresh
+                    context.read<TimetableBloc>().add(
+                      LoadListSemesters(
+                        isTeacher: userRole == RoleModel.roleTeacher,
+                        authToken: authToken,
+                      ),
+                    );
 
-                      // Đợi cho đến khi có kết quả
-                      await completer.future.timeout(
-                        Duration(seconds: 30),
-                        onTimeout: () {
-                          // Handle timeout nếu cần
-                        },
-                      );
+                    // Đợi cho đến khi có kết quả
+                    await completer.future.timeout(
+                      Duration(seconds: 30),
+                      onTimeout: () {
+                        // Handle timeout nếu cần
+                      },
+                    );
 
-                      subscription.cancel();
-                    },
-                    child: _buildContent(state, userRole));
+                    subscription.cancel();
+                  },
+                  child: _buildContent(state, userRole),
+                );
               } else {
                 return const Center(
-                    child: Text('Không thể tải dữ liệu học kỳ.'));
+                  child: Text('Không thể tải dữ liệu học kỳ.'),
+                );
               }
             },
           );
@@ -240,39 +264,45 @@ class _SemesterModeState extends State<SemesterMode> {
     final currentSemester = semesterList[selectedIndex];
 
     return Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          children: [
-            _buildSemesterSelector(semesterList, currentSemester),
-            const SizedBox(height: 20),
-            listUOS.isNotEmpty
-                ? _buildUOSContent(listUOS, userRole)
-                : Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/svg/undraw_no-data.svg",
-                            width: 120,
-                            height: 120,
-                          ),
-                          const SizedBox(height: 16),
-                          Text("Hiện chưa có dữ liệu cho học kỳ này",
-                              style: TextStyle(
-                                  fontSize: FontSizes.medium,
-                                  fontWeight: FontWeight.w600,
-                                  color: context.theme.grey ?? Colors.grey)),
-                        ],
+      padding: EdgeInsets.all(24),
+      child: Column(
+        children: [
+          _buildSemesterSelector(semesterList, currentSemester),
+          const SizedBox(height: 20),
+          listUOS.isNotEmpty
+              ? _buildUOSContent(listUOS, userRole)
+              : Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        Assets.icons.svg.undrawNoData,
+                        width: 120,
+                        height: 120,
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Hiện chưa có dữ liệu cho học kỳ này",
+                        style: TextStyle(
+                          fontSize: FontSizes.medium,
+                          fontWeight: FontWeight.w600,
+                          color: context.theme.grey ?? Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
-          ],
-        ));
+                ),
+              ),
+        ],
+      ),
+    );
   }
 
   Widget _buildSemesterSelector(
-      List<SemesterModel> semesterList, SemesterModel currentSemester) {
+    List<SemesterModel> semesterList,
+    SemesterModel currentSemester,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       spacing: 24.0,
@@ -283,21 +313,22 @@ class _SemesterModeState extends State<SemesterMode> {
         ),
         Expanded(
           child: InkWell(
-              onTap: () => _showPicker(context, semesterList),
-              borderRadius: BorderRadius.circular(4),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(4.0),
-                child: Center(
-                  child: Text(
-                    'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
-                    style: const TextStyle(
-                      fontSize: FontSizes.medium,
-                      fontWeight: FontWeight.bold,
-                    ),
+            onTap: () => _showPicker(context, semesterList),
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(4.0),
+              child: Center(
+                child: Text(
+                  'Học kỳ ${currentSemester.noSemester}, ${currentSemester.startYear}-${currentSemester.endYear}',
+                  style: const TextStyle(
+                    fontSize: FontSizes.medium,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              )),
+              ),
+            ),
+          ),
         ),
         GestureDetector(
           onTap: () => _nextSemester(semesterList),
@@ -337,15 +368,20 @@ class _SemesterModeState extends State<SemesterMode> {
                 nameSubject: listUOS[i].subjectName!,
                 credit: listUOS[i].credit,
                 timetable: Functions.analyzeStudyShifts(listUOS[i].studyShifts),
-                teacher: userRole == RoleModel.roleStudent
-                    ? listUOS[i].teacherName
-                    : null,
+                teacher:
+                    userRole == RoleModel.roleStudent
+                        ? listUOS[i].teacherName
+                        : null,
               ),
               if (i < listUOS.length - 1 &&
                   // Check if there are more valid items after current index
-                  listUOS.skip(i + 1).any((uos) =>
-                      uos.idUnitOfStudy?.isNotEmpty == true &&
-                      uos.noUOS?.isNotEmpty == true))
+                  listUOS
+                      .skip(i + 1)
+                      .any(
+                        (uos) =>
+                            uos.idUnitOfStudy?.isNotEmpty == true &&
+                            uos.noUOS?.isNotEmpty == true,
+                      ))
                 const SizedBox(height: 10),
             ],
         ],
@@ -365,8 +401,9 @@ class _SemesterModeState extends State<SemesterMode> {
             final id = examShift.idExamShift;
             if (!seenExamShiftIds.contains(id)) {
               seenExamShiftIds.add(id);
-              allExamShifts
-                  .add(UosExamShiftPairModel(uos: uos, examShift: examShift));
+              allExamShifts.add(
+                UosExamShiftPairModel(uos: uos, examShift: examShift),
+              );
             }
           }
         }
@@ -382,29 +419,31 @@ class _SemesterModeState extends State<SemesterMode> {
     });
 
     return UosCard(
-        title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
-        isExam: true,
-        child: allExamShifts.isNotEmpty
-            ? Column(
+      title: userRole == RoleModel.roleTeacher ? "Lịch coi thi" : "Lịch thi",
+      isExam: true,
+      child:
+          allExamShifts.isNotEmpty
+              ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: allExamShifts.map((pair) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      UnitOfStudyItem(
-                        idUos: pair.uos.idUnitOfStudy,
-                        noUOS: pair.uos.noUOS!,
-                        nameSubject: pair.uos.subjectName!,
-                        room: pair.uos.subjectName,
-                        examShift: pair.examShift,
-                        isExam: true,
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  );
-                }).toList(),
+                children:
+                    allExamShifts.map((pair) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          UnitOfStudyItem(
+                            idUos: pair.uos.idUnitOfStudy,
+                            noUOS: pair.uos.noUOS!,
+                            nameSubject: pair.uos.subjectName!,
+                            room: pair.uos.subjectName,
+                            examShift: pair.examShift,
+                            isExam: true,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    }).toList(),
               )
-            : Padding(
+              : Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   userRole == RoleModel.roleTeacher
@@ -412,6 +451,7 @@ class _SemesterModeState extends State<SemesterMode> {
                       : "Hiện chưa có lịch thi",
                   style: TextStyle(color: Colors.grey),
                 ),
-              ));
+              ),
+    );
   }
 }

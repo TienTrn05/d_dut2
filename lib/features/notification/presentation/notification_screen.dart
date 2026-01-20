@@ -1,4 +1,5 @@
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -89,7 +90,7 @@ class NotificationScreen extends StatelessWidget {
                   builder: (context) {
                     return IconButton(
                       icon: SvgPicture.asset(
-                        "assets/icons/svg/solar_settings-broken.svg",
+                        Assets.icons.svg.solarSettingsBroken,
                       ),
                       onPressed: () {
                         Scaffold.of(context).openEndDrawer();
@@ -120,7 +121,7 @@ class NotificationScreen extends StatelessWidget {
                             Row(
                               children: [
                                 SvgPicture.asset(
-                                  "assets/icons/svg/solar_bell-bold.svg",
+                                  Assets.icons.svg.solarBellBold,
                                   colorFilter: ColorFilter.mode(
                                     context.theme.primaryColor ?? Colors.blue,
                                     BlendMode.srcIn,
@@ -213,32 +214,6 @@ class NotificationScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // TextField(
-                    //   decoration: InputDecoration(
-                    //       hintText: "Tìm kiếm...",
-                    //       hintStyle: TextStyle(color: context.theme.grey),
-                    //       border: OutlineInputBorder(
-                    //         borderSide: BorderSide.none,
-                    //         borderRadius: BorderRadius.circular(999),
-                    //       ),
-                    //       contentPadding:
-                    //           EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    //       prefixIcon: Padding(
-                    //         padding: const EdgeInsets.all(10.0),
-                    //         child: SvgPicture.asset(
-                    //           "assets/icons/svg/flowbite_search-outline.svg",
-                    //           width: 24,
-                    //           height: 24,
-                    //           colorFilter:
-                    //               ColorFilter.mode(Colors.black, BlendMode.srcIn),
-                    //         ),
-                    //       ),
-                    //       filled: true,
-                    //       fillColor:
-                    //           context.theme.lightGrey ?? Color(0xffFAFAFA)),
-                    //   style: TextStyle(fontSize: FontSizes.large),
-                    // ),
-                    // const SizedBox(height: 10),
                     TabBar(
                       labelPadding: EdgeInsets.all(
                         0,

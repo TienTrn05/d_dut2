@@ -1,4 +1,5 @@
 import 'package:e_dut/features/schedule/bloc/export_absent/export_absent_bloc.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -370,8 +371,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                       foregroundColor: Colors.white,
                                       child: SvgPicture.asset(
                                         _isCheckAbsent
-                                            ? "assets/icons/svg/student_tracking_overview.svg"
-                                            : "assets/icons/svg/student_tracking.svg",
+                                            ? Assets
+                                                .icons
+                                                .svg
+                                                .studentTrackingOverview
+                                            : Assets.icons.svg.studentTracking,
                                         width: 18,
                                         height: 18,
                                         colorFilter: ColorFilter.mode(
@@ -410,8 +414,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 shape: CircleBorder(),
                                 child: SvgPicture.asset(
                                   _isCheckAbsent
-                                      ? "assets/icons/svg/student_tracking.svg"
-                                      : "assets/icons/svg/student_tracking_overview.svg",
+                                      ? Assets.icons.svg.studentTracking
+                                      : Assets
+                                          .icons
+                                          .svg
+                                          .studentTrackingOverview,
                                   width: 24,
                                   height: 24,
                                   colorFilter: ColorFilter.mode(

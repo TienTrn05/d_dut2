@@ -13,6 +13,7 @@ import 'package:e_dut/features/queue/presentation/widget/loading/counter_loading
 import 'package:e_dut/features/queue/presentation/widget/loading/ticket_loading.dart';
 import 'package:e_dut/features/queue/presentation/widget/queue_info_card.dart';
 import 'package:e_dut/features/queue/presentation/widget/ticket_card.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -236,7 +237,7 @@ class _QueueScreenState extends State<QueueScreen> {
                     builder: (context) {
                       return IconButton(
                         icon: SvgPicture.asset(
-                          "assets/icons/svg/solar_settings-broken.svg",
+                          Assets.icons.svg.solarSettingsBroken,
                         ),
                         onPressed: () {
                           Scaffold.of(context).openEndDrawer();
@@ -270,7 +271,7 @@ class _QueueScreenState extends State<QueueScreen> {
                               Row(
                                 children: [
                                   SvgPicture.asset(
-                                    "assets/icons/svg/solar_bell-bold.svg",
+                                    Assets.icons.svg.solarBellBold,
                                     colorFilter: ColorFilter.mode(
                                       context.theme.primaryColor ?? Colors.blue,
                                       BlendMode.srcIn,

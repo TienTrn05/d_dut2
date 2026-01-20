@@ -1,4 +1,5 @@
 import 'package:e_dut/core/bloc/notification_settings/notification_settings_bloc.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -204,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
                   elevation: 2,
                 ),
                 child: SvgPicture.asset(
-                  "assets/icons/svg/solar_logout-3-bold.svg",
+                  Assets.icons.svg.solarLogout3Bold,
                   width: 24,
                   height: 24,
                 ),
