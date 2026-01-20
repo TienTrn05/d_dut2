@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '/common/extensions/custom_theme_extension.dart';
 import '/common/extensions/font_sizes.dart';
+import '/common/extensions/custom_theme_extension.dart';
+import '/common/widgets/appbar/custom_appbar.dart';
 import '/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
+
 import '../../data/model/noti_model.dart';
 import '../widgets/item/edit_field_item.dart';
 
@@ -77,34 +79,29 @@ class _CreateNewNotiScreenState extends State<CreateNewNotiScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: context.theme.primaryColor ?? Colors.blue,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          "Thêm thông báo mới",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: FontSizes.medium,
+      appBar: CustomAppbar(
+        label: "Thêm thông báo mới",
+        showNotificationButton: false,
+        child: MaterialButton(
+          onPressed: _addNotification,
+          color: Colors.white,
+          padding: EdgeInsets.all(0),
+          minWidth: 60,
+          height: 30,
+          elevation: 0,
+          focusElevation: 0,
+          hoverElevation: 0,
+          highlightElevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(4)),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: _addNotification,
-            child: const Text("Lưu", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-        leading: Row(
-          children: [
-            const SizedBox(width: 8),
-            IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+          child: Text(
+            "Đăng",
+            style: TextStyle(
+              color: context.theme.primaryColor,
+              fontSize: FontSizes.medium,
             ),
-          ],
+          ),
         ),
       ),
       body: GestureDetector(
@@ -118,6 +115,7 @@ class _CreateNewNotiScreenState extends State<CreateNewNotiScreen> {
             children: [
               EditFieldItem(
                 field: "Tiêu đề",
+                hintText: "Tiêu đề",
                 controller: _titleController,
                 minLine: 1,
                 maxLine: 2,
@@ -125,6 +123,7 @@ class _CreateNewNotiScreenState extends State<CreateNewNotiScreen> {
               const SizedBox(height: 10),
               EditFieldItem(
                 field: "Nội dung",
+                hintText: "Nội dung thông báo",
                 controller: _contentController,
                 minLine: 7,
               ),
