@@ -31,9 +31,9 @@ class ConversationService {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          if (options.path.contains('/api/conversations')) {
-            options.headers['Authorization'] = 'Bearer $jwt';
-          }
+          // if (options.path.contains('/api/conversations')) {
+          //   options.headers['Authorization'] = 'Bearer $jwt';
+          // }
           return handler.next(options);
         },
         onError: (e, handler) {
@@ -50,6 +50,27 @@ class ConversationService {
       final res = await _dio.post(
         '/api/conversations',
         data: {'chatbot_id': _chatbotId},
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = res.data;
+        return data['id'] ?? data['data']['id'];
+      }
+    } on DioException catch (e) {
+      logger.e('❌ Failed to create conversation: ${e.response?.data}');
+    }
+    return null;
+  }
+
+  Future<String?> createConversationByChatbotId(
+    String chatbotId,
+    String jwt,
+  ) async {
+    try {
+      final res = await _dio.post(
+        '/api/conversations',
+        data: {'chatbot_id': chatbotId},
+        options: Options(headers: {"Authorization": "Bearer $jwt"}),
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -84,9 +105,18 @@ class ConversationService {
   }
 
   // 🔍 3. Get detail by ID
-  Future<Map<String, dynamic>?> getConversationDetail(String id) async {
+  Future<Map<String, dynamic>?> getConversationDetail(
+    String id,
+    String jwt,
+  ) async {
     try {
-      final res = await _dio.get('/api/conversations/$id');
+      if (id == "") {
+        return null;
+      }
+      final res = await _dio.get(
+        '/api/conversations/$id',
+        options: Options(headers: {"Authorization": "Bearer $jwt"}),
+      );
       if (res.statusCode == 200) {
         return Map<String, dynamic>.from(res.data["data"] ?? res.data);
       }

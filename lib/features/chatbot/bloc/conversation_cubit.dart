@@ -28,6 +28,7 @@ class ConversationCubit extends Cubit<ConversationState> {
       if (conversationId.isNotEmpty) {
         messagesData = await conversationRepo.getConversationDetail(
           conversationId,
+          "",
         );
       }
 
@@ -69,6 +70,7 @@ class ConversationCubit extends Cubit<ConversationState> {
           conversation: Conversation(
             id: conversationId,
             title: "Trợ lý dDUT",
+            chatbotId: "",
             messages: messages,
           ),
         ),
@@ -89,6 +91,126 @@ class ConversationCubit extends Cubit<ConversationState> {
 
       emit(
         state.copyWith(status: ConversationStatus.error, errorMessage: message),
+      );
+    }
+  }
+
+  Future<void> loadConversationById(String conversationId) async {
+    emit(state.copyWith(status: ConversationStatus.loading));
+
+    try {
+      final messagesData = await conversationRepo.getConversationDetail(
+        conversationId,
+        "",
+      );
+
+      final messagesList = messagesData?['messages'] as List<dynamic>? ?? [];
+
+      final messages =
+          messagesList
+              .map(
+                (m) => Message(
+                  text: m['content'] ?? '',
+                  isUser: m['role'] == 'user',
+                ),
+              )
+              .toList();
+
+      emit(
+        state.copyWith(
+          status: ConversationStatus.success,
+          conversation: Conversation(
+            id: conversationId,
+            title: messagesData?['title'] ?? "Untitled",
+            chatbotId: "",
+            messages: messages,
+          ),
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: ConversationStatus.error,
+          errorMessage: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+        ),
+      );
+    }
+  }
+
+  Future<void> loadConversationByChatbotId(
+    String chatbotId,
+    String conversationId,
+    String jwt,
+  ) async {
+    emit(state.copyWith(status: ConversationStatus.loading));
+
+    try {
+      final messagesData = await conversationRepo.getConversationDetail(
+        conversationId,
+        jwt,
+      );
+
+      if (messagesData == null) {
+        var newConversationId = await conversationRepo
+            .createConversationByChatbotId(chatbotId, jwt);
+
+        if (newConversationId == null) {
+          emit(
+            state.copyWith(
+              status: ConversationStatus.error,
+              errorMessage:
+                  "Không thể tạo cuộc hội thoại mới. Vui lòng thử lại sau.",
+            ),
+          );
+          return;
+        }
+
+        // Save to local storage for future sessions
+        await Storage.setConversationIdByChatbot(chatbotId, newConversationId);
+
+        emit(
+          state.copyWith(
+            status: ConversationStatus.success,
+            conversation: Conversation(
+              id: newConversationId,
+              title: messagesData?['title'] ?? "Untitled",
+              chatbotId: chatbotId,
+              messages: [],
+            ),
+          ),
+        );
+        return;
+      }
+
+      final messagesList = messagesData['messages'] as List<dynamic>? ?? [];
+
+      final messages =
+          messagesList
+              .map(
+                (m) => Message(
+                  text: m['content'] ?? '',
+                  isUser: (m['role'] as String).toLowerCase() == 'user',
+                ),
+              )
+              .toList();
+
+      emit(
+        state.copyWith(
+          status: ConversationStatus.success,
+          conversation: Conversation(
+            id: conversationId,
+            title: messagesData['title'] ?? "Untitled",
+            chatbotId: chatbotId,
+            messages: messages,
+          ),
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: ConversationStatus.error,
+          errorMessage: "Đã xảy ra lỗi không xác định. Vui lòng thử lại.",
+        ),
       );
     }
   }
@@ -150,7 +272,12 @@ class ConversationCubit extends Cubit<ConversationState> {
 
       emit(
         state.copyWith(
-          conversation: Conversation(id: id, title: "New Chat", messages: []),
+          conversation: Conversation(
+            id: id,
+            title: "New Chat",
+            chatbotId: "",
+            messages: [],
+          ),
           status: ConversationStatus.success,
         ),
       );

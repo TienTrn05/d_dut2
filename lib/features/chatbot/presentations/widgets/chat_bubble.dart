@@ -1,4 +1,6 @@
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '/common/extensions/custom_theme_extension.dart';
 
@@ -24,8 +26,12 @@ class ChatBubble extends StatelessWidget {
           if (!isUser)
             CircleAvatar(
               radius: 18,
-              backgroundColor: Colors.grey.shade300,
-              child: Icon(Icons.smart_toy, color: context.theme.grey, size: 20),
+              backgroundColor: Colors.white,
+              child: SvgPicture.asset(
+                Assets.icons.svg.chatbotIcon,
+                width: 20,
+                height: 20,
+              ),
             ),
           if (!isUser) const SizedBox(width: 8),
 

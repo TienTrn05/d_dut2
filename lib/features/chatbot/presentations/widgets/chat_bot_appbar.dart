@@ -33,18 +33,18 @@ class ChatBotAppbar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
 
       // 🧭 Drawer Button (on the right)
-      // actions: [
-      //   Builder(
-      //     builder: (context) => IconButton(
-      //       icon: const Icon(Icons.menu_rounded, color: Colors.white),
-      //       tooltip: 'Open conversations',
-      //       onPressed: () {
-      //         Scaffold.of(context).openDrawer();
-      //       },
-      //     ),
-      //   ),
-      //   const SizedBox(width: 8),
-      // ],
+      actions: [
+        Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
+            tooltip: 'Open conversations',
+            onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            },
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 
