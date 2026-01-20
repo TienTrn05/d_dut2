@@ -390,6 +390,9 @@ class _QueueScreenState extends State<QueueScreen> {
                                                             >()
                                                             .add(
                                                               RemainTurnsChanged(
+                                                                token:
+                                                                    authState
+                                                                        .accessToken,
                                                                 remainTurn:
                                                                     value,
                                                               ),

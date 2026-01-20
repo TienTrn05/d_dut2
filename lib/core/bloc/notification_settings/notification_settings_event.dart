@@ -39,9 +39,10 @@ class ToggleQueueNotification extends NotificationSettingsEvent {
 }
 
 class RemainTurnsChanged extends NotificationSettingsEvent {
+  final String token;
   final int remainTurn;
 
-  RemainTurnsChanged({required this.remainTurn});
+  RemainTurnsChanged({required this.token, required this.remainTurn});
 
   @override
   List<Object?> get props => [remainTurn];

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/common/utils/logger.dart';
 import '/core/data/local/storage.dart';
 import '/core/services/notification_service.dart';
+import '/core/data/remote/notification_settings_service.dart';
 
 import '/features/schedule/util/schedule_noti.dart';
 
@@ -12,7 +13,8 @@ part 'notification_settings_state.dart';
 
 class NotificationSettingsBloc
     extends Bloc<NotificationSettingsEvent, NotificationSettingsState> {
-  NotificationSettingsBloc()
+  final NotificationSettingsService notificationSettingsService;
+  NotificationSettingsBloc({required this.notificationSettingsService})
     : super(
         NotificationSettingsState(
           remindBefore: Storage.remindBefore,
@@ -121,6 +123,7 @@ class NotificationSettingsBloc
     emit(state.copyWith(remainTurn: () => event.remainTurn));
     try {
       await Storage.setRemindBefore(event.remainTurn);
+      await notificationSettingsService.setRemainTurn(event.token, event.remainTurn);
     } catch (e) {
       await Storage.setRemainTurn(oldRemainTurn);
       logger.e("Failed to change remain turns setting: $e");
