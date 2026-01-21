@@ -53,6 +53,7 @@ class _QueueInfoCardState extends State<QueueInfoCard> {
               spacing: 4,
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       spacing: 8,
