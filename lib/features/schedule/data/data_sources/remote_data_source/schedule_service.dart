@@ -565,6 +565,27 @@ class ScheduleService {
     }
   }
 
+  Future<bool> createMsTeamsForUos(String token, String idUOS) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/UOS/CreateMsTeamsForUos",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+        queryParameters: {"idUos": idUOS},
+      );
+
+      return response.statusCode == 200 &&
+          response.data['message'] == 'Success';
+    } catch (e) {
+      logger.e("Error create MsTeams for UOS: $e");
+      rethrow;
+    }
+  }
+
   Future<List<String>> getListStudentForNotiByUos(
     String token,
     String idUOS,

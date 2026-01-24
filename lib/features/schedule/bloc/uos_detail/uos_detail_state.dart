@@ -20,14 +20,17 @@ class UosDetailError extends UosDetailState {
 
 class FullInfoUosLoaded extends UosDetailState {
   final FullInfoUosDetailModel fullInfoUosDetail;
+  final String? errorMessage;
 
-  FullInfoUosLoaded({required this.fullInfoUosDetail});
+  FullInfoUosLoaded({required this.fullInfoUosDetail, this.errorMessage});
 }
 
 class ExamShiftDetailLoaded extends UosDetailState {
   final ExamShiftDetailModel examShiftDetail;
   final StudentsExamShiftModel examShiftWithStudents;
 
-  ExamShiftDetailLoaded(
-      {required this.examShiftDetail, required this.examShiftWithStudents});
+  ExamShiftDetailLoaded({
+    required this.examShiftDetail,
+    required this.examShiftWithStudents,
+  });
 }
