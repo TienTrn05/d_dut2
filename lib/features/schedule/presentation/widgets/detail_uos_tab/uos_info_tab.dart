@@ -71,12 +71,12 @@ class _UosInfoTabState extends State<UosInfoTab> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       backgroundColor: Colors.white,
-      builder: (context) {
+      builder: (modalContext) {
         return BottomModal(
           title: "Giảng dạy",
           mainAction: () {
             dialog.CustomAlertDialog.showCustomDialog(
-              context,
+              modalContext,
               "Xác nhận cập nhật thông tin",
               "Bạn có chắc chắn muốn cập nhật thông tin giảng dạy không\"?",
               textCancel: "Đóng",
@@ -92,7 +92,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                   ),
                 );
                 setState(() {});
-                Navigator.pop(context);
+                Navigator.pop(modalContext);
               },
             );
           },
@@ -180,19 +180,6 @@ class _UosInfoTabState extends State<UosInfoTab> {
             authToken: authToken,
           ),
         );
-        Navigator.pop(context);
-
-        CustomAlertDialog.showCustomDialog(
-          context,
-          'Đã gửi yêu cầu',
-          "Hệ thống đang xử lý. Bạn sẽ nhận được thông báo khi hoàn tất.",
-          AlertDialogType.success,
-          onConfirm: () {
-            setState(() {});
-
-            Navigator.pop(context);
-          },
-        );
       },
     );
   }
@@ -223,390 +210,369 @@ class _UosInfoTabState extends State<UosInfoTab> {
               ),
             );
           },
-          child: BlocListener<UosDetailBloc, UosDetailState>(
-            listener: (context, state) {
-              if (state is FullInfoUosLoaded) {
-                if (state.errorMessage != null &&
-                    state.errorMessage!.isNotEmpty) {
-                  CustomAlertDialog.showCustomDialog(
-                    context,
-                    'Đã xảy ra lỗi',
-                    state.errorMessage!,
-                    AlertDialogType.failure,
-                    onConfirm: () {
-                      Navigator.of(context).pop();
-                    },
-                  );
-                }
-              }
-            },
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  UosInfoCard(
-                    title: 'Thông tin chung',
-                    child: Column(
-                      children: [
-                        InfoItem(
-                          field: "Mã lớp học phần",
-                          value: widget.uosDetail.noUOS,
-                        ),
-                        InfoItem(
-                          field: "Mã môn",
-                          value: widget.uosDetail.noSubject,
-                        ),
-                        InfoItem(
-                          field: "Số tín chỉ",
-                          value: widget.uosDetail.credit.toString(),
-                        ),
-                        InfoItem(
-                          field: "Kỳ học",
-                          value: widget.uosDetail.semester,
-                        ),
-                      ],
-                    ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                UosInfoCard(
+                  title: 'Thông tin chung',
+                  child: Column(
+                    children: [
+                      InfoItem(
+                        field: "Mã lớp học phần",
+                        value: widget.uosDetail.noUOS,
+                      ),
+                      InfoItem(
+                        field: "Mã môn",
+                        value: widget.uosDetail.noSubject,
+                      ),
+                      InfoItem(
+                        field: "Số tín chỉ",
+                        value: widget.uosDetail.credit.toString(),
+                      ),
+                      InfoItem(
+                        field: "Kỳ học",
+                        value: widget.uosDetail.semester,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  UosInfoCard(
-                    title: 'Giảng dạy',
-                    canEdit: userRole == RoleModel.roleTeacher,
-                    action:
-                        () => _showEditLinkModal(
-                          context.read<UosDetailBloc>(),
-                          authToken,
-                        ),
-                    child: Column(
-                      children: [
-                        if (userRole == RoleModel.roleStudent)
-                          InfoItem(
-                            field: "Giảng viên",
-                            value: widget.teacherName!,
-                          ),
+                ),
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title: 'Giảng dạy',
+                  canEdit: userRole == RoleModel.roleTeacher,
+                  action:
+                      () => _showEditLinkModal(
+                        context.read<UosDetailBloc>(),
+                        authToken,
+                      ),
+                  child: Column(
+                    children: [
+                      if (userRole == RoleModel.roleStudent)
                         InfoItem(
-                          field: "Hình thức GD",
-                          value: widget.uosDetail.methodOfTeaching,
+                          field: "Giảng viên",
+                          value: widget.teacherName!,
                         ),
-                        UosInfoItem(
-                          field: "Mã truy cập",
-                          value:
-                              (_codeController.text.trim().isNotEmpty)
-                                  ? Text(
-                                    _codeController.text,
+                      InfoItem(
+                        field: "Hình thức GD",
+                        value: widget.uosDetail.methodOfTeaching,
+                      ),
+                      UosInfoItem(
+                        field: "Mã truy cập",
+                        value:
+                            (_codeController.text.trim().isNotEmpty)
+                                ? Text(
+                                  _codeController.text,
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    height: 1.5,
+                                  ),
+                                )
+                                : Text(
+                                  "Chưa cập nhật",
+                                  style: TextStyle(
+                                    fontSize: FontSizes.medium,
+                                    fontStyle: FontStyle.italic,
+                                    color: context.theme.grey ?? Colors.grey,
+                                    height: 1.5,
+                                  ),
+                                ),
+                        linkIconAsset:
+                            (_codeController.text.trim().isNotEmpty)
+                                ? Assets.icons.svg.lucideCopy
+                                : null,
+                        action: () {
+                          try {
+                            Clipboard.setData(
+                              ClipboardData(text: _codeController.text),
+                            );
+                            // debugPrint("Copied: 012ajsh");
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Thành công",
+                              "Đã sao chép mã ${_codeController.text}",
+                              AlertType.success,
+                            );
+                          } catch (e) {
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Lỗi",
+                              "Không thể sao chép",
+                              AlertType.error,
+                            );
+                          }
+                        },
+                      ),
+                      UosInfoItem(
+                        field: "Link tham gia",
+                        value:
+                            (_linkController.text.trim().isNotEmpty)
+                                ? GestureDetector(
+                                  onTap: () async {
+                                    final Uri url = Uri.parse("");
+                                    if (await canLaunchUrl(url)) {
+                                      await launchUrl(url);
+                                    } else if (context.mounted) {
+                                      CustomSnackbar.showSnackBar(
+                                        context,
+                                        "Lỗi",
+                                        "Không thể truy cập link",
+                                        AlertType.error,
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    "Link Teams",
                                     style: TextStyle(
                                       fontSize: FontSizes.medium,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                      height: 1.5,
-                                    ),
-                                  )
-                                  : Text(
-                                    "Chưa cập nhật",
-                                    style: TextStyle(
-                                      fontSize: FontSizes.medium,
+                                      fontWeight: FontWeight.w400,
+                                      color:
+                                          context.theme.primaryColor ??
+                                          Colors.blue,
                                       fontStyle: FontStyle.italic,
-                                      color: context.theme.grey ?? Colors.grey,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor:
+                                          context.theme.primaryColor ??
+                                          Colors.blue,
                                       height: 1.5,
                                     ),
                                   ),
-                          linkIconAsset:
-                              (_codeController.text.trim().isNotEmpty)
-                                  ? Assets.icons.svg.lucideCopy
-                                  : null,
-                          action: () {
-                            try {
-                              Clipboard.setData(
-                                ClipboardData(text: _codeController.text),
-                              );
-                              // debugPrint("Copied: 012ajsh");
-                              CustomSnackbar.showSnackBar(
-                                context,
-                                "Thành công",
-                                "Đã sao chép mã ${_codeController.text}",
-                                AlertType.success,
-                              );
-                            } catch (e) {
-                              CustomSnackbar.showSnackBar(
-                                context,
-                                "Lỗi",
-                                "Không thể sao chép",
-                                AlertType.error,
-                              );
-                            }
-                          },
-                        ),
-                        UosInfoItem(
-                          field: "Link tham gia",
-                          value:
-                              (_linkController.text.trim().isNotEmpty)
-                                  ? GestureDetector(
-                                    onTap: () async {
-                                      final Uri url = Uri.parse("");
-                                      if (await canLaunchUrl(url)) {
-                                        await launchUrl(url);
-                                      } else if (context.mounted) {
-                                        CustomSnackbar.showSnackBar(
-                                          context,
-                                          "Lỗi",
-                                          "Không thể truy cập link",
-                                          AlertType.error,
-                                        );
-                                      }
-                                    },
-                                    child: Text(
-                                      "Link Teams",
+                                )
+                                : Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  spacing: 4,
+                                  children: [
+                                    Text(
+                                      "Chưa cập nhật",
                                       style: TextStyle(
                                         fontSize: FontSizes.medium,
-                                        fontWeight: FontWeight.w400,
-                                        color:
-                                            context.theme.primaryColor ??
-                                            Colors.blue,
                                         fontStyle: FontStyle.italic,
-                                        decoration: TextDecoration.underline,
-                                        decorationColor:
-                                            context.theme.primaryColor ??
-                                            Colors.blue,
+                                        color:
+                                            context.theme.grey ?? Colors.grey,
                                         height: 1.5,
                                       ),
                                     ),
-                                  )
-                                  : Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    spacing: 4,
-                                    children: [
-                                      Text(
-                                        "Chưa cập nhật",
-                                        style: TextStyle(
-                                          fontSize: FontSizes.medium,
-                                          fontStyle: FontStyle.italic,
-                                          color:
-                                              context.theme.grey ?? Colors.grey,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                      if (_linkController.text.trim().isEmpty &&
-                                          userRole == RoleModel.roleTeacher)
-                                        InkWell(
-                                          onTap:
-                                              () => _showCreateTeamsDialog(
-                                                context.read<UosDetailBloc>(),
-                                                authToken,
-                                              ),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              border: Border.all(
-                                                color: Color(0XFF6E6EE2),
-                                              ),
+                                    if (_linkController.text.trim().isEmpty &&
+                                        userRole == RoleModel.roleTeacher)
+                                      InkWell(
+                                        onTap:
+                                            () => _showCreateTeamsDialog(
+                                              context.read<UosDetailBloc>(),
+                                              authToken,
                                             ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              spacing: 4,
-                                              children: [
-                                                Icon(
-                                                  MaterialCommunityIcons
-                                                      .microsoft_teams,
-                                                  color: Color(0XFF6E6EE2),
-                                                  size: 20,
-                                                ),
-                                                Text(
-                                                  'Tạo Teams',
-                                                  style: TextStyle(
-                                                    color: Color(0XFF6E6EE2),
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: FontSizes.medium,
-                                                  ),
-                                                ),
-                                              ],
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                            border: Border.all(
+                                              color: Color(0XFF6E6EE2),
                                             ),
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                          linkIconAsset:
-                              (_linkController.text.trim().isNotEmpty)
-                                  ? Assets.icons.svg.lucideCopy
-                                  : null,
-                          action: () {
-                            try {
-                              Clipboard.setData(
-                                ClipboardData(text: _linkController.text),
-                              );
-                              CustomSnackbar.showSnackBar(
-                                context,
-                                "Thành công",
-                                "Đã sao chép đường link",
-                                AlertType.success,
-                              );
-                            } catch (e) {
-                              CustomSnackbar.showSnackBar(
-                                context,
-                                "Lỗi",
-                                "Không thể sao chép",
-                                AlertType.error,
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  UosInfoCard(
-                    title: 'Đánh giá',
-                    child: Column(
-                      children: [
-                        if (userRole == RoleModel.roleStudent)
-                          UosInfoItem(
-                            field: "Số lần vắng",
-                            value: GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder:
-                                      (dialogContext) => BlocProvider.value(
-                                        value: context.read<ListAbsentBloc>(),
-                                        child: AbsentsCard(
-                                          isTeacher: false,
-                                          idUos: widget.uosDetail.idUnitOfStudy,
-                                          idStudent: '',
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            spacing: 4,
+                                            children: [
+                                              Icon(
+                                                MaterialCommunityIcons
+                                                    .microsoft_teams,
+                                                color: Color(0XFF6E6EE2),
+                                                size: 20,
+                                              ),
+                                              Text(
+                                                'Tạo Teams',
+                                                style: TextStyle(
+                                                  color: Color(0XFF6E6EE2),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: FontSizes.medium,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                );
-                              },
-                              child: Text(
-                                widget.absentTimes!.toString(),
-                                style: TextStyle(
-                                  fontSize: FontSizes.medium,
-                                  fontWeight: FontWeight.bold,
-                                  color: context.theme.red ?? Colors.red,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor:
-                                      context.theme.red ?? Colors.red,
-                                  height: 1.5,
+                                  ],
                                 ),
+                        linkIconAsset:
+                            (_linkController.text.trim().isNotEmpty)
+                                ? Assets.icons.svg.lucideCopy
+                                : null,
+                        action: () {
+                          try {
+                            Clipboard.setData(
+                              ClipboardData(text: _linkController.text),
+                            );
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Thành công",
+                              "Đã sao chép đường link",
+                              AlertType.success,
+                            );
+                          } catch (e) {
+                            CustomSnackbar.showSnackBar(
+                              context,
+                              "Lỗi",
+                              "Không thể sao chép",
+                              AlertType.error,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title: 'Đánh giá',
+                  child: Column(
+                    children: [
+                      if (userRole == RoleModel.roleStudent)
+                        UosInfoItem(
+                          field: "Số lần vắng",
+                          value: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder:
+                                    (dialogContext) => BlocProvider.value(
+                                      value: context.read<ListAbsentBloc>(),
+                                      child: AbsentsCard(
+                                        isTeacher: false,
+                                        idUos: widget.uosDetail.idUnitOfStudy,
+                                        idStudent: '',
+                                      ),
+                                    ),
+                              );
+                            },
+                            child: Text(
+                              widget.absentTimes!.toString(),
+                              style: TextStyle(
+                                fontSize: FontSizes.medium,
+                                fontWeight: FontWeight.bold,
+                                color: context.theme.red ?? Colors.red,
+                                decoration: TextDecoration.underline,
+                                decorationColor:
+                                    context.theme.red ?? Colors.red,
+                                height: 1.5,
                               ),
                             ),
                           ),
-                        InfoItem(
-                          field: "Công thức điểm",
-                          value: widget.uosDetail.scoreFormula,
                         ),
-                      ],
-                    ),
+                      InfoItem(
+                        field: "Công thức điểm",
+                        value: widget.uosDetail.scoreFormula,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  UosInfoCard(
-                    title:
-                        userRole == RoleModel.roleTeacher
-                            ? 'Thời khóa biểu'
-                            : 'Lịch học',
-                    child: Container(
-                      width: double.infinity,
-                      alignment: Alignment.topLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(entries.length, (index) {
-                          final entry = entries[index];
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Tuần ${entry.key}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: FontSizes.medium,
-                                    ),
+                ),
+                const SizedBox(height: 10),
+                UosInfoCard(
+                  title:
+                      userRole == RoleModel.roleTeacher
+                          ? 'Thời khóa biểu'
+                          : 'Lịch học',
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.topLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List.generate(entries.length, (index) {
+                        final entry = entries[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Tuần ${entry.key}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: FontSizes.medium,
                                   ),
-                                  const SizedBox(height: 4),
-                                  ...entry.value.map((shiftStr) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.only(
-                                          left: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            left: BorderSide(
-                                              color:
-                                                  context.theme.grey ??
-                                                  Colors.grey,
-                                              width: 1,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          shiftStr,
-                                          style: TextStyle(
+                                ),
+                                const SizedBox(height: 4),
+                                ...entry.value.map((shiftStr) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          left: BorderSide(
                                             color:
                                                 context.theme.grey ??
                                                 Colors.grey,
-                                            fontSize: FontSizes.medium,
+                                            width: 1,
                                           ),
                                         ),
                                       ),
-                                    );
-                                  }),
-                                ],
-                              ),
-                              if (index < entries.length - 1)
-                                const SizedBox(height: 10),
-                            ],
-                          );
-                        }),
-                      ),
+                                      child: Text(
+                                        shiftStr,
+                                        style: TextStyle(
+                                          color:
+                                              context.theme.grey ?? Colors.grey,
+                                          fontSize: FontSizes.medium,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                            if (index < entries.length - 1)
+                              const SizedBox(height: 10),
+                          ],
+                        );
+                      }),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  if (userRole == RoleModel.roleStudent)
-                    if (widget.examShift != null &&
-                        widget.examShift!.idExamShift.isNotEmpty)
-                      UosInfoCard(
-                        title: 'Lịch thi',
-                        child: Column(
-                          children: [
-                            InfoItem(
-                              field: "Ngày giờ",
-                              value:
-                                  widget.examShift!.examDate != null
-                                      ? Functions.formatDateTime(
-                                        widget.examShift!.examDate!,
-                                      )
-                                      : '',
-                            ),
-                            InfoItem(
-                              field: "Phòng",
-                              value: widget.examShift!.room,
-                            ),
-                            InfoItem(
-                              field: "Xuất",
-                              value: widget.examShift!.noExamShift,
-                            ),
-                            InfoItem(
-                              field: "Nhóm",
-                              value: widget.examShift!.noExamGroup,
-                            ),
-                            InfoItem(
-                              field: "Hình thức thi",
-                              value: widget.examShift!.methodOfExam,
-                            ),
-                          ],
-                        ),
+                ),
+                const SizedBox(height: 10),
+                if (userRole == RoleModel.roleStudent)
+                  if (widget.examShift != null &&
+                      widget.examShift!.idExamShift.isNotEmpty)
+                    UosInfoCard(
+                      title: 'Lịch thi',
+                      child: Column(
+                        children: [
+                          InfoItem(
+                            field: "Ngày giờ",
+                            value:
+                                widget.examShift!.examDate != null
+                                    ? Functions.formatDateTime(
+                                      widget.examShift!.examDate!,
+                                    )
+                                    : '',
+                          ),
+                          InfoItem(
+                            field: "Phòng",
+                            value: widget.examShift!.room,
+                          ),
+                          InfoItem(
+                            field: "Xuất",
+                            value: widget.examShift!.noExamShift,
+                          ),
+                          InfoItem(
+                            field: "Nhóm",
+                            value: widget.examShift!.noExamGroup,
+                          ),
+                          InfoItem(
+                            field: "Hình thức thi",
+                            value: widget.examShift!.methodOfExam,
+                          ),
+                        ],
                       ),
-                ],
-              ),
+                    ),
+              ],
             ),
           ),
         );

@@ -138,7 +138,35 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
               body:
                   userRole == RoleModel.roleTeacher
-                      ? BlocBuilder<UosDetailBloc, UosDetailState>(
+                      ? BlocConsumer<UosDetailBloc, UosDetailState>(
+                        listener: (context, state) {
+                          if (state is FullInfoUosLoaded) {
+                            // Check lỗi
+                            if (state.errorMessage != null &&
+                                state.errorMessage!.isNotEmpty) {
+                              CustomAlertDialog.showCustomDialog(
+                                context,
+                                'Đã xảy ra lỗi',
+                                state.errorMessage!,
+                                dialog.AlertDialogType.failure,
+                                onConfirm: () => Navigator.of(context).pop(),
+                              );
+                            }
+                            // Check thành công
+                            else if (state.typeSuccess == 'createTeams') {
+                              CustomAlertDialog.showCustomDialog(
+                                context,
+                                'Đã gửi yêu cầu',
+                                'Hệ thống đang xử lý. Bạn sẽ nhận được thông báo khi hoàn tất.',
+                                dialog.AlertDialogType.success,
+                                onConfirm: () {
+                                  Navigator.pop(context);
+                                },
+                                textCancel: 'Đã hiểu',
+                              );
+                            }
+                          }
+                        },
                         builder: (context, infoState) {
                           if (infoState is UosDetailLoading) {
                             return CustomLoadingIndicator.primary();

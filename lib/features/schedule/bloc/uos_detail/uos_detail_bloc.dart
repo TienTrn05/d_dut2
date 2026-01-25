@@ -1,4 +1,3 @@
-import 'package:e_dut/common/utils/logger.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_detail_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/full_info_uos_detail_model.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/students_exam_shift_model.dart';
@@ -114,7 +113,6 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
   ) async {
     emit(UosDetailLoading());
     try {
-      logger.d('CALL CREATE TEAMS');
       final idUos = event.idUos;
       final authToken = event.authToken;
 
@@ -127,7 +125,13 @@ class UosDetailBloc extends Bloc<UosDetailEvent, UosDetailState> {
             true,
             authToken,
           );
-          emit(FullInfoUosLoaded(fullInfoUosDetail: fullInfoUosDetail));
+          emit(
+            FullInfoUosLoaded(
+              fullInfoUosDetail: fullInfoUosDetail,
+              typeSuccess: 'createTeams',
+              errorMessage: null,
+            ),
+          );
         } catch (e) {
           emit(UosDetailError(message: e.toString()));
         }
