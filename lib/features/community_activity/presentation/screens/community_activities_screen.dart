@@ -1,3 +1,4 @@
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,105 +29,119 @@ class CommunityActivitiesScreen extends StatefulWidget {
 
 class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
   final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Tất cả hoạt động",
-      "iconPath": "assets/icons/svg/gg_list.svg",
-    },
+    {"title": "Tất cả hoạt động", "iconPath": Assets.icons.svg.ggList},
     {
       "title": "Hoạt động của tôi",
-      "iconPath": "assets/icons/svg/mynaui_activity-square.svg",
+      "iconPath": Assets.icons.svg.mynauiActivitySquare,
     },
     {
       "title": "Minh chứng của tôi",
-      "iconPath": "assets/icons/svg/lucide_file-check-2.svg",
+      "iconPath": Assets.icons.svg.lucideFileCheck2,
     },
-    {
-      "title": "Điểm của tôi",
-      "iconPath": "assets/icons/svg/ph_list-heart-bold.svg",
-    },
+    {"title": "Điểm của tôi", "iconPath": Assets.icons.svg.phListHeartBold},
   ];
   String selectedMenu = "Tất cả hoạt động";
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-      if (authState is! AuthUserAuthenticated) {
-        return UnauthorizedPage(title: "Hoạt động cộng đồng");
-      }
-      return MultiBlocProvider(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        if (authState is! AuthUserAuthenticated) {
+          return UnauthorizedPage(title: "Hoạt động cộng đồng");
+        }
+        return MultiBlocProvider(
           providers: [
             BlocProvider(
-                create: (_) =>
-                    CommunityActivityBloc(getIt.get<CommunityRepository>())),
+              create:
+                  (_) =>
+                      CommunityActivityBloc(getIt.get<CommunityRepository>()),
+            ),
             BlocProvider(
-                create: (_) => UserInfoBloc(getIt.get<CommunityRepository>()))
+              create: (_) => UserInfoBloc(getIt.get<CommunityRepository>()),
+            ),
           ],
           child: Scaffold(
             backgroundColor: context.theme.lightBlue,
             appBar: CustomAppbar(label: selectedMenu),
             body: _buildBodyContent(authState.accessToken),
             floatingActionButton: Builder(
-              builder: (context) => Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(64),
-                    blurRadius: 4,
-                    spreadRadius: 0,
-                    offset: const Offset(2, 2),
-                  )
-                ]),
-                child: FloatingActionButton(
-                  elevation: 0,
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                  },
-                  backgroundColor: context.theme.primaryColor,
-                  shape: const CircleBorder(),
-                  child: const Icon(Icons.menu_rounded, color: Colors.white),
+              builder:
+                  (context) => Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(64),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                          offset: const Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    child: FloatingActionButton(
+                      elevation: 0,
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                      backgroundColor: context.theme.primaryColor,
+                      shape: const CircleBorder(),
+                      child: const Icon(
+                        Icons.menu_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+            ),
+            endDrawer: Drawer(
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 18,
+                  right: 18,
+                  top: 48,
+                  bottom: 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Hoạt động cộng đồng',
+                        style: TextStyle(
+                          fontSize: FontSizes.large,
+                          height: 1,
+                          fontWeight: FontWeight.bold,
+                          color: context.theme.primaryColor ?? Colors.blue,
+                        ),
+                      ),
+                    ),
+                    Divider(color: context.theme.primaryColor),
+                    ...menuItems.map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _buildMenuItem(
+                          item["title"],
+                          iconPath: item["iconPath"],
+                          isSelected: selectedMenu == item["title"],
+                          onPressed: () {
+                            setState(() {
+                              selectedMenu = item["title"];
+                            });
+                            Navigator.pop(context);
+                          },
+                          context: context,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            endDrawer: Drawer(
-                backgroundColor: Colors.white,
-                child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 18, right: 18, top: 48, bottom: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Hoạt động cộng đồng',
-                          style: TextStyle(
-                            fontSize: FontSizes.large,
-                            height: 1,
-                            fontWeight: FontWeight.bold,
-                            color: context.theme.primaryColor ?? Colors.blue,
-                          ),
-                        ),
-                      ),
-                      Divider(color: context.theme.primaryColor),
-                      ...menuItems.map((item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _buildMenuItem(
-                              item["title"],
-                              iconPath: item["iconPath"],
-                              isSelected: selectedMenu == item["title"],
-                              onPressed: () {
-                                setState(() {
-                                  selectedMenu = item["title"];
-                                });
-                                Navigator.pop(context);
-                              },
-                              context: context,
-                            ),
-                          )),
-                    ],
-                  ),
-                )),
-          ));
-    });
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildMenuItem(
@@ -139,13 +154,12 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected
-            ? context.theme.primaryColor ?? Colors.blue
-            : Colors.white,
+        backgroundColor:
+            isSelected
+                ? context.theme.primaryColor ?? Colors.blue
+                : Colors.white,
         foregroundColor: isSelected ? Colors.white : Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: isSelected ? 2 : 0,
         padding: const EdgeInsets.all(16),
       ),
@@ -154,7 +168,9 @@ class _CommunityActivitiesScreenState extends State<CommunityActivitiesScreen> {
           SvgPicture.asset(
             iconPath,
             colorFilter: ColorFilter.mode(
-                isSelected ? Colors.white : Colors.black, BlendMode.srcIn),
+              isSelected ? Colors.white : Colors.black,
+              BlendMode.srcIn,
+            ),
             width: 24,
             height: 24,
           ),

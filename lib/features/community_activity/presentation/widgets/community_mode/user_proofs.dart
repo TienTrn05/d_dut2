@@ -14,6 +14,7 @@ import 'package:e_dut/features/community_activity/presentation/widgets/cards/use
 import 'package:e_dut/features/community_activity/presentation/widgets/common/pagination.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/search_text_field.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/custom/academic_year_selector.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -46,9 +47,9 @@ class _UserProofsState extends State<UserProofs> {
 
     if (authState is AuthUserAuthenticated) {
       final accessToken = authState.accessToken;
-      context.read<CommunityActivityBloc>().add(LoadAcademicYears(
-            token: accessToken,
-          ));
+      context.read<CommunityActivityBloc>().add(
+        LoadAcademicYears(token: accessToken),
+      );
     }
   }
 
@@ -63,12 +64,15 @@ class _UserProofsState extends State<UserProofs> {
     if (authState is AuthUserAuthenticated) {
       final keyword = _searchController.text.trim();
       final accessToken = authState.accessToken;
-      context.read<CommunityActivityBloc>().add(LoadUserProofs(
+      context.read<CommunityActivityBloc>().add(
+        LoadUserProofs(
           token: accessToken,
           keyword: keyword,
           pageNumber: pageNumber,
           academicYearId: academicYearId,
-          status: selectedStatus));
+          status: selectedStatus,
+        ),
+      );
       setState(() {
         _currentPage = pageNumber;
       });
@@ -125,190 +129,228 @@ class _UserProofsState extends State<UserProofs> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Column(
-      children: [
-        BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
-            buildWhen: (previous, current) =>
-                current is CommunityActivityLoading ||
-                current is UserProofsLoaded ||
-                current is AcademicYearsLoaded ||
-                current is CommunityActivityError,
+      child: Column(
+        children: [
+          BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+            buildWhen:
+                (previous, current) =>
+                    current is CommunityActivityLoading ||
+                    current is UserProofsLoaded ||
+                    current is AcademicYearsLoaded ||
+                    current is CommunityActivityError,
             builder: (context, state) {
               if (state is CommunityActivityLoading) {
                 return CustomLoadingIndicator.primary();
               }
               return const SizedBox.shrink();
-            }),
-        Padding(
-          padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
-          child: BlocListener<CommunityActivityBloc, CommunityActivityState>(
-            listener: (context, state) {
-              if (state is AcademicYearsLoaded) {
-                // Cập nhật danh sách academic years
-                _academicYears = state.academicYears;
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
+            child: BlocListener<CommunityActivityBloc, CommunityActivityState>(
+              listener: (context, state) {
+                if (state is AcademicYearsLoaded) {
+                  // Cập nhật danh sách academic years
+                  _academicYears = state.academicYears;
 
-                final now = DateTime.now();
-                final index = _academicYears.indexWhere((year) =>
-                    now.isAfter(year.startDate) && now.isBefore(year.endDate));
+                  final now = DateTime.now();
+                  final index = _academicYears.indexWhere(
+                    (year) =>
+                        now.isAfter(year.startDate) &&
+                        now.isBefore(year.endDate),
+                  );
 
-                setState(() {
-                  // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
-                  selectedIndex =
-                      index != -1 ? index : _academicYears.length - 1;
-                });
-
-                // Load activities với academic year đầu tiên
-                if (_academicYears.isNotEmpty) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _loadProofs(1, _academicYears[selectedIndex].id.toString());
+                  setState(() {
+                    // Nếu tìm thấy thì dùng index đó, nếu không thì lấy năm học cuối cùng
+                    selectedIndex =
+                        index != -1 ? index : _academicYears.length - 1;
                   });
-                }
-              } else if (state is UserProofsLoaded) {
-                // Cập nhật pagination info
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final totalItems = state.pagedUserProofs.total;
-                  final pageSize = int.parse(state.pagedUserProofs.limit);
-                  final total = (totalItems / pageSize).ceil();
-                  if (_totalPages != total) {
-                    setState(() {
-                      _totalPages = total;
+
+                  // Load activities với academic year đầu tiên
+                  if (_academicYears.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _loadProofs(
+                        1,
+                        _academicYears[selectedIndex].id.toString(),
+                      );
                     });
                   }
-                });
-              }
-            },
-            child: BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
-              buildWhen: (previous, current) =>
-                  current is AcademicYearsLoaded ||
-                  current is UserProofsLoaded ||
-                  current is CommunityActivityError,
-              builder: (context, state) {
-                if (_academicYears.isNotEmpty) {
-                  return _buildAcademicYearSelector(_academicYears);
-                } else {
-                  return LoadingAcademicYearSelector();
+                } else if (state is UserProofsLoaded) {
+                  // Cập nhật pagination info
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    final totalItems = state.pagedUserProofs.total;
+                    final pageSize = int.parse(state.pagedUserProofs.limit);
+                    final total = (totalItems / pageSize).ceil();
+                    if (_totalPages != total) {
+                      setState(() {
+                        _totalPages = total;
+                      });
+                    }
+                  });
                 }
               },
+              child: BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+                buildWhen:
+                    (previous, current) =>
+                        current is AcademicYearsLoaded ||
+                        current is UserProofsLoaded ||
+                        current is CommunityActivityError,
+                builder: (context, state) {
+                  if (_academicYears.isNotEmpty) {
+                    return _buildAcademicYearSelector(_academicYears);
+                  } else {
+                    return LoadingAcademicYearSelector();
+                  }
+                },
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding:
-              const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 14.0),
-          child: SearchTextField(
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 20,
+              left: 24,
+              right: 24,
+              bottom: 14.0,
+            ),
+            child: SearchTextField(
               controller: _searchController,
               onFilterPressed: () => _showFilterModal(context),
-              iconUrl: 'assets/icons/svg/tabler_filter-search.svg',
-              textColor: context.theme.grey ?? Colors.grey),
-        ),
-        BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
-          buildWhen: (previous, current) =>
-              current is UserProofsLoaded || current is CommunityActivityError,
-          builder: (context, state) {
-            if (state is UserProofsLoaded) {
-              userProofs = state.pagedUserProofs.proofs;
-              return Expanded(
+              iconUrl: Assets.icons.svg.tablerFilterSearch,
+              textColor: context.theme.grey ?? Colors.grey,
+            ),
+          ),
+          BlocBuilder<CommunityActivityBloc, CommunityActivityState>(
+            buildWhen:
+                (previous, current) =>
+                    current is UserProofsLoaded ||
+                    current is CommunityActivityError,
+            builder: (context, state) {
+              if (state is UserProofsLoaded) {
+                userProofs = state.pagedUserProofs.proofs;
+                return Expanded(
                   child: Column(
-                children: [
-                  Expanded(
-                    child: RefreshIndicator(
-                      color: context.theme.primaryColor,
-                      backgroundColor: Colors.white,
-                      onRefresh: () async {
-                        final completer = Completer<void>();
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          color: context.theme.primaryColor,
+                          backgroundColor: Colors.white,
+                          onRefresh: () async {
+                            final completer = Completer<void>();
 
-                        // Listen để biết khi nào refresh hoàn tất
-                        final subscription = context
-                            .read<CommunityActivityBloc>()
-                            .stream
-                            .listen((state) {
-                          if (state is UserProofsLoaded ||
-                              state is CommunityActivityError) {
-                            if (!completer.isCompleted) {
-                              completer.complete();
-                            }
-                          }
-                        });
+                            // Listen để biết khi nào refresh hoàn tất
+                            final subscription = context
+                                .read<CommunityActivityBloc>()
+                                .stream
+                                .listen((state) {
+                                  if (state is UserProofsLoaded ||
+                                      state is CommunityActivityError) {
+                                    if (!completer.isCompleted) {
+                                      completer.complete();
+                                    }
+                                  }
+                                });
 
-                        _loadProofsWithCurrentYear(_currentPage);
+                            _loadProofsWithCurrentYear(_currentPage);
 
-                        // Đợi cho đến khi có kết quả
-                        await completer.future.timeout(
-                          Duration(seconds: 30),
-                        );
+                            // Đợi cho đến khi có kết quả
+                            await completer.future.timeout(
+                              Duration(seconds: 30),
+                            );
 
-                        subscription.cancel();
-                      },
-                      child: SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.only(
-                            left: 24.0, right: 24.0, top: 7.0, bottom: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 10,
-                          children: userProofs.isNotEmpty
-                              ? filteredProofs.isNotEmpty
-                                  ? filteredProofs
-                                      .map(
-                                        (proof) => UserProofCard(
-                                          nameActivity:
-                                              proof.userActivity.activity.name,
-                                          score:
-                                              proof.userActivity.activity.score,
-                                          status: proof.userActivity.status,
-                                          onPressed: () {
-                                            Navigator.of(context).pushNamed(
-                                                Routes.detailUserProof,
-                                                arguments: proof);
-                                          },
-                                        ),
-                                      )
-                                      .toList()
-                                  : [
-                                      Center(
+                            subscription.cancel();
+                          },
+                          child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(
+                              left: 24.0,
+                              right: 24.0,
+                              top: 7.0,
+                              bottom: 16.0,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: 10,
+                              children:
+                                  userProofs.isNotEmpty
+                                      ? filteredProofs.isNotEmpty
+                                          ? filteredProofs
+                                              .map(
+                                                (proof) => UserProofCard(
+                                                  nameActivity:
+                                                      proof
+                                                          .userActivity
+                                                          .activity
+                                                          .name,
+                                                  score:
+                                                      proof
+                                                          .userActivity
+                                                          .activity
+                                                          .score,
+                                                  status:
+                                                      proof.userActivity.status,
+                                                  onPressed: () {
+                                                    Navigator.of(
+                                                      context,
+                                                    ).pushNamed(
+                                                      Routes.detailUserProof,
+                                                      arguments: proof,
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                              .toList()
+                                          : [
+                                            Center(
+                                              child: Text(
+                                                'Không tìm thấy minh chứng nào phù hợp với tiêu chí tìm kiếm.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color:
+                                                      context.theme.grey ??
+                                                      Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                          ]
+                                      : [
+                                        Center(
                                           child: Text(
-                                              'Không tìm thấy minh chứng nào phù hợp với tiêu chí tìm kiếm.',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: context.theme.grey ??
-                                                      Colors.grey)))
-                                    ]
-                              : [
-                                  Center(
-                                      child: Text(
-                                    'Không có dữ liệu',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color:
-                                            context.theme.grey ?? Colors.grey),
-                                  ))
-                                ],
+                                            'Không có dữ liệu',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color:
+                                                  context.theme.grey ??
+                                                  Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                            ),
+                          ),
                         ),
                       ),
+                      if (userProofs.isNotEmpty) _buildPageButtons(),
+                    ],
+                  ),
+                );
+              } else if (state is CommunityActivityError) {
+                return Expanded(
+                  child: const Center(
+                    child: Text(
+                      'Không thể tải dữ liệu minh chứng của tôi',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: FontSizes.medium),
                     ),
                   ),
-                  if (userProofs.isNotEmpty) _buildPageButtons()
-                ],
-              ));
-            } else if (state is CommunityActivityError) {
-              return Expanded(
-                child: const Center(
-                  child: Text(
-                    'Không thể tải dữ liệu minh chứng của tôi',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: FontSizes.medium,
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
-      ],
-    ));
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _onSearchChanged() {
@@ -366,44 +408,46 @@ class _UserProofsState extends State<UserProofs> {
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
-        return StatefulBuilder(builder: (modalContext, setModalState) {
-          return BottomModal(
-            title: "Sắp xếp và lọc",
-            mainActionText: "Áp dụng",
-            mainAction: () {
-              setState(() {
-                selectedStateFilters = localSelectedState;
-              });
+        return StatefulBuilder(
+          builder: (modalContext, setModalState) {
+            return BottomModal(
+              title: "Sắp xếp và lọc",
+              mainActionText: "Áp dụng",
+              mainAction: () {
+                setState(() {
+                  selectedStateFilters = localSelectedState;
+                });
 
-              Navigator.pop(modalContext);
-              _loadProofsWithCurrentYear(1);
-            },
-            onCloseText: "Đặt lại",
-            onClose: () {
-              setModalState(() {
-                localSelectedState.clear();
-                sortAscending = false;
-              });
+                Navigator.pop(modalContext);
+                _loadProofsWithCurrentYear(1);
+              },
+              onCloseText: "Đặt lại",
+              onClose: () {
+                setModalState(() {
+                  localSelectedState.clear();
+                  sortAscending = false;
+                });
 
-              setState(() {
-                selectedStateFilters.clear();
-              });
-              _loadProofsWithCurrentYear(1);
-            },
-            heightFactor: 0.7,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sortField(setModalState),
-                  const SizedBox(height: 24),
-                  _stateFilter(localSelectedState, setModalState),
-                ],
+                setState(() {
+                  selectedStateFilters.clear();
+                });
+                _loadProofsWithCurrentYear(1);
+              },
+              heightFactor: 0.7,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sortField(setModalState),
+                    const SizedBox(height: 24),
+                    _stateFilter(localSelectedState, setModalState),
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
     ).whenComplete(() {
       selectedStateFilters = localSelectedState;
@@ -429,8 +473,10 @@ class _UserProofsState extends State<UserProofs> {
             Expanded(
               child: Container(
                 height: 48,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
                   color: context.theme.lightGrey,
@@ -455,8 +501,9 @@ class _UserProofsState extends State<UserProofs> {
               child: TextButton(
                 style: ButtonStyle(
                   padding: WidgetStateProperty.all(const EdgeInsets.all(8)),
-                  backgroundColor:
-                      WidgetStateProperty.all(context.theme.lightGrey),
+                  backgroundColor: WidgetStateProperty.all(
+                    context.theme.lightGrey,
+                  ),
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
@@ -472,19 +519,21 @@ class _UserProofsState extends State<UserProofs> {
                 },
                 child: SvgPicture.asset(
                   sortAscending
-                      ? "assets/icons/svg/lucide_sort-asc.svg"
-                      : "assets/icons/svg/lucide_sort-desc.svg",
+                      ? Assets.icons.svg.lucideSortAsc
+                      : Assets.icons.svg.lucideSortDesc,
                 ),
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
 
   Widget _stateFilter(
-      Set<String> localSelectedState, StateSetter setModalState) {
+    Set<String> localSelectedState,
+    StateSetter setModalState,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -501,52 +550,59 @@ class _UserProofsState extends State<UserProofs> {
         Wrap(
           spacing: 5,
           runSpacing: 5,
-          children: UserProofStatus.keys.map((statusKey) {
-            final bool isSelected = localSelectedState.contains(statusKey);
-            final style = UserProofStatus.styles[statusKey];
-            final label = style?.label ?? statusKey;
+          children:
+              UserProofStatus.keys.map((statusKey) {
+                final bool isSelected = localSelectedState.contains(statusKey);
+                final style = UserProofStatus.styles[statusKey];
+                final label = style?.label ?? statusKey;
 
-            return TextButton(
-              onPressed: () {
-                setModalState(() {
-                  if (isSelected) {
-                    localSelectedState.remove(statusKey);
-                  } else {
-                    localSelectedState.add(statusKey);
-                  }
-                });
-              },
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(
-                    fontWeight: FontWeight.w400, fontSize: FontSizes.small),
-                backgroundColor: isSelected
-                    ? context.theme.primaryColor
-                    : context.theme.lightGrey,
-                foregroundColor: isSelected ? Colors.white : context.theme.grey,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label),
-                  if (isSelected)
-                    Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      child: const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 12,
-                      ),
+                return TextButton(
+                  onPressed: () {
+                    setModalState(() {
+                      if (isSelected) {
+                        localSelectedState.remove(statusKey);
+                      } else {
+                        localSelectedState.add(statusKey);
+                      }
+                    });
+                  },
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: FontSizes.small,
                     ),
-                ],
-              ),
-            );
-          }).toList(),
-        )
+                    backgroundColor:
+                        isSelected
+                            ? context.theme.primaryColor
+                            : context.theme.lightGrey,
+                    foregroundColor:
+                        isSelected ? Colors.white : context.theme.grey,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(label),
+                      if (isSelected)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          child: const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+        ),
       ],
     );
   }

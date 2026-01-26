@@ -19,6 +19,8 @@ class _Keys {
   // notification settings
   static const generalNotification = 'general_notification';
   static const personalNotification = 'personal_notification';
+  static const queueNotification = 'queue_notification';
+  static const remainTurn = 'remain_turn';
   static const examNotification = 'exam_notification';
   static const remindBefore = 'remind_before';
   static const scheduleNotifications = 'schedule_notifications';
@@ -141,6 +143,15 @@ class Storage {
       _get<bool>(_Keys.personalNotification) ?? true;
   static Future<void> setMyNotification(bool val) =>
       _set(_Keys.personalNotification, val, notify: true);
+
+  static bool get queueNotification =>
+      _get<bool>(_Keys.queueNotification) ?? true;
+  static Future<void> setQueueNotification(bool val) =>
+      _set(_Keys.queueNotification, val, notify: true);
+
+  static int get remainTurn => _get<int>(_Keys.remainTurn) ?? 3;
+  static Future<void> setRemainTurn(int val) =>
+      _set(_Keys.remainTurn, val, notify: true);
 
   static bool get examNotification =>
       _get<bool>(_Keys.examNotification) ?? true;

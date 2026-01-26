@@ -110,9 +110,6 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/bi_chat-dots-fill.svg
   String get biChatDotsFill => 'assets/icons/svg/bi_chat-dots-fill.svg';
 
-  /// File path: assets/icons/svg/bx_bot.svg
-  String get bxBot => 'assets/icons/svg/bx_bot.svg';
-
   /// File path: assets/icons/svg/carbon_book.svg
   String get carbonBook => 'assets/icons/svg/carbon_book.svg';
 
@@ -278,6 +275,10 @@ class $AssetsIconsSvgGen {
   String get solarUsersGroupRoundedBroken =>
       'assets/icons/svg/solar_users-group-rounded-broken.svg';
 
+  /// File path: assets/icons/svg/streamline-logos_microsoft-teams-logo-block.svg
+  String get streamlineLogosMicrosoftTeamsLogoBlock =>
+      'assets/icons/svg/streamline-logos_microsoft-teams-logo-block.svg';
+
   /// File path: assets/icons/svg/streamline-ultimate_loading-bold.svg
   String get streamlineUltimateLoadingBold =>
       'assets/icons/svg/streamline-ultimate_loading-bold.svg';
@@ -303,6 +304,9 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/tabler_filter-search.svg
   String get tablerFilterSearch => 'assets/icons/svg/tabler_filter-search.svg';
 
+  /// File path: assets/icons/svg/tabler_ticket.svg
+  String get tablerTicket => 'assets/icons/svg/tabler_ticket.svg';
+
   /// File path: assets/icons/svg/uil_chart-line.svg
   String get uilChartLine => 'assets/icons/svg/uil_chart-line.svg';
 
@@ -319,7 +323,6 @@ class $AssetsIconsSvgGen {
   List<String> get values => [
     bgPattern,
     biChatDotsFill,
-    bxBot,
     carbonBook,
     chatbotIcon,
     dDUT,
@@ -370,6 +373,7 @@ class $AssetsIconsSvgGen {
     solarUserBold,
     solarUserBroken,
     solarUsersGroupRoundedBroken,
+    streamlineLogosMicrosoftTeamsLogoBlock,
     streamlineUltimateLoadingBold,
     streamlineUltimateWorkflowTeamworkUserHighFive,
     studentTracking,
@@ -377,6 +381,7 @@ class $AssetsIconsSvgGen {
     systemUiconsCalendarDate,
     tablerCoin,
     tablerFilterSearch,
+    tablerTicket,
     uilChartLine,
     uiwSwapRight,
     undrawNoData,

@@ -4,6 +4,7 @@ import 'package:e_dut/features/community_activity/presentation/screens/community
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_proof_screen.dart';
 import 'package:e_dut/features/homeroom/presentation/screens/detail_homeroom_screen.dart';
 import 'package:e_dut/features/homeroom/presentation/screens/list_homeroom_screen.dart';
+import 'package:e_dut/features/queue/presentation/queue_screen.dart';
 import 'package:e_dut/features/schedule/bloc/uos_detail/uos_detail_bloc.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
 import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
@@ -230,6 +231,7 @@ class Routes {
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
             builder: (context) => StatisticsPage(apiBase: apiBase),
+            builder: (context) => StatisticsPage(apiBase: apiBase),
           );
         }
 
@@ -276,6 +278,9 @@ class Routes {
 
       case tuitionFee:
         return MaterialPageRoute(builder: (context) => TuitionFeeScreen());
+
+      case queue:
+        return MaterialPageRoute(builder: (context) => QueueScreen());
 
       // ===== default ===== //
       default:

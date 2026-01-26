@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 // Core
 import 'core/bloc/notification_settings/notification_settings_bloc.dart';
 import 'core/data/local/storage.dart';
+import 'core/data/remote/notification_settings_service.dart';
 import 'core/services/auto_redirect_service.dart';
 import 'core/services/navigation_service.dart';
 import 'core/services/notification_service.dart';
@@ -76,7 +77,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create:
               (_) =>
-                  NotificationSettingsBloc()..add(LoadNotificationSettings()),
+                  NotificationSettingsBloc(notificationSettingsService: getIt<NotificationSettingsService>())..add(LoadNotificationSettings()),
         ),
 
         BlocProvider<CalendarBloc>(
@@ -105,6 +106,14 @@ class MyApp extends StatelessWidget {
                     notificationService.unsubscribeFromTopic(
                       "personal_$username",
                     );
+                  }
+
+                  if (Storage.queueNotification) {
+                    if (await notificationService.areNotificationsAllowed()) {
+                      notificationService.subscribeToTopic("queue_$username");
+                    }
+                  } else {
+                    notificationService.unsubscribeFromTopic("queue_$username");
                   }
                 },
               ),
@@ -135,6 +144,16 @@ class MyApp extends StatelessWidget {
                     } else {
                       notificationService.unsubscribeFromTopic(
                         "personal_$username",
+                      );
+                    }
+
+                    if (Storage.queueNotification) {
+                      if (await notificationService.areNotificationsAllowed()) {
+                        notificationService.subscribeToTopic("queue_$username");
+                      }
+                    } else {
+                      notificationService.unsubscribeFromTopic(
+                        "queue_$username",
                       );
                     }
                   }
