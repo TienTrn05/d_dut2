@@ -36,10 +36,7 @@ class AppUpdateService {
                   children: <Widget>[
                     Text(
                       'V${status.storeVersion} đã sẵn sàng. Cập nhật để trải nghiệm tốt hơn:',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        height: 1.3,
-                      ),
+                      style: const TextStyle(color: Colors.black, height: 1.3),
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -52,7 +49,8 @@ class AppUpdateService {
               actions: <Widget>[
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
-                      width: MediaQuery.of(context).size.width * 0.8),
+                    width: MediaQuery.of(context).size.width * 0.8,
+                  ),
                   child: TextButton(
                     style: TextButton.styleFrom(
                       backgroundColor: context.theme.primaryColor,
@@ -65,6 +63,29 @@ class AppUpdateService {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                  ),
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: BorderSide(
+                        color: context.theme.primaryColor ?? Color(0xFF2A74BD),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Để sau',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: context.theme.primaryColor,
                       ),
                     ),
                   ),

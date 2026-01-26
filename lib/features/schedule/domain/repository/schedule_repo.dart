@@ -190,6 +190,10 @@ class ScheduleRepository {
     );
   }
 
+  Future<bool> createMsTeamsForUos(String token, String idUOS) async {
+    return _scheduleService.createMsTeamsForUos(token, idUOS);
+  }
+
   Future<List<String>> getListStudentForNotiByUos(
     String idUos,
     String authToken,

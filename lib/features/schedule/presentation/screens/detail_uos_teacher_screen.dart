@@ -1,4 +1,5 @@
 import 'package:e_dut/features/schedule/bloc/export_absent/export_absent_bloc.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -137,7 +138,35 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
               appBar: CustomAppbar(label: "Thông tin chi tiết học phần"),
               body:
                   userRole == RoleModel.roleTeacher
-                      ? BlocBuilder<UosDetailBloc, UosDetailState>(
+                      ? BlocConsumer<UosDetailBloc, UosDetailState>(
+                        listener: (context, state) {
+                          if (state is FullInfoUosLoaded) {
+                            // Check lỗi
+                            if (state.errorMessage != null &&
+                                state.errorMessage!.isNotEmpty) {
+                              CustomAlertDialog.showCustomDialog(
+                                context,
+                                'Đã xảy ra lỗi',
+                                state.errorMessage!,
+                                dialog.AlertDialogType.failure,
+                                onConfirm: () => Navigator.of(context).pop(),
+                              );
+                            }
+                            // Check thành công
+                            else if (state.typeSuccess == 'createTeams') {
+                              CustomAlertDialog.showCustomDialog(
+                                context,
+                                'Đã gửi yêu cầu',
+                                'Hệ thống đang xử lý. Bạn sẽ nhận được thông báo khi hoàn tất.',
+                                dialog.AlertDialogType.success,
+                                onConfirm: () {
+                                  Navigator.pop(context);
+                                },
+                                textCancel: 'Đã hiểu',
+                              );
+                            }
+                          }
+                        },
                         builder: (context, infoState) {
                           if (infoState is UosDetailLoading) {
                             return CustomLoadingIndicator.primary();
@@ -370,8 +399,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                       foregroundColor: Colors.white,
                                       child: SvgPicture.asset(
                                         _isCheckAbsent
-                                            ? "assets/icons/svg/student_tracking_overview.svg"
-                                            : "assets/icons/svg/student_tracking.svg",
+                                            ? Assets
+                                                .icons
+                                                .svg
+                                                .studentTrackingOverview
+                                            : Assets.icons.svg.studentTracking,
                                         width: 18,
                                         height: 18,
                                         colorFilter: ColorFilter.mode(
@@ -410,8 +442,11 @@ class _DetailUOSTeacherScreenState extends State<DetailUOSTeacherScreen>
                                 shape: CircleBorder(),
                                 child: SvgPicture.asset(
                                   _isCheckAbsent
-                                      ? "assets/icons/svg/student_tracking.svg"
-                                      : "assets/icons/svg/student_tracking_overview.svg",
+                                      ? Assets.icons.svg.studentTracking
+                                      : Assets
+                                          .icons
+                                          .svg
+                                          .studentTrackingOverview,
                                   width: 24,
                                   height: 24,
                                   colorFilter: ColorFilter.mode(

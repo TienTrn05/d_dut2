@@ -1,15 +1,16 @@
-import 'package:card_loading/card_loading.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/custom_mail_picker.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
 import 'package:e_dut/features/schedule/domain/repository/schedule_repo.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_mail_launcher/open_mail_launcher.dart';
 
@@ -416,10 +417,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           if (state is ScheduleLoading) {
                             return Expanded(
                               child: Column(
-                                children: const [
-                                  CardLoading(
-                                    height: 56,
-                                    margin: EdgeInsets.only(bottom: 4),
+                                children: [
+                                  Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade300,
+                                    highlightColor: Colors.grey.shade100,
+                                    child: Container(
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -602,7 +610,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       builder:
                                           (context, state) => FeatureCard(
                                             iconUrl:
-                                                "assets/icons/svg/bx_bot.svg",
+                                                Assets.icons.svg.chatbotIcon,
                                             title: "Trợ lý dDUT",
                                             onTap: () {
                                               context.read<DashboardBloc>().add(
@@ -723,7 +731,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       builder:
                                           (context, state) => FeatureCard(
                                             iconUrl:
-                                                "assets/icons/svg/bx_bot.svg",
+                                                Assets.icons.svg.chatbotIcon,
                                             title: "Trợ lý dDUT",
                                             onTap: () {
                                               context.read<DashboardBloc>().add(
@@ -748,6 +756,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               }
                                             },
                                           ),
+                                    ),
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/tabler_ticket.svg",
+                                      title: "Lấy số tổ 1 cửa",
+                                      originIconColor: true,
+                                      onTap: () {
+                                        context.read<DashboardBloc>().add(
+                                          DashboardNavigateRequested(
+                                            scopes,
+                                            Routes.queue,
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ];
                                 }

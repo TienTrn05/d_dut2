@@ -19,81 +19,99 @@ class ScheduleNoti {
   ) async {
     try {
       final repository = ScheduleRepository(getIt.get<ScheduleService>());
-      final scheduleNotis = await repository.getScheduleNotification(
-        isTeacher,
-        authToken,
-      );
 
-      final academicEvents = await repository.getAcademicEventForReminder(
-        authToken,
-      );
+      final results = await Future.wait([
+        repository.getScheduleNotification(isTeacher, authToken),
+        repository.getAcademicEventForReminder(authToken),
+      ]);
 
-      // Convert scheduleNotis to JSON string for comparison
+      final scheduleNotis = results[0] as List<UosModel>;
+      final academicEvents = results[1] as List<AcademicEventModel>;
+
+      // Convert to JSON for comparison
       final newDataJson = json.encode({
         'schedule': scheduleNotis.map((uos) => uos.toJson()).toList(),
         'events': academicEvents.map((event) => event.toJson()).toList(),
       });
 
-      // Get stored schedule from SharedPreferences
+      // Get stored schedule
       final storedDataJson = Storage.getScheduleNotifications();
 
-      // Compare to old data
       if (storedDataJson != null && storedDataJson == newDataJson) {
         logger.i("Schedule notifications unchanged, skipping update");
         return true;
       }
 
-      logger.i("Schedule notifications changed, updating...");
-
-      // Cancel all existing notifications chỉ khi có thay đổi
-      await NotificationService().cancelAllNotifications();
-
-      int notificationId = 10000; // Base ID để đảm bảo unique
-
-      for (var uos in scheduleNotis) {
-        for (var studyShift in uos.studyShifts) {
-          await ScheduleNoti.scheduleStudyShiftNotifications(
-            isTeacher: isTeacher,
-            uos: uos,
-            studyShift: studyShift,
-            notificationId: notificationId++,
-            academicEvents: academicEvents,
-          );
-        }
-
-        // Process Exam Shifts
-        for (var examShift in uos.examShifts) {
-          await ScheduleNoti.scheduleExamShiftNotification(
-            isTeacher: isTeacher,
-            uos: uos,
-            examShift: examShift,
-            notificationId: notificationId++,
-          );
-        }
-      }
-
-      // Process Rescheduled Study Events (eventType == 5)
-      for (var event in academicEvents) {
-        if (event.eventType == 5) {
-          await scheduleRescheduledStudyNotification(
-            isTeacher: isTeacher,
-            event: event,
-            notificationId: notificationId++,
-          );
-        }
-      }
+      logger.i("Schedule notifications changed, processing in background...");
 
       await Storage.setScheduleNotifications(newDataJson);
 
-      logger.i(
-        "Successfully setup ${scheduleNotis.length} schedule notifications "
-        "with ${academicEvents.length} academic events",
+      // fire and forget
+      _processNotificationsInBackground(
+        isTeacher: isTeacher,
+        scheduleNotis: scheduleNotis,
+        academicEvents: academicEvents,
       );
-      return true; // Trả về true khi setup thành công
+
+      return true;
     } catch (e) {
-      logger.e("Failed to setup schedule notifications: $e");
-      return false; // Trả về false khi có lỗi
+      logger.e("Failed to fetch schedule data: $e");
+      return false;
     }
+  }
+
+  static void _processNotificationsInBackground({
+    required bool isTeacher,
+    required List<UosModel> scheduleNotis,
+    required List<AcademicEventModel> academicEvents,
+  }) {
+    Future(() async {
+      try {
+        // Cancel all existing notifications
+        await NotificationService().cancelAllNotifications();
+
+        int notificationId = 10000;
+
+        for (var uos in scheduleNotis) {
+          for (var studyShift in uos.studyShifts) {
+            await scheduleStudyShiftNotifications(
+              isTeacher: isTeacher,
+              uos: uos,
+              studyShift: studyShift,
+              notificationId: notificationId++,
+              academicEvents: academicEvents,
+            );
+          }
+
+          for (var examShift in uos.examShifts) {
+            await scheduleExamShiftNotification(
+              isTeacher: isTeacher,
+              uos: uos,
+              examShift: examShift,
+              notificationId: notificationId++,
+            );
+          }
+        }
+
+        // Process Rescheduled Study Events (eventType == 5)
+        for (var event in academicEvents) {
+          if (event.eventType == 5) {
+            await scheduleRescheduledStudyNotification(
+              isTeacher: isTeacher,
+              event: event,
+              notificationId: notificationId++,
+            );
+          }
+        }
+
+        logger.i(
+          "Background: Successfully setup ${scheduleNotis.length} schedule "
+          "notifications with ${academicEvents.length} academic events",
+        );
+      } catch (e) {
+        logger.e("Background: Failed to process notifications: $e");
+      }
+    });
   }
 
   static Future<void> scheduleStudyShiftNotifications({

@@ -3,12 +3,17 @@
         {
             "id": "cmi5rbaeb03qnkdfpkdnnwfui",
             "name": "Trung tâm Hỗ trợ Sinh viên và Quan hệ Doanh nghiệp",
-            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRua2pxcTAzbmprZGZwcjB6cnhjbG8iLCJlbWFpbCI6InNzZXJjQGR1dC51ZG4udm4iLCJpYXQiOjE3NjQ5MjA2MjQsImV4cCI6MTc2NzUxMjYyNH0.FH4MoKxKTFtNAx5LqXW_Gc8QZK9hWDNLlmEEXh7fNE4"
+            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRua2pxcTAzbmprZGZwcjB6cnhjbG8iLCJlbWFpbCI6InNzZXJjQGR1dC51ZG4udm4iLCJpYXQiOjE3Njc4Mzk2MzQsImV4cCI6MTc3MDQzMTYzNH0.mjBJ3sSxIL14ApZHPS2nYPQ-s9uVNAans-QIV9mahnw"
         },
         {
             "id": "cmifhnssj04l7kdfpl4lnwy47",
             "name": "Phòng Công tác sinh viên",
-            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRudTRqdzAzbnNrZGZwaWppdHhoZnoiLCJlbWFpbCI6ImN0c3YuZGhia0BkdXQudWRuLnZuIiwiaWF0IjoxNzY0OTAzNDM1LCJleHAiOjE3Njc0OTU0MzV9.gv9iN_uOpMWOHFKrAxrGvFlCRPrvT0azXWW4M-q_7mM"
+            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRudTRqdzAzbnNrZGZwaWppdHhoZnoiLCJlbWFpbCI6ImN0c3YuZGhia0BkdXQudWRuLnZuIiwiaWF0IjoxNzY3ODM5NzEwLCJleHAiOjE3NzA0MzE3MTB9.1pJZPBr3JNff-NnxXlG8b1R1jLzGlowFHBvBIYhBgdk"
+        },
+        {
+            "id": "cmitvzh5o00fx10ptlyvdrm2n",
+            "name": "Phòng Đào tạo",
+            "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtaTRudHpvZTAzbnFrZGZweWFyZWJ1djQiLCJlbWFpbCI6ImR0LmRoYmtAZHV0LnVkbi52biIsImlhdCI6MTc2NzgzOTc0NiwiZXhwIjoxNzcwNDMxNzQ2fQ.HfCAEc-SUwIuzlHXEf8LvNAPiatiRtjggf9L6kP33_E"
         }
     ]
 }

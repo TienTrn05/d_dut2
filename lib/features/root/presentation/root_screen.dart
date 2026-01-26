@@ -1,3 +1,4 @@
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -135,18 +136,13 @@ class _MainViewState extends State<_MainView> {
                           bottomNavigationItem(
                             context,
                             0,
-                            "assets/icons/svg/iconoir_home-alt.svg",
+                            Assets.icons.svg.iconoirHomeAlt,
                             bottomItemWidth,
                           ),
-                          // bottomNavigationItem(
-                          //     context,
-                          //     1,
-                          //     "assets/icons/svg/flowbite_search-outline.svg",
-                          //     bottomItemWidth),
                           bottomNavigationItem(
                             context,
                             1,
-                            "assets/icons/svg/solar_user-broken.svg",
+                            Assets.icons.svg.solarUserBroken,
                             bottomItemWidth,
                           ),
                         ],

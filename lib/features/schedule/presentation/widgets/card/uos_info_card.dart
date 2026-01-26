@@ -1,5 +1,6 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -9,12 +10,13 @@ class UosInfoCard extends StatefulWidget {
   final bool canEdit;
   final Function()? action;
 
-  const UosInfoCard(
-      {super.key,
-      required this.title,
-      this.child,
-      this.canEdit = false,
-      this.action});
+  const UosInfoCard({
+    super.key,
+    required this.title,
+    this.child,
+    this.canEdit = false,
+    this.action,
+  });
 
   @override
   State<UosInfoCard> createState() => _UosInfoCardState();
@@ -40,14 +42,21 @@ class _UosInfoCardState extends State<UosInfoCard> {
             },
             minWidth: double.infinity,
             padding: EdgeInsets.only(
-                top: 16, right: 16, left: 16, bottom: isShowing ? 10 : 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              top: 16,
+              right: 16,
+              left: 16,
+              bottom: isShowing ? 10 : 16,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Row(
               children: [
                 TweenAnimationBuilder(
                   tween: Tween<double>(
-                      begin: 0, end: isShowing ? 0 : -1), // 1 tương đương 90 độ
+                    begin: 0,
+                    end: isShowing ? 0 : -1,
+                  ), // 1 tương đương 90 độ
                   duration: const Duration(milliseconds: 300),
                   builder: (context, double value, child) {
                     return Transform.rotate(
@@ -62,54 +71,54 @@ class _UosInfoCardState extends State<UosInfoCard> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                    child: Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: FontSizes.medium,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: FontSizes.medium,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                )),
+                ),
                 if (widget.canEdit && isShowing)
                   GestureDetector(
                     onTap: widget.action,
                     child: Container(
                       padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(shape: BoxShape.circle),
                       child: SvgPicture.asset(
-                        "assets/icons/svg/lucide_pen.svg",
+                        Assets.icons.svg.lucidePen,
                         width: 20,
                         height: 20,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
           ),
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: (isShowing && widget.child != null)
-                ? Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                    ),
-                    child: Container(
+            child:
+                (isShowing && widget.child != null)
+                    ? Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                      ),
+                      child: Container(
                         padding: EdgeInsets.only(top: 8),
                         width: double.infinity,
                         decoration: BoxDecoration(
-                            border: Border(
-                                top: BorderSide(
-                          color: Colors.black,
-                          width: 1,
-                        ))),
-                        child: widget.child),
-                  )
-                : const SizedBox(),
+                          border: Border(
+                            top: BorderSide(color: Colors.black, width: 1),
+                          ),
+                        ),
+                        child: widget.child,
+                      ),
+                    )
+                    : const SizedBox(),
           ),
         ],
       ),

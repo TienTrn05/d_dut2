@@ -10,21 +10,23 @@ import 'package:e_dut/features/community_activity/domain/repository/community_re
 import 'package:e_dut/features/community_activity/presentation/screens/detail_user_activity_screen.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/cards/user_activity_card.dart';
 import 'package:e_dut/features/community_activity/presentation/widgets/common/submit_proof_modal.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserOptionDialog extends StatefulWidget {
-  const UserOptionDialog(
-      {super.key,
-      required this.userActivity,
-      required this.keyword,
-      required this.academicYearId,
-      required this.status,
-      required this.pageNumber,
-      required this.communityBloc,
-      this.onRefresh});
+  const UserOptionDialog({
+    super.key,
+    required this.userActivity,
+    required this.keyword,
+    required this.academicYearId,
+    required this.status,
+    required this.pageNumber,
+    required this.communityBloc,
+    this.onRefresh,
+  });
 
   final CommunityActivityBloc communityBloc;
   final String keyword;
@@ -93,14 +95,16 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
         textCancel: "Đóng",
         dialog.AlertDialogType.delete,
         onConfirm: () {
-          widget.communityBloc.add(CancelRegistration(
-            token: token,
-            keyword: widget.keyword,
-            academicYearId: widget.academicYearId,
-            idActivity: widget.userActivity.activity.id,
-            status: widget.status,
-            pageNumber: widget.pageNumber,
-          ));
+          widget.communityBloc.add(
+            CancelRegistration(
+              token: token,
+              keyword: widget.keyword,
+              academicYearId: widget.academicYearId,
+              idActivity: widget.userActivity.activity.id,
+              status: widget.status,
+              pageNumber: widget.pageNumber,
+            ),
+          );
           Navigator.pop(context);
         },
       );
@@ -118,13 +122,16 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
         textCancel: "Đóng",
         dialog.AlertDialogType.confirm,
         onConfirm: () {
-          widget.communityBloc.add(ReRegistActivity(
+          widget.communityBloc.add(
+            ReRegistActivity(
               token: token,
               keyword: widget.keyword,
               academicYearId: widget.academicYearId,
               idActivity: widget.userActivity.activity.id,
               status: widget.status,
-              pageNumber: widget.pageNumber));
+              pageNumber: widget.pageNumber,
+            ),
+          );
           Navigator.pop(context);
         },
       );
@@ -163,22 +170,27 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                   children: [
                     _buildDialogAction(
                       label: "Xem chi tiết",
-                      icon: "assets/icons/svg/heroicons_viewfinder-circle.svg",
+                      icon: Assets.icons.svg.heroiconsViewfinderCircle,
                       color: context.theme.grey!,
                       onTap: () async {
                         Navigator.pop(context);
                         final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => BlocProvider(
-                                      create: (_) => CommunityActivityBloc(
-                                          getIt.get<CommunityRepository>()),
-                                      child: DetailUserActivityScreen(
-                                        userActivity: widget.userActivity,
-                                        communityBloc: widget.communityBloc,
-                                        pageOfActivity: widget.pageNumber,
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => BlocProvider(
+                                  create:
+                                      (_) => CommunityActivityBloc(
+                                        getIt.get<CommunityRepository>(),
                                       ),
-                                    )));
+                                  child: DetailUserActivityScreen(
+                                    userActivity: widget.userActivity,
+                                    communityBloc: widget.communityBloc,
+                                    pageOfActivity: widget.pageNumber,
+                                  ),
+                                ),
+                          ),
+                        );
                         if (result == true) {
                           widget.onRefresh?.call();
                         }
@@ -188,24 +200,30 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                       _buildDialogAction(
                         label: "Hủy đăng ký",
                         icon:
-                            "assets/icons/svg/material-symbols_cancel-outline-rounded.svg",
+                            Assets
+                                .icons
+                                .svg
+                                .materialSymbolsCancelOutlineRounded,
                         color: const Color(0xFFF97316),
                         onTap: _cancelRegistration,
                       ),
                       _buildDialogAction(
-                          label: "Nộp minh chứng",
-                          icon: "assets/icons/svg/lucide_file-check-2.svg",
-                          color: const Color(0xFF47B5C1),
-                          onTap: _showProofSubmission,
-                          isEnabled: (startDate.isAfter(DateTime.now())
-                              ? false
-                              : true)),
+                        label: "Nộp minh chứng",
+                        icon: Assets.icons.svg.lucideFileCheck2,
+                        color: const Color(0xFF47B5C1),
+                        onTap: _showProofSubmission,
+                        isEnabled:
+                            (startDate.isAfter(DateTime.now()) ? false : true),
+                      ),
                     ],
                     if (status == UserActivityStatus.canceled)
                       _buildDialogAction(
                         label: "Đăng ký",
                         icon:
-                            "assets/icons/svg/material-symbols_app-registration-rounded.svg",
+                            Assets
+                                .icons
+                                .svg
+                                .materialSymbolsAppRegistrationRounded,
                         color: const Color(0xFF7CB305),
                         onTap: _reRegisterActivity,
                       ),
@@ -213,7 +231,7 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -235,23 +253,22 @@ class _UserOptionDialogState extends State<UserOptionDialog> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: TextStyle(color: color, fontSize: FontSizes.small)),
+          Text(
+            label,
+            style: TextStyle(color: color, fontSize: FontSizes.small),
+          ),
           SvgPicture.asset(
             icon,
             height: 18,
             width: 18,
             colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-          )
+          ),
         ],
       ),
     );
     return GestureDetector(
       onTap: isEnabled ? onTap : null,
-      child: Opacity(
-        opacity: isEnabled ? 1.0 : 0.4,
-        child: actionContent,
-      ),
+      child: Opacity(opacity: isEnabled ? 1.0 : 0.4, child: actionContent),
     );
   }
 }

@@ -28,7 +28,7 @@ class ConversationCubit extends Cubit<ConversationState> {
       if (conversationId.isNotEmpty) {
         messagesData = await conversationRepo.getConversationDetail(
           conversationId,
-          ""
+          "",
         );
       }
 
@@ -101,7 +101,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     try {
       final messagesData = await conversationRepo.getConversationDetail(
         conversationId,
-        ""
+        "",
       );
 
       final messagesList = messagesData?['messages'] as List<dynamic>? ?? [];
@@ -147,7 +147,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     try {
       final messagesData = await conversationRepo.getConversationDetail(
         conversationId,
-        jwt
+        jwt,
       );
 
       if (messagesData == null) {
@@ -167,9 +167,22 @@ class ConversationCubit extends Cubit<ConversationState> {
 
         // Save to local storage for future sessions
         await Storage.setConversationIdByChatbot(chatbotId, newConversationId);
+
+        emit(
+          state.copyWith(
+            status: ConversationStatus.success,
+            conversation: Conversation(
+              id: newConversationId,
+              title: messagesData?['title'] ?? "Untitled",
+              chatbotId: chatbotId,
+              messages: [],
+            ),
+          ),
+        );
+        return;
       }
 
-      final messagesList = messagesData?['messages'] as List<dynamic>? ?? [];
+      final messagesList = messagesData['messages'] as List<dynamic>? ?? [];
 
       final messages =
           messagesList
@@ -186,8 +199,8 @@ class ConversationCubit extends Cubit<ConversationState> {
           status: ConversationStatus.success,
           conversation: Conversation(
             id: conversationId,
-            title: messagesData?['title'] ?? "Untitled",
-            chatbotId: "",
+            title: messagesData['title'] ?? "Untitled",
+            chatbotId: chatbotId,
             messages: messages,
           ),
         ),
@@ -207,7 +220,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     final conv = state.conversation;
     if (text.trim().isEmpty || conv == null) return;
 
-    // ✉️ Add user message immediately
+    // Add user message immediately
     final userMsg = Message(text: text, isUser: true);
     var updatedConv = conv.copyWith(messages: [...conv.messages, userMsg]);
     emit(state.copyWith(conversation: updatedConv));
@@ -223,7 +236,7 @@ class ConversationCubit extends Cubit<ConversationState> {
 
           await Future.delayed(const Duration(milliseconds: 100));
 
-          // ✅ Check trước khi emit
+          // Check trước khi emit
           if (!isClosed) {
             emit(
               state.copyWith(
@@ -236,7 +249,7 @@ class ConversationCubit extends Cubit<ConversationState> {
         },
       );
     } catch (e, stack) {
-      logger.e("❌ Error in sendMessage: $e\n$stack");
+      logger.e(" Error in sendMessage: $e\n$stack");
 
       if (!isClosed) {
         emit(
