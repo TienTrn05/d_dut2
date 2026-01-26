@@ -220,7 +220,7 @@ class ConversationCubit extends Cubit<ConversationState> {
     final conv = state.conversation;
     if (text.trim().isEmpty || conv == null) return;
 
-    // ✉️ Add user message immediately
+    // Add user message immediately
     final userMsg = Message(text: text, isUser: true);
     var updatedConv = conv.copyWith(messages: [...conv.messages, userMsg]);
     emit(state.copyWith(conversation: updatedConv));
@@ -236,7 +236,7 @@ class ConversationCubit extends Cubit<ConversationState> {
 
           await Future.delayed(const Duration(milliseconds: 100));
 
-          // ✅ Check trước khi emit
+          // Check trước khi emit
           if (!isClosed) {
             emit(
               state.copyWith(
@@ -249,7 +249,7 @@ class ConversationCubit extends Cubit<ConversationState> {
         },
       );
     } catch (e, stack) {
-      logger.e("❌ Error in sendMessage: $e\n$stack");
+      logger.e(" Error in sendMessage: $e\n$stack");
 
       if (!isClosed) {
         emit(

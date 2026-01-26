@@ -1,4 +1,5 @@
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -15,14 +16,15 @@ class NotificationCard extends StatelessWidget {
   final bool canDel;
   final VoidCallback? onDelete;
 
-  const NotificationCard(
-      {super.key,
-      required this.date,
-      required this.title,
-      required this.content,
-      this.isRead = true,
-      this.canDel = false,
-      this.onDelete});
+  const NotificationCard({
+    super.key,
+    required this.date,
+    required this.title,
+    required this.content,
+    this.isRead = true,
+    this.canDel = false,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,48 +41,54 @@ class NotificationCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(date,
-                      style: TextStyle(
-                          color: context.theme.red ?? Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: FontSizes.medium)),
+                  child: Text(
+                    date,
+                    style: TextStyle(
+                      color: context.theme.red ?? Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: FontSizes.medium,
+                    ),
+                  ),
                 ),
                 if (canDel)
                   GestureDetector(
                     onTap: onDelete,
                     child: Container(
                       padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
+                      decoration: BoxDecoration(shape: BoxShape.circle),
                       child: SvgPicture.asset(
-                        "assets/icons/svg/mynaui_delete_solid.svg",
+                        Assets.icons.svg.mynauiDeleteSolid,
                         width: 20,
                         height: 20,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
             SizedBox(height: 5),
-            Text(title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: FontSizes.medium,
-                )),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: FontSizes.medium,
+              ),
+            ),
             SizedBox(height: 5),
             Html(
               data: content,
               onLinkTap: (url, attributes, element) async {
                 if (url != null && await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url),
-                      mode: LaunchMode.externalApplication);
+                  await launchUrl(
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  );
                 } else {
                   CustomSnackbar.showSnackBar(
-                      context,
-                      "Không thể mở liên kết",
-                      " Liên kết không hợp lệ hoặc không thể mở.",
-                      AlertType.error);
+                    context,
+                    "Không thể mở liên kết",
+                    " Liên kết không hợp lệ hoặc không thể mở.",
+                    AlertType.error,
+                  );
                 }
               },
               style: {

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/common/utils/logger.dart';
 import '/core/data/local/storage.dart';
 import '/core/services/notification_service.dart';
+import '/core/data/remote/notification_settings_service.dart';
 
 import '/features/schedule/util/schedule_noti.dart';
 
@@ -12,7 +13,8 @@ part 'notification_settings_state.dart';
 
 class NotificationSettingsBloc
     extends Bloc<NotificationSettingsEvent, NotificationSettingsState> {
-  NotificationSettingsBloc()
+  final NotificationSettingsService notificationSettingsService;
+  NotificationSettingsBloc({required this.notificationSettingsService})
     : super(
         NotificationSettingsState(
           remindBefore: Storage.remindBefore,
@@ -22,6 +24,8 @@ class NotificationSettingsBloc
     on<LoadNotificationSettings>(_onLoadNotificationSettings);
     on<ToggleGeneralNotification>(_onToggleGeneralNotification);
     on<ToggleMyNotification>(_onToggleMyNotification);
+    on<ToggleQueueNotification>(_onToggleQueueNotification);
+    on<RemainTurnsChanged>(_onRemainTurnChanged);
     on<ToggleExamNotification>(_onToggleExamNotification);
     on<RemindBeforeChanged>(_onRemindBeforeChanged);
     on<ClearErrorMessage>((event, emit) {
@@ -38,11 +42,14 @@ class NotificationSettingsBloc
       await Storage.setGeneralNotification(false);
       await Storage.setMyNotification(false);
       await Storage.setExamNotification(false);
+      await Storage.setQueueNotification(false);
       return emit(
         state.copyWith(
           generalEnabled: () => false,
           personalEnabled: () => false,
           examEnabled: () => false,
+          queueEnabled: () => false,
+          remainTurn: () => Storage.remainTurn
         ),
       );
     }
@@ -52,6 +59,8 @@ class NotificationSettingsBloc
         generalEnabled: () => Storage.generalNotification,
         personalEnabled: () => Storage.myNotification,
         examEnabled: () => Storage.examNotification,
+        queueEnabled: () => Storage.queueNotification,
+        remainTurn: () => Storage.remainTurn
       ),
     );
   }
@@ -78,14 +87,49 @@ class NotificationSettingsBloc
     ToggleMyNotification event,
     Emitter<NotificationSettingsState> emit,
   ) async {
-    if (event.isEnabled &&
-        !await NotificationService().areNotificationsAllowed()) {
-      // open app settings if not allowed
-      await NotificationService().openAppSettings();
-      return;
+    try {
+      if (event.isEnabled &&
+          !await NotificationService().areNotificationsAllowed()) {
+        await NotificationService().openAppSettings();
+        return;
+      }
+      await Storage.setMyNotification(event.isEnabled);
+      emit(state.copyWith(personalEnabled: () => event.isEnabled));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: () => "Đã có lỗi xảy ra"));
     }
-    await Storage.setMyNotification(event.isEnabled);
-    emit(state.copyWith(personalEnabled: () => event.isEnabled));
+  }
+
+  Future<void> _onToggleQueueNotification(
+    ToggleQueueNotification event,
+    Emitter<NotificationSettingsState> emit,
+  ) async {
+    try {
+      if (event.isEnabled &&
+          !await NotificationService().areNotificationsAllowed()) {
+        await NotificationService().openAppSettings();
+        return;
+      }
+      await Storage.setQueueNotification(event.isEnabled);
+      emit(state.copyWith(queueEnabled: () => event.isEnabled));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: () => "Đã có lỗi xảy ra"));
+    }
+  }
+
+  Future<void> _onRemainTurnChanged(
+    RemainTurnsChanged event,
+    Emitter<NotificationSettingsState> emit,
+  ) async {
+    final oldRemainTurn = state.remainTurn;
+    emit(state.copyWith(remainTurn: () => event.remainTurn));
+    try {
+      await Storage.setRemainTurn(event.remainTurn);
+      await notificationSettingsService.setRemainTurn(event.token, event.remainTurn);
+    } catch (e) {
+      await Storage.setRemainTurn(oldRemainTurn);
+      logger.e("Failed to change remain turns setting: $e");
+    }
   }
 
   Future<void> _onToggleExamNotification(

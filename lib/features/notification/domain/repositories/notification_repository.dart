@@ -18,7 +18,7 @@ class NotificationRepository {
   }
 
   Future<List<Notification>> fetchMyNotifications(String token,
-      {int limit = 5, String? lastVisible}) async {
+      {int limit = 10, String? lastVisible}) async {
     try {
       final notifications = await _notificationService.getMyNotifications(token,
           limit: limit, lastVisible: lastVisible);
@@ -29,7 +29,7 @@ class NotificationRepository {
   }
 
   Future<List<Notification>> fetchGeneralNotifications(String token,
-      {int limit = 5, String? lastVisible}) async {
+      {int limit = 10, String? lastVisible}) async {
     try {
       final notifications = await _notificationService.getGeneralNotifications(token,
           limit: limit, lastVisible: lastVisible);

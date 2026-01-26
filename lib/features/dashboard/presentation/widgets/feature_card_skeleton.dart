@@ -1,4 +1,5 @@
 import 'package:e_dut/common/extensions/font_sizes.dart';
+import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,7 +25,7 @@ class FeatureCardSkeleton extends StatelessWidget {
             baseColor: context.theme.primaryColor ?? Colors.blue,
             highlightColor: Colors.white,
             child: SvgPicture.asset(
-              "assets/icons/svg/mage_goals.svg",
+              Assets.icons.svg.mageGoals,
               width: 32,
               height: 32,
             ),
@@ -41,17 +42,16 @@ class FeatureCardSkeleton extends StatelessWidget {
                     "Đang tải...",
                     maxLines: 2,
                     style: TextStyle(
-                        color: context.theme.primaryColor,
-                        fontSize: FontSizes.large,
-                        fontWeight: FontWeight.bold,
-                        height: 1),
+                      color: context.theme.primaryColor,
+                      fontSize: FontSizes.large,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
-              SizedBox(
-                height: 30,
-              )
+              SizedBox(height: 30),
             ],
           ),
         ],

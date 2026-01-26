@@ -92,7 +92,6 @@ class ScheduleService {
     bool isTeacher,
     String authToken,
   ) async {
-    logger.d(authToken);
     try {
       dynamic response;
       if (isTeacher) {
@@ -566,6 +565,27 @@ class ScheduleService {
     }
   }
 
+  Future<bool> createMsTeamsForUos(String token, String idUOS) async {
+    try {
+      final response = await _apiClient.dio.post(
+        "$_url/api/UOS/CreateMsTeamForUos",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+        queryParameters: {"idUos": idUOS},
+      );
+
+      return response.statusCode == 202 &&
+          response.data['message'] == 'Success';
+    } catch (e) {
+      logger.e("Error create MsTeams for UOS: $e");
+      rethrow;
+    }
+  }
+
   Future<List<String>> getListStudentForNotiByUos(
     String token,
     String idUOS,
@@ -692,7 +712,7 @@ class ScheduleService {
         queryParameters: {"idUos": idUos},
       );
       if (response.statusCode == 200) return true;
-      
+
       final msg = response.data['data'] ?? 'Unknown error';
       logger.e("Export failed: $msg");
       return false;
