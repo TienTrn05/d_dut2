@@ -10,8 +10,11 @@ class LoadFullInfoUosDetail extends UosDetailEvent {
   final bool isTeacher;
   final String authToken;
 
-  LoadFullInfoUosDetail(
-      {required this.idUos, this.isTeacher = true, required this.authToken});
+  LoadFullInfoUosDetail({
+    required this.idUos,
+    this.isTeacher = true,
+    required this.authToken,
+  });
 }
 
 class LoadExamShiftDetail extends UosDetailEvent {
@@ -28,10 +31,18 @@ class UpdateMsTeamsInfo extends UosDetailEvent {
   final String msTeamCode;
   final String msTeamLink;
 
-  UpdateMsTeamsInfo(
-      {required this.idUos,
-      this.isTeacher = true,
-      required this.authToken,
-      required this.msTeamCode,
-      required this.msTeamLink});
+  UpdateMsTeamsInfo({
+    required this.idUos,
+    this.isTeacher = true,
+    required this.authToken,
+    required this.msTeamCode,
+    required this.msTeamLink,
+  });
+}
+
+class CreateMsTeams extends UosDetailEvent {
+  final String idUos;
+  final String authToken;
+
+  CreateMsTeams({required this.idUos, required this.authToken});
 }

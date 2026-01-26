@@ -1,6 +1,7 @@
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart' as dialog;
+import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
 import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
@@ -70,12 +71,12 @@ class _UosInfoTabState extends State<UosInfoTab> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       backgroundColor: Colors.white,
-      builder: (context) {
+      builder: (modalContext) {
         return BottomModal(
           title: "Giảng dạy",
           mainAction: () {
             dialog.CustomAlertDialog.showCustomDialog(
-              context,
+              modalContext,
               "Xác nhận cập nhật thông tin",
               "Bạn có chắc chắn muốn cập nhật thông tin giảng dạy không\"?",
               textCancel: "Đóng",
@@ -91,7 +92,7 @@ class _UosInfoTabState extends State<UosInfoTab> {
                   ),
                 );
                 setState(() {});
-                Navigator.pop(context);
+                Navigator.pop(modalContext);
               },
             );
           },
@@ -109,7 +110,9 @@ class _UosInfoTabState extends State<UosInfoTab> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showCreateTeamsDialog(detailBloc, authToken);
+                    },
 
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.resolveWith<Color>((
@@ -158,6 +161,23 @@ class _UosInfoTabState extends State<UosInfoTab> {
                   ),
                 ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCreateTeamsDialog(UosDetailBloc detailBloc, String authToken) {
+    CustomAlertDialog.showCustomDialog(
+      context,
+      "Xác nhận tạo teams",
+      "Bạn có chắc chắn muốn tạo lớp học trên Microsoft Teams cho học phần này không?",
+      AlertDialogType.confirm,
+      onConfirm: () {
+        detailBloc.add(
+          CreateMsTeams(
+            idUos: widget.uosDetail.idUnitOfStudy,
+            authToken: authToken,
           ),
         );
       },
@@ -334,9 +354,14 @@ class _UosInfoTabState extends State<UosInfoTab> {
                                         height: 1.5,
                                       ),
                                     ),
-                                    if (_linkController.text.trim().isEmpty)
+                                    if (_linkController.text.trim().isEmpty &&
+                                        userRole == RoleModel.roleTeacher)
                                       InkWell(
-                                        onTap: () {},
+                                        onTap:
+                                            () => _showCreateTeamsDialog(
+                                              context.read<UosDetailBloc>(),
+                                              authToken,
+                                            ),
                                         child: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
