@@ -537,8 +537,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         );
                                       },
                                     ),
-
-                                    // Update lịch tuần
                                     FeatureCard(
                                       iconUrl:
                                           "assets/icons/svg/fluent_calendar-work-week-32-regular.svg",
@@ -627,6 +625,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               }
                                             },
                                           ),
+                                    ),
+
+                                    // Lý lịch khoa học
+                                    FeatureCard(
+                                      iconUrl:
+                                          "assets/icons/svg/solar_notebook-broken.svg",
+                                      title: "Lý lịch khoa học",
+                                      onTap: () {
+                                        final auth =
+                                            context.read<AuthBloc>().state;
+                                        if (auth is! AuthUserAuthenticated) {
+                                          CustomSnackbar.showSnackBar(
+                                            context,
+                                            'Chưa đăng nhập',
+                                            'Vui lòng đăng nhập để xem Lý lịch khoa học',
+                                            AlertType.warning,
+                                          );
+                                          return;
+                                        }
+
+                                        final microsoftEmail = _extractEmail(
+                                          auth.userData,
+                                        );
+                                        if (microsoftEmail.isEmpty) {
+                                          CustomSnackbar.showSnackBar(
+                                            context,
+                                            'Thiếu thông tin',
+                                            'Không tìm thấy email trường cấp để tải Lý lịch khoa học',
+                                            AlertType.error,
+                                          );
+                                          return;
+                                        }
+
+                                        Navigator.of(context).pushNamed(
+                                          Routes.scientificProfile,
+                                          arguments: microsoftEmail,
+                                        );
+                                      },
                                     ),
                                   ];
                                 } else {

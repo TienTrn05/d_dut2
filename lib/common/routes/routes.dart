@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// Academic (kết quả học tập/học vụ)
 import 'package:e_dut/features/academic/presentation/results.dart';
 import 'package:e_dut/features/academic/presentation/statistics.dart';
 
@@ -28,10 +27,14 @@ import '../../features/schedule/presentation/screens/detail_uos_teacher_screen.d
 import '../../features/course_registration/presentation/screens/course_registration_screen.dart';
 import '../../features/course_registration/features/grade/presentation/grade_screen.dart';
 
-// Weekly Schedule (lịch tuần)
 import 'package:e_dut/features/weekly_schedule/bloc/weekly_schedule_bloc.dart';
 import 'package:e_dut/features/weekly_schedule/presentation/weekly_schedule.dart';
 import 'package:e_dut/features/weekly_schedule/data/weekly_schedule_repository.dart';
+
+import 'package:e_dut/features/scientific_profile/bloc/scientific_profile_bloc.dart';
+import 'package:e_dut/features/scientific_profile/bloc/scientific_profile_event.dart';
+import 'package:e_dut/features/scientific_profile/data/scientific_profile_repository.dart';
+import 'package:e_dut/features/scientific_profile/presentation/scientific_profile.dart';
 
 String _resolveApiBase() {
   const fromDefine = String.fromEnvironment('API_BASE', defaultValue: '');
@@ -52,6 +55,20 @@ String _resolveWeeklyApiBase() {
   if (fromDefine.isNotEmpty) return fromDefine;
   try {
     return dotenv.env['WEEKLY_SCHEDULE_API_BASE'] ?? '';
+  } catch (_) {
+    return '';
+  }
+}
+
+// Endpoint cho Scientific Profile
+String _resolveScientificApiBase() {
+  const fromDefine = String.fromEnvironment(
+    'SCIENTIFIC_PROFILE_API_BASE',
+    defaultValue: '',
+  );
+  if (fromDefine.isNotEmpty) return fromDefine;
+  try {
+    return dotenv.env['SCIENTIFIC_PROFILE_API_BASE'] ?? '';
   } catch (_) {
     return '';
   }
@@ -94,6 +111,9 @@ class Routes {
 
   // weekly schedule
   static const String weeklySchedule = "/weekly_schedule";
+
+  // scientific profile
+  static const String scientificProfile = "/scientific_profile";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -209,9 +229,7 @@ class Routes {
         {
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
-            builder:
-                (context) =>
-                    StatisticsPage(apiBase: apiBase),
+            builder: (context) => StatisticsPage(apiBase: apiBase),
           );
         }
 
@@ -232,6 +250,23 @@ class Routes {
                           WeeklyScheduleBloc(repo)
                             ..add(WeeklyScheduleRequested(email)),
                   child: WeeklySchedulePage(email: email),
+                ),
+          );
+        }
+
+      // ***** SCIENTIFIC PROFILE ***** //
+      case scientificProfile:
+        {
+          final microsoftEmail = settings.arguments as String;
+
+          return MaterialPageRoute(
+            builder:
+                (_) => BlocProvider(
+                  create:
+                      (_) => ScientificProfileBloc(
+                        getIt.get<ScientificProfileRepository>(),
+                      )..add(FetchProfile(microsoftEmail)),
+                  child: const ScientificProfileScreen(),
                 ),
           );
         }
