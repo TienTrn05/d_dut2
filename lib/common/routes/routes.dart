@@ -116,6 +116,9 @@ class Routes {
   // scientific profile
   static const String scientificProfile = "/scientific_profile";
 
+  // queue
+  static const String queue = "/queue";
+
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case root:
@@ -230,7 +233,6 @@ class Routes {
         {
           final apiBase = _resolveApiBase();
           return MaterialPageRoute(
-            builder: (context) => StatisticsPage(apiBase: apiBase),
             builder: (context) => StatisticsPage(apiBase: apiBase),
           );
         }
