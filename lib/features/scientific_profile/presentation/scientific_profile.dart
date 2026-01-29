@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
-// THÊM: Import loading progress bar giống weekly_schedule
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
-import 'package:e_dut/common/widgets/errors/error_view.dart';
 import '../bloc/scientific_profile_bloc.dart';
 import '../bloc/scientific_profile_state.dart';
 import '../models/scientific_profile_model.dart';
@@ -23,6 +23,19 @@ class ScientificProfileScreen extends StatelessWidget {
       return DateFormat('dd-MM-yyyy').format(DateTime.parse(dateStr));
     } catch (_) {
       return dateStr;
+    }
+  }
+
+  Future<void> _launchSSOUrl() async {
+    final String ssoUrl = dotenv.env['SSO_URL'] ?? '';
+    if (ssoUrl.isEmpty) {
+      debugPrint("Lỗi: Chưa cấu hình SSO_URL trong file .env");
+      return;
+    }
+
+    final Uri url = Uri.parse(ssoUrl);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Không thể mở liên kết: $url');
     }
   }
 
@@ -62,7 +75,48 @@ class ScientificProfileScreen extends StatelessWidget {
       ),
       body: BlocBuilder<ScientificProfileBloc, ScientificProfileState>(
         builder: (context, state) {
-          if (state is ProfileError) return ErrorView(message: state.message);
+          if (state is ProfileError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: Colors.orange,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Bạn hãy đăng nhập bằng email trường cấp vào đường link dưới đây và quay trở lại app",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _launchSSOUrl,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2A74BD),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "Đăng nhập và thử lại",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
 
           if (state is ProfileLoaded || state is ProfileLoading) {
             final profile = (state is ProfileLoaded) ? state.profile : null;
@@ -75,7 +129,6 @@ class ScientificProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Thông tin cơ bản
                   _buildHeaderCard("Thông tin cơ bản", [
                     _buildFormattedRow("Chức danh:", profile.chucDanh),
                     _buildFormattedRow(
@@ -83,10 +136,7 @@ class ScientificProfileScreen extends StatelessWidget {
                       profile.linhVucChuyenSau.join(", "),
                     ),
                   ]),
-
                   const SizedBox(height: 12),
-
-                  // Quá trình đào tạo
                   _buildHeaderCard("Quá trình đào tạo", [
                     if (profile.quaTrinhDaoTao.daiHoc != null)
                       _buildEduDetail(
@@ -104,8 +154,6 @@ class ScientificProfileScreen extends StatelessWidget {
                         profile.quaTrinhDaoTao.tienSi!,
                       ),
                   ]),
-
-                  // Tạp chí quốc tế
                   _buildExpandableSection(
                     title: "Tạp chí quốc tế",
                     color: colorInternational,
@@ -130,8 +178,6 @@ class ScientificProfileScreen extends StatelessWidget {
                             )
                             .toList(),
                   ),
-
-                  // Tạp chí quốc gia
                   _buildExpandableSection(
                     title: "Tạp chí quốc gia",
                     color: colorNational,
@@ -153,8 +199,6 @@ class ScientificProfileScreen extends StatelessWidget {
                             )
                             .toList(),
                   ),
-
-                  // Đề tài
                   _buildExpandableSection(
                     title: "Đề tài",
                     color: colorProject,
@@ -176,8 +220,6 @@ class ScientificProfileScreen extends StatelessWidget {
                             )
                             .toList(),
                   ),
-
-                  // Khen thưởng
                   _buildExpandableSection(
                     title: "Khen thưởng",
                     color: colorAward,
