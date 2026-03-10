@@ -257,6 +257,10 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/solar_logout-3-bold.svg
   String get solarLogout3Bold => 'assets/icons/svg/solar_logout-3-bold.svg';
 
+  /// File path: assets/icons/svg/solar_notebook-broken.svg
+  String get solarNotebookBroken =>
+      'assets/icons/svg/solar_notebook-broken.svg';
+
   /// File path: assets/icons/svg/solar_settings-broken.svg
   String get solarSettingsBroken =>
       'assets/icons/svg/solar_settings-broken.svg';
@@ -364,6 +368,7 @@ class $AssetsIconsSvgGen {
     solarEyeBroken,
     solarLockBold,
     solarLogout3Bold,
+    solarNotebookBroken,
     solarSettingsBroken,
     solarUserBold,
     solarUserBroken,
