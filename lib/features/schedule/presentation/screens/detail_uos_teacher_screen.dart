@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/features/schedule/bloc/export_absent/export_absent_bloc.dart';
 import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import '../../presentation/widgets/detail_uos_tab/uos_info_tab.dart';
 import '../../presentation/widgets/detail_uos_tab/uos_noti_tab.dart';
 import '../../../notification/domain/repositories/notification_repository.dart';
 
+@RoutePage()
 class DetailUOSTeacherScreen extends StatefulWidget {
   final String idUos;
   final DateTime selectedDay;

@@ -1,13 +1,12 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
-import 'package:e_dut/features/schedule/data/model/unit_of_study/exam_shift_args.dart';
-import 'package:e_dut/features/schedule/data/model/unit_of_study/uos_absent_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/extensions/custom_theme_extension.dart';
+import '../../../app/app_router.dart';
 
 class ScheduleItem extends StatelessWidget {
   final String idSubject;
@@ -16,42 +15,48 @@ class ScheduleItem extends StatelessWidget {
   final String room;
   final bool isExam;
 
-  const ScheduleItem(
-      {super.key,
-      required this.idSubject,
-      required this.subject,
-      required this.time,
-      required this.room,
-      this.isExam = false});
+  const ScheduleItem({
+    super.key,
+    required this.idSubject,
+    required this.subject,
+    required this.time,
+    required this.room,
+    this.isExam = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
-      final String userRole = authState is AuthUserAuthenticated
-          ? authState.userData.role.name
-          : '';
-      final String authToken =
-          authState is AuthUserAuthenticated ? authState.accessToken : '';
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        final String userRole =
+            authState is AuthUserAuthenticated
+                ? authState.userData.role.name
+                : '';
+        final String authToken =
+            authState is AuthUserAuthenticated ? authState.accessToken : '';
 
-      return GestureDetector(
+        return GestureDetector(
           onTap: () {
-            Navigator.of(context).pushNamed(
-                userRole == RoleModel.roleStudent
-                    ? Routes.detailUnitOfStudy
-                    : isExam
-                        ? Routes.detailExamShiftTeacher
-                        : Routes.detailUnitOfStudyTeacher,
-                arguments: userRole == RoleModel.roleTeacher
-                    ? isExam
-                        ? ExamShiftArgs(
-                            idExamShift: idSubject,
-                            examShiftName: subject,
-                            authToken: authToken)
-                        : UosAbsentArgs(
-                            idUos: idSubject,
-                            selectedDay: DateTime.now(),
-                          )
-                    : idSubject);
+            if (userRole == RoleModel.roleStudent) {
+              context.router.push(DetailUOSRoute(idUos: idSubject));
+            } else if (userRole == RoleModel.roleTeacher) {
+              if (isExam) {
+                context.router.push(
+                  DetailExamShiftRoute(
+                    idExamShift: idSubject,
+                    examShiftName: subject,
+                    authToken: authToken
+                  ),
+                );
+              } else {
+                context.router.push(
+                  DetailUOSTeacherRoute(
+                    idUos: idSubject,
+                    selectedDay: DateTime.now(),
+                  ),
+                );
+              }
+            }
           },
           child: Container(
             width: double.infinity,
@@ -62,9 +67,10 @@ class ScheduleItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               border: Border(
                 left: BorderSide(
-                  color: isExam
-                      ? (context.theme.red ?? Colors.red)
-                      : (context.theme.primaryColor ?? Colors.blue),
+                  color:
+                      isExam
+                          ? (context.theme.red ?? Colors.red)
+                          : (context.theme.primaryColor ?? Colors.blue),
                   width: 2,
                 ),
               ),
@@ -114,7 +120,9 @@ class ScheduleItem extends StatelessWidget {
                 ),
               ],
             ),
-          ));
-    });
+          ),
+        );
+      },
+    );
   }
 }

@@ -7,16 +7,15 @@ import 'core/bloc/notification_settings/notification_settings_bloc.dart';
 import 'core/data/local/storage.dart';
 import 'core/data/remote/notification_settings_service.dart';
 import 'core/services/auto_redirect_service.dart';
-import 'core/services/navigation_service.dart';
 import 'core/services/notification_service.dart';
 
 // Common
 import 'common/extensions/custom_theme_extension.dart';
-import 'common/routes/routes.dart';
 import 'common/utils/app_environment.dart';
 import 'common/utils/getit_utils.dart';
 
 // Features
+import 'features/app/app_router.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/data/model/user_model.dart';
 import 'features/auth/domain/repository/auth_repo.dart';
@@ -52,14 +51,15 @@ Future<void> main() async {
   }
 
   final userData = Storage.user;
-  runApp(MyApp(navigatorKey, userData: userData));
+  runApp(MyApp(userData: userData));
 }
 
 class MyApp extends StatelessWidget {
-  final GlobalKey<NavigatorState> navigatorKey;
   final UserModel? userData;
 
-  const MyApp(this.navigatorKey, {super.key, this.userData});
+  MyApp({super.key, this.userData});
+
+  final _appRouter = getIt<AppRouter>();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create:
               (context) => AuthBloc(
-                navigatorKey,
+                _appRouter.navigatorKey,
                 getIt.get<AuthRepository>(),
                 getIt.get<NotificationRepository>(),
               )..add(AuthInitRequested()),
@@ -160,11 +160,9 @@ class MyApp extends StatelessWidget {
                 },
               ),
             ],
-            child: MaterialApp(
+            child: MaterialApp.router(
               debugShowCheckedModeBanner: false,
-              navigatorKey: navigatorKey,
-              onGenerateRoute: Routes.onGenerateRoute,
-              initialRoute: userData != null ? Routes.root : Routes.auth,
+              routerConfig: _appRouter.config(),
               theme: _lightTheme(context),
               darkTheme: _darkTheme(),
               builder: (context, child) => LoadingOverlay(child: child!),

@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
@@ -12,10 +13,11 @@ import 'package:e_dut/features/schedule/presentation/widgets/detail_uos_tab/uos_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DetailUnitOfStudy extends StatelessWidget {
+@RoutePage()
+class DetailUOSScreen extends StatelessWidget {
   final String idUos;
 
-  const DetailUnitOfStudy({super.key, required this.idUos});
+  const DetailUOSScreen({super.key, required this.idUos});
 
   @override
   Widget build(BuildContext context) {

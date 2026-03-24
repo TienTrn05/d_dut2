@@ -12,12 +12,12 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:device_info_plus/device_info_plus.dart';
 
+import '../../common/utils/getit_utils.dart';
+import '../../features/app/app_router.dart';
 import '../../features/schedule/util/schedule_noti.dart';
 import '../data/local/storage.dart';
-import '/common/routes/routes.dart';
 import '/common/utils/logger.dart';
 import '/firebase_options.dart';
-import './navigation_service.dart';
 import 'auto_redirect_service.dart';
 
 // Handler cho background messages phải là một top-level function
@@ -319,10 +319,7 @@ class NotificationService {
               ? 'RedirectToNotificationScreenGeneralTab'
               : 'RedirectToNotificationScreen';
 
-      navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        Routes.root,
-        (route) => false,
-      );
+      getIt<AppRouter>().replaceAll([const RootRoute()]);
     } catch (e, stack) {
       logger.e(
         "Error handling notification tap: $e",
@@ -338,10 +335,7 @@ class NotificationService {
       logger.i("Notification tapped with payload: ${response.payload}");
       AutoRedirectService.pendingPayload = response.payload;
 
-      navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        Routes.root,
-        (route) => false,
-      );
+      getIt<AppRouter>().replaceAll([const RootRoute()]);
     } catch (e, stack) {
       logger.e(
         "Error handling notification tap: $e",

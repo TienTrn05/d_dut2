@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +10,7 @@ import '../../../common/widgets/loading/loading_progress_bar.dart';
 import '../../../common/widgets/appbar/custom_appbar.dart';
 
 import '../bloc/weekly_schedule_bloc.dart';
+import '../data/weekly_schedule_repository.dart';
 import '../models/weekly_schedule_model.dart';
 import 'detail_schedule.dart';
 
@@ -83,6 +85,7 @@ bool _isConnectionError(String? error) {
       e.contains('kết nối');
 }
 
+@RoutePage()
 class WeeklySchedulePage extends StatefulWidget {
   const WeeklySchedulePage({super.key, required this.email});
   final String email;
@@ -197,11 +200,18 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 4),
+    return BlocProvider(
+      create:
+          (_) => WeeklyScheduleBloc(
+            WeeklyScheduleRepository(
+              endpoint: "https://lichtuan.dut.udn.vn/api/schedules",
+            ),
+          )..add(WeeklyScheduleRequested(widget.email)),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -228,313 +238,321 @@ class _WeeklySchedulePageState extends State<WeeklySchedulePage> {
               ),
             ],
           ),
-      ),
-      body: BlocListener<CalendarBloc, CalendarState>(
-        listenWhen: (prev, curr) => curr is CalendarWeekLoaded,
-        listener: (context, state) {
-          if (state is CalendarWeekLoaded) {
-            setState(() {
-              _academicWeekLabel =
-                  state.noWeek.isNotEmpty ? 'Tuần ${state.noWeek}' : '';
-            });
-          }
-        },
-        child: BlocListener<WeeklyScheduleBloc, WeeklyScheduleState>(
-          listenWhen:
-              (prev, curr) =>
-                  prev.data != curr.data || prev.error != curr.error,
+        ),
+        body: BlocListener<CalendarBloc, CalendarState>(
+          listenWhen: (prev, curr) => curr is CalendarWeekLoaded,
           listener: (context, state) {
-            if (_isFirstMount && (state.data != null || state.error != null)) {
+            if (state is CalendarWeekLoaded) {
               setState(() {
-                _isFirstMount = false;
+                _academicWeekLabel =
+                    state.noWeek.isNotEmpty ? 'Tuần ${state.noWeek}' : '';
               });
             }
-
-            if (state.data != null) {
-              _cachedEvents = _eventMap(state.data!.schedules);
-
-              if (_autoSelectDayOnLoad) {
-                final correctDay = _determineBestDayToSelect(
-                  _focusedDay,
-                  _cachedEvents,
-                );
-
+          },
+          child: BlocListener<WeeklyScheduleBloc, WeeklyScheduleState>(
+            listenWhen:
+                (prev, curr) =>
+                    prev.data != curr.data || prev.error != curr.error,
+            listener: (context, state) {
+              if (_isFirstMount &&
+                  (state.data != null || state.error != null)) {
                 setState(() {
-                  _selectedDay = _normalize(correctDay);
-                  _focusedDay = _normalize(correctDay);
-                  _autoSelectDayOnLoad = false;
+                  _isFirstMount = false;
                 });
               }
-            }
-          },
-          child: BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
-            builder: (context, state) {
-              if (state.error != null && _isConnectionError(state.error)) {
-                return ErrorView(
-                  message: 'Kiểm tra kết nối mạng và thử lại.',
-                  onRetry: () {
+
+              if (state.data != null) {
+                _cachedEvents = _eventMap(state.data!.schedules);
+
+                if (_autoSelectDayOnLoad) {
+                  final correctDay = _determineBestDayToSelect(
+                    _focusedDay,
+                    _cachedEvents,
+                  );
+
+                  setState(() {
+                    _selectedDay = _normalize(correctDay);
+                    _focusedDay = _normalize(correctDay);
+                    _autoSelectDayOnLoad = false;
+                  });
+                }
+              }
+            },
+            child: BlocBuilder<WeeklyScheduleBloc, WeeklyScheduleState>(
+              builder: (context, state) {
+                if (state.error != null && _isConnectionError(state.error)) {
+                  return ErrorView(
+                    message: 'Kiểm tra kết nối mạng và thử lại.',
+                    onRetry: () {
+                      context.read<WeeklyScheduleBloc>().add(
+                        WeeklyScheduleRequested(
+                          widget.email,
+                          date: _focusedDay,
+                        ),
+                      );
+                      _requestAcademicWeek(_focusedDay);
+                    },
+                  );
+                }
+
+                if (_isFirstMount &&
+                    _cachedEvents.isEmpty &&
+                    state.error != null) {
+                  return ErrorView(
+                    message: 'Không thể tải dữ liệu. Vui lòng thử lại.',
+                    onRetry: () {
+                      context.read<WeeklyScheduleBloc>().add(
+                        WeeklyScheduleRequested(
+                          widget.email,
+                          date: _focusedDay,
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                final itemsOfDay = _itemsOfSelectedDayFromCache();
+                final today = DateTime.now();
+
+                return RefreshIndicator(
+                  color: Theme.of(context).primaryColor,
+                  backgroundColor: Colors.white,
+                  onRefresh: () async {
                     context.read<WeeklyScheduleBloc>().add(
-                      WeeklyScheduleRequested(widget.email, date: _focusedDay),
+                      WeeklyScheduleRefreshed(widget.email, date: _selectedDay),
                     );
                     _requestAcademicWeek(_focusedDay);
                   },
-                );
-              }
-
-              if (_isFirstMount &&
-                  _cachedEvents.isEmpty &&
-                  state.error != null) {
-                return ErrorView(
-                  message: 'Không thể tải dữ liệu. Vui lòng thử lại.',
-                  onRetry: () {
-                    context.read<WeeklyScheduleBloc>().add(
-                      WeeklyScheduleRequested(widget.email, date: _focusedDay),
-                    );
-                  },
-                );
-              }
-
-              final itemsOfDay = _itemsOfSelectedDayFromCache();
-              final today = DateTime.now();
-
-              return RefreshIndicator(
-                color: Theme.of(context).primaryColor,
-                backgroundColor: Colors.white,
-                onRefresh: () async {
-                  context.read<WeeklyScheduleBloc>().add(
-                    WeeklyScheduleRefreshed(widget.email, date: _selectedDay),
-                  );
-                  _requestAcademicWeek(_focusedDay);
-                },
-                child: SafeArea(
-                  top: false,
-                  bottom: true,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: const [
-                            BoxShadow(
-                              blurRadius: 18,
-                              offset: Offset(0, 8),
-                              color: Color(0x1A000000),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 8,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TableCalendar<WeeklyScheduleItem>(
-                              locale: 'vi',
-                              firstDay: DateTime.utc(2010, 1, 1),
-                              lastDay: DateTime.utc(2035, 12, 31),
-                              focusedDay: _focusedDay,
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              calendarFormat: CalendarFormat.week,
-                              availableCalendarFormats: const {
-                                CalendarFormat.week: 'Week',
-                              },
-                              headerVisible: true,
-                              headerStyle: HeaderStyle(
-                                formatButtonVisible: false,
-                                titleCentered: true,
-                                titleTextFormatter: (date, _) {
-                                  final m = DateFormat.M('vi').format(date);
-                                  return 'Tháng $m, ${date.year}';
-                                },
-                                titleTextStyle: const TextStyle(
-                                  color: Color(0xFF2A74BD),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                leftChevronIcon: Icon(
-                                  Icons.chevron_left_rounded,
-                                  color: Colors.grey.shade600,
-                                ),
-                                rightChevronIcon: Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: Colors.grey.shade600,
-                                ),
+                  child: SafeArea(
+                    top: false,
+                    bottom: true,
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 18,
+                                offset: Offset(0, 8),
+                                color: Color(0x1A000000),
                               ),
-                              onPageChanged: (d) {
-                                final monday = _mondayOf(d);
-                                final now = _normalize(DateTime.now());
-                                final weekStart = _normalize(monday);
-                                final weekEnd = _normalize(
-                                  monday.add(const Duration(days: 6)),
-                                );
-
-                                final isCurrentWeek =
-                                    !now.isBefore(weekStart) &&
-                                    !now.isAfter(weekEnd);
-
-                                setState(() {
-                                  _focusedDay = _normalize(d);
-                                  _autoSelectDayOnLoad = true;
-
-                                  if (isCurrentWeek) {
-                                    _selectedDay = now;
-                                  } else {
-                                    _selectedDay = _normalize(monday);
-                                  }
-                                });
-
-                                _requestAcademicWeek(d);
-                                context.read<WeeklyScheduleBloc>().add(
-                                  WeeklyScheduleRequested(
-                                    widget.email,
-                                    date: isCurrentWeek ? now : _selectedDay,
-                                  ),
-                                );
-                              },
-                              selectedDayPredicate:
-                                  (day) => _isSameLocalDay(day, _selectedDay),
-                              onDaySelected: (sel, foc) {
-                                setState(() {
-                                  _selectedDay = _normalize(sel);
-                                  _focusedDay = _normalize(sel);
-                                  _autoSelectDayOnLoad = false;
-                                });
-
-                                _requestAcademicWeek(sel);
-                                context.read<WeeklyScheduleBloc>().add(
-                                  WeeklyScheduleRequested(
-                                    widget.email,
-                                    date: _selectedDay,
-                                  ),
-                                );
-                              },
-                              eventLoader:
-                                  (day) =>
-                                      _cachedEvents[_normalize(day)] ??
-                                      const [],
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekdayStyle: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  height: 1,
-                                ),
-                                weekendStyle: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  height: 1,
-                                ),
-                              ),
-                              calendarStyle: CalendarStyle(
-                                defaultTextStyle: const TextStyle(
-                                  fontSize: FontSizes.small + 1,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                weekendTextStyle: const TextStyle(
-                                  fontSize: FontSizes.small + 1,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                outsideTextStyle: const TextStyle(
-                                  fontSize: FontSizes.small + 1,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                todayTextStyle: const TextStyle(
-                                  fontSize: FontSizes.small + 1,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                todayDecoration: const BoxDecoration(
-                                  color: Color(0xFFEFF3F8),
-                                  shape: BoxShape.circle,
-                                ),
-                                selectedTextStyle: const TextStyle(
-                                  fontSize: FontSizes.small + 1,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                                selectedDecoration: const BoxDecoration(
-                                  color: Color(0xFFD6E6F6),
-                                  shape: BoxShape.circle,
-                                ),
-                                cellMargin: EdgeInsets.zero,
-                              ),
-                              calendarBuilders: CalendarBuilders(
-                                markerBuilder: (context, day, items) {
-                                  if (items.isEmpty) {
-                                    return const SizedBox.shrink();
-                                  }
-                                  final isToday = _isSameLocalDay(day, today);
-                                  final color =
-                                      isToday
-                                          ? const Color(0xFFCC0102)
-                                          : const Color(0xFF2A74BD);
-                                  return Positioned(
-                                    bottom: 10,
-                                    child: Container(
-                                      width: 6,
-                                      height: 6,
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                dowBuilder: (context, day) {
-                                  final txt =
-                                      day.weekday == DateTime.sunday
-                                          ? 'CN'
-                                          : 'T${day.weekday + 1}';
-                                  return Center(
-                                    child: Text(
-                                      txt,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.black,
-                                        height: 1,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              _academicWeekLabel.isNotEmpty
-                                  ? '- $_academicWeekLabel -'
-                                  : '- Tuần ${_isoWeekNumber(_selectedDay)} -',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      if (itemsOfDay.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 24.0, bottom: 24.0),
-                          child: Center(
-                            child: Text('Không có lịch nào trong ngày này'),
+                            ],
                           ),
-                        )
-                      else
-                        ...itemsOfDay.map((it) => _ScheduleCard(item: it)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TableCalendar<WeeklyScheduleItem>(
+                                locale: 'vi',
+                                firstDay: DateTime.utc(2010, 1, 1),
+                                lastDay: DateTime.utc(2035, 12, 31),
+                                focusedDay: _focusedDay,
+                                startingDayOfWeek: StartingDayOfWeek.monday,
+                                calendarFormat: CalendarFormat.week,
+                                availableCalendarFormats: const {
+                                  CalendarFormat.week: 'Week',
+                                },
+                                headerVisible: true,
+                                headerStyle: HeaderStyle(
+                                  formatButtonVisible: false,
+                                  titleCentered: true,
+                                  titleTextFormatter: (date, _) {
+                                    final m = DateFormat.M('vi').format(date);
+                                    return 'Tháng $m, ${date.year}';
+                                  },
+                                  titleTextStyle: const TextStyle(
+                                    color: Color(0xFF2A74BD),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  leftChevronIcon: Icon(
+                                    Icons.chevron_left_rounded,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  rightChevronIcon: Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                onPageChanged: (d) {
+                                  final monday = _mondayOf(d);
+                                  final now = _normalize(DateTime.now());
+                                  final weekStart = _normalize(monday);
+                                  final weekEnd = _normalize(
+                                    monday.add(const Duration(days: 6)),
+                                  );
 
-                      const SizedBox(height: 12),
-                      _buildWebButton(),
-                      const SizedBox(height: 12),
-                    ],
+                                  final isCurrentWeek =
+                                      !now.isBefore(weekStart) &&
+                                      !now.isAfter(weekEnd);
+
+                                  setState(() {
+                                    _focusedDay = _normalize(d);
+                                    _autoSelectDayOnLoad = true;
+
+                                    if (isCurrentWeek) {
+                                      _selectedDay = now;
+                                    } else {
+                                      _selectedDay = _normalize(monday);
+                                    }
+                                  });
+
+                                  _requestAcademicWeek(d);
+                                  context.read<WeeklyScheduleBloc>().add(
+                                    WeeklyScheduleRequested(
+                                      widget.email,
+                                      date: isCurrentWeek ? now : _selectedDay,
+                                    ),
+                                  );
+                                },
+                                selectedDayPredicate:
+                                    (day) => _isSameLocalDay(day, _selectedDay),
+                                onDaySelected: (sel, foc) {
+                                  setState(() {
+                                    _selectedDay = _normalize(sel);
+                                    _focusedDay = _normalize(sel);
+                                    _autoSelectDayOnLoad = false;
+                                  });
+
+                                  _requestAcademicWeek(sel);
+                                  context.read<WeeklyScheduleBloc>().add(
+                                    WeeklyScheduleRequested(
+                                      widget.email,
+                                      date: _selectedDay,
+                                    ),
+                                  );
+                                },
+                                eventLoader:
+                                    (day) =>
+                                        _cachedEvents[_normalize(day)] ??
+                                        const [],
+                                daysOfWeekStyle: const DaysOfWeekStyle(
+                                  weekdayStyle: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    height: 1,
+                                  ),
+                                  weekendStyle: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    height: 1,
+                                  ),
+                                ),
+                                calendarStyle: CalendarStyle(
+                                  defaultTextStyle: const TextStyle(
+                                    fontSize: FontSizes.small + 1,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  weekendTextStyle: const TextStyle(
+                                    fontSize: FontSizes.small + 1,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  outsideTextStyle: const TextStyle(
+                                    fontSize: FontSizes.small + 1,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  todayTextStyle: const TextStyle(
+                                    fontSize: FontSizes.small + 1,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  todayDecoration: const BoxDecoration(
+                                    color: Color(0xFFEFF3F8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  selectedTextStyle: const TextStyle(
+                                    fontSize: FontSizes.small + 1,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  selectedDecoration: const BoxDecoration(
+                                    color: Color(0xFFD6E6F6),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  cellMargin: EdgeInsets.zero,
+                                ),
+                                calendarBuilders: CalendarBuilders(
+                                  markerBuilder: (context, day, items) {
+                                    if (items.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    final isToday = _isSameLocalDay(day, today);
+                                    final color =
+                                        isToday
+                                            ? const Color(0xFFCC0102)
+                                            : const Color(0xFF2A74BD);
+                                    return Positioned(
+                                      bottom: 10,
+                                      child: Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          color: color,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  dowBuilder: (context, day) {
+                                    final txt =
+                                        day.weekday == DateTime.sunday
+                                            ? 'CN'
+                                            : 'T${day.weekday + 1}';
+                                    return Center(
+                                      child: Text(
+                                        txt,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.black,
+                                          height: 1,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _academicWeekLabel.isNotEmpty
+                                    ? '- $_academicWeekLabel -'
+                                    : '- Tuần ${_isoWeekNumber(_selectedDay)} -',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        if (itemsOfDay.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 24.0, bottom: 24.0),
+                            child: Center(
+                              child: Text('Không có lịch nào trong ngày này'),
+                            ),
+                          )
+                        else
+                          ...itemsOfDay.map((it) => _ScheduleCard(item: it)),
+
+                        const SizedBox(height: 12),
+                        _buildWebButton(),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

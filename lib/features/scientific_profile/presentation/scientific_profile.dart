@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -5,12 +6,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
+import '../../../common/utils/getit_utils.dart';
 import '../bloc/scientific_profile_bloc.dart';
+import '../bloc/scientific_profile_event.dart';
 import '../bloc/scientific_profile_state.dart';
+import '../data/scientific_profile_repository.dart';
 import '../models/scientific_profile_model.dart';
 
+@RoutePage()
 class ScientificProfileScreen extends StatelessWidget {
-  const ScientificProfileScreen({super.key});
+  final String microsoftEmail;
+  const ScientificProfileScreen({super.key, required this.microsoftEmail});
 
   static const Color colorInternational = Color(0xFF133D87);
   static const Color colorNational = Color(0xFFCC0102);
@@ -41,151 +47,134 @@ class ScientificProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CustomAppbar(label: "Lý lịch khoa học"),
-            BlocBuilder<ScientificProfileBloc, ScientificProfileState>(
-              buildWhen:
-                  (p, c) => (p is ProfileLoading) != (c is ProfileLoading),
-              builder: (context, state) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child:
-                      state is ProfileLoading
-                          ? SizedBox(
-                            key: const ValueKey('profile-loading-bar'),
-                            height: 2,
-                            width: double.infinity,
-                            child: CustomLoadingIndicator.thin(),
-                          )
-                          : const SizedBox(
-                            key: ValueKey('profile-no-loading'),
-                            height: 2,
-                          ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      body: BlocBuilder<ScientificProfileBloc, ScientificProfileState>(
-        builder: (context, state) {
-          if (state is ProfileError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.info_outline,
-                      color: Colors.orange,
-                      size: 48,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Bạn hãy đăng nhập bằng email trường cấp vào đường link dưới đây và quay trở lại app",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _launchSSOUrl,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2A74BD),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        "Đăng nhập và thử lại",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
+    return BlocProvider(
+      create:
+          (_) =>
+              ScientificProfileBloc(getIt.get<ScientificProfileRepository>())
+                ..add(FetchProfile(microsoftEmail)),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF1F5F9),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CustomAppbar(label: "Lý lịch khoa học"),
+              BlocBuilder<ScientificProfileBloc, ScientificProfileState>(
+                buildWhen:
+                    (p, c) => (p is ProfileLoading) != (c is ProfileLoading),
+                builder: (context, state) {
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child:
+                        state is ProfileLoading
+                            ? SizedBox(
+                              key: const ValueKey('profile-loading-bar'),
+                              height: 2,
+                              width: double.infinity,
+                              child: CustomLoadingIndicator.thin(),
+                            )
+                            : const SizedBox(
+                              key: ValueKey('profile-no-loading'),
+                              height: 2,
+                            ),
+                  );
+                },
               ),
-            );
-          }
-
-          if (state is ProfileLoaded || state is ProfileLoading) {
-            final profile = (state is ProfileLoaded) ? state.profile : null;
-
-            if (profile == null) {
-              return const SizedBox.shrink();
+            ],
+          ),
+        ),
+        body: BlocBuilder<ScientificProfileBloc, ScientificProfileState>(
+          builder: (context, state) {
+            if (state is ProfileError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.orange,
+                        size: 48,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Bạn hãy đăng nhập bằng email trường cấp vào đường link dưới đây và quay trở lại app",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _launchSSOUrl,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2A74BD),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          "Đăng nhập và thử lại",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _buildHeaderCard("Thông tin cơ bản", [
-                    _buildFormattedRow("Chức danh:", profile.chucDanh),
-                    _buildFormattedRow(
-                      "Lĩnh vực:",
-                      profile.linhVucChuyenSau.join(", "),
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
-                  _buildHeaderCard("Quá trình đào tạo", [
-                    if (profile.quaTrinhDaoTao.daiHoc != null)
-                      _buildEduDetail(
-                        "Đào tạo Đại Học",
-                        profile.quaTrinhDaoTao.daiHoc!,
+            if (state is ProfileLoaded || state is ProfileLoading) {
+              final profile = (state is ProfileLoaded) ? state.profile : null;
+
+              if (profile == null) {
+                return const SizedBox.shrink();
+              }
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _buildHeaderCard("Thông tin cơ bản", [
+                      _buildFormattedRow("Chức danh:", profile.chucDanh),
+                      _buildFormattedRow(
+                        "Lĩnh vực:",
+                        profile.linhVucChuyenSau.join(", "),
                       ),
-                    if (profile.quaTrinhDaoTao.thacSi != null)
-                      _buildEduDetail(
-                        "Đào tạo Thạc Sĩ",
-                        profile.quaTrinhDaoTao.thacSi!,
-                      ),
-                    if (profile.quaTrinhDaoTao.tienSi != null)
-                      _buildEduDetail(
-                        "Đào tạo Tiến Sĩ",
-                        profile.quaTrinhDaoTao.tienSi!,
-                      ),
-                  ]),
-                  _buildExpandableSection(
-                    title: "Tạp chí quốc tế",
-                    color: colorInternational,
-                    children:
-                        profile.tapChiQuocTe
-                            .map(
-                              (item) => _buildSubItemCard(
-                                item.ten,
-                                colorInternational,
-                                [
-                                  _buildFormattedRow(
-                                    "Ngày công bố:",
-                                    _formatDate(item.ngay),
-                                  ),
-                                  _buildFormattedRow(
-                                    "Tên tạp chí:",
-                                    item.tapChi,
-                                  ),
-                                  _buildFormattedRow("Tác giả:", item.tacGia),
-                                ],
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  _buildExpandableSection(
-                    title: "Tạp chí quốc gia",
-                    color: colorNational,
-                    children:
-                        profile.tapChiQuocGia
-                            .map(
-                              (item) =>
-                                  _buildSubItemCard(item.ten, colorNational, [
+                    ]),
+                    const SizedBox(height: 12),
+                    _buildHeaderCard("Quá trình đào tạo", [
+                      if (profile.quaTrinhDaoTao.daiHoc != null)
+                        _buildEduDetail(
+                          "Đào tạo Đại Học",
+                          profile.quaTrinhDaoTao.daiHoc!,
+                        ),
+                      if (profile.quaTrinhDaoTao.thacSi != null)
+                        _buildEduDetail(
+                          "Đào tạo Thạc Sĩ",
+                          profile.quaTrinhDaoTao.thacSi!,
+                        ),
+                      if (profile.quaTrinhDaoTao.tienSi != null)
+                        _buildEduDetail(
+                          "Đào tạo Tiến Sĩ",
+                          profile.quaTrinhDaoTao.tienSi!,
+                        ),
+                    ]),
+                    _buildExpandableSection(
+                      title: "Tạp chí quốc tế",
+                      color: colorInternational,
+                      children:
+                          profile.tapChiQuocTe
+                              .map(
+                                (item) => _buildSubItemCard(
+                                  item.ten,
+                                  colorInternational,
+                                  [
                                     _buildFormattedRow(
                                       "Ngày công bố:",
                                       _formatDate(item.ngay),
@@ -195,74 +184,102 @@ class ScientificProfileScreen extends StatelessWidget {
                                       item.tapChi,
                                     ),
                                     _buildFormattedRow("Tác giả:", item.tacGia),
-                                  ]),
-                            )
-                            .toList(),
-                  ),
-                  _buildExpandableSection(
-                    title: "Đề tài",
-                    color: colorProject,
-                    children:
-                        profile.deTai
-                            .map(
-                              (item) =>
-                                  _buildSubItemCard(item.ten, colorProject, [
-                                    _buildFormattedRow("Mã số:", item.maSo),
-                                    _buildFormattedRow(
-                                      "Ngày bắt đầu:",
-                                      _formatDate(item.batDau),
-                                    ),
-                                    _buildFormattedRow(
-                                      "Ngày nghiệm thu:",
-                                      _formatDate(item.nghiemThu),
-                                    ),
-                                  ]),
-                            )
-                            .toList(),
-                  ),
-                  _buildExpandableSection(
-                    title: "Khen thưởng",
-                    color: colorAward,
-                    children:
-                        profile.khenThuong.isEmpty
-                            ? [
-                              const Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Text(
-                                  "",
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  ],
                                 ),
-                              ),
-                            ]
-                            : profile.khenThuong
-                                .map(
-                                  (item) => _buildSubItemCard(
-                                    item.tenKhenThuong ?? "Khen thưởng",
-                                    colorAward,
-                                    [
+                              )
+                              .toList(),
+                    ),
+                    _buildExpandableSection(
+                      title: "Tạp chí quốc gia",
+                      color: colorNational,
+                      children:
+                          profile.tapChiQuocGia
+                              .map(
+                                (item) =>
+                                    _buildSubItemCard(item.ten, colorNational, [
                                       _buildFormattedRow(
-                                        "Năm quyết định:",
-                                        item.namQuyetDinh ?? "",
+                                        "Ngày công bố:",
+                                        _formatDate(item.ngay),
                                       ),
                                       _buildFormattedRow(
-                                        "Hình thức:",
-                                        item.hinhThucKhenThuong ?? "",
+                                        "Tên tạp chí:",
+                                        item.tapChi,
                                       ),
                                       _buildFormattedRow(
-                                        "Cấp khen thưởng:",
-                                        item.capKhenThuong ?? "",
+                                        "Tác giả:",
+                                        item.tacGia,
                                       ),
-                                    ],
+                                    ]),
+                              )
+                              .toList(),
+                    ),
+                    _buildExpandableSection(
+                      title: "Đề tài",
+                      color: colorProject,
+                      children:
+                          profile.deTai
+                              .map(
+                                (item) =>
+                                    _buildSubItemCard(item.ten, colorProject, [
+                                      _buildFormattedRow("Mã số:", item.maSo),
+                                      _buildFormattedRow(
+                                        "Ngày bắt đầu:",
+                                        _formatDate(item.batDau),
+                                      ),
+                                      _buildFormattedRow(
+                                        "Ngày nghiệm thu:",
+                                        _formatDate(item.nghiemThu),
+                                      ),
+                                    ]),
+                              )
+                              .toList(),
+                    ),
+                    _buildExpandableSection(
+                      title: "Khen thưởng",
+                      color: colorAward,
+                      children:
+                          profile.khenThuong.isEmpty
+                              ? [
+                                const Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    "",
+                                    style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
-                                )
-                                .toList(),
-                  ),
-                ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
+                                ),
+                              ]
+                              : profile.khenThuong
+                                  .map(
+                                    (item) => _buildSubItemCard(
+                                      item.tenKhenThuong ?? "Khen thưởng",
+                                      colorAward,
+                                      [
+                                        _buildFormattedRow(
+                                          "Năm quyết định:",
+                                          item.namQuyetDinh ?? "",
+                                        ),
+                                        _buildFormattedRow(
+                                          "Hình thức:",
+                                          item.hinhThucKhenThuong ?? "",
+                                        ),
+                                        _buildFormattedRow(
+                                          "Cấp khen thưởng:",
+                                          item.capKhenThuong ?? "",
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  .toList(),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

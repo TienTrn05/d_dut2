@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
@@ -9,6 +10,7 @@ import 'package:e_dut/features/schedule/presentation/widgets/card/uos_info_card.
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
+@RoutePage()
 class DetailUserProofScreen extends StatelessWidget {
   final UserProofModel userProof;
 

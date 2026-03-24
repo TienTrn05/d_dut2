@@ -1,5 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/widgets/dialog/custom_alert_dialog.dart';
+import 'package:e_dut/features/app/app_router.dart';
 import 'package:e_dut/features/auth/data/model/role_model.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/custom_mail_picker.dart';
 import 'package:e_dut/features/schedule/bloc/schedule/schedule_bloc.dart';
@@ -18,7 +20,6 @@ import '../../root/bloc/root_bloc.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../domain/repository/dashboard_repo.dart';
 
-import '../../../common/routes/routes.dart';
 import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import './widgets/schedule_item.dart';
@@ -26,7 +27,6 @@ import './widgets/feature_card.dart';
 import './widgets/feature_card_skeleton.dart';
 import './widgets/header.dart';
 
-import '../../auth/data/model/scope_model.dart';
 import '../../../common/extensions/custom_theme_extension.dart';
 import '../../../features/auth/bloc/auth_bloc.dart';
 
@@ -143,9 +143,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
       return;
     }
-    Navigator.of(
-      context,
-    ).pushNamed(Routes.academicResults, arguments: studentId);
+
+    context.router.push(
+      ResultsRoute(
+        studentId: studentId,
+        apiBase: "https://xemdiem.dut.udn.vn/api",
+      ),
+    );
   }
 
   void _openAcademicStats(BuildContext context, AuthUserAuthenticated state) {
@@ -159,9 +163,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
       return;
     }
-    Navigator.of(
-      context,
-    ).pushNamed(Routes.academicStatistics, arguments: studentId);
+    context.router.push(
+      StatisticsRoute(apiBase: "https://xemdiem.dut.udn.vn/api"),
+    );
   }
 
   @override
@@ -330,7 +334,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         context.read<MainBloc>().add(ChangePage(1));
                       },
                       onTap: () {
-                        Navigator.of(context).pushNamed(Routes.notification);
+                        context.router.push(
+                          NotificationRoute(initialTabIndex: 0),
+                        );
                       },
                     );
                   },
@@ -511,8 +517,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   FeatureCardSkeleton(),
                                 ];
                               } else {
-                                final List<ScopeModel> scopes =
-                                    state.userData.scopes;
                                 final String userRole =
                                     state.userData.role.name;
 
@@ -524,12 +528,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/solar_calendar-broken.svg",
                                       title: "Thời khóa biểu",
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.schedule,
-                                          ),
-                                        );
+                                        context.router.push(ScheduleRoute());
                                       },
                                     ),
                                     FeatureCard(
@@ -537,11 +536,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/solar_users-group-rounded-broken.svg",
                                       title: "Lớp chủ nhiệm",
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.listHomeRoom,
-                                          ),
+                                        context.router.push(
+                                          ListHomeroomRoute(),
                                         );
                                       },
                                     ),
@@ -575,9 +571,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           return;
                                         }
 
-                                        Navigator.of(context).pushNamed(
-                                          Routes.weeklySchedule,
-                                          arguments: email,
+                                        context.router.push(
+                                          WeeklyScheduleRoute(email: email),
                                         );
                                       },
                                     ),
@@ -611,11 +606,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 Assets.icons.svg.chatbotIcon,
                                             title: "Trợ lý dDUT",
                                             onTap: () {
-                                              context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                  scopes,
-                                                  Routes.chatBot,
-                                                ),
+                                              context.router.push(
+                                                ChatBotRoute(),
                                               );
                                             },
                                           ),
@@ -666,9 +658,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           return;
                                         }
 
-                                        Navigator.of(context).pushNamed(
-                                          Routes.scientificProfile,
-                                          arguments: microsoftEmail,
+                                        context.router.push(
+                                          ScientificProfileRoute(
+                                            microsoftEmail: microsoftEmail,
+                                          ),
                                         );
                                       },
                                     ),
@@ -680,12 +673,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/solar_calendar-broken.svg",
                                       title: "Thời khóa biểu",
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.schedule,
-                                          ),
-                                        );
+                                        context.router.push(ScheduleRoute());
                                       },
                                     ),
                                     FeatureCard(
@@ -732,11 +720,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       title: "Lớp sinh hoạt",
                                       // disabled: true,
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.detailHomeRoom,
-                                          ),
+                                        context.router.push(
+                                          DetailHomeroomRoute(),
                                         );
                                       },
                                     ),
@@ -745,12 +730,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/tabler_coin.svg",
                                       title: "Học phí",
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.tuitionFee,
-                                          ),
-                                        );
+                                        context.router.push(TuitionFeeRoute());
                                       },
                                     ),
                                     FeatureCard(
@@ -758,9 +738,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           "assets/icons/svg/streamline-ultimate_workflow-teamwork-user-high-five.svg",
                                       title: "Hoạt động \ncộng đồng",
                                       onTap: () {
-                                        Navigator.of(
-                                          context,
-                                        ).pushNamed(Routes.communityActivities);
+                                        context.router.push(
+                                          CommunityActivitiesRoute(),
+                                        );
                                       },
                                     ),
                                     BlocBuilder<AuthBloc, AuthState>(
@@ -770,11 +750,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 Assets.icons.svg.chatbotIcon,
                                             title: "Trợ lý dDUT",
                                             onTap: () {
-                                              context.read<DashboardBloc>().add(
-                                                DashboardNavigateRequested(
-                                                  scopes,
-                                                  Routes.chatBot,
-                                                ),
+                                              context.router.push(
+                                                ChatBotRoute(),
                                               );
                                             },
                                           ),
@@ -799,12 +776,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       title: "Lấy số tổ 1 cửa",
                                       originIconColor: true,
                                       onTap: () {
-                                        context.read<DashboardBloc>().add(
-                                          DashboardNavigateRequested(
-                                            scopes,
-                                            Routes.queue,
-                                          ),
-                                        );
+                                        context.router.push(QueueRoute());
                                       },
                                     ),
                                   ];

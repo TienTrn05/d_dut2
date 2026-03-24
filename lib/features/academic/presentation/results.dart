@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +17,7 @@ import 'detail_result.dart';
 
 import '../../../features/auth/bloc/auth_bloc.dart';
 
+@RoutePage()
 class ResultsPage extends StatefulWidget {
   final String studentId;
   final String apiBase;

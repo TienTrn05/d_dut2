@@ -1,8 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/features/dashboard/presentation/widgets/notification_button.dart';
 import 'package:flutter/material.dart';
+
+import '../../../features/app/app_router.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String label;
@@ -42,7 +44,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
         if (showNotificationButton)
           NotificationButton(
             notificationCount: 0,
-            onTap: () => {Navigator.of(context).pushNamed(Routes.notification)},
+            onTap: () => {context.router.push(NotificationRoute(initialTabIndex: 0))},
           ),
         if (child != null)
           Padding(padding: const EdgeInsets.only(right: 16), child: child!),

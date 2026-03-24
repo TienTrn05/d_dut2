@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,6 +26,7 @@ import '/common/widgets/errors/error_view.dart';
 import '../../../notification/domain/repositories/notification_repository.dart';
 import '../../bloc/notification/noti_bloc.dart';
 
+@RoutePage()
 class DetailHomeroomScreen extends StatefulWidget {
   const DetailHomeroomScreen({super.key, this.classId, this.homeroomName});
 
