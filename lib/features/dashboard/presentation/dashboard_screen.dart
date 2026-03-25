@@ -147,7 +147,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     context.router.push(
       ResultsRoute(
         studentId: studentId,
-        apiBase: "https://xemdiem.dut.udn.vn/api",
       ),
     );
   }

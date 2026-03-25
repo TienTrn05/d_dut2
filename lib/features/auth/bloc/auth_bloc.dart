@@ -20,50 +20,47 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<NavigatorState> navigatorKey;
-  final AuthRepository _authRepository;
-  final NotificationRepository _notificationRepository;
+  final AuthRepository authRepository;
+  final NotificationRepository notificationRepository;
 
-  AuthBloc(
-      this.navigatorKey, this._authRepository, this._notificationRepository)
-      : super(AuthInitial()) {
-    on<AuthInitRequested>(_onInitUser);
+  final UserModel? userData;
+  final String? accessToken;
+
+  AuthBloc({
+    required this.navigatorKey,
+    required this.authRepository,
+    required this.notificationRepository,
+    this.userData,
+    this.accessToken,
+  }) : super(
+         (userData != null && accessToken != null)
+             ? AuthUserAuthenticated(accessToken, userData)
+             : AuthHandlerFinished(),
+       ) {
     on<MicrosoftSignInRequested>(_onMicrosoftSignIn);
     on<AuthLoginRequested>(_onLogin);
     on<AuthLogoutRequested>(_onLogout);
   }
 
   AadOAuth _microsoftSignInSetup(String? savedEmail) {
-    return AadOAuth(Config(
-      tenant: AppEnvironment.tenantId,
-      clientId: AppEnvironment.clientId,
-      redirectUri: AppEnvironment.redirectUri,
-      responseType: "code",
-      scope: "User.Read",
-      loginHint: savedEmail ?? "",
-      loader: MicrosoftLoading(),
-      navigatorKey: navigatorKey, // Truyền navigatorKey
-    ));
-  }
-
-  Future<void> _onInitUser(
-      AuthInitRequested event, Emitter<AuthState> emit) async {
-    try {
-      final String? token = await Storage.accessToken;
-      final UserModel? user = Storage.user;
-
-      if (token != null && user != null) {
-        emit(AuthUserAuthenticated(token, user));
-      } else {
-        emit(AuthHandlerFinished());
-      }
-    } catch (e) {
-      logger.e("Failed to load user from storage: $e");
-      emit(AuthError("Không thể lấy thông tin người dùng."));
-    }
+    return AadOAuth(
+      Config(
+        tenant: AppEnvironment.tenantId,
+        clientId: AppEnvironment.clientId,
+        redirectUri: AppEnvironment.redirectUri,
+        responseType: "code",
+        scope: "User.Read",
+        loginHint: savedEmail ?? "",
+        loader: MicrosoftLoading(),
+        navigatorKey: navigatorKey, // Truyền navigatorKey
+      ),
+    );
   }
 
   Future<void> _onMicrosoftSignIn(
-      MicrosoftSignInRequested event, Emitter<AuthState> emit) async {
+    MicrosoftSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     String savedEmail = Storage.hintEmail ?? "";
     AadOAuth microsoftSignIn = _microsoftSignInSetup(savedEmail);
 
@@ -82,25 +79,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
 
         try {
-          final data =
-              await _authRepository.getProfileWithMicrosoft(token.accessToken!);
+          final data = await authRepository.getProfileWithMicrosoft(
+            token.accessToken!,
+          );
 
           await Storage.setAccessToken(data["accessToken"]);
           await Storage.setUser(data["user"]);
 
           if (event.FCMToken.isNotEmpty) {
             try {
-              await _notificationRepository.registerFCMToken(
-                  data["accessToken"], event.FCMToken);
+              await notificationRepository.registerFCMToken(
+                data["accessToken"],
+                event.FCMToken,
+              );
             } catch (e) {
               logger.e("Failed to register FCM token: $e");
             }
           }
 
-          emit(AuthUserAuthenticated(
-            data["accessToken"],
-            data["user"],
-          ));
+          emit(AuthUserAuthenticated(data["accessToken"], data["user"]));
         } catch (e) {
           logger.e("Failed to login: $e");
           emit(AuthError("Đăng nhập thất bại. Vui lòng thử lại sau."));
@@ -110,17 +107,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogin(
-      AuthLoginRequested event, Emitter<AuthState> emit) async {
+    AuthLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     try {
       emit(AuthLoading());
-      final data = await _authRepository.signIn(event.username, event.password);
+      final data = await authRepository.signIn(event.username, event.password);
 
       await Storage.setAccessToken(data["accessToken"]);
 
-      emit(AuthUserAuthenticated(
-        data["accessToken"],
-        data["user"],
-      ));
+      emit(AuthUserAuthenticated(data["accessToken"], data["user"]));
 
       await Storage.setAccessToken(data["accessToken"]);
       await Storage.setUser(data["user"]);
@@ -131,7 +127,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogout(
-      AuthLogoutRequested event, Emitter<AuthState> emit) async {
+    AuthLogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     await _microsoftSignInSetup(null).logout();
     await Storage.setAccessToken(null);
     await Storage.setUser(null);

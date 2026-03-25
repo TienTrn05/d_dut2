@@ -51,13 +51,15 @@ Future<void> main() async {
   }
 
   final userData = Storage.user;
-  runApp(MyApp(userData: userData));
+  final accessToken = await Storage.accessToken;
+  runApp(MyApp(userData: userData, accessToken: accessToken,));
 }
 
 class MyApp extends StatelessWidget {
   final UserModel? userData;
+  final String? accessToken;
 
-  MyApp({super.key, this.userData});
+  MyApp({super.key, this.userData, this.accessToken});
 
   final _appRouter = getIt<AppRouter>();
 
@@ -68,16 +70,20 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create:
               (context) => AuthBloc(
-                _appRouter.navigatorKey,
-                getIt.get<AuthRepository>(),
-                getIt.get<NotificationRepository>(),
-              )..add(AuthInitRequested()),
+                navigatorKey: _appRouter.navigatorKey,
+                authRepository: getIt.get<AuthRepository>(),
+                notificationRepository: getIt.get<NotificationRepository>(),
+                accessToken: accessToken,
+                userData: userData
+              ),
         ),
         BlocProvider(create: (_) => LoadingBloc()),
         BlocProvider(
           create:
-              (_) =>
-                  NotificationSettingsBloc(notificationSettingsService: getIt<NotificationSettingsService>())..add(LoadNotificationSettings()),
+              (_) => NotificationSettingsBloc(
+                notificationSettingsService:
+                    getIt<NotificationSettingsService>(),
+              )..add(LoadNotificationSettings()),
         ),
 
         BlocProvider<CalendarBloc>(

@@ -476,15 +476,10 @@ class ResultsRoute extends PageRouteInfo<ResultsRouteArgs> {
   ResultsRoute({
     Key? key,
     required String studentId,
-    required String apiBase,
     List<PageRouteInfo>? children,
   }) : super(
          ResultsRoute.name,
-         args: ResultsRouteArgs(
-           key: key,
-           studentId: studentId,
-           apiBase: apiBase,
-         ),
+         args: ResultsRouteArgs(key: key, studentId: studentId),
          initialChildren: children,
        );
 
@@ -494,44 +489,32 @@ class ResultsRoute extends PageRouteInfo<ResultsRouteArgs> {
     name,
     builder: (data) {
       final args = data.argsAs<ResultsRouteArgs>();
-      return ResultsPage(
-        key: args.key,
-        studentId: args.studentId,
-        apiBase: args.apiBase,
-      );
+      return ResultsPage(key: args.key, studentId: args.studentId);
     },
   );
 }
 
 class ResultsRouteArgs {
-  const ResultsRouteArgs({
-    this.key,
-    required this.studentId,
-    required this.apiBase,
-  });
+  const ResultsRouteArgs({this.key, required this.studentId});
 
   final Key? key;
 
   final String studentId;
 
-  final String apiBase;
-
   @override
   String toString() {
-    return 'ResultsRouteArgs{key: $key, studentId: $studentId, apiBase: $apiBase}';
+    return 'ResultsRouteArgs{key: $key, studentId: $studentId}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! ResultsRouteArgs) return false;
-    return key == other.key &&
-        studentId == other.studentId &&
-        apiBase == other.apiBase;
+    return key == other.key && studentId == other.studentId;
   }
 
   @override
-  int get hashCode => key.hashCode ^ studentId.hashCode ^ apiBase.hashCode;
+  int get hashCode => key.hashCode ^ studentId.hashCode;
 }
 
 /// generated route for
