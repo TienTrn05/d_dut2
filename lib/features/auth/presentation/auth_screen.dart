@@ -1,15 +1,17 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:e_dut/features/app/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../core/services/notification_service.dart';
-import '../../../common/routes/routes.dart';
 import '../../../common/widgets/snackbar/custom_snackbar.dart';
 import '../../loading/loading_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import 'login_form.dart';
 
+@RoutePage()
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -68,11 +70,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   context.read<LoadingBloc>().add(LoadingShow());
                 } else if (state is AuthUserAuthenticated) {
                   context.read<LoadingBloc>().add(LoadingHide());
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.root,
-                    (route) => false,
-                  );
+
+                  context.router.replaceAll([const RootRoute()]);
                 } else if (state is AuthError) {
                   context.read<LoadingBloc>().add(LoadingHide());
                   CustomSnackbar.showSnackBar(

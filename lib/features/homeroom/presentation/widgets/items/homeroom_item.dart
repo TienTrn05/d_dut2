@@ -1,5 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
+import 'package:e_dut/features/app/app_router.dart';
 import 'package:e_dut/features/homeroom/data/model/homeroom_model.dart';
 import 'package:flutter/material.dart';
 
@@ -11,13 +12,7 @@ class HomeroomItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          Routes.detailHomeRoom,
-          arguments: {
-            "id": homeroom.id,
-            "name": homeroom.name,
-          },
-        );
+        context.router.push(DetailHomeroomRoute(classId: homeroom.id, homeroomName: homeroom.name));
       },
       child: Container(
         width: double.infinity,

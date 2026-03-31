@@ -2,12 +2,10 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/material.dart';
 
+import '../../common/utils/getit_utils.dart';
+import '../../features/app/app_router.dart';
 import '../data/local/storage.dart';
-import '/features/auth/presentation/auth_screen.dart';
-
-import './navigation_service.dart';
 
 class ApiClient {
   final Dio _dio = Dio();
@@ -33,13 +31,7 @@ class ApiClient {
             await Storage.setAccessToken(null);
             await Storage.setUser(null);
 
-            final context = navigatorKey.currentState?.context;
-            if (context != null) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => AuthScreen()),
-                (Route<dynamic> route) => false,
-              );
-            }
+            getIt<AppRouter>().replaceAll([const AuthRoute()]);
           }
           return handler.next(e);
         },

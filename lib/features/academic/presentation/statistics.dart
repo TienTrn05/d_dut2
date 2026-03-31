@@ -1,9 +1,11 @@
 import 'dart:math' as math;
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../../common/extensions/font_sizes.dart';
+import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/appbar/custom_appbar.dart';
 import '../../../common/widgets/loading/loading_progress_bar.dart';
 
@@ -13,6 +15,7 @@ import '../data/stats_repository.dart';
 import '../data/academic_api_client.dart';
 import '../models/stats_model.dart';
 
+@RoutePage()
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key, required this.apiBase});
 
@@ -23,14 +26,12 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
-  late final AcademicApiClient _client;
   late final StatsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
-    _client = AcademicApiClient(baseUrl: widget.apiBase);
-    _bloc = StatsBloc(StatsRepository(_client));
+    _bloc = StatsBloc(StatsRepository(getIt<AcademicApiClient>()));
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       _bloc.add(StatsRequested(authToken: authState.accessToken));
@@ -40,7 +41,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void dispose() {
     _bloc.close();
-    _client.close();
     super.dispose();
   }
 

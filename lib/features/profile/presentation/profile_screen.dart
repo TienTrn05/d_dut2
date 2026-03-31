@@ -5,10 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/dialog/custom_alert_dialog.dart';
+import '../../app/app_router.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/extensions/custom_theme_extension.dart';
-import '/common/routes/routes.dart';
 
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/data/model/role_model.dart';
@@ -23,9 +24,7 @@ class ProfileScreen extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthLogoutSuccess) {
-          Navigator.of(
-            context,
-          ).pushNamedAndRemoveUntil(Routes.auth, (route) => false);
+          getIt<AppRouter>().replaceAll([const AuthRoute()]);
         }
       },
       child: SafeArea(
