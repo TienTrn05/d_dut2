@@ -55,7 +55,7 @@ class _ListHomeroomScreenState extends State<ListHomeroomScreen> {
                   ));
                 } else if (state is ListHomeroomError) {
                   return Center(
-                      child: Text('Đã có lỗi xảy ra: ${state.message}',
+                      child: Text('Đã có lỗi xảy ra!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: context.theme.grey ?? Colors.grey)));
