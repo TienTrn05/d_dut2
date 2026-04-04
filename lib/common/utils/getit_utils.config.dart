@@ -16,6 +16,9 @@ import 'package:e_dut/core/data/remote/notification_settings_service.dart'
     as _i603;
 import 'package:e_dut/features/academic/data/academic_api_client.dart' as _i395;
 import 'package:e_dut/features/academic/data/academic_api_module.dart' as _i446;
+import 'package:e_dut/features/academic/data/plo_module.dart' as _i546;
+import 'package:e_dut/features/academic/data/plo_repository.dart' as _i1010;
+import 'package:e_dut/features/academic/data/plo_service.dart' as _i172;
 import 'package:e_dut/features/app/app_router.dart' as _i514;
 import 'package:e_dut/features/auth/data/data_sources/remote_data_source/auth_module.dart'
     as _i916;
@@ -120,6 +123,7 @@ extension GetItInjectableX on _i174.GetIt {
     final tuitionFeeModule = _$TuitionFeeModule();
     final authModule = _$AuthModule();
     final queueModule = _$QueueModule();
+    final pLOModule = _$PLOModule();
     final courseSectionModule = _$CourseSectionModule();
     final academicApiModule = _$AcademicApiModule();
     gh.factory<_i706.SignalRService>(() => _i706.SignalRService());
@@ -188,6 +192,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => queueModule.queueAPIUrl,
       instanceName: 'queueAPIUrl',
     );
+    gh.factory<String>(() => pLOModule.ploAPIUrl, instanceName: 'ploAPIUrl');
     gh.factory<String>(
       () => courseSectionModule.courseRegistrationAPIUrl,
       instanceName: 'courseRegistrationAPIUrl',
@@ -267,6 +272,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i513.CourseSectionRepository>(
       () => _i513.CourseSectionRepository(gh<_i728.CourseSectionService>()),
     );
+    gh.factory<_i172.PLOService>(
+      () => _i172.PLOService(gh<String>(instanceName: 'ploAPIUrl')),
+    );
     gh.factory<_i935.ProfileRepository>(
       () => _i935.ProfileRepository(gh<_i957.ProfileService>()),
     );
@@ -290,6 +298,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i409.AuthRepository>(
       () => _i409.AuthRepository(gh<_i255.AuthService>()),
+    );
+    gh.factory<_i1010.PLORepository>(
+      () => _i1010.PLORepository(gh<_i172.PLOService>()),
     );
     return this;
   }
@@ -320,6 +331,8 @@ class _$TuitionFeeModule extends _i878.TuitionFeeModule {}
 class _$AuthModule extends _i916.AuthModule {}
 
 class _$QueueModule extends _i456.QueueModule {}
+
+class _$PLOModule extends _i546.PLOModule {}
 
 class _$CourseSectionModule extends _i279.CourseSectionModule {}
 

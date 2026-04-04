@@ -142,9 +142,14 @@ class NotificationService {
   // --- PHẦN XỬ LÝ REMOTE NOTIFICATION (Push từ server) ---
 
   Future<String?> getFCMToken() async {
-    String? token = await _firebaseMessaging.getToken();
-    logger.i('Firebase Messaging Token: $token');
-    return token;
+    try {
+      String? token = await _firebaseMessaging.getToken();
+      logger.i('Firebase Messaging Token: $token');
+      return token;
+    } catch (e) {
+      logger.e(e);
+      return null;
+    }
   }
 
   void registerMessageHandlers() {

@@ -14,6 +14,8 @@ import '../bloc/stats_bloc.dart';
 import '../data/stats_repository.dart';
 import '../data/academic_api_client.dart';
 import '../models/stats_model.dart';
+import '../data/plo_repository.dart';
+import '../presentation/widgets/plo_item.dart';
 
 @RoutePage()
 class StatisticsPage extends StatefulWidget {
@@ -31,7 +33,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void initState() {
     super.initState();
-    _bloc = StatsBloc(StatsRepository(getIt<AcademicApiClient>()));
+    _bloc = StatsBloc(
+      StatsRepository(getIt<AcademicApiClient>()),
+      getIt<PLORepository>(),
+    );
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       _bloc.add(StatsRequested(authToken: authState.accessToken));
@@ -198,6 +203,49 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     ),
 
                     const SizedBox(height: 24),
+
+                    // PLO
+                    Material(
+                      elevation: 0,
+                      color: const Color(0xFFFAFAFA),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Điểm PLO',
+                              style: const TextStyle(
+                                fontSize: FontSizes.medium,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                alignment: WrapAlignment.spaceBetween,
+                                children:
+                                    state.plo
+                                        .map(
+                                          (p) => PLOItem(
+                                            ploName: p.ploName,
+                                            ploScore: p.ploScore,
+                                          ),
+                                        )
+                                        .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
 
                     // GPA (thang 4.0)
                     _ChartCard(

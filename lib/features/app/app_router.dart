@@ -41,46 +41,103 @@ class AppRouter extends RootStackRouter {
 
     AutoRoute(page: AuthRoute.page, path: '/auth'),
 
-    AutoRoute(page: NotificationRoute.page, path: '/notification'),
-    AutoRoute(page: ScheduleRoute.page, path: '/schedule'),
+    AutoRoute(
+      page: NotificationRoute.page,
+      path: '/notification',
+      guards: [authGuard],
+    ),
+    AutoRoute(page: ScheduleRoute.page, path: '/schedule', guards: [authGuard]),
+
     // AutoRoute(page: DetailExamShiftRoute.page, path: '/msteamtool'),
+    AutoRoute(
+      page: DetailUOSRoute.page,
+      path: '/detailUnitOfStudy',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: DetailUOSTeacherRoute.page,
+      path: '/detailUOSTeacher',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: DetailExamShiftRoute.page,
+      path: '/detailExamShiftTeacher',
+      guards: [authGuard],
+    ),
 
-    AutoRoute(page: DetailUOSRoute.page, path: '/detailUnitOfStudy'),
-    AutoRoute(page: DetailUOSTeacherRoute.page, path: '/detailUOSTeacher'),
-    AutoRoute(page: DetailExamShiftRoute.page, path: '/detailExamShiftTeacher'),
-
-    AutoRoute(page: CourseRegistrationRoute.page, path: '/courseRegistration'),
-    AutoRoute(page: GradeRoute.page, path: '/courseRegistrationGrade'),
+    AutoRoute(
+      page: CourseRegistrationRoute.page,
+      path: '/courseRegistration',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: GradeRoute.page,
+      path: '/courseRegistrationGrade',
+      guards: [authGuard],
+    ),
 
     // community activity
     AutoRoute(
       page: CommunityActivitiesRoute.page,
       path: '/communityActivities',
+      guards: [authGuard],
     ),
     // AutoRoute(page: DetailUOSTeacherRoute.page, path: '/detailUserActivity'),
-    AutoRoute(page: DetailUserProofRoute.page, path: '/detailUserProof'),
+    AutoRoute(
+      page: DetailUserProofRoute.page,
+      path: '/detailUserProof',
+      guards: [authGuard],
+    ),
 
     // homeroom
-    AutoRoute(page: ListHomeroomRoute.page, path: '/listHomeRoom'),
-    AutoRoute(page: DetailHomeroomRoute.page, path: '/detailHomeRoom'),
+    AutoRoute(
+      page: ListHomeroomRoute.page,
+      path: '/listHomeRoom',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: DetailHomeroomRoute.page,
+      path: '/detailHomeRoom',
+      guards: [authGuard],
+    ),
 
     // academic
-    AutoRoute(page: ResultsRoute.page, path: '/academic/results'),
-    AutoRoute(page: StatisticsRoute.page, path: '/academic/statistics'),
+    AutoRoute(
+      page: ResultsRoute.page,
+      path: '/academic/results',
+      guards: [authGuard],
+    ),
+    AutoRoute(
+      page: StatisticsRoute.page,
+      path: '/academic/statistics',
+      guards: [authGuard],
+    ),
 
     // chat bot
-    AutoRoute(page: ChatBotRoute.page, path: '/chatBot'),
+    AutoRoute(page: ChatBotRoute.page, path: '/chatBot', guards: [authGuard]),
 
     // tuition fee
-    AutoRoute(page: TuitionFeeRoute.page, path: '/tuitionFee'),
+    AutoRoute(
+      page: TuitionFeeRoute.page,
+      path: '/tuitionFee',
+      guards: [authGuard],
+    ),
 
     // weekly schedule
-    AutoRoute(page: WeeklyScheduleRoute.page, path: '/weekly_schedule'),
+    AutoRoute(
+      page: WeeklyScheduleRoute.page,
+      path: '/weekly_schedule',
+      guards: [authGuard],
+    ),
 
     // scientific profile
-    AutoRoute(page: ScientificProfileRoute.page, path: '/scientific_profile'),
+    AutoRoute(
+      page: ScientificProfileRoute.page,
+      path: '/scientific_profile',
+      guards: [authGuard],
+    ),
 
     // queue
-    AutoRoute(page: QueueRoute.page, path: '/queue'),
+    AutoRoute(page: QueueRoute.page, path: '/queue', guards: [authGuard]),
   ];
 }
