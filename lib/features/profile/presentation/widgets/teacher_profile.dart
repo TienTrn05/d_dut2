@@ -51,6 +51,7 @@ class TeacherProfile extends StatelessWidget {
               TeacherProfileStatus.failure) {
             return ErrorView(
                   message: "Lỗi khi tải thông tin.\nVui lòng thử lại sau.",
+                  errorType: ErrorType.internalError,
                 );
           }
 
