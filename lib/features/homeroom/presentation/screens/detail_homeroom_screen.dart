@@ -153,6 +153,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                       return ErrorView(
                         message:
                             "Lỗi khi tải thông tin.\nVui lòng thử lại sau.",
+                        errorType: ErrorType.internalError,
                       );
                     }
 

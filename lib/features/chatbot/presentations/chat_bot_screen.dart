@@ -161,6 +161,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                 message:
                     state.errorMessage ??
                     "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
+                errorType: ErrorType.internalError,
                 onRetry: cubit.loadConversation,
               ),
             );
