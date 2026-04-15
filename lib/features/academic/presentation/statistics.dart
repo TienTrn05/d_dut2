@@ -212,33 +212,34 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Điểm PLO',
+                              'Điểm PLO - Chuẩn đầu ra',
                               style: const TextStyle(
                                 fontSize: FontSizes.medium,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 16),
                             SizedBox(
                               width: double.infinity,
-                              child: Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                alignment: WrapAlignment.spaceBetween,
-                                children:
-                                    state.plo
-                                        .map(
-                                          (p) => PLOItem(
-                                            ploName: p.ploName,
-                                            ploScore: p.ploScore,
-                                          ),
-                                        )
-                                        .toList(),
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: state.plo.length,
+                                itemBuilder: (context, index) {
+                                  final p = state.plo[index];
+                                  return PLOItem(
+                                    ploName: p.ploName,
+                                    ploScore: p.ploScore,
+                                  );
+                                },
+                                separatorBuilder:
+                                    (context, index) =>
+                                        const SizedBox(height: 12),
                               ),
                             ),
                           ],
@@ -328,7 +329,7 @@ class _ChartCard extends StatelessWidget {
       color: const Color(0xFFFAFAFA),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

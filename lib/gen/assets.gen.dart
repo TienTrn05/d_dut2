@@ -116,6 +116,9 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/chatbot_icon.svg
   String get chatbotIcon => 'assets/icons/svg/chatbot_icon.svg';
 
+  /// File path: assets/icons/svg/ci_warning.svg
+  String get ciWarning => 'assets/icons/svg/ci_warning.svg';
+
   /// File path: assets/icons/svg/dDUT.svg
   String get dDUT => 'assets/icons/svg/dDUT.svg';
 
@@ -325,6 +328,7 @@ class $AssetsIconsSvgGen {
     biChatDotsFill,
     carbonBook,
     chatbotIcon,
+    ciWarning,
     dDUT,
     dDUTD,
     dDUTT,
