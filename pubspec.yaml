@@ -1,7 +1,7 @@
 name: e_dut
 description: "A dDUT project."
 publish_to: "none"
-version: 1.2.7+35
+version: 1.2.8+36
 
 environment:
   sdk: ">=3.7.2 <4.0.0"
