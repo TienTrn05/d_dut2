@@ -52,7 +52,7 @@ Future<void> main() async {
 
   final userData = Storage.user;
   final accessToken = await Storage.accessToken;
-  runApp(MyApp(userData: userData, accessToken: accessToken,));
+  runApp(MyApp(userData: userData, accessToken: accessToken));
 }
 
 class MyApp extends StatelessWidget {
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
                 authRepository: getIt.get<AuthRepository>(),
                 notificationRepository: getIt.get<NotificationRepository>(),
                 accessToken: accessToken,
-                userData: userData
+                userData: userData,
               ),
         ),
         BlocProvider(create: (_) => LoadingBloc()),

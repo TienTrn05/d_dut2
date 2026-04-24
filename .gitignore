@@ -76,3 +76,4 @@ linux/flutter/generated_plugin_registrant.h
 windows/flutter/generated_plugin_registrant.h
 
 ios_backup/
+GoogleService-Info.plist
