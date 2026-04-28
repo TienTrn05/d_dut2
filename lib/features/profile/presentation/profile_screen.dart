@@ -192,6 +192,10 @@ class ProfileScreen extends StatelessWidget {
                                 RoleModel.roleTeacher,
                           ),
                         );
+                      } else {
+                        context.read<AuthBloc>().add(
+                          AuthLogoutRequested(""),
+                        );
                       }
                     },
                     textConfirm: "Đăng xuất",

@@ -133,7 +133,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await _microsoftSignInSetup(null).logout();
     await Storage.setAccessToken(null);
     await Storage.setUser(null);
-    await Storage.setHintEmail(event.email);
+    if (event.email.isNotEmpty) {
+      await Storage.setHintEmail(event.email);
+    }
     await Storage.setExamNotification(true);
 
     emit(AuthLogoutSuccess());
