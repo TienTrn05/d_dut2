@@ -52,7 +52,7 @@ Future<void> main() async {
 
   final userData = Storage.user;
   final accessToken = await Storage.accessToken;
-  runApp(MyApp(userData: userData, accessToken: accessToken));
+  runApp(MyApp(userData: userData, accessToken: accessToken ?? ""));
 }
 
 class MyApp extends StatelessWidget {
