@@ -94,6 +94,7 @@ class _CreateNewHomeroomNotiScreenState
             style: TextStyle(
               color: context.theme.primaryColor,
               fontSize: FontSizes.medium,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
