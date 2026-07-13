@@ -100,6 +100,7 @@ class _CreateNewNotiScreenState extends State<CreateNewNotiScreen> {
             style: TextStyle(
               color: context.theme.primaryColor,
               fontSize: FontSizes.medium,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
