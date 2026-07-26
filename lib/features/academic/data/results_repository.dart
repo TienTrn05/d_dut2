@@ -5,7 +5,7 @@ class SubjectResult {
   final String semesterCode; // Kỳ học
   final String subjectCode; // Mã học phần
   final String classCode; // Mã lớp học phần
-  final int? credits; // Số tín chỉ
+  final num? credits; // Số tín chỉ
   final double? score10; // Thang 10
   final String? scoreChar; // Tổng kết thang chữ
   final double? score4; // Thang 4
@@ -29,7 +29,7 @@ class SubjectResult {
         semesterCode: (j['semesterCode'] ?? '') as String,
         subjectCode: (j['subjectCode'] ?? '') as String,
         classCode: (j['classCode'] ?? '') as String,
-        credits: (j['credits'] as num?)?.toInt(),
+        credits: j['credits'] as num?,
         score10: (j['score10'] as num?)?.toDouble(),
         scoreChar: j['scoreChar'] as String?,
         score4: (j['score4'] as num?)?.toDouble(),
@@ -47,11 +47,11 @@ class ResultsRepository {
   ResultsRepository(this._api);
   final AcademicApiClient _api;
 
-  // Chuyển dynamic sang int
-  int? _toInt(dynamic v) {
+  // Chuyển dynamic sang num
+  num? _toNum(dynamic v) {
     if (v == null) return null;
-    if (v is num) return v.toInt();
-    return int.tryParse('$v');
+    if (v is num) return v;
+    return num.tryParse('$v');
   }
 
   double? _toDouble(dynamic v) {
@@ -86,7 +86,7 @@ class ResultsRepository {
       'subjectCode':
           _toStr(raw['subjectCode']),
       'classCode': _toStr(classCode),
-      'credits': _toInt(credits),
+      'credits': _toNum(credits),
       'score10': _toDouble(score10),
       'score4': _toDouble(score4),
       'scoreChar': scoreChar == null ? null : _toStr(scoreChar),

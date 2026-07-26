@@ -10,7 +10,7 @@ class ResultModel {
   final String studentId; // Mã sinh viên
   final String subjectName; // Tên học phần
   final String classCode; // Mã lớp học phần
-  final int? credits; // Số tín chỉ
+  final num? credits; // Số tín chỉ
   final String? scoreChar; // Tổng kết (điểm chữ)
   final double? score10; // Thang 10
   final double? score4; // Thang 4
@@ -70,7 +70,7 @@ class ResultModel {
       studentId: json['Mã sinh viên']?.toString() ?? '',
       subjectName: json['Tên học phần']?.toString() ?? '',
       classCode: json['Mã lớp học phần']?.toString() ?? '',
-      credits: int.tryParse(json['Số tín chỉ']?.toString() ?? ''),
+      credits: num.tryParse(json['Số tín chỉ']?.toString() ?? ''),
       scoreChar: json['Tổng kết']?.toString(),
       score10: toDouble(json['Thang 10']),
       score4: toDouble(json['Thang 4']),
