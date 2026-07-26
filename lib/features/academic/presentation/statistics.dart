@@ -122,8 +122,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   data.creditsPerSemester.map((e) => e.toDouble()).toList();
 
               final double? overallGpa4 = _overallGpa4(data);
-              final double totalAccumCredits =
-                  data.totalAccumCredits?.toDouble() ?? 0.0;
+              final num totalAccumCredits =
+                  data.totalAccumCredits ?? 0;
 
               // Điểm rèn luyện trung bình
               final double? avgConduct =
@@ -508,7 +508,7 @@ class _InfoSummaryInline extends StatelessWidget {
     this.studyStage,
   });
 
-  final double totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final num totalAccumCredits; // HPTichLuy (kỳ mới nhất)
   final double? avgConduct; // trung bình DiemRL các kỳ
   final String? studyStage; // Namhoc (string)
 
@@ -541,7 +541,9 @@ class _InfoSummaryInline extends StatelessWidget {
             children: [
               const TextSpan(text: 'Số tín chỉ tích luỹ: ', style: _labelStyle),
               TextSpan(
-                text: totalAccumCredits.toStringAsFixed(0),
+                text: totalAccumCredits == totalAccumCredits.toInt()
+                    ? totalAccumCredits.toInt().toString()
+                    : totalAccumCredits.toString(),
                 style: _valueStyle,
               ),
             ],

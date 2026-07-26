@@ -55,7 +55,7 @@ class StatsRepository {
       'semesters': _toStringList(kyHocVN),
       'gpaPerSemester': _toDoubleList(gpaVN),
       'conductPerSemester': _toDoubleList(drlVN),
-      'creditsPerSemester': _toIntList(tcVN),
+      'creditsPerSemester': _toNumList(tcVN),
       'overall': overall,
     };
   }
@@ -79,16 +79,16 @@ class StatsRepository {
     return const <double>[];
   }
 
-  List<int> _toIntList(dynamic v) {
+  List<num> _toNumList(dynamic v) {
     if (v is List) {
       return v
           .map((e) {
-            if (e is num) return e.toInt();
-            return int.tryParse('$e');
+            if (e is num) return e;
+            return num.tryParse('$e');
           })
-          .whereType<int>()
+          .whereType<num>()
           .toList();
     }
-    return const <int>[];
+    return const <num>[];
   }
 }
