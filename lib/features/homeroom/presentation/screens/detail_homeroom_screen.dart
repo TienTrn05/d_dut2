@@ -1,3 +1,6 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:e_dut/common/utils/logger.dart';
+import 'package:e_dut/features/homeroom/presentation/widgets/teacher_detail_tab/list_student_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,7 +17,7 @@ import '/features/auth/data/model/role_model.dart';
 import '../../bloc/homeroom_bloc.dart';
 import '../../data/model/student_model.dart';
 import '../../domain/repository/homeroom_repo.dart';
-import '../../presentation/widgets/detail_tab/notifications_tab.dart';
+import '../widgets/teacher_detail_tab/notifications_tab.dart';
 import '../../presentation/widgets/items/student_item.dart';
 import '/features/profile/bloc/student_profile/student_profile_bloc.dart';
 import '/features/profile/domain/repository/profile_repository.dart';
@@ -25,6 +28,7 @@ import '/common/widgets/errors/error_view.dart';
 import '../../../notification/domain/repositories/notification_repository.dart';
 import '../../bloc/notification/noti_bloc.dart';
 
+@RoutePage()
 class DetailHomeroomScreen extends StatefulWidget {
   const DetailHomeroomScreen({super.key, this.classId, this.homeroomName});
 
@@ -127,6 +131,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                 : '';
         final String authToken =
             authState is AuthUserAuthenticated ? authState.accessToken : '';
+
         final bool isStudent = userRole == RoleModel.roleStudent;
 
         if (isStudent) {
@@ -151,6 +156,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                       return ErrorView(
                         message:
                             "Lỗi khi tải thông tin.\nVui lòng thử lại sau.",
+                        errorType: ErrorType.internalError,
                       );
                     }
 
@@ -391,7 +397,7 @@ class _DetailHomeroomScreenState extends State<DetailHomeroomScreen>
                                 ),
                             ],
                           ),
-                          _buildStudentsList(),
+                          ListStudentTab(students: students),
                         ],
                       ),
                     );

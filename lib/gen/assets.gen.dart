@@ -87,6 +87,15 @@ class $AssetsImagesGen {
   AssetGenImage get defaultImage =>
       const AssetGenImage('assets/images/default_image.jpg');
 
+  /// File path: assets/images/error_auth.svg
+  String get errorAuth => 'assets/images/error_auth.svg';
+
+  /// File path: assets/images/error_connection.svg
+  String get errorConnection => 'assets/images/error_connection.svg';
+
+  /// File path: assets/images/error_internal_server.svg
+  String get errorInternalServer => 'assets/images/error_internal_server.svg';
+
   /// File path: assets/images/free-schedule.svg
   String get freeSchedule => 'assets/images/free-schedule.svg';
 
@@ -97,6 +106,9 @@ class $AssetsImagesGen {
     chatbotHero,
     defaultAvatar,
     defaultImage,
+    errorAuth,
+    errorConnection,
+    errorInternalServer,
     freeSchedule,
   ];
 }
@@ -115,6 +127,9 @@ class $AssetsIconsSvgGen {
 
   /// File path: assets/icons/svg/chatbot_icon.svg
   String get chatbotIcon => 'assets/icons/svg/chatbot_icon.svg';
+
+  /// File path: assets/icons/svg/ci_warning.svg
+  String get ciWarning => 'assets/icons/svg/ci_warning.svg';
 
   /// File path: assets/icons/svg/dDUT.svg
   String get dDUT => 'assets/icons/svg/dDUT.svg';
@@ -257,6 +272,10 @@ class $AssetsIconsSvgGen {
   /// File path: assets/icons/svg/solar_logout-3-bold.svg
   String get solarLogout3Bold => 'assets/icons/svg/solar_logout-3-bold.svg';
 
+  /// File path: assets/icons/svg/solar_notebook-broken.svg
+  String get solarNotebookBroken =>
+      'assets/icons/svg/solar_notebook-broken.svg';
+
   /// File path: assets/icons/svg/solar_settings-broken.svg
   String get solarSettingsBroken =>
       'assets/icons/svg/solar_settings-broken.svg';
@@ -321,6 +340,7 @@ class $AssetsIconsSvgGen {
     biChatDotsFill,
     carbonBook,
     chatbotIcon,
+    ciWarning,
     dDUT,
     dDUTD,
     dDUTT,
@@ -364,6 +384,7 @@ class $AssetsIconsSvgGen {
     solarEyeBroken,
     solarLockBold,
     solarLogout3Bold,
+    solarNotebookBroken,
     solarSettingsBroken,
     solarUserBold,
     solarUserBroken,

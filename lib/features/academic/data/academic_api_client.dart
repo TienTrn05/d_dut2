@@ -1,16 +1,13 @@
 import 'dart:convert';
 import 'dart:io' show HttpHeaders;
 import 'package:http/http.dart' as http;
+import 'package:injectable/injectable.dart';
 
-const String _apiFromEnvironment = String.fromEnvironment(
-  'ACADEMIC_API_BASE',
-  defaultValue: '',
-);
-
+@injectable
 class AcademicApiClient {
-  AcademicApiClient({String? baseUrl, http.Client? httpClient})
-    : baseUrl = (baseUrl ?? _apiFromEnvironment).trim(),
-      _client = httpClient ?? http.Client() {
+  AcademicApiClient(@Named('academicAPIUrl') String baseUrl)
+    : baseUrl = (baseUrl).trim(),
+      _client = http.Client() {
     if (this.baseUrl.isEmpty) {
       throw Exception(
         'Missing ACADEMIC_API_BASE. '

@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
 import 'package:e_dut/common/utils/getit_utils.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+@RoutePage()
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
 
@@ -46,7 +48,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       ],
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: CustomAppbar(label: "Thời khóa biểu"),
+        appBar: CustomAppbar(
+          label: "Thời khóa biểu",
+          showNotificationButton: false,
+          child: Builder(
+            builder:
+                (context) => IconButton(
+                  icon: const Icon(Icons.menu_rounded, color: Colors.white),
+                  tooltip: 'Open menu',
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                ),
+          ),
+        ),
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
             final String userRole =
@@ -68,31 +83,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               );
             }
           },
-        ),
-        floatingActionButton: Builder(
-          builder:
-              (context) => Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 4,
-                      spreadRadius: 0,
-                      offset: const Offset(2, 5),
-                    ),
-                  ],
-                ),
-                child: FloatingActionButton(
-                  elevation: 0,
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                  },
-                  backgroundColor: context.theme.primaryColor,
-                  shape: const CircleBorder(),
-                  child: const Icon(Icons.menu_rounded, color: Colors.white),
-                ),
-              ),
         ),
         endDrawer: Drawer(
           backgroundColor: Colors.white,

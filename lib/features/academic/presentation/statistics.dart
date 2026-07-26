@@ -1,9 +1,11 @@
 import 'dart:math' as math;
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../../common/extensions/font_sizes.dart';
+import '../../../common/utils/getit_utils.dart';
 import '../../../common/widgets/appbar/custom_appbar.dart';
 import '../../../common/widgets/loading/loading_progress_bar.dart';
 
@@ -12,7 +14,10 @@ import '../bloc/stats_bloc.dart';
 import '../data/stats_repository.dart';
 import '../data/academic_api_client.dart';
 import '../models/stats_model.dart';
+import '../data/plo_repository.dart';
+import '../presentation/widgets/plo_item.dart';
 
+@RoutePage()
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({super.key, required this.apiBase});
 
@@ -23,14 +28,15 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
-  late final AcademicApiClient _client;
   late final StatsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
-    _client = AcademicApiClient(baseUrl: widget.apiBase);
-    _bloc = StatsBloc(StatsRepository(_client));
+    _bloc = StatsBloc(
+      StatsRepository(getIt<AcademicApiClient>()),
+      getIt<PLORepository>(),
+    );
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       _bloc.add(StatsRequested(authToken: authState.accessToken));
@@ -40,7 +46,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void dispose() {
     _bloc.close();
-    _client.close();
     super.dispose();
   }
 
@@ -117,8 +122,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   data.creditsPerSemester.map((e) => e.toDouble()).toList();
 
               final double? overallGpa4 = _overallGpa4(data);
-              final double totalAccumCredits =
-                  data.totalAccumCredits?.toDouble() ?? 0.0;
+              final num totalAccumCredits =
+                  data.totalAccumCredits ?? 0;
 
               // Điểm rèn luyện trung bình
               final double? avgConduct =
@@ -198,6 +203,50 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     ),
 
                     const SizedBox(height: 24),
+
+                    // PLO
+                    Material(
+                      elevation: 0,
+                      color: const Color(0xFFFAFAFA),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Điểm PLO - Chuẩn đầu ra',
+                              style: const TextStyle(
+                                fontSize: FontSizes.medium,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: state.plo.length,
+                                itemBuilder: (context, index) {
+                                  final p = state.plo[index];
+                                  return PLOItem(
+                                    ploName: p.ploName,
+                                    ploScore: p.ploScore,
+                                  );
+                                },
+                                separatorBuilder:
+                                    (context, index) =>
+                                        const SizedBox(height: 12),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
 
                     // GPA (thang 4.0)
                     _ChartCard(
@@ -280,7 +329,7 @@ class _ChartCard extends StatelessWidget {
       color: const Color(0xFFFAFAFA),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -459,7 +508,7 @@ class _InfoSummaryInline extends StatelessWidget {
     this.studyStage,
   });
 
-  final double totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final num totalAccumCredits; // HPTichLuy (kỳ mới nhất)
   final double? avgConduct; // trung bình DiemRL các kỳ
   final String? studyStage; // Namhoc (string)
 
@@ -492,7 +541,9 @@ class _InfoSummaryInline extends StatelessWidget {
             children: [
               const TextSpan(text: 'Số tín chỉ tích luỹ: ', style: _labelStyle),
               TextSpan(
-                text: totalAccumCredits.toStringAsFixed(0),
+                text: totalAccumCredits == totalAccumCredits.toInt()
+                    ? totalAccumCredits.toInt().toString()
+                    : totalAccumCredits.toString(),
                 style: _valueStyle,
               ),
             ],

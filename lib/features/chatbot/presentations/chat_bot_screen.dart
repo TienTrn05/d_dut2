@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:dartx/dartx.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ import '/features/chatbot/domain/repository/chatbot_repo.dart';
 import '/features/chatbot/domain/repository/conversation_repo.dart';
 import './widgets/chat_bubble.dart';
 
+@RoutePage()
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
 
@@ -159,6 +161,7 @@ class _ChatBotScreenState extends State<ChatBotScreen>
                 message:
                     state.errorMessage ??
                     "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau.",
+                errorType: ErrorType.internalError,
                 onRetry: cubit.loadConversation,
               ),
             );

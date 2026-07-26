@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/widgets/appbar/custom_appbar.dart';
 import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'general_notifications.dart';
 import 'my_notifications.dart';
 import 'widgets/custom_time_dropdown.dart';
 
+@RoutePage()
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key, required this.initialTabIndex});
 

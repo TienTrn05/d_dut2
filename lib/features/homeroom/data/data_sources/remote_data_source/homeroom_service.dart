@@ -8,30 +8,30 @@ import 'package:injectable/injectable.dart';
 @injectable
 class HomeroomService {
   HomeroomService(@Named('homeroomAPIUrl') String url)
-      : _url = url,
-        _apiClient = ApiClient(url);
+    : _url = url,
+      _apiClient = ApiClient(url);
 
   final String _url;
   final ApiClient _apiClient;
 
   Future<List<StudentModel>> getStudents(String token, String classId) async {
     try {
-      final response = await _apiClient.dio.get("$_url/api/students",
-          queryParameters: {"classId": classId},
-          options: Options(headers: {
-            "Authorization": "Bearer $token",
-          }));
+      final response = await _apiClient.dio.get(
+        "$_url/api/students",
+        queryParameters: {"classId": classId},
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
       if (response.statusCode == 200 && response.data['isSuccess'] == true) {
         final responseData = response.data;
 
         final List<dynamic> data = responseData['data'];
 
         final students = data.map((e) => StudentModel.fromJson(e)).toList();
-
         return students;
       } else {
         throw Exception(
-            "Failed to load students of homeroom: ${response.data['message']}");
+          "Failed to load students of homeroom: ${response.data['message']}",
+        );
       }
     } catch (e) {
       logger.e("Error fetching students of homeroom: $e");
@@ -41,10 +41,10 @@ class HomeroomService {
 
   Future<List<HomeroomModel>> getHomerooms(String token) async {
     try {
-      final response = await _apiClient.dio.get("$_url/api/classActivities",
-          options: Options(headers: {
-            "Authorization": "Bearer $token",
-          }));
+      final response = await _apiClient.dio.get(
+        "$_url/api/classActivities",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
       if (response.statusCode == 200 && response.data['isSuccess'] == true) {
         final responseData = response.data;
 
@@ -55,7 +55,8 @@ class HomeroomService {
         return homerooms;
       } else {
         throw Exception(
-            "Failed to load homerooms: ${response.data['message']}");
+          "Failed to load homerooms: ${response.data['message']}",
+        );
       }
     } catch (e) {
       logger.e("Error fetching homerooms: $e");

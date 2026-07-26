@@ -4,8 +4,49 @@ import 'package:e_dut/common/widgets/snackbar/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:linkify/linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+class VietnamesePhoneNumberLinkifier extends Linkifier {
+  const VietnamesePhoneNumberLinkifier();
+
+  @override
+  List<LinkifyElement> parse(
+    List<LinkifyElement> elements,
+    LinkifyOptions options,
+  ) {
+    final list = <LinkifyElement>[];
+    // Regex bắt các số điện thoại VN bắt đầu bằng 03, 05, 07, 08, 09 và có đủ 10 số
+    final regex = RegExp(r'\b(0[3|5|7|8|9][0-9]{8})\b');
+
+    for (var element in elements) {
+      if (element is TextElement) {
+        final text = element.text;
+        final matches = regex.allMatches(text);
+
+        if (matches.isEmpty) {
+          list.add(element);
+        } else {
+          var start = 0;
+          for (final match in matches) {
+            if (match.start > start) {
+              list.add(TextElement(text.substring(start, match.start)));
+            }
+            final phone = match.group(0)!;
+            // Trả về một LinkableElement với scheme là tel:
+            list.add(LinkableElement(phone, 'tel:$phone', phone));
+            start = match.end;
+          }
+          if (start < text.length) {
+            list.add(TextElement(text.substring(start)));
+          }
+        }
+      } else {
+        list.add(element);
+      }
+    }
+    return list;
+  }
+}
 
 class InfoItem extends StatelessWidget {
   final String field;
@@ -55,15 +96,21 @@ class InfoItem extends StatelessWidget {
                     linkifiers: [
                       UrlLinkifier(),
                       EmailLinkifier(),
-                      // PhoneNumberLinkifier()
+                      VietnamesePhoneNumberLinkifier(),
                     ],
                     onOpen: (link) async {
                       if (link.url.startsWith('tel:')) {
-                        _showContactOptions(context,
-                            isPhone: true, data: link.url.substring(4));
+                        _showContactOptions(
+                          context,
+                          isPhone: true,
+                          data: link.url.substring(4),
+                        );
                       } else if (link.url.startsWith('mailto:')) {
-                        _showContactOptions(context,
-                            isPhone: false, data: link.url.substring(7));
+                        _showContactOptions(
+                          context,
+                          isPhone: false,
+                          data: link.url.substring(7),
+                        );
                       }
                     },
                   ),
@@ -76,8 +123,11 @@ class InfoItem extends StatelessWidget {
     );
   }
 
-  void _showContactOptions(BuildContext context,
-      {required bool isPhone, required String data}) {
+  void _showContactOptions(
+    BuildContext context, {
+    required bool isPhone,
+    required String data,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

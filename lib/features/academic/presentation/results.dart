@@ -1,3 +1,5 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:e_dut/common/utils/getit_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,14 +18,13 @@ import 'detail_result.dart';
 
 import '../../../features/auth/bloc/auth_bloc.dart';
 
+@RoutePage()
 class ResultsPage extends StatefulWidget {
   final String studentId;
-  final String apiBase;
 
   const ResultsPage({
     super.key,
     required this.studentId,
-    required this.apiBase,
   });
 
   @override
@@ -34,14 +35,12 @@ class _ResultsPageState extends State<ResultsPage> {
   int _semesterIndex = 0;
   bool _autoPickedLatestOnce = false;
 
-  late final AcademicApiClient _client;
   late final ResultsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
-    _client = AcademicApiClient(baseUrl: widget.apiBase);
-    _bloc = ResultsBloc(ResultsRepository(_client));
+    _bloc = ResultsBloc(ResultsRepository(getIt<AcademicApiClient>()));
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthUserAuthenticated) {
       _bloc.add(LoadResults(authState.accessToken));
@@ -51,7 +50,6 @@ class _ResultsPageState extends State<ResultsPage> {
   @override
   void dispose() {
     _bloc.close();
-    _client.close();
     super.dispose();
   }
 

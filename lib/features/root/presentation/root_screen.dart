@@ -1,10 +1,11 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:e_dut/features/app/app_router.dart';
 import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../bloc/root_bloc.dart';
 
-import '/common/routes/routes.dart';
 import '/core/services/auto_redirect_service.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/core/services/app_update_service.dart';
@@ -13,6 +14,7 @@ import '../../dashboard/presentation/dashboard_screen.dart';
 // import '../../searching/presentation/searching_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 
+@RoutePage()
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
 
@@ -48,13 +50,13 @@ class _MainViewState extends State<_MainView> {
 
       switch (redirect) {
         case AutoRedirectName.redirectToNotificationScreen:
-          Navigator.pushNamed(context, Routes.notification);
+          context.router.push(NotificationRoute(initialTabIndex: 0));
           break;
         case AutoRedirectName.redirectToNotificationScreenGeneralTab:
-          Navigator.pushNamed(context, Routes.notification, arguments: 1);
+          context.router.push(NotificationRoute(initialTabIndex: 1));
           break;
         case AutoRedirectName.redirectToScheduleScreen:
-          Navigator.pushNamed(context, Routes.schedule);
+          context.router.push(ScheduleRoute());
           break;
         case AutoRedirectName.unknown:
           // Không redirect nếu không xác định được payload

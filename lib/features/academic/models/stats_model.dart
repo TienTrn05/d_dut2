@@ -1,15 +1,15 @@
 class StatsModel {
   final double? gpa4; // GPA thang 4 (kỳ mới nhất)
   final double? gpa10;
-  final int totalCredits; // tổng TC đăng ký
-  final int? totalAccumCredits; // HPTichLuy (kỳ mới nhất)
+  final num totalCredits; // tổng TC đăng ký
+  final num? totalAccumCredits; // HPTichLuy (kỳ mới nhất)
   final double? avgConduct; // Điểm rèn luyện trung bình
   final String? stage; // Năm học
 
   final List<String> semesters;
   final List<double> gpaPerSemester; // DiemTBTL 4.0 theo kỳ
   final List<double> conductPerSemester; // DiemRL 0-100 theo kỳ
-  final List<int> creditsPerSemester; // HPDangky theo kỳ
+  final List<num> creditsPerSemester; // HPDangky theo kỳ
 
   /// Thống kê theo kỳ
   final List<SemesterStat> bySemester;
@@ -31,8 +31,6 @@ class StatsModel {
   factory StatsModel.fromJson(Map<String, dynamic> json) {
     double? _d(v) =>
         v == null ? null : (v is num ? v.toDouble() : double.tryParse('$v'));
-    int? _i(v) =>
-        v == null ? null : (v is num ? v.toInt() : int.tryParse('$v'));
     String? _s(v) => v == null ? null : '$v';
 
     List<String> _strList(v) =>
@@ -44,26 +42,28 @@ class StatsModel {
                 .whereType<double>()
                 .toList()
             : const <double>[];
-    List<int> _intList(v) =>
+    List<num> _numList(v) =>
         (v is List)
             ? v
-                .map((e) => (e is num ? e.toInt() : int.tryParse('$e')))
-                .whereType<int>()
+                .map((e) => (e is num ? e : num.tryParse('$e')))
+                .whereType<num>()
                 .toList()
-            : const <int>[];
+            : const <num>[];
 
     // Mảng cho biểu đồ
     final semesters = _strList(json['semesters']);
     final gpaPerSem = _doubleList(json['gpaPerSemester']);
     final conductPerSem = _doubleList(json['conductPerSemester']);
-    final creditsPerSem = _intList(json['creditsPerSemester']);
+    final creditsPerSem = _numList(json['creditsPerSemester']);
 
     // Tổng quan
     final ov = (json['overall'] as Map?) ?? const {};
     final gpa4 = _d(ov['gpa4']) ?? _d(ov['gpa10']);
     final gpa10 = _d(ov['gpa10']);
-    final totalAccumCredits = _i(ov['totalAccumCredits']);
-    final totalCredits = _i(ov['totalCredits'] ?? ov['totalAccumCredits']) ?? 0;
+    num? _n(v) =>
+        v == null ? null : (v is num ? v : num.tryParse('$v'));
+    final totalAccumCredits = _n(ov['totalAccumCredits']);
+    final totalCredits = _n(ov['totalCredits'] ?? ov['totalAccumCredits']) ?? 0;
     final avgConduct = _d(ov['avgConduct']);
     final stage = _s(ov['stage'] ?? ov['studyStage']);
 
@@ -106,7 +106,7 @@ class SemesterStat {
   final String? semester;
   final double? gpa10;
   final double? gpa4; // GPA thang 4
-  final int? credits; // Tín chỉ đăng ký
+  final num? credits; // Tín chỉ đăng ký
   final double? conduct; // ĐRL 0-100
 
   SemesterStat({
@@ -120,14 +120,14 @@ class SemesterStat {
   factory SemesterStat.fromJson(Map<String, dynamic> json) {
     double? _d(v) =>
         v == null ? null : (v is num ? v.toDouble() : double.tryParse('$v'));
-    int? _i(v) =>
-        v == null ? null : (v is num ? v.toInt() : int.tryParse('$v'));
+    num? _n(v) =>
+        v == null ? null : (v is num ? v : num.tryParse('$v'));
 
     return SemesterStat(
       semester: json['semester'] ?? json['HocKy'] ?? json['term'],
       gpa10: _d(json['gpa10'] ?? json['GPA10']),
       gpa4: _d(json['gpa4'] ?? json['GPA4']),
-      credits: _i(json['credits'] ?? json['TinChi']),
+      credits: _n(json['credits'] ?? json['TinChi']),
       conduct: _d(json['conduct'] ?? json['DiemRL']),
     );
   }

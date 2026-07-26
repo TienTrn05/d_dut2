@@ -21,7 +21,7 @@ class _SubjectFeesListState extends State<SubjectFeesList> {
 
   @override
   Widget build(BuildContext context) {
-    final totalCredits = widget.subjectFees.fold<int>(
+    final totalCredits = widget.subjectFees.fold<num>(
       0,
       (sum, item) => sum + (item.credits),
     );

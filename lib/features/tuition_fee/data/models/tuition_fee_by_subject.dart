@@ -1,7 +1,7 @@
 class TuitionFeeBySubject {
   final String subjectId;
   final String classId;
-  final int credits;
+  final double credits;
   final bool classType;
   final String className;
   final double tuitionFee;
@@ -21,7 +21,7 @@ class TuitionFeeBySubject {
     return TuitionFeeBySubject(
       subjectId: json['subjectId'] ?? '',
       classId: json['classId'] ?? '',
-      credits: _parseInt(json['credits']),
+      credits: _parseDouble(json['credits']),
       classType: json['classType'] == 1 || json['classType'] == true,
       className: json['className'] ?? '',
       tuitionFee: _parseDouble(json['tuitionFee']),
@@ -43,14 +43,6 @@ class TuitionFeeBySubject {
     if (value == null) return 0;
     if (value is num) return value.toDouble();
     if (value is String) return double.tryParse(value) ?? 0;
-    return 0;
-  }
-
-  static int _parseInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? 0;
     return 0;
   }
 }

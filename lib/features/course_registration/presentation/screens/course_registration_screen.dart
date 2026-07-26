@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,7 +6,6 @@ import '../../../../common/widgets/snackbar/custom_snackbar.dart';
 import '/common/extensions/font_sizes.dart';
 import '/common/extensions/custom_theme_extension.dart';
 import '/common/utils/getit_utils.dart';
-import '/common/routes/routes.dart';
 import '/features/auth/bloc/auth_bloc.dart';
 import '/features/auth/presentation/unauthorized_page.dart';
 
@@ -17,6 +17,7 @@ import '../containers/available_courses_view.dart';
 import '../containers/registered_courses_view.dart';
 import '../widgets/buttons/grade_button.dart';
 
+@RoutePage()
 class CourseRegistrationScreen extends StatelessWidget {
   const CourseRegistrationScreen({super.key});
 
@@ -99,8 +100,8 @@ class CourseRegistrationScreen extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 16.0),
                           child: GradeButton(
                             onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(Routes.courseRegistrationGrade);
+                              // Navigator.of(context)
+                              //     .pushNamed(Routes.courseRegistrationGrade);
                             },
                           ),
                         ),

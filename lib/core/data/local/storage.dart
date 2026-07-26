@@ -77,10 +77,22 @@ class Storage {
     throw Exception('Type not supported!');
   }
 
-  static Future<String?> _getSecure(String key) => _storage.read(key: key);
+  static Future<String?> _getSecure(String key) async {
+    try {
+      return await _storage.read(key: key);
+    } catch (e) {
+      await _storage.delete(key: key);
+      return null;
+    }
+  }
 
-  static Future<void> _setSecure(String key, String? val) =>
-      _storage.write(key: key, value: val);
+  static Future<void> _setSecure(String key, String? val) async {
+    try {
+      await _storage.write(key: key, value: val);
+    } catch (e) {
+      await _storage.delete(key: key);
+    }
+  }
 
   static String? get lang => _get(_Keys.lang);
 

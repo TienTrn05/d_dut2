@@ -4,7 +4,7 @@ import 'package:injectable/injectable.dart';
 @module
 abstract class ConversationModule {
   @Named('chatbotConversationHost')
-  String get chatbotConversationHost => "http://171.244.46.201:8080";
+  String get chatbotConversationHost => "https://api.mcanswers.ai";
   @Named('chatbotConversationJwt')
   String get chatbotConversationJwt => AppEnvironment.chatbotConversationJwt;
   @Named('chatbotConversationAPIKey')

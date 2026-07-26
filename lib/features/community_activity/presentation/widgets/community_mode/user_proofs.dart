@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/common/extensions/custom_theme_extension.dart';
 import 'package:e_dut/common/extensions/font_sizes.dart';
-import 'package:e_dut/common/routes/routes.dart';
 import 'package:e_dut/common/widgets/loading/loading_progress_bar.dart';
 import 'package:e_dut/common/widgets/modal/bottom_modal.dart';
+import 'package:e_dut/features/app/app_router.dart';
 import 'package:e_dut/features/auth/bloc/auth_bloc.dart';
 import 'package:e_dut/features/community_activity/bloc/community_activity/community_activity_bloc.dart';
 import 'package:e_dut/features/community_activity/constant/user_proof_status.dart';
@@ -289,11 +290,10 @@ class _UserProofsState extends State<UserProofs> {
                                                   status:
                                                       proof.userActivity.status,
                                                   onPressed: () {
-                                                    Navigator.of(
-                                                      context,
-                                                    ).pushNamed(
-                                                      Routes.detailUserProof,
-                                                      arguments: proof,
+                                                    context.router.push(
+                                                      DetailUserProofRoute(
+                                                        userProof: proof,
+                                                      ),
                                                     );
                                                   },
                                                 ),

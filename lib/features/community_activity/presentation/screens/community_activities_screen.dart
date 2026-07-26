@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:e_dut/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,7 @@ import '../widgets/community_mode/all_activities.dart';
 import '../widgets/community_mode/user_activities.dart';
 import '../widgets/community_mode/user_proofs.dart';
 
+@RoutePage()
 class CommunityActivitiesScreen extends StatefulWidget {
   const CommunityActivitiesScreen({super.key});
 
