@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>dDUT · Cổng sinh viên</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Đại học Bách khoa · Đại học Đà Nẵng</p>
+        <h1>dDUT · Cổng sinh viên</h1>
+        <p class="subtitle">
+          Đăng nhập bằng tài khoản Microsoft của trường. Web nhận accessToken
+          từ DUT SSO và giữ phiên trong tab này. Bạn có thể đổi thêm token để
+          kiểm tra hệ thống đăng ký tín chỉ.
+        </p>
+      </section>
+
+      <section class="card" aria-labelledby="token-title">
+        <span class="label">Test auth</span>
+        <h2 id="token-title">Nhận accessToken</h2>
+        <p id="token-status" role="status">Dán accessToken hoặc đăng nhập SSO để tự điền token vào form.</p>
+        <form id="token-form" class="notification-form">
+          <label for="access-token">Access token
+            <input id="access-token" name="accessToken" type="password" autocomplete="off" spellcheck="false" maxlength="16384" required aria-describedby="token-status" placeholder="Nhập accessToken tại đây" />
+          </label>
+          <div class="actions">
+            <button id="token-submit" class="button primary" type="submit">Dùng token này</button>
+            <button id="token-toggle" class="button secondary" type="button" aria-controls="access-token" aria-pressed="false">Hiện token</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card portal" aria-labelledby="portal-title">
+        <div class="section-heading">
+          <div><span class="label">Dữ liệu từ hệ thống DUT</span><h2 id="portal-title">Không gian học tập của bạn</h2></div>
+          <button id="portal-load" class="button primary" type="button">Tải dữ liệu của tôi</button>
+        </div>
+        <p id="portal-status" role="status">Đăng nhập SSO ở bên dưới, sau đó tải dữ liệu.</p>
+        <div class="portal-filters">
+          <label>Vai trò<select id="portal-role"><option value="Student">Sinh viên</option><option value="Teacher">Giảng viên</option></select></label>
+          <label>Ngày xem lịch<input id="portal-date" type="date" required /></label>
+          <label>Học kỳ<select id="portal-semester"><option value="">Tải dữ liệu để chọn học kỳ</option></select></label>
+        </div>
+        <nav id="portal-nav" class="portal-nav" aria-label="Chức năng"></nav>
+        <div id="portal-content" aria-live="polite"></div>
+        <details class="portal-debug"><summary>Kiểm tra token qua Microsoft/me</summary>
+          <p>Dùng khi callback trả token Microsoft cần đổi sang token ứng dụng, theo luồng trong lib. Nếu token hiện tại đã gọi được API, bạn không cần bước này.</p>
+          <button id="portal-me" class="button secondary" type="button">Gọi Microsoft/me</button>
+        </details>
+      </section>
+
+      <section id="notifications" class="card" aria-labelledby="notifications-title">
+        <div class="section-heading">
+          <div><span class="label">dDUT Notification</span><h2 id="notifications-title">Thông báo</h2></div>
+          <button id="notification-verify" class="button secondary" type="button">Xác minh token SSO</button>
+        </div>
+        <p id="notification-status" role="status">Đăng nhập SSO, sau đó tải thông báo.</p>
+        <nav class="portal-nav" aria-label="Loại thông báo">
+          <button id="notification-personal" type="button">Thông báo của tôi</button>
+          <button id="notification-general" type="button">Thông báo chung</button>
+        </nav>
+        <div class="actions">
+          <button id="notification-refresh" class="button primary" type="button">Tải thông báo</button>
+          <button id="notification-more" class="button secondary" type="button" disabled>Xem thêm</button>
+        </div>
+        <div id="notification-list" aria-live="polite"></div>
+        <details class="portal-debug">
+          <summary>Gửi thông báo</summary>
+          <form id="notification-send" class="notification-form">
+            <label>userId người nhận<textarea id="notification-recipients" rows="2" required placeholder="Một hoặc nhiều userId, cách nhau bằng dấu phẩy hoặc xuống dòng"></textarea></label>
+            <label>Tiêu đề<input id="notification-title" required /></label>
+            <label>Nội dung<textarea id="notification-body" rows="4" required></textarea></label>
+            <label>Liên kết (tùy chọn)<input id="notification-link" type="url" /></label>
+            <label>notiTimeTableId (tùy chọn)<input id="notification-timetable" /></label>
+            <button class="button primary" type="submit">Gửi thông báo</button>
+          </form>
+        </details>
+        <details class="portal-debug">
+          <summary>Đăng ký FCM token</summary>
+          <p>Nhập FCM token đã có của thiết bị cần nhận push cho tài khoản hiện tại.</p>
+          <form id="notification-register" class="notification-form">
+            <label>FCM token<input id="notification-fcm" type="password" autocomplete="off" required /></label>
+            <button class="button secondary" type="submit">Đăng ký thiết bị</button>
+          </form>
+        </details>
+        <details class="portal-debug">
+          <summary>Cài đặt thông báo hàng đợi</summary>
+          <div class="notification-form">
+            <label>userId để xem cài đặt<input id="notification-user-id" /></label>
+            <button id="notification-queue-get" class="button secondary" type="button">Xem số lượt còn lại</button>
+          </div>
+          <form id="notification-queue" class="notification-form">
+            <label>Nhắc khi còn số lượt (tài khoản hiện tại)<input id="notification-remain-turn" type="number" min="0" step="1" value="3" required /></label>
+            <button class="button secondary" type="submit">Lưu cài đặt</button>
+          </form>
+        </details>
+        <details class="portal-debug"><summary>Xem phản hồi notification</summary><pre id="notification-result"></pre></details>
+      </section>
+
+      <section class="card config-card">
+        <div>
+          <span class="label">DUT SSO</span>
+          <code id="sso-base-url"></code>
+        </div>
+        <div>
+          <span class="label">Course Registration API</span>
+          <code id="course-api-url"></code>
+        </div>
+        <div>
+          <span class="label">Callback local của web test</span>
+          <code id="callback-uri"></code>
+        </div>
+        <div>
+          <span class="label">Cơ chế phiên</span>
+          <code>SSO accessToken trong sessionStorage</code>
+        </div>
+      </section>
+
+      <section id="notice" class="notice" role="status"></section>
+
+      <section class="actions" aria-label="Thao tác xác thực">
+        <button id="login-button" class="button primary" type="button">
+          Đăng nhập qua DUT SSO
+        </button>
+        <button id="exchange-button" class="button secondary" type="button" disabled>
+          Đổi token Course Registration
+        </button>
+        <button id="profile-button" class="button secondary" type="button" disabled>
+          Gọi Account/profile
+        </button>
+        <button id="logout-button" class="button danger" type="button" disabled>
+          Đăng xuất
+        </button>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <span class="label">Trạng thái</span>
+            <h2 id="status-title">Đang khởi tạo…</h2>
+          </div>
+          <span id="status-dot" class="status-dot waiting"></span>
+        </div>
+        <pre id="result">Chưa có dữ liệu.</pre>
+      </section>
+
+      <section class="card instructions">
+        <h2>Điều kiện để test local</h2>
+        <p>
+          Mở web bằng <code>npm run dev</code>, sau đó chọn “Đăng nhập qua DUT SSO”.
+          Đăng nhập thành công khi callback nhận được <code>accessToken</code>.
+          Bước đổi Course JWT là tùy chọn và cần tài khoản được backend đăng ký tín chỉ hỗ trợ.
+          Vite chuyển tiếp request
+          <code>/course-api/*</code> đến backend thật tại
+          <code>https://dangkytinchi.dut.udn.vn</code>. Đổi Course JWT có thể làm
+          phiên cũ của cùng tài khoản hết hiệu lực do cơ chế ActiveToken.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/portal.js"></script>
+    <script type="module" src="/src/notifications.js"></script>
+  </body>
+</html>

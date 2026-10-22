@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "dDUT - GET General Notifications",
+    "description": "Import vào Postman. Điền access_token (không kèm Bearer) và api_key trong Variables trước khi gửi. Bật lastVisible và điền ID thông báo cuối để lấy trang tiếp theo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://notifications.dut.udn.vn",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "limit",
+      "value": "10",
+      "type": "string"
+    },
+    {
+      "key": "lastVisible",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET /api/notifications/general",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{access_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/notifications/general?limit={{limit}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "notifications", "general"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "{{limit}}"
+            },
+            {
+              "key": "lastVisible",
+              "value": "{{lastVisible}}",
+              "disabled": true,
+              "description": "Tùy chọn: ID thông báo cuối của trang trước."
+            }
+          ]
+        },
+        "description": "Lấy thông báo chung từ backend DUT. Danh sách thông báo nằm trong data.notifications."
+      },
+      "response": []
+    }
+  ]
+}
